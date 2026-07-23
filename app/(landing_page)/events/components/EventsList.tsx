@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import Image from "next/image";
 import {
   Calendar,
   MapPin,
@@ -168,18 +167,19 @@ export default function EventsList() {
                     >
                       {/* Image Section */}
                       <div className="relative aspect-16/10 overflow-hidden bg-white/5">
-                        <Image
+                        <img
                           src={
                             event.coverImageUrl ||
                             "/images/landing/hero-car.png"
                           }
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                           alt={event.title}
-                          fill
-                          className="object-cover transition-transform duration-700 group-hover:scale-105"
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                          unoptimized
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src =
+                              "/images/landing/hero-car.png";
+                          }}
                         />
-                        <div className="absolute top-6 left-6 z-10">
+                        <div className="absolute top-6 left-6">
                           <span className="px-4 py-1.5 bg-[#4ADE80]/20 backdrop-blur-md border border-[#4ADE80]/30 text-[#4ADE80] text-[10px] font-bold uppercase tracking-[0.2em] rounded-full">
                             {event.status || "UPCOMING"}
                           </span>
@@ -202,7 +202,6 @@ export default function EventsList() {
                             <ArrowUpRight className="w-6 h-6" />
                           </div>
                         </div>
-
                         <div className="pt-6 border-t border-white/5 flex flex-wrap gap-x-8 gap-y-4 mt-auto">
                           <div className="flex items-center gap-2 text-[#E0E0E0] text-[16px] font-medium tracking-wide">
                             <Calendar className="w-4 h-4 text-primary/60" />

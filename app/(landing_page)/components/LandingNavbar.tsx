@@ -43,6 +43,7 @@ const NAV_LINKS: NavLink[] = [
 ];
 
 export default function LandingNavbar() {
+  const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -52,11 +53,15 @@ export default function LandingNavbar() {
   const pathname = usePathname();
   const router = useRouter();
 
-  const { user: storeUser, isAuthenticated } = useAuthStore();
+  const { user: storeUser, token: storeToken, isAuthenticated } = useAuthStore();
   const logoutMutation = useLogoutMutation();
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Fetch user profile via TanStack Query
-  const hasToken = !!(Cookies.get("access_token") || useAuthStore.getState().token);
+  const hasToken = mounted && !!(Cookies.get("access_token") || storeToken);
   const { data: userProfile, isLoading: isUserLoading } = useGetMeQuery(hasToken);
 
   const user = userProfile || storeUser;
@@ -200,7 +205,22 @@ export default function LandingNavbar() {
 
         {/* Desktop Auth */}
         <div className="hidden lg:flex items-center gap-6">
-          {isLoading ? (
+          {!mounted ? (
+            <>
+              <Link
+                href="/login"
+                className="text-sm font-normal text-white/80 font-montserrat hover:text-white transition-colors"
+              >
+                Log in
+              </Link>
+              <Link
+                href="/register"
+                className="px-6 py-2.5 rounded-sm font-montserrat border border-land text-land text-sm font-normal hover:bg-primary hover:text-black transition-all duration-300"
+              >
+                Register
+              </Link>
+            </>
+          ) : isLoading ? (
             /* Skeleton Loading State */
             <div className="flex items-center gap-3 py-1.5 px-3.5 rounded-full bg-white/5 border border-white/10 animate-pulse">
               <div className="w-8 h-8 rounded-full bg-white/20" />
@@ -412,7 +432,24 @@ export default function LandingNavbar() {
               <div className="h-px bg-white/10 my-2" />
 
               {/* Mobile Auth Section */}
-              {isLoading ? (
+              {!mounted ? (
+                <>
+                  <Link
+                    href="/login"
+                    className="text-lg font-medium text-white/90"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Log in
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="px-6 py-3 rounded-sm border border-primary text-primary text-center font-semibold"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Register
+                  </Link>
+                </>
+              ) : isLoading ? (
                 <div className="flex items-center gap-3 p-4 rounded-md bg-white/5 animate-pulse">
                   <div className="w-10 h-10 rounded-full bg-white/20" />
                   <div className="flex flex-col gap-2">
