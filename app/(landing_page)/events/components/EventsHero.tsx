@@ -1,11 +1,10 @@
 "use client";
 
-import React from "react";
 import { motion } from "framer-motion";
 
 export default function EventsHero() {
   return (
-    <section className="relative h-screen min-h-[600px] w-full overflow-hidden flex flex-col justify-center">
+    <section className="relative h-screen min-h-150 w-full overflow-hidden flex flex-col justify-center">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img
@@ -14,8 +13,8 @@ export default function EventsHero() {
           alt="Luxury Events"
         />
         {/* Cinema-grade Dark Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent z-[1]" />
-        <div className="absolute inset-0 bg-black/20 z-[1]" />
+        <div className="absolute inset-0 bg-linear-to-r from-black via-black/80 to-transparent z-1" />
+        <div className="absolute inset-0 bg-black/20 z-1" />
       </div>
 
       {/* Content */}
@@ -25,34 +24,36 @@ export default function EventsHero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-primary text-sm md:text-base font-bold tracking-[0.4em] uppercase"
+            className="text-primary font-montserrat text-sm md:text-[24px] font-normal   uppercase"
           >
-            LUXURY EVENTS
+            Exclusive Gatherings
           </motion.h4>
-          
+
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-4xl md:text-7xl lg:text-8xl font-serif text-white leading-tight"
+            className="text-4xl   lg:text-[56px] font-serif text-white leading-tight"
           >
-            Extraordinary <br />
-            <span className="italic">Experiences</span>
+            Events & Media
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-white/70 text-lg md:text-xl max-w-3xl leading-relaxed"
+            className="text-white/70 text-lg md:text-[24px] max-w-3xl leading-relaxed"
           >
-            From Exclusive Yacht Parties In Monaco To Private Aviation Summits—Our Events Are Curated To Connect The World&apos;s Most Discerning Individuals In Unparalleled Settings.
+            From intimate VIP gatherings to world-class automotive concours,
+            ExoticWorld curates the most exclusive events in the luxury asset
+            world. Each experience is thoughtfully designed to bring together
+            collectors,
           </motion.p>
         </div>
       </div>
-      
+
       {/* Decorative Bottom Bar */}
-      <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent z-10" />
+      <div className="absolute bottom-0 left-0 w-full h-px bg-linear-to-r from-transparent via-primary/30 to-transparent z-10" />
     </section>
   );
 }
