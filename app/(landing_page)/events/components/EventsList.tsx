@@ -12,9 +12,10 @@ import { Calendar, MapPin, ArrowUpRight } from "lucide-react";
 export default function EventsList() {
   const [activeTab, setActiveTab] = useState("ALL");
 
-  const filteredEvents = activeTab === "ALL" 
-    ? EVENTS_DATA 
-    : EVENTS_DATA.filter(e => e.category === activeTab);
+  const filteredEvents =
+    activeTab === "ALL"
+      ? EVENTS_DATA
+      : EVENTS_DATA.filter((e) => e.category === activeTab);
 
   return (
     <section className="py-24 bg-black px-6 md:px-12">
@@ -52,7 +53,7 @@ export default function EventsList() {
                   className="group bg-[#0A0A0A] rounded-xl overflow-hidden border border-white/5 hover:border-white/10 transition-all duration-500 h-full flex flex-col"
                 >
                   {/* Image Section */}
-                  <div className="relative aspect-[16/10] overflow-hidden">
+                  <div className="relative aspect-16/10 overflow-hidden">
                     <img
                       src={event.image}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -76,7 +77,7 @@ export default function EventsList() {
                           {event.title}
                         </h3>
                       </div>
-                      
+
                       <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-black group-hover:bg-white group-hover:scale-110 transition-all shadow-lg mt-2">
                         <ArrowUpRight className="w-6 h-6" />
                       </div>

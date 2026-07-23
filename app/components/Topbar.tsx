@@ -1,12 +1,32 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Search, Bell, ChevronDown, Menu, User, Settings, LogOut, Shield } from "lucide-react";
+import { Search, Bell, ChevronDown, Menu, User as UserIcon, Settings, LogOut, Shield, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLogoutMutation } from "@/hooks/useAuth";
+import { useAuthStore } from "@/lib/store/useAuthStore";
 
 export default function Topbar({ setIsSidebarOpen }: { setIsSidebarOpen: (open: boolean) => void }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const logoutMutation = useLogoutMutation();
+  const { user } = useAuthStore();
+
+  const displayName =
+    user?.name ||
+    [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
+    user?.email?.split("@")[0] ||
+    "User";
+
+  const avatarSrc =
+    user?.avatar ||
+    user?.avatarUrl ||
+    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80";
+
+  const handleLogout = () => {
+    setIsDropdownOpen(false);
+    logoutMutation.mutate();
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -20,7 +40,7 @@ export default function Topbar({ setIsSidebarOpen }: { setIsSidebarOpen: (open: 
   }, []);
 
   const menuItems = [
-    { icon: User, label: "View Profile", desc: "Your personal details" },
+    { icon: UserIcon, label: "View Profile", desc: "Your personal details" },
     { icon: Settings, label: "Settings", desc: "Account preferences" },
     { icon: Shield, label: "Security", desc: "Privacy & security" },
   ];
@@ -63,12 +83,14 @@ export default function Topbar({ setIsSidebarOpen }: { setIsSidebarOpen: (open: 
           >
             <div className="w-8 h-8 lg:w-9 lg:h-9 rounded-full overflow-hidden bg-gray-600 border ring-2 ring-[#E78F23]/20 border-transparent shadow-lg object-cover">
               <img
-                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                src={avatarSrc}
                 alt="Avatar"
                 className="w-full h-full object-cover"
               />
             </div>
-            <span className="hidden sm:block text-sm font-medium text-[#E78F23]">Alexander</span>
+            <span className="hidden sm:block text-sm font-medium text-[#E78F23] max-w-[120px] truncate">
+              {displayName}
+            </span>
             <motion.div
               animate={{ rotate: isDropdownOpen ? 180 : 0 }}
               transition={{ duration: 0.3 }}
@@ -87,8 +109,17 @@ export default function Topbar({ setIsSidebarOpen }: { setIsSidebarOpen: (open: 
                 className="absolute right-0 mt-4 w-64 bg-[#18181A] border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden z-50 p-2"
               >
                 <div className="px-4 py-3 border-b border-white/5 mb-1">
-                  <p className="text-xs text-gray-500 font-medium">Signed in as</p>
-                  <p className="text-sm font-semibold text-white/90 truncate">alexander@example.com</p>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs text-gray-500 font-medium">Signed in as</p>
+                    {user?.role && (
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#E78F23]/20 text-[#E78F23] border border-[#E78F23]/30 uppercase">
+                        {user.role}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm font-semibold text-white/90 truncate mt-0.5">
+                    {user?.email || "guest@example.com"}
+                  </p>
                 </div>
 
                 <div className="space-y-0.5">
@@ -109,12 +140,22 @@ export default function Topbar({ setIsSidebarOpen }: { setIsSidebarOpen: (open: 
                 </div>
 
                 <div className="mt-1 pt-1 border-t border-white/5">
-                  <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all group group-hover:translate-x-1">
+                  <button
+                    onClick={handleLogout}
+                    disabled={logoutMutation.isPending}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
                     <div className="p-2 rounded-lg bg-red-500/10 transition-colors">
-                      <LogOut className="w-4 h-4" />
+                      {logoutMutation.isPending ? (
+                        <Loader2 className="w-4 h-4 animate-spin text-red-400" />
+                      ) : (
+                        <LogOut className="w-4 h-4" />
+                      )}
                     </div>
                     <div className="text-left">
-                      <p className="text-sm font-medium leading-none">Logout</p>
+                      <p className="text-sm font-medium leading-none">
+                        {logoutMutation.isPending ? "Logging out..." : "Logout"}
+                      </p>
                       <p className="text-[10px] text-red-500/50 mt-1">Exit application</p>
                     </div>
                   </button>
@@ -127,4 +168,3 @@ export default function Topbar({ setIsSidebarOpen }: { setIsSidebarOpen: (open: 
     </header>
   );
 }
-
