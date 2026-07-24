@@ -32,7 +32,17 @@ export interface GetEventsParams {
   page?: number;
   limit?: number;
   category?: string;
+  status?: string;
   search?: string;
+}
+
+export interface CreateEventInput {
+  title: string;
+  category: string;
+  description: string;
+  eventDate: string;
+  location: string;
+  coverImageUrl?: string;
 }
 
 export const getEventsApi = async (params?: GetEventsParams): Promise<EventsResponse> => {
@@ -41,6 +51,7 @@ export const getEventsApi = async (params?: GetEventsParams): Promise<EventsResp
       page: params?.page ?? 1,
       limit: params?.limit ?? 10,
       ...(params?.category && params.category !== "ALL" ? { category: params.category } : {}),
+      ...(params?.status && params.status !== "ALL" ? { status: params.status } : {}),
       ...(params?.search ? { search: params.search } : {}),
     },
   });
@@ -50,4 +61,13 @@ export const getEventsApi = async (params?: GetEventsParams): Promise<EventsResp
 export const getEventByIdApi = async (id: string): Promise<EventItem> => {
   const response = await apiClient.get<EventItem>(`/events/${id}`);
   return response.data;
+};
+
+export const createEventApi = async (data: CreateEventInput): Promise<EventItem> => {
+  const response = await apiClient.post<EventItem>("/events", data);
+  return response.data;
+};
+
+export const deleteEventApi = async (id: string): Promise<void> => {
+  await apiClient.delete(`/events/${id}`);
 };

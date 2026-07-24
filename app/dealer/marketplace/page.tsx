@@ -1,4 +1,4 @@
- "use client";
+"use client";
 
 import React, { useState } from "react";
 import { Eye, MapPin, ChevronDown, RotateCcw, Filter, X } from "lucide-react";
@@ -10,6 +10,7 @@ const categories = ["All", "Car", "Yacht", "Jet", "Real Estate", "Watch"];
 
 interface Asset {
   id: number;
+  slug?: string;
   image: string;
   title: string;
   location: string;
@@ -320,7 +321,7 @@ export default function MarketplacePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {filteredAssets.map((asset, index) => (
               <AnimationWrapper key={asset.id} type="fade-up" duration={0.5} delay={0.05 * (index % 3)}>
-                <Link href={`/buyer/marketplace/${asset.id}`}>
+                <Link href={`/buyer/marketplace/${asset.slug || asset.id}`}>
                   <MarketplaceCard asset={asset} />
                 </Link>
               </AnimationWrapper>
@@ -385,11 +386,10 @@ function FilterSidebar({
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`text-left px-3 sm:px-4 py-2 rounded-lg text-sm transition-all ${
-                activeCategory === cat
-                  ? "bg-[#2C2C2E] text-white font-medium"
-                  : "text-gray-500 hover:text-gray-300"
-              }`}
+              className={`text-left px-3 sm:px-4 py-2 rounded-lg text-sm transition-all ${activeCategory === cat
+                ? "bg-[#2C2C2E] text-white font-medium"
+                : "text-gray-500 hover:text-gray-300"
+                }`}
             >
               {cat}
             </button>

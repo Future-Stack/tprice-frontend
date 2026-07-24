@@ -1,5 +1,14 @@
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import { getEventsApi, getEventByIdApi, GetEventsParams, EventsResponse, EventItem } from "@/lib/api/events";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
+import {
+  getEventsApi,
+  getEventByIdApi,
+  createEventApi,
+  deleteEventApi,
+  GetEventsParams,
+  EventsResponse,
+  EventItem,
+  CreateEventInput,
+} from "@/lib/api/events";
 
 export const EVENTS_QUERY_KEYS = {
   all: ["events"] as const,
@@ -30,5 +39,31 @@ export const useGetEventByIdQuery = (id: string) => {
     enabled: Boolean(id),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
+  });
+};
+
+/**
+ * Hook to create a new event
+ */
+export const useCreateEventMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: CreateEventInput) => createEventApi(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: EVENTS_QUERY_KEYS.all });
+    },
+  });
+};
+
+/**
+ * Hook to delete an event
+ */
+export const useDeleteEventMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteEventApi(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: EVENTS_QUERY_KEYS.all });
+    },
   });
 };

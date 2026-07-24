@@ -2,13 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import {
-  Search,
-  SlidersHorizontal,
-  Eye,
-  MoreVertical,
-  Plus
-} from "lucide-react";
+import { Search, SlidersHorizontal, Eye, MoreVertical } from "lucide-react";
 import AnimationWrapper from "../../components/AnimationWrapper";
 
 const listings = [
@@ -30,7 +24,8 @@ const listings = [
     price: "$6,500,000",
     status: "Live",
     engagement: "8,320",
-    image: "https://images.unsplash.com/photo-1567899539078-4e8586b39da7?auto=format&fit=crop&q=80&w=300&h=200",
+    image:
+      "https://images.unsplash.com/photo-1567899539078-4e8586b39da7?auto=format&fit=crop&q=80&w=300&h=200",
   },
   {
     id: "LST-003",
@@ -40,7 +35,8 @@ const listings = [
     price: "$32,500",
     status: "Pending",
     engagement: "0",
-    image: "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?auto=format&fit=crop&q=80&w=300&h=200",
+    image:
+      "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?auto=format&fit=crop&q=80&w=300&h=200",
   },
   {
     id: "LST-004",
@@ -50,7 +46,8 @@ const listings = [
     price: "$14,000,000",
     status: "Sold",
     engagement: "12,450",
-    image: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&q=80&w=300&h=200",
+    image:
+      "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&q=80&w=300&h=200",
   },
   {
     id: "LST-005",
@@ -60,7 +57,8 @@ const listings = [
     price: "$72,000,000",
     status: "Rejected",
     engagement: "0",
-    image: "https://images.unsplash.com/photo-1540962351504-03099e0a754b?auto=format&fit=crop&q=80&w=300&h=200",
+    image:
+      "https://images.unsplash.com/photo-1540962351504-03099e0a754b?auto=format&fit=crop&q=80&w=300&h=200",
   },
 ];
 
@@ -81,11 +79,13 @@ const getStatusStyles = (status: string) => {
 
 const SellerListing = () => {
   return (
-    <div className="w-full max-w-350 mx-auto space-y-10 pb-10">
+    <div className="w-full mx-auto space-y-10 pb-10">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <AnimationWrapper type="fade-down">
-          <h1 className="text-4xl font-medium font-clash tracking-tight text-white">My Listings</h1>
+          <h1 className="text-4xl font-medium font-clash tracking-tight text-white">
+            My Listings
+          </h1>
         </AnimationWrapper>
 
         <AnimationWrapper type="fade-down" delay={0.1}>
@@ -114,7 +114,8 @@ const SellerListing = () => {
                 <span>Filters</span>
               </button>
               <span className="text-gray-400 font-medium text-sm whitespace-nowrap">
-                Showing <span className="text-white font-bold text-lg">5</span> items
+                Showing <span className="text-white font-bold text-lg">5</span>{" "}
+                items
               </span>
             </div>
           </div>
@@ -130,17 +131,32 @@ const SellerListing = () => {
               <table className="w-full text-left border-collapse min-w-250">
                 <thead>
                   <tr className="border-b border-[#1F1F1F]">
-                    <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500">Item</th>
-                    <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500">Category</th>
-                    <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500">Price</th>
-                    <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500">Status</th>
-                    <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500">Engagement</th>
-                    <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500 text-right">Actions</th>
+                    <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-[0.2em] text-white">
+                      Item
+                    </th>
+                    <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-[0.2em] text-white">
+                      Category
+                    </th>
+                    <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-[0.2em] text-white">
+                      Price
+                    </th>
+                    <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-[0.2em] text-white">
+                      Status
+                    </th>
+                    <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-[0.2em] text-white">
+                      Engagement
+                    </th>
+                    <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-[0.2em] text-white text-right">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#1F1F1F]">
                   {listings.map((item, idx) => (
-                    <tr key={item.id} className="hover:bg-white/3 transition-all duration-300 group">
+                    <tr
+                      key={item.id}
+                      className="hover:bg-white/3 transition-all duration-300 group"
+                    >
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-5">
                           <div className="relative w-24 h-16 rounded-xl overflow-hidden shrink-0 bg-[#1A1A1A] border border-[#2D2D2D] transition-transform duration-300 group-hover:scale-105">
@@ -152,17 +168,26 @@ const SellerListing = () => {
                             />
                           </div>
                           <div className="min-w-0">
-                            <p className="text-base font-bold text-white group-hover:text-[#E78F23] transition-colors duration-300 truncate">{item.name}</p>
+                            <p className="text-base font-bold text-white group-hover:text-[#E78F23] transition-colors duration-300 truncate">
+                              {item.name}
+                            </p>
                             <p className="text-[12px] text-gray-500 mt-1 font-medium">
-                              {item.id} <span className="mx-1.5">•</span> Added {item.dateAdded}
+                              {item.id} <span className="mx-1.5">•</span> Added{" "}
+                              {item.dateAdded}
                             </p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-8 py-6 text-sm text-gray-400 font-medium">{item.category}</td>
-                      <td className="px-8 py-6 text-lg font-extrabold text-white">{item.price}</td>
+                      <td className="px-8 py-6 text-sm text-gray-400 font-medium">
+                        {item.category}
+                      </td>
+                      <td className="px-8 py-6 text-lg font-extrabold text-white">
+                        {item.price}
+                      </td>
                       <td className="px-8 py-6">
-                        <span className={`px-4 py-1.5 text-[11px] font-bold rounded-full border tracking-wide inline-block ${getStatusStyles(item.status)}`}>
+                        <span
+                          className={`px-4 py-1.5 text-[11px] font-bold rounded-full border tracking-wide inline-block ${getStatusStyles(item.status)}`}
+                        >
                           {item.status}
                         </span>
                       </td>

@@ -1,339 +1,377 @@
- "use client";
+"use client";
 
 import React, { useState } from "react";
-import { Eye, MapPin, ChevronDown, RotateCcw, Filter, X } from "lucide-react";
+import { Eye, MapPin, ChevronDown, RotateCcw, Filter, X, Search, AlertTriangle, ChevronLeft, ChevronRight, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import AnimationWrapper from "../../components/AnimationWrapper";
+import { useListingsQuery } from "@/hooks/useListings";
+import { useDebounce } from "@/hooks/useDebounce";
+import { ListingItem } from "@/lib/api/listings";
 
-/* ─── Data (unchanged) ─── */
-const categories = ["All", "Car", "Yacht", "Jet", "Real Estate", "Watch"];
-
-interface Asset {
-  id: number;
-  image: string;
-  title: string;
-  location: string;
-  price: string;
-  category: string;
-  type?: string;
-  model?: string;
-  year?: number;
-  priceValue: number;
-}
-
-const assets: Asset[] = [
-  {
-    id: 1,
-    image: "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&q=80&w=800",
-    title: "Ferrari 488 Spider",
-    location: "Monaco",
-    price: "$295,000",
-    category: "Car",
-    type: "Sport",
-    model: "Ferrari",
-    year: 2022,
-    priceValue: 295000,
-  },
-  {
-    id: 2,
-    image: "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?auto=format&fit=crop&q=80&w=800",
-    title: "Azimut Grande 27M",
-    location: "Monaco",
-    price: "$295,000",
-    category: "Yacht",
-    type: "Yacht",
-    model: "Volvo",
-    year: 2021,
-    priceValue: 295000,
-  },
-  {
-    id: 3,
-    image: "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?auto=format&fit=crop&q=80&w=800",
-    title: "Rolex Daytona 116S",
-    location: "Monaco",
-    price: "$295,000",
-    category: "Watch",
-    type: "Luxury",
-    model: "Rolex",
-    year: 2023,
-    priceValue: 295000,
-  },
-  {
-    id: 4,
-    image: "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?auto=format&fit=crop&q=80&w=800",
-    title: "Azimut Grande 27M",
-    location: "Monaco",
-    price: "$295,000",
-    category: "Yacht",
-    type: "Yacht",
-    model: "Azimut",
-    year: 2020,
-    priceValue: 295000,
-  },
-  {
-    id: 5,
-    image: "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?auto=format&fit=crop&q=80&w=800",
-    title: "Rolex Daytona 116S",
-    location: "Monaco",
-    price: "$295,000",
-    category: "Watch",
-    type: "Sport",
-    model: "Rolex",
-    year: 2022,
-    priceValue: 295000,
-  },
-  {
-    id: 6,
-    image: "https://images.unsplash.com/photo-1540962351504-03099e0a754b?auto=format&fit=crop&q=80&w=800",
-    title: "Gulfstream G650ER",
-    location: "Monaco",
-    price: "$295,000",
-    category: "Jet",
-    type: "Private Jet",
-    model: "Gulfstream",
-    year: 2019,
-    priceValue: 295000,
-  },
-  {
-    id: 7,
-    image: "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&q=80&w=800",
-    title: "Ferrari 488 Spider",
-    location: "Monaco",
-    price: "$295,000",
-    category: "Car",
-    type: "Convertible",
-    model: "Ferrari",
-    year: 2023,
-    priceValue: 295000,
-  },
-  {
-    id: 8,
-    image: "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?auto=format&fit=crop&q=80&w=800",
-    title: "Rolex Daytona 116S",
-    location: "Monaco",
-    price: "$295,000",
-    category: "Watch",
-    type: "Casual",
-    model: "Rolex",
-    year: 2024,
-    priceValue: 295000,
-  },
-  {
-    id: 9,
-    image: "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?auto=format&fit=crop&q=80&w=800",
-    title: "Azimut Grande 27M",
-    location: "Monaco",
-    price: "$295,000",
-    category: "Yacht",
-    type: "Yacht",
-    model: "Azimut",
-    year: 2021,
-    priceValue: 295000,
-  },
-  {
-    id: 10,
-    image: "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?auto=format&fit=crop&q=80&w=800",
-    title: "Azimut Grande 27M",
-    location: "Monaco",
-    price: "$295,000",
-    category: "Yacht",
-    type: "Yacht",
-    model: "Azimut",
-    year: 2022,
-    priceValue: 295000,
-  },
-  {
-    id: 11,
-    image: "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?auto=format&fit=crop&q=80&w=800",
-    title: "Rolex Daytona 116S",
-    location: "Monaco",
-    price: "$295,000",
-    category: "Watch",
-    type: "Luxury",
-    model: "Rolex",
-    year: 2022,
-    priceValue: 295000,
-  },
-  {
-    id: 12,
-    image: "https://images.unsplash.com/photo-1540962351504-03099e0a754b?auto=format&fit=crop&q=80&w=800",
-    title: "Gulfstream G650ER",
-    location: "Monaco",
-    price: "$295,000",
-    category: "Jet",
-    type: "Private Jet",
-    model: "Gulfstream",
-    year: 2023,
-    priceValue: 295000,
-  },
+/* ─── Category Configuration ─── */
+const CATEGORIES = [
+  { label: "All", value: "ALL" },
+  { label: "Supercar", value: "SUPERCAR" },
+  { label: "Yacht", value: "YACHT" },
+  { label: "Jet", value: "JET" },
+  { label: "Real Estate", value: "REAL_ESTATE" },
+  { label: "Watch", value: "WATCH" },
 ];
 
-/* ─── Page Component ─── */
+const SORT_OPTIONS = [
+  { label: "Newest Listed", value: "newest" },
+  { label: "Price: Low to High", value: "price_asc" },
+  { label: "Price: High to Low", value: "price_desc" },
+  { label: "Oldest Listed", value: "oldest" },
+];
+
 export default function MarketplacePage() {
-  const [activeCategory, setActiveCategory] = useState("All");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  // Applied filters
-  const [appliedFilters, setAppliedFilters] = useState({
-    type: "All",
-    model: "All",
-    yearFrom: "2005",
-    yearTo: "2024",
-    priceMin: 12000,
-    priceMax: 500000
+  // Filter state
+  const [activeCategory, setActiveCategory] = useState("ALL");
+  const [search, setSearch] = useState("");
+  const [subCategory, setSubCategory] = useState("");
+  const [locationCity, setLocationCity] = useState("");
+  const [locationCountry, setLocationCountry] = useState("");
+  const [buildYear, setBuildYear] = useState("");
+  const [priceMin, setPriceMin] = useState<number>(0);
+  const [priceMax, setPriceMax] = useState<number>(100000000);
+  const [sortBy, setSortBy] = useState("newest");
+  const [page, setPage] = useState(1);
+  const limit = 9;
+
+  // Debounced inputs for smooth real-time onChange requests without spamming
+  const debouncedSearch = useDebounce(search, 400);
+  const debouncedCity = useDebounce(locationCity, 400);
+  const debouncedCountry = useDebounce(locationCountry, 400);
+  const debouncedBuildYear = useDebounce(buildYear, 400);
+  const debouncedPriceMin = useDebounce(priceMin, 400);
+  const debouncedPriceMax = useDebounce(priceMax, 400);
+
+  // Fetch listings using React Query
+  const { data, isLoading, isError, error, refetch, isFetching } = useListingsQuery({
+    category: activeCategory,
+    subCategory: subCategory || undefined,
+    search: debouncedSearch || undefined,
+    locationCity: debouncedCity || undefined,
+    locationCountry: debouncedCountry || undefined,
+    buildYear: debouncedBuildYear ? Number(debouncedBuildYear) : undefined,
+    minPrice: debouncedPriceMin > 0 ? debouncedPriceMin : undefined,
+    maxPrice: debouncedPriceMax < 100000000 ? debouncedPriceMax : undefined,
+    sortBy: sortBy,
+    page: page,
+    limit: limit,
   });
 
-  // Draft filters (for sidebar inputs)
-  const [draftFilters, setDraftFilters] = useState({ ...appliedFilters });
+  const listings = data?.data || [];
+  const meta = data?.meta;
 
-  const minLimit = 0;
-  const maxLimit = 500000;
-
-  const handleReset = () => {
-    setActiveCategory("All");
-    const resetValues = {
-      type: "All",
-      model: "All",
-      yearFrom: "2005",
-      yearTo: "2024",
-      priceMin: 12000,
-      priceMax: 500000
-    };
-    setDraftFilters(resetValues);
-    setAppliedFilters(resetValues);
+  const handleResetFilters = () => {
+    setActiveCategory("ALL");
+    setSearch("");
+    setSubCategory("");
+    setLocationCity("");
+    setLocationCountry("");
+    setBuildYear("");
+    setPriceMin(0);
+    setPriceMax(100000000);
+    setSortBy("newest");
+    setPage(1);
   };
 
-  const handleApply = () => {
-    setAppliedFilters({ ...draftFilters });
-    setIsFilterOpen(false); // close drawer on mobile after apply
+  const handleCategoryChange = (catValue: string) => {
+    setActiveCategory(catValue);
+    setPage(1);
   };
-
-  const filteredAssets = assets.filter((asset) => {
-    const categoryMatch = activeCategory === "All" || asset.category === activeCategory;
-    const typeMatch = appliedFilters.type === "All" || asset.type === appliedFilters.type;
-    const modelMatch = appliedFilters.model === "All" || asset.model === appliedFilters.model;
-    const yearMatch = (asset.year || 0) >= parseInt(appliedFilters.yearFrom) && (asset.year || 0) <= parseInt(appliedFilters.yearTo);
-    const priceMatch = asset.priceValue >= appliedFilters.priceMin && asset.priceValue <= appliedFilters.priceMax;
-
-    return categoryMatch && typeMatch && modelMatch && yearMatch && priceMatch;
-  });
 
   return (
     <div className="mx-auto relative z-0 px-4 sm:px-6 lg:px-8">
       {/* ── Page Header ── */}
-      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-6 lg:mb-10">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6 lg:mb-8">
         <AnimationWrapper type="fade-down" duration={0.5}>
           <div>
-            <h2 className="text-2xl sm:text-4xl font-clash font-medium tracking-wide">
+            <h2 className="text-2xl sm:text-4xl font-clash font-medium tracking-wide text-white">
               Exclusive Collection
             </h2>
-            <p className="text-gray-500 text-xs sm:text-sm mt-1 sm:mt-2 font-medium">
-              Discover the world&apos;s finest assets available for acquisition.
+            <p className="text-gray-400 text-xs sm:text-sm mt-1 sm:mt-2 font-medium">
+              Discover the world&apos;s finest luxury assets available for acquisition.
             </p>
           </div>
         </AnimationWrapper>
 
-        {/* Category Tabs - hidden on mobile, scrollable on small, normal on lg+ */}
-        <AnimationWrapper type="fade-down" duration={0.5} delay={0.1} >
+        {/* Category Tabs */}
+        <AnimationWrapper type="fade-down" duration={0.5} delay={0.1}>
           <div className="overflow-x-auto pb-1 -mx-4 px-4 lg:mx-0 lg:px-0">
             <div className="flex items-center gap-1.5 bg-[#18181A] border border-[#2C2C2E] rounded-full p-1.5 w-max">
-              {categories.map((cat) => (
+              {CATEGORIES.map((cat) => (
                 <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
-                  className={`px-4 sm:px-5 py-2 rounded-full text-[11px] sm:text-[13px] font-medium transition-all duration-200 whitespace-nowrap
-                    ${activeCategory === cat
-                      ? "bg-[#E78F23] text-white shadow-[0_2px_12px_rgba(231,143,35,0.4)]"
-                      : "text-gray-400 hover:text-white hover:bg-white/5"
+                  key={cat.value}
+                  onClick={() => handleCategoryChange(cat.value)}
+                  className={`px-4 sm:px-5 py-2 rounded-full text-[11px] sm:text-[13px] font-medium transition-all duration-200 whitespace-nowrap ${activeCategory === cat.value
+                    ? "bg-[#E78F23] text-white shadow-[0_2px_12px_rgba(231,143,35,0.4)]"
+                    : "text-gray-400 hover:text-white hover:bg-white/5"
                     }`}
                 >
-                  {cat}
+                  {cat.label}
                 </button>
               ))}
             </div>
           </div>
         </AnimationWrapper>
+      </div>
 
-        {/* Mobile Filter Button */}
-        <div className="lg:hidden">
+      {/* Search & Sort Bar */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-6 bg-[#1C1C1E] border border-[#2C2C2E] rounded-xl p-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+            placeholder="Search by title, make, or keyword..."
+            className="w-full pl-10 pr-4 py-2 bg-transparent text-sm text-white placeholder-gray-500 focus:outline-none"
+          />
+          {search && (
+            <button
+              onClick={() => {
+                setSearch("");
+                setPage(1);
+              }}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
+        <div className="flex items-center gap-3 justify-between sm:justify-end">
+          {/* Mobile Filter Toggle Button */}
           <button
             onClick={() => setIsFilterOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-[#18181A] border border-[#2C2C2E] rounded-full text-white text-sm font-medium"
+            className="lg:hidden flex items-center gap-2 px-4 py-2 bg-[#2C2C2E] hover:bg-[#3A3A3C] text-white rounded-lg text-xs font-semibold transition-colors"
           >
             <Filter className="w-4 h-4" />
             Filters
           </button>
+
+          {/* Sort By Dropdown */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-400 hidden sm:inline whitespace-nowrap">Sort by:</span>
+            <div className="relative">
+              <select
+                value={sortBy}
+                onChange={(e) => {
+                  setSortBy(e.target.value);
+                  setPage(1);
+                }}
+                className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-lg pl-3 pr-8 py-2 text-xs font-medium text-white appearance-none cursor-pointer focus:outline-none focus:border-[#E78F23]"
+              >
+                {SORT_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value} className="bg-[#1C1C1E] text-white">
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* ── Body: Filter Sidebar + Grid ── */}
+      {/* ── Main Layout: Sidebar + Card Grid ── */}
       <div className="flex gap-8">
-        {/* Desktop Sidebar (always visible on lg+) */}
-        <aside className="hidden lg:block w-75 shrink-0">
+        {/* Desktop Sidebar */}
+        <aside className="hidden lg:block w-72 shrink-0">
           <FilterSidebar
             activeCategory={activeCategory}
-            setActiveCategory={setActiveCategory}
-            draftFilters={draftFilters}
-            setDraftFilters={setDraftFilters}
-            handleReset={handleReset}
-            handleApply={handleApply}
-            minLimit={minLimit}
-            maxLimit={maxLimit}
+            setActiveCategory={(cat) => {
+              setActiveCategory(cat);
+              setPage(1);
+            }}
+            subCategory={subCategory}
+            setSubCategory={(val) => {
+              setSubCategory(val);
+              setPage(1);
+            }}
+            locationCity={locationCity}
+            setLocationCity={(val) => {
+              setLocationCity(val);
+              setPage(1);
+            }}
+            locationCountry={locationCountry}
+            setLocationCountry={(val) => {
+              setLocationCountry(val);
+              setPage(1);
+            }}
+            buildYear={buildYear}
+            setBuildYear={(val) => {
+              setBuildYear(val);
+              setPage(1);
+            }}
+            priceMin={priceMin}
+            setPriceMin={(val) => {
+              setPriceMin(val);
+              setPage(1);
+            }}
+            priceMax={priceMax}
+            setPriceMax={(val) => {
+              setPriceMax(val);
+              setPage(1);
+            }}
+            handleResetFilters={handleResetFilters}
           />
         </aside>
 
-        {/* Mobile Filter Drawer (overlay) */}
+        {/* Mobile Drawer Overlay */}
         {isFilterOpen && (
           <div className="fixed inset-0 z-50 lg:hidden">
             <div
-              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
               onClick={() => setIsFilterOpen(false)}
             />
-            <div className="absolute right-0 top-0 h-full w-full max-w-[320px] bg-[#1C1C1E] shadow-xl overflow-y-auto">
-              <div className="sticky top-0 bg-[#1C1C1E] p-4 border-b border-[#2C2C2E] flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-white">Filters</h3>
+            <div className="absolute right-0 top-0 h-full w-full max-w-[340px] bg-[#1C1C1E] shadow-2xl overflow-y-auto">
+              <div className="sticky top-0 bg-[#1C1C1E] p-4 border-b border-[#2C2C2E] flex items-center justify-between z-10">
+                <h3 className="text-lg font-semibold text-white">Filter Listings</h3>
                 <button
                   onClick={() => setIsFilterOpen(false)}
-                  className="p-1.5 rounded-lg hover:bg-white/5"
+                  className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5"
                 >
-                  <X className="w-5 h-5 text-gray-400" />
+                  <X className="w-5 h-5" />
                 </button>
               </div>
-              <div className="p-6">
+              <div className="p-5">
                 <FilterSidebar
                   activeCategory={activeCategory}
-                  setActiveCategory={setActiveCategory}
-                  draftFilters={draftFilters}
-                  setDraftFilters={setDraftFilters}
-                  handleReset={handleReset}
-                  handleApply={handleApply}
-                  minLimit={minLimit}
-                  maxLimit={maxLimit}
+                  setActiveCategory={(cat) => {
+                    setActiveCategory(cat);
+                    setPage(1);
+                  }}
+                  subCategory={subCategory}
+                  setSubCategory={(val) => {
+                    setSubCategory(val);
+                    setPage(1);
+                  }}
+                  locationCity={locationCity}
+                  setLocationCity={(val) => {
+                    setLocationCity(val);
+                    setPage(1);
+                  }}
+                  locationCountry={locationCountry}
+                  setLocationCountry={(val) => {
+                    setLocationCountry(val);
+                    setPage(1);
+                  }}
+                  buildYear={buildYear}
+                  setBuildYear={(val) => {
+                    setBuildYear(val);
+                    setPage(1);
+                  }}
+                  priceMin={priceMin}
+                  setPriceMin={(val) => {
+                    setPriceMin(val);
+                    setPage(1);
+                  }}
+                  priceMax={priceMax}
+                  setPriceMax={(val) => {
+                    setPriceMax(val);
+                    setPage(1);
+                  }}
+                  handleResetFilters={handleResetFilters}
                 />
               </div>
             </div>
           </div>
         )}
 
-        {/* Product Grid */}
+        {/* Product Grid Area */}
         <div className="flex-1 min-w-0">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {filteredAssets.map((asset, index) => (
-              <AnimationWrapper key={asset.id} type="fade-up" duration={0.5} delay={0.05 * (index % 3)}>
-                <Link href={`/buyer/marketplace/${asset.id}`}>
-                  <MarketplaceCard asset={asset} />
-                </Link>
-              </AnimationWrapper>
-            ))}
-          </div>
+          {/* Error State */}
+          {isError && (
+            <div className="bg-[#2A1616] border border-red-500/30 rounded-2xl p-6 mb-8 text-center">
+              <AlertTriangle className="w-10 h-10 text-red-400 mx-auto mb-3" />
+              <h3 className="text-lg font-semibold text-white mb-1">Failed to load listings</h3>
+              <p className="text-sm text-gray-400 mb-4">
+                {(error as any)?.response?.data?.message || error?.message || "An unexpected error occurred while fetching listings."}
+              </p>
+              <button
+                onClick={() => refetch()}
+                className="px-5 py-2.5 bg-[#E78F23] hover:bg-[#D47D17] text-black font-semibold text-xs rounded-xl transition-all"
+              >
+                Try Again
+              </button>
+            </div>
+          )}
 
-          {filteredAssets.length === 0 && (
-            <AnimationWrapper type="zoom" duration={0.4}>
-              <div className="flex flex-col items-center justify-center py-16 sm:py-24 text-gray-500">
-                <p className="text-base sm:text-lg font-medium">No assets found</p>
-                <p className="text-xs sm:text-sm mt-1">Try adjusting your filters or category.</p>
+          {/* Loading Skeleton */}
+          {isLoading ? (
+            <ListingsSkeleton />
+          ) : listings.length > 0 ? (
+            <>
+              {/* Listings Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                {listings.map((item, index) => (
+                  <AnimationWrapper key={item.id} type="fade-up" duration={0.4} delay={0.04 * (index % 3)}>
+                    <Link href={`/buyer/marketplace/${item.slug || item.id}`}>
+                      <MarketplaceCard asset={item} />
+                    </Link>
+                  </AnimationWrapper>
+                ))}
               </div>
-            </AnimationWrapper>
+
+              {/* Pagination Controls */}
+              {meta && meta.totalPages > 1 && (
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-10 pt-6 border-t border-[#2C2C2E]">
+                  <p className="text-xs text-gray-400">
+                    Showing <span className="font-semibold text-white">{listings.length}</span> of{" "}
+                    <span className="font-semibold text-white">{meta.total}</span> listings
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setPage((p) => Math.max(p - 1, 1))}
+                      disabled={page <= 1 || isFetching}
+                      className="p-2 rounded-lg bg-[#1C1C1E] border border-[#2C2C2E] text-white disabled:opacity-40 disabled:cursor-not-allowed hover:border-[#E78F23] transition-colors"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <span className="px-4 py-1.5 bg-[#1C1C1E] border border-[#2C2C2E] rounded-lg text-xs font-semibold text-white">
+                      Page {page} of {meta.totalPages}
+                    </span>
+                    <button
+                      onClick={() => setPage((p) => Math.min(p + 1, meta.totalPages))}
+                      disabled={page >= meta.totalPages || isFetching}
+                      className="p-2 rounded-lg bg-[#1C1C1E] border border-[#2C2C2E] text-white disabled:opacity-40 disabled:cursor-not-allowed hover:border-[#E78F23] transition-colors"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            /* Empty State */
+            !isError && (
+              <AnimationWrapper type="zoom" duration={0.4}>
+                <div className="flex flex-col items-center justify-center py-20 bg-[#1C1C1E] border border-[#2C2C2E] rounded-2xl text-center px-4">
+                  <div className="w-16 h-16 rounded-full bg-[#2C2C2E] flex items-center justify-center mb-4">
+                    <Search className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-white">No listings found</h3>
+                  <p className="text-sm text-gray-400 mt-1 max-w-sm">
+                    We couldn&apos;t find any assets matching your active filter criteria. Try adjusting your filters or search term.
+                  </p>
+                  <button
+                    onClick={handleResetFilters}
+                    className="mt-5 flex items-center gap-2 px-5 py-2.5 bg-[#E78F23] hover:bg-[#D47D17] text-black font-semibold text-xs rounded-xl transition-all"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" /> Reset Filters
+                  </button>
+                </div>
+              </AnimationWrapper>
+            )
           )}
         </div>
       </div>
@@ -341,236 +379,277 @@ export default function MarketplacePage() {
   );
 }
 
-/* ─── Filter Sidebar Component (reused for desktop & mobile) ─── */
+/* ─── Filter Sidebar Component (onChange implementation) ─── */
 interface FilterSidebarProps {
   activeCategory: string;
   setActiveCategory: (cat: string) => void;
-  draftFilters: any;
-  setDraftFilters: React.Dispatch<React.SetStateAction<any>>;
-  handleReset: () => void;
-  handleApply: () => void;
-  minLimit: number;
-  maxLimit: number;
+  subCategory: string;
+  setSubCategory: (val: string) => void;
+  locationCity: string;
+  setLocationCity: (val: string) => void;
+  locationCountry: string;
+  setLocationCountry: (val: string) => void;
+  buildYear: string;
+  setBuildYear: (val: string) => void;
+  priceMin: number;
+  setPriceMin: (val: number) => void;
+  priceMax: number;
+  setPriceMax: (val: number) => void;
+  handleResetFilters: () => void;
 }
 
 function FilterSidebar({
   activeCategory,
   setActiveCategory,
-  draftFilters,
-  setDraftFilters,
-  handleReset,
-  handleApply,
-  minLimit,
-  maxLimit,
+  subCategory,
+  setSubCategory,
+  locationCity,
+  setLocationCity,
+  locationCountry,
+  setLocationCountry,
+  buildYear,
+  setBuildYear,
+  priceMin,
+  setPriceMin,
+  priceMax,
+  setPriceMax,
+  handleResetFilters,
 }: FilterSidebarProps) {
+  const minLimit = 0;
+  const maxLimit = 10000000;
+
   return (
-    <div className="bg-[#1C1C1E] border border-[#2C2C2E] rounded-2xl p-5 sm:p-6">
+    <div className="bg-[#1C1C1E] border border-[#2C2C2E] rounded-2xl p-5 sm:p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-base sm:text-lg font-semibold text-white">Filter Listing</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-base sm:text-lg font-semibold text-white">Filter Listings</h3>
         <button
-          onClick={handleReset}
-          className="text-[#E78F23] text-xs sm:text-sm font-medium hover:underline"
+          onClick={handleResetFilters}
+          className="text-[#E78F23] text-xs sm:text-sm font-medium hover:underline flex items-center gap-1"
         >
-          Reset
+          <RotateCcw className="w-3.5 h-3.5" /> Reset
         </button>
       </div>
-      <div className="h-px bg-[#2C2C2E] w-full mb-5 sm:mb-6" />
+      <div className="h-px bg-[#2C2C2E] w-full" />
 
       {/* Category */}
-      <div className="mb-6 sm:mb-8">
-        <label className="block text-sm font-medium text-gray-300 mb-3 sm:mb-4">Category</label>
+      <div>
+        <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">
+          Category
+        </label>
         <div className="flex flex-col gap-1">
-          {categories.map((cat) => (
+          {CATEGORIES.map((cat) => (
             <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`text-left px-3 sm:px-4 py-2 rounded-lg text-sm transition-all ${
-                activeCategory === cat
-                  ? "bg-[#2C2C2E] text-white font-medium"
-                  : "text-gray-500 hover:text-gray-300"
-              }`}
+              key={cat.value}
+              onClick={() => setActiveCategory(cat.value)}
+              className={`text-left px-3.5 py-2 rounded-lg text-sm transition-all ${activeCategory === cat.value
+                ? "bg-[#E78F23]/15 text-[#E78F23] font-semibold border border-[#E78F23]/30"
+                : "text-gray-400 hover:text-white hover:bg-white/5"
+                }`}
             >
-              {cat}
+              {cat.label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Type */}
-      <FilterSelect
-        label="Type"
-        value={draftFilters.type}
-        onChange={(val) => setDraftFilters((prev: any) => ({ ...prev, type: val }))}
-        options={["All", "Sport", "Yacht", "Luxury", "Private Jet", "Convertible", "Casual"]}
-      />
-
-      {/* Model */}
-      <FilterSelect
-        label="Model"
-        value={draftFilters.model}
-        onChange={(val) => setDraftFilters((prev: any) => ({ ...prev, model: val }))}
-        options={["All", "Ferrari", "Volvo", "Rolex", "Azimut", "Gulfstream"]}
-      />
-
-      {/* Build Year */}
-      <div className="mb-6 sm:mb-8">
-        <label className="block text-sm font-medium text-gray-300 mb-3 sm:mb-4">Build Year</label>
-        <div className="flex items-center gap-2 sm:gap-3">
-          <input
-            type="text"
-            value={draftFilters.yearFrom}
-            onChange={(e) => setDraftFilters((prev: any) => ({ ...prev, yearFrom: e.target.value }))}
-            className="w-full bg-transparent border border-[#E78F23]/20 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-white focus:outline-none focus:border-[#E78F23] transition-colors"
-            placeholder="2005"
-          />
-          <span className="text-gray-500 text-sm">to</span>
-          <input
-            type="text"
-            value={draftFilters.yearTo}
-            onChange={(e) => setDraftFilters((prev: any) => ({ ...prev, yearTo: e.target.value }))}
-            className="w-full bg-transparent border border-[#E78F23]/20 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-white focus:outline-none focus:border-[#E78F23] transition-colors"
-            placeholder="2024"
-          />
-        </div>
-      </div>
-
-      <div className="h-px bg-[#2C2C2E] w-full mb-5 sm:mb-6" />
-
-      {/* Price Range */}
-      <div className="mb-6 sm:mb-8">
-        <label className="block text-sm font-medium text-gray-300 mb-5 sm:mb-6">Price Range</label>
-        <div className="relative h-1 bg-[#2C2C2E] rounded-full mb-5 sm:mb-6">
-          <div
-            className="absolute h-full bg-[#E78F23]"
-            style={{
-              left: `${((draftFilters.priceMin - minLimit) / (maxLimit - minLimit)) * 100}%`,
-              right: `${100 - ((draftFilters.priceMax - minLimit) / (maxLimit - minLimit)) * 100}%`,
-            }}
-          />
-          <input
-            type="range"
-            min={minLimit}
-            max={maxLimit}
-            value={draftFilters.priceMin}
-            onChange={(e) =>
-              setDraftFilters((prev: any) => ({
-                ...prev,
-                priceMin: Math.min(Number(e.target.value), draftFilters.priceMax - 1000),
-              }))
-            }
-            className="absolute w-full -top-2 h-5 appearance-none bg-transparent pointer-events-none 
-              [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none 
-              [&::-webkit-slider-thumb]:w-5 sm:[&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-5 sm:[&::-webkit-slider-thumb]:h-6 
-              [&::-webkit-slider-thumb]:rounded-md [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 
-              [&::-webkit-slider-thumb]:border-[#E78F23] [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-lg
-              [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:w-5 sm:[&::-moz-range-thumb]:w-6 
-              [&::-moz-range-thumb]:h-5 sm:[&::-moz-range-thumb]:h-6 [&::-moz-range-thumb]:rounded-md 
-              [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-[#E78F23] 
-              [&::-moz-range-thumb]:cursor-pointer"
-          />
-          <input
-            type="range"
-            min={minLimit}
-            max={maxLimit}
-            value={draftFilters.priceMax}
-            onChange={(e) =>
-              setDraftFilters((prev: any) => ({
-                ...prev,
-                priceMax: Math.max(Number(e.target.value), draftFilters.priceMin + 1000),
-              }))
-            }
-            className="absolute w-full -top-2 h-5 appearance-none bg-transparent pointer-events-none 
-              [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none 
-              [&::-webkit-slider-thumb]:w-5 sm:[&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-5 sm:[&::-webkit-slider-thumb]:h-6 
-              [&::-webkit-slider-thumb]:rounded-md [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 
-              [&::-webkit-slider-thumb]:border-[#E78F23] [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-lg
-              [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:w-5 sm:[&::-moz-range-thumb]:w-6 
-              [&::-moz-range-thumb]:h-5 sm:[&::-moz-range-thumb]:h-6 [&::-moz-range-thumb]:rounded-md 
-              [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-[#E78F23] 
-              [&::-moz-range-thumb]:cursor-pointer"
-          />
-        </div>
-        <div className="flex justify-between text-xs sm:text-sm text-white">
-          <span>${draftFilters.priceMin.toLocaleString()}</span>
-          <span>${draftFilters.priceMax.toLocaleString()}</span>
-        </div>
-      </div>
-
-      {/* Apply Button */}
-      <button
-        onClick={handleApply}
-        className="w-full py-3.5 sm:py-4 bg-[#E78F23] hover:bg-[#D47D17] text-black font-bold rounded-xl transition-all active:scale-[0.98]"
-      >
-        Apply
-      </button>
-    </div>
-  );
-}
-
-/* ─── FilterSelect Component (unchanged but slightly responsive) ─── */
-function FilterSelect({
-  label,
-  value,
-  onChange,
-  options,
-}: {
-  label: string;
-  value: string;
-  onChange: (val: string) => void;
-  options: string[];
-}) {
-  return (
-    <div className="mb-6 sm:mb-8">
-      <label className="block text-sm font-medium text-gray-300 mb-3 sm:mb-4">{label}</label>
-      <div className="relative">
-        <select
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full bg-transparent border border-[#E78F23]/20 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-white appearance-none focus:outline-none focus:border-[#E78F23] transition-colors cursor-pointer"
-        >
-          {options.map((opt) => (
-            <option key={opt} value={opt} className="bg-[#1C1C1E] text-white">
-              {opt}
-            </option>
-          ))}
-        </select>
-        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
-      </div>
-    </div>
-  );
-}
-
-/* ─── MarketplaceCard (unchanged, already responsive) ─── */
-function MarketplaceCard({ asset }: { asset: Asset }) {
-  return (
-    <div className="bg-[#1C1C1E] rounded-[8px] border border-[#2C2C2E] overflow-hidden group hover:border-[#E78F23]/20 transition-all shadow-xl hover:shadow-[#E78F23]/5">
-      <div className="relative h-45 sm:h-50 lg:h-54.25 overflow-hidden bg-black">
-        <img
-          src={asset.image}
-          alt={asset.title}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out opacity-90 group-hover:opacity-100"
+      {/* SubCategory */}
+      <div>
+        <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
+          Sub Category
+        </label>
+        <input
+          type="text"
+          value={subCategory}
+          onChange={(e) => setSubCategory(e.target.value)}
+          placeholder="e.g. Hypercar, Villa, Yacht"
+          className="w-full bg-[#18181A] border border-[#2C2C2E] rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#E78F23] transition-colors"
         />
       </div>
 
-      <div className="p-4 sm:p-5 relative mt-4 sm:mt-6">
-        <div className="flex justify-between items-center text-[10px] sm:text-[11px] text-gray-400 mb-2 font-medium">
-          <span className="flex items-center gap-1 sm:gap-1.5">
-            <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> {asset.location}
-          </span>
-          <span className="tracking-widest uppercase text-gray-500">Price</span>
-        </div>
-        <div className="flex justify-between items-center mb-4 sm:mb-5">
-          <h4 className="font-semibold font-inter text-sm sm:text-[15px] truncate pr-3 text-white">
-            {asset.title}
-          </h4>
-          <span className="font-bold font-inter text-base sm:text-[17px] text-white whitespace-nowrap">
-            {asset.price}
-          </span>
+      {/* Location City & Country */}
+      <div className="space-y-3">
+        <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400">
+          Location
+        </label>
+        <input
+          type="text"
+          value={locationCity}
+          onChange={(e) => setLocationCity(e.target.value)}
+          placeholder="City (e.g. Miami, Geneva)"
+          className="w-full bg-[#18181A] border border-[#2C2C2E] rounded-lg px-3.5 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#E78F23] transition-colors"
+        />
+        <input
+          type="text"
+          value={locationCountry}
+          onChange={(e) => setLocationCountry(e.target.value)}
+          placeholder="Country (e.g. United States)"
+          className="w-full bg-[#18181A] border border-[#2C2C2E] rounded-lg px-3.5 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#E78F23] transition-colors"
+        />
+      </div>
+
+      {/* Build Year */}
+      <div>
+        <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
+          Build Year
+        </label>
+        <input
+          type="number"
+          value={buildYear}
+          onChange={(e) => setBuildYear(e.target.value)}
+          placeholder="e.g. 2024"
+          className="w-full bg-[#18181A] border border-[#2C2C2E] rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#E78F23] transition-colors"
+        />
+      </div>
+
+      <div className="h-px bg-[#2C2C2E] w-full" />
+
+      {/* Price Range */}
+      <div>
+        <div className="flex justify-between items-center mb-3">
+          <label className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+            Price Range ($)
+          </label>
         </div>
 
-        <button className="w-full py-2 sm:py-2.5 cursor-pointer bg-[#D98728] hover:bg-[#E6983A] text-white text-xs sm:text-[13px] font-semibold rounded-xl flex items-center justify-center gap-1.5 sm:gap-2 transition-all shadow-lg shadow-[#D98728]/20 active:scale-[0.98]">
-          View Details <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+        <div className="grid grid-cols-2 gap-2 mb-4">
+          <div>
+            <span className="text-[10px] text-gray-500 block mb-1">Min Price</span>
+            <input
+              type="number"
+              value={priceMin || ""}
+              onChange={(e) => setPriceMin(Number(e.target.value))}
+              placeholder="0"
+              className="w-full bg-[#18181A] border border-[#2C2C2E] rounded-lg px-3 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-[#E78F23]"
+            />
+          </div>
+          <div>
+            <span className="text-[10px] text-gray-500 block mb-1">Max Price</span>
+            <input
+              type="number"
+              value={priceMax >= 100000000 ? "" : priceMax}
+              onChange={(e) => setPriceMax(e.target.value ? Number(e.target.value) : 100000000)}
+              placeholder="Max"
+              className="w-full bg-[#18181A] border border-[#2C2C2E] rounded-lg px-3 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-[#E78F23]"
+            />
+          </div>
+        </div>
+
+        <div className="relative h-1.5 bg-[#2C2C2E] rounded-full mb-3">
+          <div
+            className="absolute h-full bg-[#E78F23] rounded-full"
+            style={{
+              left: `${Math.min(100, Math.max(0, (priceMin / maxLimit) * 100))}%`,
+              right: `${Math.min(100, Math.max(0, 100 - (Math.min(priceMax, maxLimit) / maxLimit) * 100))}%`,
+            }}
+          />
+        </div>
+        <div className="flex justify-between text-[11px] text-gray-400 font-medium">
+          <span>${priceMin.toLocaleString()}</span>
+          <span>{priceMax >= 100000000 ? "Any Max" : `$${priceMax.toLocaleString()}`}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Skeleton Loading Component ─── */
+function ListingsSkeleton() {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+      {[1, 2, 3, 4, 5, 6].map((n) => (
+        <div
+          key={n}
+          className="bg-[#1C1C1E] rounded-xl border border-[#2C2C2E] overflow-hidden animate-pulse flex flex-col"
+        >
+          <div className="h-48 sm:h-52 bg-[#2C2C2E]" />
+          <div className="p-5 space-y-4 flex-1 flex flex-col justify-between">
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <div className="w-20 h-3 bg-[#2C2C2E] rounded-full" />
+                <div className="w-12 h-3 bg-[#2C2C2E] rounded-full" />
+              </div>
+              <div className="w-3/4 h-5 bg-[#2C2C2E] rounded-md" />
+              <div className="w-1/2 h-6 bg-[#2C2C2E] rounded-md" />
+            </div>
+            <div className="w-full h-10 bg-[#2C2C2E] rounded-xl pt-2" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ─── MarketplaceCard Component ─── */
+function MarketplaceCard({ asset }: { asset: ListingItem }) {
+  const imageUrl = asset.media?.[0]?.url || "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&q=80&w=800";
+
+  const formattedPrice = asset.askingPrice
+    ? `${asset.currency || "$"}${Number(asset.askingPrice).toLocaleString()}`
+    : "Price on Request";
+
+  const locationText = [asset.locationCity, asset.locationCountry].filter(Boolean).join(", ") || "Worldwide";
+
+  return (
+    <div className="bg-[#1C1C1E] rounded-xl border border-[#2C2C2E] overflow-hidden group hover:border-[#E78F23]/40 transition-all duration-300 shadow-xl hover:shadow-[#E78F23]/5 flex flex-col h-full">
+      {/* Media Container */}
+      <div className="relative h-48 sm:h-52 overflow-hidden bg-black/40">
+        <img
+          src={imageUrl}
+          alt={asset.title}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out opacity-90 group-hover:opacity-100"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&q=80&w=800";
+          }}
+        />
+
+        {/* Badges */}
+        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
+          {asset.category && (
+            <span className="bg-black/70 backdrop-blur-md text-[#E78F23] text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border border-[#E78F23]/30">
+              {asset.category}
+            </span>
+          )}
+          {asset.buildYear && (
+            <span className="bg-black/70 backdrop-blur-md text-white text-[10px] font-medium px-2.5 py-1 rounded-full border border-white/10">
+              {asset.buildYear}
+            </span>
+          )}
+        </div>
+
+        {asset.isFeatured && (
+          <div className="absolute top-3 right-3 bg-[#E78F23] text-black text-[10px] font-bold px-2 py-0.5 rounded shadow">
+            FEATURED
+          </div>
+        )}
+      </div>
+
+      {/* Content Container */}
+      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
+        <div>
+          <div className="flex justify-between items-center text-[11px] text-gray-400 mb-2 font-medium">
+            <span className="flex items-center gap-1 truncate pr-2">
+              <MapPin className="w-3.5 h-3.5 text-[#E78F23] shrink-0" />
+              <span className="truncate">{locationText}</span>
+            </span>
+            {asset.owner?.isVerified && (
+              <span className="flex items-center gap-1 text-emerald-400 text-[10px] font-semibold shrink-0">
+                <CheckCircle2 className="w-3 h-3" /> Verified Seller
+              </span>
+            )}
+          </div>
+
+          <h4 className="font-semibold text-white text-base sm:text-lg line-clamp-1 mb-2 group-hover:text-[#E78F23] transition-colors">
+            {asset.title}
+          </h4>
+
+          <div className="text-lg sm:text-xl font-bold font-clash text-[#E78F23] mb-4">
+            {formattedPrice}
+          </div>
+        </div>
+
+        <button className="w-full py-2.5 cursor-pointer bg-[#D98728] hover:bg-[#E6983A] text-white text-xs sm:text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#D98728]/20 active:scale-[0.98]">
+          View Details <Eye className="w-4 h-4" />
         </button>
       </div>
     </div>

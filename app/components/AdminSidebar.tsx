@@ -12,12 +12,14 @@ import {
   Settings,
   X,
   Heart,
+  Calendar,
 } from "lucide-react";
 
 const navItems = [
   { href: "/admin", icon: LayoutDashboard, label: "Overview" },
   { href: "/admin/listings", icon: Building2, label: "Listings" },
   { href: "/admin/deals", icon: Gavel, label: "Deals" },
+  { href: "/admin/events", icon: Calendar, label: "Events" },
   { href: "/admin/dealers", icon: BadgePercent, label: "Dealers" },
   { href: "/admin/activity", icon: Heart, label: "Activity" },
   { href: "/admin/settings", icon: Settings, label: "Settings" },
@@ -45,7 +47,7 @@ export default function AdminSidebar({ isSidebarOpen, onClose }: { isSidebarOpen
           // boxShadow: "213px 0 59px 0 rgba(143, 96, 36, 0.00), 136px 0 54px 0 rgba(143, 96, 36, 0.01), 77px 0 46px 0 rgba(143, 96, 36, 0.05), 34px 0 34px 0 rgba(143, 96, 36, 0.09), 9px 0 19px 0 rgba(143, 96, 36, 0.10)"
         }}
 
-        
+
       >
         {/* Logo and Close Button (mobile only) */}
         <div className="p-8 flex items-center justify-between">
