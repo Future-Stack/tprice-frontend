@@ -305,15 +305,6 @@ export default function AdminBrandsPage() {
                         <div className="flex items-center gap-4">
                           <div className="relative w-14 h-14 rounded-xl overflow-hidden border border-[#262626] bg-[#1A1A1A] shrink-0 p-1 flex items-center justify-center">
                             {brand.logoUrl ? (
-                              // <img
-                              //   src={brand.logoUrl}
-                              //   alt={brand.name}
-                              //   className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300"
-                              //   onError={(e) => {
-                              //     (e.target as HTMLImageElement).src =
-                              //       "https://cdn.exoticworld.com/brands/ferrari-logo.png";
-                              //   }}
-                              // />
                               <Image
                                 src={brand.logoUrl}
                                 alt={brand.name}
