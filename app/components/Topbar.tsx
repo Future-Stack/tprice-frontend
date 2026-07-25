@@ -1,12 +1,28 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Search, Bell, ChevronDown, Menu, User as UserIcon, Settings, LogOut, Shield, Loader2 } from "lucide-react";
+import { UserRound } from "lucide-react";
+import {
+  Search,
+  Bell,
+  ChevronDown,
+  Menu,
+  User as UserIcon,
+  Settings,
+  LogOut,
+  Shield,
+  Loader2,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLogoutMutation } from "@/hooks/useAuth";
 import { useAuthStore } from "@/lib/store/useAuthStore";
+import Image from "next/image";
 
-export default function Topbar({ setIsSidebarOpen }: { setIsSidebarOpen: (open: boolean) => void }) {
+export default function Topbar({
+  setIsSidebarOpen,
+}: {
+  setIsSidebarOpen: (open: boolean) => void;
+}) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const logoutMutation = useLogoutMutation();
@@ -18,10 +34,7 @@ export default function Topbar({ setIsSidebarOpen }: { setIsSidebarOpen: (open: 
     user?.email?.split("@")[0] ||
     "User";
 
-  const avatarSrc =
-    user?.avatar ||
-    user?.avatarUrl ||
-    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80";
+  const avatarSrc = user?.avatar || user?.avatarUrl;
 
   const handleLogout = () => {
     setIsDropdownOpen(false);
@@ -31,7 +44,10 @@ export default function Topbar({ setIsSidebarOpen }: { setIsSidebarOpen: (open: 
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsDropdownOpen(false);
       }
     }
@@ -76,19 +92,28 @@ export default function Topbar({ setIsSidebarOpen }: { setIsSidebarOpen: (open: 
         <div className="hidden sm:block w-px h-8 bg-[#2C2C2E]"></div>
 
         {/* profile button */}
-        <div className="relative" ref={dropdownRef}>
+        <div
+          className="relative border border-primary  rounded-full p-1"
+          ref={dropdownRef}
+        >
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center gap-2 lg:gap-3 hover:opacity-80 transition-opacity"
+            className="flex items-center gap-2 lg:gap-3 hover:opacity-80 transition-opacity cursor-pointer"
           >
-            <div className="w-8 h-8 lg:w-9 lg:h-9 rounded-full overflow-hidden bg-gray-600 border ring-2 ring-[#E78F23]/20 border-transparent shadow-lg object-cover">
-              <img
-                src={avatarSrc}
-                alt="Avatar"
-                className="w-full h-full object-cover"
-              />
+            <div className="w-8 h-8 lg:w-9 lg:h-9 flex justify-center items-center rounded-full overflow-hidden  border ring-2 ring-[#E78F23]/20 border-transparent shadow-lg object-cover">
+              {avatarSrc ? (
+                <Image
+                  src={avatarSrc}
+                  alt="Avatar"
+                  className="w-full h-full object-cover"
+                  width={100}
+                  height={100}
+                />
+              ) : (
+                <UserRound />
+              )}
             </div>
-            <span className="hidden sm:block text-sm font-medium text-[#E78F23] max-w-[120px] truncate">
+            <span className="hidden sm:block text-sm font-medium text-primary max-w-30 truncate">
               {displayName}
             </span>
             <motion.div
@@ -110,7 +135,9 @@ export default function Topbar({ setIsSidebarOpen }: { setIsSidebarOpen: (open: 
               >
                 <div className="px-4 py-3 border-b border-white/5 mb-1">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-xs text-gray-500 font-medium">Signed in as</p>
+                    <p className="text-xs text-gray-500 font-medium">
+                      Signed in as
+                    </p>
                     {user?.role && (
                       <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#E78F23]/20 text-[#E78F23] border border-[#E78F23]/30 uppercase">
                         {user.role}
@@ -132,8 +159,12 @@ export default function Topbar({ setIsSidebarOpen }: { setIsSidebarOpen: (open: 
                         <item.icon className="w-4 h-4" />
                       </div>
                       <div className="text-left">
-                        <p className="text-sm font-medium leading-none">{item.label}</p>
-                        <p className="text-[10px] text-gray-500 mt-1">{item.desc}</p>
+                        <p className="text-sm font-medium leading-none">
+                          {item.label}
+                        </p>
+                        <p className="text-[10px] text-gray-500 mt-1">
+                          {item.desc}
+                        </p>
                       </div>
                     </button>
                   ))}
@@ -156,7 +187,9 @@ export default function Topbar({ setIsSidebarOpen }: { setIsSidebarOpen: (open: 
                       <p className="text-sm font-medium leading-none">
                         {logoutMutation.isPending ? "Logging out..." : "Logout"}
                       </p>
-                      <p className="text-[10px] text-red-500/50 mt-1">Exit application</p>
+                      <p className="text-[10px] text-red-500/50 mt-1">
+                        Exit application
+                      </p>
                     </div>
                   </button>
                 </div>
