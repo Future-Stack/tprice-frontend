@@ -1,361 +1,863 @@
 "use client";
 
-import React, { useState } from "react";
-import { ChevronLeft, ChevronRight, UploadCloud, Image as ImageIcon, Plus, X, Check, CheckCircle2, Circle, ArrowRight } from "lucide-react";
+import React, { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
+import {
+  ChevronLeft,
+  ChevronRight,
+  UploadCloud,
+  Image as ImageIcon,
+  Plus,
+  Trash2,
+  Check,
+  CheckCircle2,
+  Circle,
+  Loader2,
+  Tag,
+  MapPin,
+  Calendar,
+  DollarSign,
+  Sparkles,
+  Layers,
+  Clock,
+  Briefcase,
+  AlertCircle,
+} from "lucide-react";
 import AnimationWrapper from "../../components/AnimationWrapper";
+import { useGetCategoriesQuery } from "@/hooks/useCategories";
+import { useUploadMediaMutation } from "@/hooks/useMedia";
+import { useCreateListingMutation } from "@/hooks/useListings";
+import { toast } from "sonner";
 
 const steps = ["Basic Info", "Specifications", "Media", "Pricing", "Review"];
 
-export default function AddListing() {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [images, setImages] = useState<{ file: File; preview: string }[]>([]);
-  const [saleType, setSaleType] = useState("fixed");
-  const [askingPrice, setAskingPrice] = useState("");
-  const [allowCounterOffers, setAllowCounterOffers] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState("standard");
+interface KeyValuePair {
+  id: string;
+  key: string;
+  value: string;
+}
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length > 0) {
-      const newImages = files.map((file) => ({
+interface UploadedMediaItem {
+  url: string;
+  type: string;
+  displayOrder: number;
+}
+
+const COMMON_SPEC_SUGGESTIONS = [
+  "horsepower",
+  "engine",
+  "transmission",
+  "exteriorColor",
+  "mileage",
+  "interiorColor",
+  "bedrooms",
+  "bathrooms",
+];
+
+export default function AddListing() {
+  const router = useRouter();
+
+  // Queries & Mutations
+  const { data: categoriesResponse, isLoading: isLoadingCategories } = useGetCategoriesQuery();
+  const uploadMediaMutation = useUploadMediaMutation();
+  const createListingMutation = useCreateListingMutation();
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Steps
+  const [currentStep, setCurrentStep] = useState(0);
+
+  // Form State
+  const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("");
+  const [subCategory, setSubCategory] = useState("");
+  const [brand, setBrand] = useState("");
+  const [buildYear, setBuildYear] = useState<number | "">(2024);
+  const [locationCity, setLocationCity] = useState("");
+  const [locationCountry, setLocationCountry] = useState("");
+  const [isOffMarket, setIsOffMarket] = useState(false);
+
+  // Dynamic Specifications state
+  const [specifications, setSpecifications] = useState<KeyValuePair[]>([
+    { id: "1", key: "horsepower", value: "986" },
+    { id: "2", key: "engine", value: "4.0L V8 Twin-Turbo" },
+    { id: "3", key: "transmission", value: "8-Speed DCT" },
+    { id: "4", key: "exteriorColor", value: "Rosso Corsa" },
+    { id: "5", key: "mileage", value: "450" },
+  ]);
+
+  // Media Gallery state
+  const [mediaList, setMediaList] = useState<UploadedMediaItem[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
+
+  // Pricing & Sale Type
+  const [saleType, setSaleType] = useState<"FIXED_PRICE" | "AUCTION" | "PRIVATE">("FIXED_PRICE");
+  const [askingPrice, setAskingPrice] = useState<string>("625000");
+  const [startingBid, setStartingBid] = useState<string>("500000");
+  const [auctionEndsAt, setAuctionEndsAt] = useState<string>("2026-12-31T23:59:59.000Z");
+  const [currency, setCurrency] = useState("USD");
+  const [allowCounterOffers, setAllowCounterOffers] = useState(true);
+
+  // Plan Selection
+  const [selectedPlan, setSelectedPlan] = useState<"standard" | "featured">("standard");
+
+  // Dynamic Specification handlers
+  const handleAddSpecRow = () => {
+    setSpecifications((prev) => [
+      ...prev,
+      { id: Date.now().toString(), key: "", value: "" },
+    ]);
+  };
+
+  const handleSpecChange = (id: string, field: "key" | "value", val: string) => {
+    setSpecifications((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, [field]: val } : item))
+    );
+  };
+
+  const handleRemoveSpecRow = (id: string) => {
+    setSpecifications((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const handleAddSuggestion = (keyName: string) => {
+    if (specifications.some((s) => s.key.toLowerCase() === keyName.toLowerCase())) {
+      toast.info(`"${keyName}" specification key is already added.`);
+      return;
+    }
+    setSpecifications((prev) => [
+      ...prev,
+      { id: Date.now().toString(), key: keyName, value: "" },
+    ]);
+  };
+
+  // Image Upload handler using useMedia mutation
+  const handleFileUpload = async (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select a valid image file.");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Image file size should be under 10MB.");
+      return;
+    }
+
+    try {
+      const res = await uploadMediaMutation.mutateAsync({
         file,
-        preview: URL.createObjectURL(file),
-      }));
-      setImages((prev) => [...prev, ...newImages].slice(0, 5)); // Limit to 5 images for demonstration
+        folder: "exoticworld/listings",
+      });
+
+      if (res?.url) {
+        setMediaList((prev) => [
+          ...prev,
+          {
+            url: res.url,
+            type: "IMAGE",
+            displayOrder: prev.length + 1,
+          },
+        ]);
+        toast.success("Image uploaded successfully!");
+      }
+    } catch (err: any) {
+      const errMsg =
+        err?.response?.data?.message || err?.message || "Failed to upload image.";
+      toast.error(errMsg);
     }
   };
 
-  const removeImage = (index: number) => {
-    setImages((prev) => {
-      const newImages = [...prev];
-      URL.revokeObjectURL(newImages[index].preview);
-      newImages.splice(index, 1);
-      return newImages;
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    files.forEach((file) => handleFileUpload(file));
+    if (e.target) {
+      e.target.value = "";
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const files = Array.from(e.dataTransfer.files || []);
+    files.forEach((file) => handleFileUpload(file));
+  };
+
+  const handleRemoveMedia = (index: number) => {
+    setMediaList((prev) => {
+      const updated = prev.filter((_, i) => i !== index);
+      return updated.map((item, idx) => ({ ...item, displayOrder: idx + 1 }));
     });
   };
 
+  // Step Validation
+  const validateCurrentStep = (): boolean => {
+    if (currentStep === 0) {
+      if (!title.trim()) {
+        toast.error("Please enter a listing title.");
+        return false;
+      }
+      if (!category) {
+        toast.error("Please select a category.");
+        return false;
+      }
+    }
+    if (currentStep === 3) {
+      if (saleType === "FIXED_PRICE" && (!askingPrice || Number(askingPrice) <= 0)) {
+        toast.error("Please enter a valid asking price.");
+        return false;
+      }
+      if (saleType === "AUCTION") {
+        if (!startingBid || Number(startingBid) <= 0) {
+          toast.error("Please enter a valid starting bid.");
+          return false;
+        }
+      }
+    }
+    return true;
+  };
+
   const handleNext = () => {
+    if (!validateCurrentStep()) return;
     if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      // Final submission logic would go here
-      console.log("Listing submitted with plan:", selectedPlan);
+      setCurrentStep((prev) => prev + 1);
     }
   };
 
   const handleBack = () => {
     if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+      setCurrentStep((prev) => prev - 1);
     }
   };
+
+  // Submit Listing Function
+  const handleSubmitListing = async () => {
+    if (!validateCurrentStep()) return;
+
+    // Convert dynamic specifications array to JSON string
+    const specsObject: Record<string, any> = {};
+    specifications.forEach((item) => {
+      const trimmedKey = item.key.trim();
+      const trimmedVal = item.value.trim();
+      if (trimmedKey) {
+        // Try parsing number if numeric value
+        if (trimmedVal && !isNaN(Number(trimmedVal))) {
+          specsObject[trimmedKey] = Number(trimmedVal);
+        } else {
+          specsObject[trimmedKey] = trimmedVal;
+        }
+      }
+    });
+
+    const specificationsJson = Object.keys(specsObject).length > 0
+      ? JSON.stringify(specsObject)
+      : undefined;
+
+    const askingPriceNum = askingPrice
+      ? Number(askingPrice)
+      : saleType === "AUCTION" && startingBid
+      ? Number(startingBid)
+      : 0;
+
+    const payload = {
+      title: title.trim(),
+      category,
+      subCategory: subCategory.trim() || undefined,
+      brand: brand.trim() || undefined,
+      buildYear: buildYear ? Number(buildYear) : undefined,
+      locationCity: locationCity.trim() || undefined,
+      locationCountry: locationCountry.trim() || undefined,
+      isOffMarket,
+      saleType,
+      allowCounterOffers,
+      askingPrice: askingPriceNum,
+      startingBid: saleType === "AUCTION" && startingBid ? Number(startingBid) : undefined,
+      auctionEndsAt: saleType === "AUCTION" && auctionEndsAt ? auctionEndsAt : undefined,
+      currency: currency || "USD",
+      isFeatured: selectedPlan === "featured",
+      specifications: specificationsJson,
+      media: mediaList.map((m, idx) => ({
+        url: m.url,
+        type: m.type || "IMAGE",
+        displayOrder: idx + 1,
+      })),
+    };
+
+    try {
+      await createListingMutation.mutateAsync(payload);
+      toast.success("Listing created successfully!");
+      router.push("/seller/my-listing");
+    } catch (err: any) {
+      const errMsg =
+        err?.response?.data?.message || err?.message || "Failed to create listing. Please check required fields.";
+      toast.error(errMsg);
+    }
+  };
+
+  // Categories extraction
+  const categoriesList = categoriesResponse?.data || [];
 
   const renderStepContent = () => {
     switch (currentStep) {
       case 0:
         return (
           <div className="space-y-6">
-            <h3 className="text-xl font-clash font-medium mb-8">Basic Information</h3>
+            <h3 className="text-xl font-clash font-medium mb-6 text-white flex items-center gap-2">
+              <Tag className="w-5 h-5 text-primary2" /> Basic Information
+            </h3>
+
             {/* Listing Title */}
-            <div className="space-y-2.5">
-              <label className="text-[14px] font-medium text-gray-300">Listing Title</label>
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+                Listing Title <span className="text-primary2">*</span>
+              </label>
               <input
                 type="text"
-                placeholder="e.g. Ferrari 488 Spider"
-                className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50 transition-colors shadow-inner"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="e.g. 2024 Ferrari SF90 Stradale Assetto Fiorano"
+                className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors shadow-inner"
+                required
               />
             </div>
 
-            {/* Category & Location Grid */}
+            {/* Category & SubCategory */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2.5">
-                <label className="text-[14px] font-medium text-gray-300">Category</label>
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <Layers className="w-3.5 h-3.5 text-primary2" /> Category <span className="text-primary2">*</span>
+                </label>
                 <div className="relative">
-                  <select className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white focus:outline-none focus:border-primary2/50 transition-colors appearance-none cursor-pointer">
-                    <option value="">Select Category</option>
-                    <option value="luxury-cars">Luxury Cars</option>
-                    <option value="watches">Watches</option>
-                    <option value="real-estate">Real Estate</option>
-                    <option value="yachts">Yachts</option>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-primary2/60 transition-colors appearance-none cursor-pointer"
+                  >
+                    <option value="">
+                      {isLoadingCategories ? "Loading categories..." : "Select Category"}
+                    </option>
+                    {categoriesList.map((cat) => (
+                      <option key={cat.id} value={cat.name}>
+                        {cat.name}
+                      </option>
+                    ))}
                   </select>
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
                     <ChevronRight className="w-4 h-4 rotate-90" />
                   </div>
                 </div>
               </div>
-              <div className="space-y-2.5">
-                <label className="text-[14px] font-medium text-gray-300">Item Location</label>
+
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider">
+                  Sub Category
+                </label>
                 <input
                   type="text"
-                  placeholder="City, Country"
-                  className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50 transition-colors shadow-inner"
+                  value={subCategory}
+                  onChange={(e) => setSubCategory(e.target.value)}
+                  placeholder="e.g. Hypercar"
+                  className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors shadow-inner"
                 />
               </div>
             </div>
 
-            {/* Description */}
-            <div className="space-y-2.5">
-              <label className="text-[14px] font-medium text-gray-300">Description</label>
-              <textarea
-                rows={6}
-                placeholder="Provide a detailed description of the item..."
-                className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50 transition-colors resize-none shadow-inner"
+            {/* Brand & Build Year */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <Briefcase className="w-3.5 h-3.5 text-primary2" /> Brand / Manufacturer
+                </label>
+                <input
+                  type="text"
+                  value={brand}
+                  onChange={(e) => setBrand(e.target.value)}
+                  placeholder="e.g. Ferrari"
+                  className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors shadow-inner"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-primary2" /> Build Year
+                </label>
+                <input
+                  type="number"
+                  value={buildYear}
+                  onChange={(e) => setBuildYear(e.target.value ? parseInt(e.target.value, 10) : "")}
+                  placeholder="e.g. 2024"
+                  className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors shadow-inner"
+                />
+              </div>
+            </div>
+
+            {/* Location City & Country */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-primary2" /> Location City
+                </label>
+                <input
+                  type="text"
+                  value={locationCity}
+                  onChange={(e) => setLocationCity(e.target.value)}
+                  placeholder="e.g. Miami"
+                  className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors shadow-inner"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider">
+                  Location Country
+                </label>
+                <input
+                  type="text"
+                  value={locationCountry}
+                  onChange={(e) => setLocationCountry(e.target.value)}
+                  placeholder="e.g. United States"
+                  className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors shadow-inner"
+                />
+              </div>
+            </div>
+
+            {/* Off Market Toggle */}
+            <div className="flex items-center justify-between p-4 bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl">
+              <div>
+                <p className="text-sm font-semibold text-white">Private Off-Market Listing</p>
+                <p className="text-xs text-gray-400">Keep this listing visible only to verified VIP buyers</p>
+              </div>
+              <input
+                type="checkbox"
+                checked={isOffMarket}
+                onChange={(e) => setIsOffMarket(e.target.checked)}
+                className="w-5 h-5 rounded border-[#2C2C2E] text-primary2 focus:ring-primary2 accent-[#E78F23] cursor-pointer"
               />
             </div>
           </div>
         );
+
       case 1:
         return (
           <div className="space-y-6">
-            <h3 className="text-xl font-clash font-medium mb-8">Specifications</h3>
-            
-            {/* Row 1: Year & Condition */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2.5">
-                <label className="text-[14px] font-medium text-gray-300">Year of Manufacture</label>
-                <input
-                  type="text"
-                  placeholder="YYYY"
-                  className="w-full bg-[#0D0D0F] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50 transition-colors"
-                />
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-clash font-medium text-white flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-primary2" /> Specifications System
+                </h3>
+                <p className="text-xs text-gray-400 mt-1">
+                  Add dynamic key-value specifications for your luxury item.
+                </p>
               </div>
-              <div className="space-y-2.5">
-                <label className="text-[14px] font-medium text-gray-300">Condition</label>
-                <div className="relative">
-                  <select className="w-full bg-[#0D0D0F] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white focus:outline-none focus:border-primary2/50 transition-colors appearance-none cursor-pointer">
-                    <option value="">Select Condition</option>
-                    <option value="new">New</option>
-                    <option value="excellent">Excellent</option>
-                    <option value="good">Good</option>
-                    <option value="fair">Fair</option>
-                  </select>
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                    <ChevronRight className="w-4 h-4 rotate-90" />
-                  </div>
+
+              <button
+                type="button"
+                onClick={handleAddSpecRow}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary2/10 border border-primary2/30 text-primary2 hover:bg-primary2 hover:text-black font-semibold text-xs transition-all cursor-pointer"
+              >
+                <Plus className="w-4 h-4" /> Add Field
+              </button>
+            </div>
+
+            {/* Common Suggestion Chips */}
+            <div className="space-y-2">
+              <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                Quick Preset Keys
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {COMMON_SPEC_SUGGESTIONS.map((preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => handleAddSuggestion(preset)}
+                    className="px-3 py-1 bg-[#1c1c1e] border border-[#2C2C2E] hover:border-primary2/50 text-gray-300 hover:text-primary2 rounded-lg text-xs transition-colors cursor-pointer flex items-center gap-1 font-mono"
+                  >
+                    <Plus className="w-3 h-3" /> {preset}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Key-Value Pair Inputs */}
+            <div className="space-y-3 pt-2">
+              {specifications.length === 0 ? (
+                <div className="p-8 text-center border-2 border-dashed border-[#2C2C2E] rounded-xl bg-[#1c1c1e]/50">
+                  <AlertCircle className="w-8 h-8 text-gray-500 mx-auto mb-2" />
+                  <p className="text-sm font-medium text-gray-400">No specifications added yet</p>
+                  <p className="text-xs text-gray-600 mt-0.5">Click "Add Field" or choose a preset above.</p>
                 </div>
-              </div>
+              ) : (
+                specifications.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex flex-col md:flex-row items-stretch md:items-center gap-3 p-3 bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl hover:border-gray-700 transition-colors"
+                  >
+                    <div className="flex-1">
+                      <input
+                        type="text"
+                        value={item.key}
+                        onChange={(e) => handleSpecChange(item.id, "key", e.target.value)}
+                        placeholder="Key (e.g. horsepower)"
+                        className="w-full bg-[#111113] border border-[#2C2C2E] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors font-mono"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <input
+                        type="text"
+                        value={item.value}
+                        onChange={(e) => handleSpecChange(item.id, "value", e.target.value)}
+                        placeholder="Value (e.g. 986)"
+                        className="w-full bg-[#111113] border border-[#2C2C2E] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveSpecRow(item.id)}
+                      className="p-2.5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer self-end md:self-center shrink-0"
+                      title="Remove specification"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))
+              )}
             </div>
-
-            {/* Row 2: Usage & Exterior Color */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2.5">
-                <label className="text-[14px] font-medium text-gray-300">Usage / Mileage</label>
-                <input
-                  type="text"
-                  placeholder="e.g. 12,000 miles or 450 flight hours"
-                  className="w-full bg-[#0D0D0F] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50 transition-colors"
-                />
-              </div>
-              <div className="space-y-2.5">
-                <label className="text-[14px] font-medium text-gray-300">Exterior Color</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Rosso Corsa"
-                  className="w-full bg-[#0D0D0F] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50 transition-colors"
-                />
-              </div>
-            </div>
-
-            {/* Placeholder for remaining space to match image height if needed */}
-            <div className="h-20 hidden md:block"></div>
           </div>
         );
+
       case 2:
         return (
-          <div className="space-y-8">
-            <h3 className="text-xl font-clash font-medium mb-8">Media Gallery</h3>
+          <div className="space-y-6">
+            <h3 className="text-xl font-clash font-medium text-white flex items-center gap-2 mb-2">
+              <ImageIcon className="w-5 h-5 text-primary2" /> Media Gallery
+            </h3>
 
-            {/* Main Upload Area */}
-            <div className="relative group">
+            {/* Dropzone & Upload Area */}
+            <div
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current?.click()}
+              className={`relative border-2 border-dashed rounded-2xl aspect-[16/6] flex flex-col items-center justify-center p-6 text-center cursor-pointer transition-all duration-300 ${
+                isDragging
+                  ? "border-primary2 bg-primary2/10"
+                  : "border-[#2C2C2E] bg-[#1c1c1e] hover:border-primary2/50 hover:bg-[#252528]"
+              }`}
+            >
               <input
+                ref={fileInputRef}
                 type="file"
                 multiple
                 accept="image/*"
-                onChange={handleImageUpload}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                onChange={handleFileInputChange}
+                className="hidden"
               />
-              <div className="border-2 border-dashed border-[#2C2C2E] bg-[#1c1c1e] aspect-[16/7] rounded-2xl flex flex-col items-center justify-center gap-4 transition-all duration-300 group-hover:border-primary2/50 group-hover:bg-[#252528]">
-                <div className="w-16 h-16 bg-[#111113] rounded-full flex items-center justify-center text-gray-400 group-hover:text-primary2 transition-colors">
-                  <UploadCloud className="w-8 h-8" />
+
+              {uploadMediaMutation.isPending ? (
+                <div className="flex flex-col items-center justify-center space-y-2 py-4">
+                  <Loader2 className="w-8 h-8 text-primary2 animate-spin" />
+                  <p className="text-sm font-medium text-primary2">Uploading image to cloud media service...</p>
+                  <p className="text-xs text-gray-500">Please wait</p>
                 </div>
-                <div className="text-center">
-                  <p className="text-white font-medium text-lg">Click or drag images to upload</p>
-                  <p className="text-gray-500 text-sm mt-1">High-resolution JPG, PNG or WEBP (max 10MB each)</p>
+              ) : (
+                <div className="flex flex-col items-center justify-center space-y-3">
+                  <div className="w-14 h-14 bg-[#111113] border border-[#2C2C2E] rounded-full flex items-center justify-center text-primary2 shadow-md">
+                    <UploadCloud className="w-7 h-7" />
+                  </div>
+                  <div>
+                    <p className="text-white font-medium text-base">
+                      Click to browse or drag & drop high-resolution images
+                    </p>
+                    <p className="text-gray-500 text-xs mt-1">
+                      Supports JPG, PNG, WEBP (Max 10MB each)
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
-            {/* Preview Grid */}
-            <div className="grid grid-cols-3 gap-4">
-              {[0, 1, 2].map((i) => (
-                <div key={i} className="relative aspect-square rounded-2xl border-2 border-[#2C2C2E] bg-[#1c1c1e] overflow-hidden flex items-center justify-center group">
-                  {images[i] ? (
-                    <>
-                      <img src={images[i].preview} alt="Preview" className="w-full h-full object-cover" />
+            {/* Uploaded Images Preview Grid */}
+            <div>
+              <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                Uploaded Media ({mediaList.length})
+              </label>
+
+              {mediaList.length === 0 ? (
+                <p className="text-xs text-gray-500 italic">No images uploaded yet.</p>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                  {mediaList.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="relative aspect-square rounded-xl border border-[#2C2C2E] bg-[#1c1c1e] overflow-hidden group shadow-md"
+                    >
+                      <img
+                        src={item.url}
+                        alt={`Upload ${idx + 1}`}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                      <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/70 backdrop-blur-md rounded-md text-[10px] text-primary2 font-mono font-bold">
+                        #{item.displayOrder}
+                      </div>
                       <button
-                        onClick={() => removeImage(i)}
-                        className="absolute top-2 right-2 p-1.5 bg-black/50 backdrop-blur-md rounded-lg text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500 z-20"
+                        type="button"
+                        onClick={() => handleRemoveMedia(idx)}
+                        className="absolute top-2 right-2 p-1.5 bg-black/70 backdrop-blur-md hover:bg-red-500 rounded-lg text-white opacity-0 group-hover:opacity-100 transition-all cursor-pointer z-10"
+                        title="Remove image"
                       >
-                        <X className="w-4 h-4" />
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
-                    </>
-                  ) : (
-                    <div className="text-gray-600/50">
-                      {i === 0 ? <ImageIcon className="w-8 h-8" /> : <Plus className="w-8 h-8" />}
                     </div>
-                  )}
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
           </div>
         );
+
       case 3:
         return (
-          <div className="space-y-10">
-            <h3 className="text-xl font-clash font-medium mb-8">Pricing & Sale Type</h3>
+          <div className="space-y-8">
+            <h3 className="text-xl font-clash font-medium text-white flex items-center gap-2 mb-4">
+              <DollarSign className="w-5 h-5 text-primary2" /> Pricing & Sale Type
+            </h3>
 
             {/* Sale Type Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
-                { id: "fixed", title: "Fixed Price", desc: "Set a specific asking price" },
-                { id: "auction", title: "Auction", desc: "Set starting bid and duration" },
-                { id: "private", title: "Private Sale", desc: "Price on Application (POA)" }
+                { id: "FIXED_PRICE", title: "Fixed Price", desc: "Set a specific asking price" },
+                { id: "AUCTION", title: "Auction", desc: "Set starting bid and auction end date" },
+                { id: "PRIVATE", title: "Private Sale", desc: "Price on Application (POA)" },
               ].map((type) => (
                 <button
                   key={type.id}
-                  onClick={() => setSaleType(type.id)}
-                  className={`flex flex-col items-start p-6 rounded-xl border transition-all duration-300 text-left ${
+                  type="button"
+                  onClick={() => setSaleType(type.id as any)}
+                  className={`flex flex-col items-start p-5 rounded-xl border transition-all duration-300 text-left cursor-pointer ${
                     saleType === type.id
-                      ? "border-primary2 bg-primary2/5 ring-1 ring-primary2"
+                      ? "border-primary2 bg-primary2/10 ring-1 ring-primary2"
                       : "border-[#2C2C2E] bg-[#1c1c1e] hover:border-gray-600"
                   }`}
                 >
-                  <span className={`font-semibold text-base mb-1 ${saleType === type.id ? "text-primary2" : "text-white"}`}>
+                  <span
+                    className={`font-semibold text-sm mb-1 ${
+                      saleType === type.id ? "text-primary2" : "text-white"
+                    }`}
+                  >
                     {type.title}
                   </span>
-                  <span className="text-gray-500 text-xs">
-                    {type.desc}
-                  </span>
+                  <span className="text-gray-400 text-xs">{type.desc}</span>
                 </button>
               ))}
             </div>
 
-            {/* Asking Price Input */}
-            <div className="space-y-4 max-w-md">
-              <div className="space-y-2.5">
-                <label className="text-[14px] font-medium text-gray-300">Asking Price (USD)</label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">$</span>
-                  <input
-                    type="text"
-                    value={askingPrice}
-                    onChange={(e) => setAskingPrice(e.target.value)}
-                    placeholder="0.00"
-                    className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl pl-8 pr-4 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50 transition-colors shadow-inner"
-                  />
+            {/* Pricing Details */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Asking Price */}
+              {(saleType === "FIXED_PRICE" || saleType === "PRIVATE") && (
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider">
+                    Asking Price ({currency}) <span className="text-primary2">*</span>
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-sm">
+                      $
+                    </span>
+                    <input
+                      type="number"
+                      value={askingPrice}
+                      onChange={(e) => setAskingPrice(e.target.value)}
+                      placeholder="625000"
+                      className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl pl-8 pr-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors shadow-inner"
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {/* Counter Offers Checkbox */}
-              <label className="flex items-center gap-3 cursor-pointer group">
-                <div className="relative flex items-center justify-center">
-                  <input
-                    type="checkbox"
-                    checked={allowCounterOffers}
-                    onChange={(e) => setAllowCounterOffers(e.target.checked)}
-                    className="peer appearance-none w-5 h-5 border border-[#2C2C2E] rounded bg-[#1c1c1e] checked:bg-primary2 checked:border-primary2 transition-all cursor-pointer"
-                  />
-                  <Check className={`absolute w-3.5 h-3.5 text-[#111113] transition-opacity duration-200 pointer-events-none ${allowCounterOffers ? "opacity-100" : "opacity-0"}`} />
-                </div>
-                <span className="text-[14px] text-gray-400 group-hover:text-gray-300 transition-colors">
-                  Allow buyers to make counter-offers
-                </span>
+              {/* Starting Bid if Auction */}
+              {saleType === "AUCTION" && (
+                <>
+                  <div className="space-y-2">
+                    <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider">
+                      Starting Bid ({currency}) <span className="text-primary2">*</span>
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-sm">
+                        $
+                      </span>
+                      <input
+                        type="number"
+                        value={startingBid}
+                        onChange={(e) => setStartingBid(e.target.value)}
+                        placeholder="500000"
+                        className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl pl-8 pr-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors shadow-inner"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5 text-primary2" /> Auction Ends At (ISO Date)
+                    </label>
+                    <input
+                      type="text"
+                      value={auctionEndsAt}
+                      onChange={(e) => setAuctionEndsAt(e.target.value)}
+                      placeholder="2026-12-31T23:59:59.000Z"
+                      className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors font-mono shadow-inner"
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* Currency */}
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider">
+                  Currency
+                </label>
+                <select
+                  value={currency}
+                  onChange={(e) => setCurrency(e.target.value)}
+                  className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-primary2/60 transition-colors cursor-pointer"
+                >
+                  <option value="USD">USD ($)</option>
+                  <option value="EUR">EUR (€)</option>
+                  <option value="GBP">GBP (£)</option>
+                  <option value="AED">AED (د.إ)</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Allow Counter Offers */}
+            <div className="flex items-center gap-3 bg-[#1c1c1e] border border-[#2C2C2E] p-4 rounded-xl">
+              <input
+                type="checkbox"
+                id="allowCounterOffers"
+                checked={allowCounterOffers}
+                onChange={(e) => setAllowCounterOffers(e.target.checked)}
+                className="w-4 h-4 rounded border-[#2C2C2E] text-primary2 focus:ring-primary2 accent-[#E78F23] cursor-pointer"
+              />
+              <label
+                htmlFor="allowCounterOffers"
+                className="text-xs font-semibold text-gray-200 cursor-pointer"
+              >
+                Allow potential buyers to submit counter-offers
               </label>
             </div>
-            
-            <div className="h-4 hidden md:block" />
           </div>
         );
+
       case 4:
         return (
-          <div className="flex flex-col items-center">
-            {/* Header Icon & Text */}
-            <div className="text-center mb-10">
-              <div className="w-16 h-16 bg-primary2/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-primary2/20">
-                <CheckCircle2 className="w-8 h-8 text-primary2" />
+          <div className="space-y-8">
+            <div className="text-center">
+              <div className="w-14 h-14 bg-primary2/10 rounded-full flex items-center justify-center mx-auto mb-3 border border-primary2/20 text-primary2">
+                <CheckCircle2 className="w-7 h-7" />
               </div>
-              <h3 className="text-2xl font-clash font-medium text-white mb-2">Ready to Submit</h3>
-              <p className="text-gray-500 max-w-md mx-auto text-sm leading-relaxed">
-                Your listing will be submitted to our curation team for review. 
-                This typically takes 24-48 hours.
+              <h3 className="text-2xl font-clash font-medium text-white mb-1">
+                Review & Confirm Listing
+              </h3>
+              <p className="text-gray-400 text-xs max-w-md mx-auto">
+                Review listing details and choose visibility package before submission.
               </p>
             </div>
 
-            {/* Plans Grid */}
+            {/* Listing Details Card Summary */}
+            <div className="p-5 bg-[#1c1c1e] border border-[#2C2C2E] rounded-2xl space-y-4">
+              <div className="flex items-center justify-between border-b border-[#2C2C2E] pb-3">
+                <div>
+                  <h4 className="text-base font-bold text-white">{title || "Untitled Listing"}</h4>
+                  <p className="text-xs text-gray-400">
+                    Category: <span className="text-primary2 font-semibold">{category || "Unassigned"}</span>{" "}
+                    {subCategory && `• ${subCategory}`} {brand && `• Brand: ${brand}`}
+                  </p>
+                </div>
+                <span className="px-3 py-1 bg-primary2/10 border border-primary2/20 text-primary2 text-xs font-bold rounded-lg">
+                  {currency} {askingPrice ? Number(askingPrice).toLocaleString() : "0"}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+                <div>
+                  <span className="text-gray-500 block">Sale Type</span>
+                  <span className="text-white font-semibold">{saleType}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500 block">Build Year</span>
+                  <span className="text-white font-semibold">{buildYear || "N/A"}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500 block">Specifications</span>
+                  <span className="text-white font-semibold">{specifications.filter(s => s.key).length} keys</span>
+                </div>
+                <div>
+                  <span className="text-gray-500 block">Uploaded Media</span>
+                  <span className="text-white font-semibold">{mediaList.length} files</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Plans Selection Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-              {/* Standard Listing Plan */}
-              <div 
+              {/* Standard Plan */}
+              <div
                 onClick={() => setSelectedPlan("standard")}
-                className={`relative group cursor-pointer p-8 rounded-2xl border transition-all duration-300 ${
-                  selectedPlan === "standard" 
-                    ? "bg-[#1c1c1e] border-primary2/50 ring-1 ring-primary2/20" 
+                className={`relative cursor-pointer p-6 rounded-2xl border transition-all duration-300 ${
+                  selectedPlan === "standard"
+                    ? "bg-[#1c1c1e] border-primary2 ring-1 ring-primary2/30"
                     : "bg-[#1c1c1e] border-[#2C2C2E] hover:border-gray-600"
                 }`}
               >
                 <div className="flex items-start gap-4">
-                  <div className={`mt-1 transition-colors ${selectedPlan === "standard" ? "text-green-500" : "text-gray-600"}`}>
-                    {selectedPlan === "standard" ? <CheckCircle2 className="w-6 h-6" /> : <Circle className="w-6 h-6" />}
+                  <div
+                    className={`mt-1 transition-colors ${
+                      selectedPlan === "standard" ? "text-primary2" : "text-gray-600"
+                    }`}
+                  >
+                    {selectedPlan === "standard" ? (
+                      <CheckCircle2 className="w-5 h-5" />
+                    ) : (
+                      <Circle className="w-5 h-5" />
+                    )}
                   </div>
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="text-xl font-clash font-medium text-white">Standard Listing (Free)</h4>
-                      <p className="text-gray-400 text-sm mt-1">List your item on the marketplace at no upfront cost.</p>
-                    </div>
-                    <ul className="space-y-3 mt-6">
-                      {[
-                        "No listing fee",
-                        "6% commission charged only after sale",
-                        "Standard visibility"
-                      ].map((feature, idx) => (
-                        <li key={idx} className="flex items-center gap-3 text-sm text-gray-300">
-                          <ArrowRight className="w-3.5 h-3.5 text-gray-500" />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
+                  <div>
+                    <h4 className="text-lg font-clash font-medium text-white">Standard Listing (Free)</h4>
+                    <p className="text-gray-400 text-xs mt-1">List your luxury item on marketplace standard queue.</p>
                   </div>
                 </div>
               </div>
 
-              {/* Featured Listing Plan */}
-              <div 
+              {/* Featured Plan */}
+              <div
                 onClick={() => setSelectedPlan("featured")}
-                className={`relative group cursor-pointer p-8 rounded-2xl border transition-all duration-300 ${
-                  selectedPlan === "featured" 
-                    ? "bg-[#1c1c1e] border-primary2/50 ring-1 ring-primary2/20" 
+                className={`relative cursor-pointer p-6 rounded-2xl border transition-all duration-300 ${
+                  selectedPlan === "featured"
+                    ? "bg-[#1c1c1e] border-primary2 ring-1 ring-primary2/30"
                     : "bg-[#1c1c1e] border-[#2C2C2E] hover:border-gray-600"
                 }`}
               >
                 <div className="flex items-start gap-4">
-                  <div className={`mt-1 transition-colors ${selectedPlan === "featured" ? "text-green-500" : "text-gray-600"}`}>
-                    {selectedPlan === "featured" ? <CheckCircle2 className="w-6 h-6" /> : <Circle className="w-6 h-6" />}
+                  <div
+                    className={`mt-1 transition-colors ${
+                      selectedPlan === "featured" ? "text-primary2" : "text-gray-600"
+                    }`}
+                  >
+                    {selectedPlan === "featured" ? (
+                      <CheckCircle2 className="w-5 h-5" />
+                    ) : (
+                      <Circle className="w-5 h-5" />
+                    )}
                   </div>
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="text-xl font-clash font-medium text-white">Featured Listing ($99)</h4>
-                      <p className="text-gray-400 text-sm mt-1">Boost your listing visibility and reach more premium buyers.</p>
-                    </div>
-                    <ul className="space-y-3 mt-6">
-                      {[
-                        "Priority placement in listings",
-                        "Higher visibility to VIP buyers",
-                        "Faster exposure"
-                      ].map((feature, idx) => (
-                        <li key={idx} className="flex items-center gap-3 text-sm text-gray-300">
-                          <ArrowRight className="w-3.5 h-3.5 text-gray-500" />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
+                  <div>
+                    <h4 className="text-lg font-clash font-medium text-white">Featured Listing (VIP)</h4>
+                    <p className="text-gray-400 text-xs mt-1">Priority placement for higher buyer conversion.</p>
                   </div>
                 </div>
               </div>
@@ -366,24 +868,28 @@ export default function AddListing() {
   };
 
   return (
-    <div className="space-y-8 relative z-0 max-w-229 mx-auto">
+    <div className="space-y-8 relative z-0 max-w-4xl mx-auto pb-12">
       {/* Header Section */}
       <AnimationWrapper type="fade-down" duration={0.5}>
         <div className="mb-6">
-          <h2 className="text-[40px] font-clash font-medium tracking-tight">Create New Listing</h2>
-          <p className="text-gray-400 mt-2 text-lg">Add your luxury item to the marketplace.</p>
+          <h2 className="text-[40px] font-clash font-medium tracking-tight text-white">
+            Create New Listing
+          </h2>
+          <p className="text-gray-400 mt-1 text-base">
+            Add your luxury item to the marketplace catalog.
+          </p>
         </div>
       </AnimationWrapper>
 
       <AnimationWrapper type="fade-up" duration={0.6} delay={0.1}>
         <div
-          className="bg-[#1C1C1E] p-8 md:p-10 rounded-2xl border border-[#2C2C2E] shadow-2xl overflow-hidden "
+          className="bg-[#1C1C1E] p-6 md:p-10 rounded-2xl border border-[#2C2C2E] shadow-2xl overflow-hidden"
           style={{
-            boxShadow: "0 0 50px -12px rgba(178, 114, 31, 0.15)"
+            boxShadow: "0 0 50px -12px rgba(178, 114, 31, 0.15)",
           }}
         >
           {/* Progress Section */}
-          <div className="mb-12">
+          <div className="mb-8">
             <div className="w-full bg-[#111113] h-1.5 rounded-full overflow-hidden mb-6">
               <div
                 className="bg-primary2 h-full transition-all duration-500 ease-out"
@@ -396,13 +902,14 @@ export default function AddListing() {
                 <span
                   key={step}
                   className={`transition-colors duration-300 cursor-default ${
-                    index <= currentStep ? "text-primary2" : "text-gray-500"
+                    index <= currentStep ? "text-primary2 font-semibold" : "text-gray-500"
                   }`}
                 >
-                  {step}
+                  {index + 1}. {step}
                 </span>
               ))}
             </div>
+
             {/* Mobile step indicator */}
             <div className="md:hidden text-center text-primary2 font-medium text-sm">
               Step {currentStep + 1}: {steps[currentStep]}
@@ -410,18 +917,19 @@ export default function AddListing() {
           </div>
 
           {/* Form Context Container */}
-          <div className="bg-[#111113]/50 rounded-2xl p-6 md:p-8 border border-[#2C2C2E]/60  min-h-115">
+          <div className="bg-[#111113]/50 rounded-2xl p-6 md:p-8 border border-[#2C2C2E]/60 min-h-[420px]">
             <AnimationWrapper key={currentStep} type="zoom" duration={0.4}>
               {renderStepContent()}
             </AnimationWrapper>
           </div>
 
           {/* Navigation Buttons */}
-          <div className="flex justify-between items-center mt-12">
+          <div className="flex justify-between items-center mt-8 pt-4 border-t border-[#2C2C2E]">
             {currentStep > 0 ? (
               <button
+                type="button"
                 onClick={handleBack}
-                className="flex items-center gap-2 px-6 py-3 border border-[#2C2C2E] rounded-xl text-gray-400 text-sm font-medium hover:bg-[#2C2C2E] hover:text-white transition-all duration-300 group cursor-pointer"
+                className="flex items-center gap-2 px-6 py-3 border border-[#2C2C2E] rounded-xl text-gray-300 text-sm font-medium hover:bg-[#2C2C2E] hover:text-white transition-all duration-300 group cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                 Back
@@ -429,16 +937,37 @@ export default function AddListing() {
             ) : (
               <div />
             )}
-            
-            <button
-              onClick={handleNext}
-              className="flex items-center gap-2 px-8 py-3 bg-primary2 text-[#111113] rounded-xl text-sm font-bold hover:bg-primary transition-all duration-300 shadow-lg shadow-primary2/10 group cursor-pointer ml-auto"
-            >
-              {currentStep === steps.length - 1 ? "Submit Listing" : "Next Step"}
-              {currentStep !== steps.length - 1 && (
+
+            {currentStep === steps.length - 1 ? (
+              <button
+                type="button"
+                onClick={handleSubmitListing}
+                disabled={createListingMutation.isPending || uploadMediaMutation.isPending}
+                className="flex items-center gap-2 px-8 py-3 bg-primary2 text-[#111113] rounded-xl text-sm font-bold hover:bg-yellow-400 transition-all duration-300 shadow-lg shadow-primary2/20 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer active:scale-95 ml-auto"
+              >
+                {createListingMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 text-black animate-spin" />
+                    Submitting Listing...
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-4 h-4 text-black" />
+                    Submit Listing
+                  </>
+                )}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleNext}
+                disabled={uploadMediaMutation.isPending}
+                className="flex items-center gap-2 px-8 py-3 bg-primary2 text-[#111113] rounded-xl text-sm font-bold hover:bg-yellow-400 transition-all duration-300 shadow-lg shadow-primary2/20 group cursor-pointer ml-auto disabled:opacity-50"
+              >
+                Next Step
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              )}
-            </button>
+              </button>
+            )}
           </div>
         </div>
       </AnimationWrapper>

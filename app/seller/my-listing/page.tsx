@@ -1,83 +1,152 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
-import { Search, SlidersHorizontal, Eye, MoreVertical } from "lucide-react";
+import Link from "next/link";
+import {
+  Search,
+  Eye,
+  MoreVertical,
+  ChevronLeft,
+  ChevronRight,
+  PackageOpen,
+  RefreshCw,
+} from "lucide-react";
 import AnimationWrapper from "../../components/AnimationWrapper";
-
-const listings = [
-  {
-    id: "LST-001",
-    name: "Ferrari 488 Spider",
-    dateAdded: "Oct 12, 2023",
-    category: "Supercar",
-    price: "$345,000",
-    status: "Live",
-    engagement: "1,245",
-    image: "/images/listings/ferrari.png",
-  },
-  {
-    id: "LST-002",
-    name: "Azimut Grande 27 Metri",
-    dateAdded: "Sep 28, 2023",
-    category: "Yacht",
-    price: "$6,500,000",
-    status: "Live",
-    engagement: "8,320",
-    image:
-      "https://images.unsplash.com/photo-1567899539078-4e8586b39da7?auto=format&fit=crop&q=80&w=300&h=200",
-  },
-  {
-    id: "LST-003",
-    name: "Rolex Daytona 116500LN",
-    dateAdded: "Oct 24, 2023",
-    category: "Watch",
-    price: "$32,500",
-    status: "Pending",
-    engagement: "0",
-    image:
-      "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?auto=format&fit=crop&q=80&w=300&h=200",
-  },
-  {
-    id: "LST-004",
-    name: "Modern Bel Air Mansion",
-    dateAdded: "Aug 15, 2023",
-    category: "Real Estate",
-    price: "$14,000,000",
-    status: "Sold",
-    engagement: "12,450",
-    image:
-      "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&q=80&w=300&h=200",
-  },
-  {
-    id: "LST-005",
-    name: "Bombardier Global 7500",
-    dateAdded: "Oct 20, 2023",
-    category: "Private Jet",
-    price: "$72,000,000",
-    status: "Rejected",
-    engagement: "0",
-    image:
-      "https://images.unsplash.com/photo-1540962351504-03099e0a754b?auto=format&fit=crop&q=80&w=300&h=200",
-  },
-];
+import { useMyListingsQuery } from "@/hooks/useListings";
+import { useDebounce } from "@/hooks/useDebounce";
 
 const getStatusStyles = (status: string) => {
-  switch (status) {
-    case "Live":
+  const normalized = status?.toUpperCase();
+  switch (normalized) {
+    case "LIVE":
+    case "APPROVED":
+    case "ACTIVE":
       return "bg-emerald-500/10 text-emerald-500 border-emerald-500/20";
-    case "Pending":
+    case "PENDING":
+    case "PENDING_APPROVAL":
       return "bg-amber-500/10 text-amber-500 border-amber-500/20";
-    case "Sold":
+    case "SOLD":
       return "bg-blue-500/10 text-blue-500 border-blue-500/20";
-    case "Rejected":
+    case "REJECTED":
       return "bg-rose-500/10 text-rose-500 border-rose-500/20";
     default:
       return "bg-gray-500/10 text-gray-500 border-gray-500/20";
   }
 };
 
+const formatStatusLabel = (status: string) => {
+  if (!status) return "Unknown";
+  const normalized = status.toUpperCase();
+  switch (normalized) {
+    case "PENDING_APPROVAL":
+    case "PENDING":
+      return "Pending";
+    case "APPROVED":
+    case "LIVE":
+    case "ACTIVE":
+      return "Live";
+    case "SOLD":
+      return "Sold";
+    case "REJECTED":
+      return "Rejected";
+    default:
+      return status;
+  }
+};
+
+const formatDate = (dateString?: string) => {
+  if (!dateString) return "N/A";
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  } catch {
+    return dateString;
+  }
+};
+
+const formatPrice = (price?: string | number, currency = "USD") => {
+  if (price === undefined || price === null || price === "") return "N/A";
+  const num = typeof price === "string" ? parseFloat(price) : price;
+  if (isNaN(num)) return `${currency} ${price}`;
+
+  try {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency || "USD",
+      maximumFractionDigits: 0,
+    }).format(num);
+  } catch {
+    return `$${num.toLocaleString()}`;
+  }
+};
+
+const TableSkeleton = () => (
+  <>
+    {[1, 2, 3, 4, 5].map((n) => (
+      <tr key={n} className="border-b border-[#1F1F1F] animate-pulse">
+        <td className="px-8 py-6">
+          <div className="flex items-center gap-5">
+            <div className="w-24 h-16 bg-white/10 rounded-xl shrink-0" />
+            <div className="space-y-2 flex-1 min-w-0">
+              <div className="w-48 h-5 bg-white/10 rounded" />
+              <div className="w-32 h-3.5 bg-white/10 rounded" />
+            </div>
+          </div>
+        </td>
+        <td className="px-8 py-6">
+          <div className="w-24 h-4 bg-white/10 rounded" />
+        </td>
+        <td className="px-8 py-6">
+          <div className="w-28 h-5 bg-white/10 rounded" />
+        </td>
+        <td className="px-8 py-6">
+          <div className="w-20 h-6 bg-white/10 rounded-full" />
+        </td>
+        <td className="px-8 py-6">
+          <div className="w-16 h-4 bg-white/10 rounded" />
+        </td>
+        <td className="px-8 py-6 text-right">
+          <div className="w-8 h-8 bg-white/10 rounded-full ml-auto" />
+        </td>
+      </tr>
+    ))}
+  </>
+);
+
 const SellerListing = () => {
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const debouncedSearch = useDebounce(searchQuery, 400);
+
+  const { data, isLoading, isFetching, refetch } = useMyListingsQuery({
+    page,
+    limit,
+    search: debouncedSearch,
+    sortBy: "NEWEST",
+  });
+
+  const listings = data?.data || [];
+  const meta = data?.meta || {
+    total: 0,
+    page: 1,
+    limit: 10,
+    totalPages: 1,
+  };
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= meta.totalPages) {
+      setPage(newPage);
+    }
+  };
+
   return (
     <div className="w-full mx-auto space-y-10 pb-10">
       {/* Header Section */}
@@ -89,9 +158,11 @@ const SellerListing = () => {
         </AnimationWrapper>
 
         <AnimationWrapper type="fade-down" delay={0.1}>
-          <button className="flex items-center gap-2 px-8 py-3 bg-[#E78F23] hover:bg-[#E78F23]/90 transition-all duration-300 text-black font-bold rounded-xl shadow-[0_0_25px_rgba(231,143,35,0.3)] hover:scale-[1.02] active:scale-[0.98]">
-            Add Listing
-          </button>
+          <Link href="/seller/add-listing">
+            <button className="flex items-center gap-2 px-8 py-3 bg-[#E78F23] hover:bg-[#E78F23]/90 transition-all duration-300 text-black font-bold rounded-xl shadow-[0_0_25px_rgba(231,143,35,0.3)] hover:scale-[1.02] active:scale-[0.98] cursor-pointer">
+              Add Listing
+            </button>
+          </Link>
         </AnimationWrapper>
       </div>
 
@@ -103,18 +174,27 @@ const SellerListing = () => {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
               <input
                 type="text"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setPage(1);
+                }}
                 placeholder="Search listings..."
                 className="w-full bg-[#121212] border border-[#2D2D2D] rounded-xl py-3 pl-12 pr-4 text-gray-200 placeholder:text-gray-600 focus:outline-none focus:border-[#E78F23]/40 focus:ring-1 focus:ring-[#E78F23]/40 transition-all duration-300"
               />
             </div>
 
-            <div className="flex items-center gap-8 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
-              <button className="flex items-center gap-2 px-6 py-2.5 border border-[#E78F23]/60 text-[#E78F23] rounded-xl hover:bg-[#E78F23]/10 transition-all duration-300 font-medium whitespace-nowrap">
-                <SlidersHorizontal className="w-4 h-4" />
-                <span>Filters</span>
+            <div className="flex items-center gap-6 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
+              <button
+                onClick={() => refetch()}
+                className="flex items-center gap-2 px-6 py-2.5 border border-[#E78F23]/60 text-[#E78F23] rounded-xl hover:bg-[#E78F23]/10 transition-all duration-300 font-medium whitespace-nowrap cursor-pointer"
+                title="Refresh listings"
+              >
+                <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`} />
+                <span>Refresh</span>
               </button>
               <span className="text-gray-400 font-medium text-sm whitespace-nowrap">
-                Showing <span className="text-white font-bold text-lg">5</span>{" "}
+                Showing <span className="text-white font-bold text-lg">{meta.total}</span>{" "}
                 items
               </span>
             </div>
@@ -152,61 +232,151 @@ const SellerListing = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#1F1F1F]">
-                  {listings.map((item, idx) => (
-                    <tr
-                      key={item.id}
-                      className="hover:bg-white/3 transition-all duration-300 group"
-                    >
-                      <td className="px-8 py-6">
-                        <div className="flex items-center gap-5">
-                          <div className="relative w-24 h-16 rounded-xl overflow-hidden shrink-0 bg-[#1A1A1A] border border-[#2D2D2D] transition-transform duration-300 group-hover:scale-105">
-                            <Image
-                              src={item.image}
-                              alt={item.name}
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-base font-bold text-white group-hover:text-[#E78F23] transition-colors duration-300 truncate">
-                              {item.name}
-                            </p>
-                            <p className="text-[12px] text-gray-500 mt-1 font-medium">
-                              {item.id} <span className="mx-1.5">•</span> Added{" "}
-                              {item.dateAdded}
-                            </p>
-                          </div>
+                  {isLoading ? (
+                    <TableSkeleton />
+                  ) : listings.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="px-8 py-16 text-center">
+                        <div className="max-w-md mx-auto space-y-3">
+                          <PackageOpen className="w-12 h-12 text-gray-600 mx-auto" />
+                          <p className="text-lg font-bold text-gray-300">
+                            No listings found
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            {searchQuery
+                              ? `No listings match your search "${searchQuery}"`
+                              : "You haven't created any listings yet. Click 'Add Listing' to post your first vehicle or asset."}
+                          </p>
                         </div>
-                      </td>
-                      <td className="px-8 py-6 text-sm text-gray-400 font-medium">
-                        {item.category}
-                      </td>
-                      <td className="px-8 py-6 text-lg font-extrabold text-white">
-                        {item.price}
-                      </td>
-                      <td className="px-8 py-6">
-                        <span
-                          className={`px-4 py-1.5 text-[11px] font-bold rounded-full border tracking-wide inline-block ${getStatusStyles(item.status)}`}
-                        >
-                          {item.status}
-                        </span>
-                      </td>
-                      <td className="px-8 py-6">
-                        <div className="flex items-center gap-2.5 text-sm text-gray-400 font-bold">
-                          <Eye className="w-5 h-5 text-gray-500" />
-                          <span>{item.engagement}</span>
-                        </div>
-                      </td>
-                      <td className="px-8 py-6 text-right">
-                        <button className="p-3 text-gray-500 hover:text-white hover:bg-white/5 rounded-full transition-all duration-300">
-                          <MoreVertical className="w-6 h-6" />
-                        </button>
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    listings.map((item) => {
+                      const imageUrl =
+                        item.media?.[0]?.url ||
+                        "https://images.unsplash.com/photo-1592198084033-aade902d1aae?auto=format&fit=crop&q=80&w=300&h=200";
+
+                      return (
+                        <tr
+                          key={item.id}
+                          className="hover:bg-white/3 transition-all duration-300 group"
+                        >
+                          <td className="px-8 py-6">
+                            <div className="flex items-center gap-5">
+                              <div className="relative w-24 h-16 rounded-xl overflow-hidden shrink-0 bg-[#1A1A1A] border border-[#2D2D2D] transition-transform duration-300 group-hover:scale-105">
+                                <Image
+                                  src={imageUrl}
+                                  alt={item.title}
+                                  fill
+                                  className="object-cover"
+                                  unoptimized
+                                />
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-base font-bold text-white group-hover:text-[#E78F23] transition-colors duration-300 truncate">
+                                  {item.title}
+                                </p>
+                                <p className="text-[12px] text-gray-500 mt-1 font-medium">
+                                  LST-{item.id.slice(0, 6).toUpperCase()}{" "}
+                                  <span className="mx-1.5">•</span> Added{" "}
+                                  {formatDate(item.createdAt)}
+                                </p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-8 py-6 text-sm text-gray-400 font-medium">
+                            {item.category}
+                            {item.subCategory && (
+                              <span className="text-xs text-gray-600 block">
+                                {item.subCategory}
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-8 py-6 text-lg font-extrabold text-white">
+                            {formatPrice(item.askingPrice, item.currency)}
+                          </td>
+                          <td className="px-8 py-6">
+                            <span
+                              className={`px-4 py-1.5 text-[11px] font-bold rounded-full border tracking-wide inline-block ${getStatusStyles(
+                                item.status
+                              )}`}
+                            >
+                              {formatStatusLabel(item.status)}
+                            </span>
+                          </td>
+                          <td className="px-8 py-6">
+                            <div className="flex items-center gap-2.5 text-sm text-gray-400 font-bold">
+                              <Eye className="w-5 h-5 text-gray-500" />
+                              <span>{item.viewsCount ?? 0}</span>
+                            </div>
+                          </td>
+                          <td className="px-8 py-6 text-right">
+                            <button className="p-3 text-gray-500 hover:text-white hover:bg-white/5 rounded-full transition-all duration-300 cursor-pointer">
+                              <MoreVertical className="w-6 h-6" />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination Controls */}
+            {!isLoading && meta.totalPages > 1 && (
+              <div className="px-8 py-5 border-t border-[#1F1F1F] bg-[#0A0A0A] flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-400">
+                <div>
+                  Showing{" "}
+                  <span className="font-bold text-white">
+                    {(meta.page - 1) * meta.limit + 1}
+                  </span>{" "}
+                  to{" "}
+                  <span className="font-bold text-white">
+                    {Math.min(meta.page * meta.limit, meta.total)}
+                  </span>{" "}
+                  of <span className="font-bold text-white">{meta.total}</span> items
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handlePageChange(meta.page - 1)}
+                    disabled={meta.page <= 1}
+                    className="px-4 py-2 rounded-xl border border-[#2D2D2D] bg-[#121212] text-gray-300 hover:text-white hover:border-[#E78F23]/50 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 flex items-center gap-1.5 font-medium text-xs cursor-pointer"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    <span>Previous</span>
+                  </button>
+
+                  <div className="flex items-center gap-1.5">
+                    {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map(
+                      (pageNum) => (
+                        <button
+                          key={pageNum}
+                          onClick={() => handlePageChange(pageNum)}
+                          className={`w-9 h-9 rounded-xl border font-bold text-xs transition-all duration-300 cursor-pointer ${
+                            pageNum === meta.page
+                              ? "bg-[#E78F23] text-black border-[#E78F23] shadow-[0_0_15px_rgba(231,143,35,0.4)]"
+                              : "bg-[#121212] border-[#2D2D2D] text-gray-400 hover:text-white hover:border-[#E78F23]/40"
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      )
+                    )}
+                  </div>
+
+                  <button
+                    onClick={() => handlePageChange(meta.page + 1)}
+                    disabled={meta.page >= meta.totalPages}
+                    className="px-4 py-2 rounded-xl border border-[#2D2D2D] bg-[#121212] text-gray-300 hover:text-white hover:border-[#E78F23]/50 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 flex items-center gap-1.5 font-medium text-xs cursor-pointer"
+                  >
+                    <span>Next</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </AnimationWrapper>
       </div>

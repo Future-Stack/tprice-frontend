@@ -7,14 +7,12 @@ import {
   Bell,
   CreditCard,
   Camera,
-  ChevronRight,
   Mail,
   Phone,
   Building2,
-  CheckCircle2,
   Plus,
   ShieldCheck,
-  X
+  X,
 } from "lucide-react";
 import AnimationWrapper from "../../components/AnimationWrapper";
 import { AnimatePresence, motion } from "framer-motion";
@@ -39,7 +37,9 @@ const tabs = [
 
 export default function SellerSettings() {
   const [activeTab, setActiveTab] = useState("profile");
-  const [avatarPreview, setAvatarPreview] = useState("https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&h=256&auto=format&fit=crop");
+  const [avatarPreview, setAvatarPreview] = useState(
+    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&h=256&auto=format&fit=crop",
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([
@@ -62,7 +62,9 @@ export default function SellerSettings() {
   ]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingMethod, setEditingMethod] = useState<PaymentMethod | null>(null);
+  const [editingMethod, setEditingMethod] = useState<PaymentMethod | null>(
+    null,
+  );
   const [formData, setFormData] = useState({
     nameOnCard: "",
     cardNumber: "",
@@ -90,7 +92,10 @@ export default function SellerSettings() {
       setEditingMethod(method);
       setFormData({
         nameOnCard: method.nameOnCard || "Alexander Kingston",
-        cardNumber: method.type === "card" ? `•••• •••• •••• ${method.lastFour}` : `•••• •••• •••• ${method.lastFour}`,
+        cardNumber:
+          method.type === "card"
+            ? `•••• •••• •••• ${method.lastFour}`
+            : `•••• •••• •••• ${method.lastFour}`,
         expiry: method.expiry || "MM/YY",
         cvc: "•••",
       });
@@ -107,25 +112,33 @@ export default function SellerSettings() {
   };
 
   const handleTogglePrimary = (id: string) => {
-    setPaymentMethods(prev => prev.map(m => ({
-      ...m,
-      isPrimary: m.id === id
-    })));
+    setPaymentMethods((prev) =>
+      prev.map((m) => ({
+        ...m,
+        isPrimary: m.id === id,
+      })),
+    );
   };
 
   const handleRemove = (id: string) => {
-    setPaymentMethods(prev => prev.filter(m => m.id !== id));
+    setPaymentMethods((prev) => prev.filter((m) => m.id !== id));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (editingMethod) {
-      setPaymentMethods(prev => prev.map(m => m.id === editingMethod.id ? {
-        ...m,
-        nameOnCard: formData.nameOnCard,
-        lastFour: formData.cardNumber.replace(/\s/g, "").slice(-4),
-        expiry: formData.expiry
-      } : m));
+      setPaymentMethods((prev) =>
+        prev.map((m) =>
+          m.id === editingMethod.id
+            ? {
+                ...m,
+                nameOnCard: formData.nameOnCard,
+                lastFour: formData.cardNumber.replace(/\s/g, "").slice(-4),
+                expiry: formData.expiry,
+              }
+            : m,
+        ),
+      );
     } else {
       const newMethod: PaymentMethod = {
         id: Math.random().toString(36).substr(2, 9),
@@ -146,7 +159,9 @@ export default function SellerSettings() {
       {/* Header Section */}
       <AnimationWrapper type="fade-down" duration={0.5}>
         <div className="mb-8">
-          <h2 className="text-3xl md:text-[40px] font-clash font-medium tracking-tight text-white">Settings</h2>
+          <h2 className="text-3xl md:text-[40px] font-clash font-medium tracking-tight text-white">
+            Settings
+          </h2>
           <p className="text-gray-400 mt-2 text-base md:text-lg">
             Manage your account preferences, security, and payout methods.
           </p>
@@ -161,13 +176,18 @@ export default function SellerSettings() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`shrink-0 lg:w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group ${activeTab === tab.id
-                  ? "bg-[#1C1C1E] border border-[#2C2C2E] text-primary2 shadow-lg"
-                  : "text-gray-400 hover:text-gray-200 hover:bg-[#1C1C1E]/50 border border-transparent"
-                  }`}
+                className={`shrink-0 lg:w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group ${
+                  activeTab === tab.id
+                    ? "bg-[#1C1C1E] border border-[#2C2C2E] text-primary2 shadow-lg"
+                    : "text-gray-400 hover:text-gray-200 hover:bg-[#1C1C1E]/50 border border-transparent"
+                }`}
               >
-                <tab.icon className={`w-5 h-5 ${activeTab === tab.id ? "text-primary2" : "text-gray-500 group-hover:text-gray-400"}`} />
-                <span className="font-medium text-[15px] whitespace-nowrap">{tab.label}</span>
+                <tab.icon
+                  className={`w-5 h-5 ${activeTab === tab.id ? "text-primary2" : "text-gray-500 group-hover:text-gray-400"}`}
+                />
+                <span className="font-medium text-[15px] whitespace-nowrap">
+                  {tab.label}
+                </span>
                 {activeTab === tab.id && (
                   <div className="hidden lg:block ml-auto w-1 h-4 bg-primary2 rounded-full scale-y-125" />
                 )}
@@ -177,7 +197,12 @@ export default function SellerSettings() {
         </AnimationWrapper>
 
         {/* Content Area */}
-        <AnimationWrapper key={activeTab} type="fade-up" duration={0.6} delay={0.1}>
+        <AnimationWrapper
+          key={activeTab}
+          type="fade-up"
+          duration={0.6}
+          delay={0.1}
+        >
           <div className="bg-[#1C1C1E] rounded-3xl border border-[#2C2C2E] overflow-hidden shadow-2xl relative">
             {/* Glow Effect */}
             <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-primary2/5 blur-[100px] pointer-events-none rounded-full" />
@@ -186,7 +211,9 @@ export default function SellerSettings() {
               {activeTab === "profile" && (
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                   <div className="mb-8 font-clash">
-                    <h3 className="text-2xl font-medium text-white">Personal Information</h3>
+                    <h3 className="text-2xl font-medium text-white">
+                      Personal Information
+                    </h3>
                     <div className="h-0.5 bg-linear-to-r from-[#2C2C2E] to-transparent mt-4 w-full" />
                   </div>
 
@@ -223,7 +250,9 @@ export default function SellerSettings() {
                         >
                           Change Avatar
                         </button>
-                        <p className="text-gray-500 text-xs tracking-wide">JPG, GIF or PNG. 1MB max.</p>
+                        <p className="text-gray-500 text-xs tracking-wide">
+                          JPG, GIF or PNG. 1MB max.
+                        </p>
                       </div>
                     </div>
 
@@ -231,7 +260,9 @@ export default function SellerSettings() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-7">
                       {/* First Name */}
                       <div className="space-y-2.5">
-                        <label className="text-sm font-medium text-gray-400 ml-1">First Name</label>
+                        <label className="text-sm font-medium text-gray-400 ml-1">
+                          First Name
+                        </label>
                         <input
                           type="text"
                           defaultValue="Julian"
@@ -241,7 +272,9 @@ export default function SellerSettings() {
 
                       {/* Last Name */}
                       <div className="space-y-2.5">
-                        <label className="text-sm font-medium text-gray-400 ml-1">Last Name</label>
+                        <label className="text-sm font-medium text-gray-400 ml-1">
+                          Last Name
+                        </label>
                         <input
                           type="text"
                           defaultValue="Carter"
@@ -251,7 +284,9 @@ export default function SellerSettings() {
 
                       {/* Email */}
                       <div className="md:col-span-2 space-y-2.5">
-                        <label className="text-sm font-medium text-gray-400 ml-1">Email Address</label>
+                        <label className="text-sm font-medium text-gray-400 ml-1">
+                          Email Address
+                        </label>
                         <div className="relative group">
                           <input
                             type="email"
@@ -264,7 +299,9 @@ export default function SellerSettings() {
 
                       {/* Phone Number */}
                       <div className="md:col-span-2 space-y-2.5">
-                        <label className="text-sm font-medium text-gray-400 ml-1">Phone Number</label>
+                        <label className="text-sm font-medium text-gray-400 ml-1">
+                          Phone Number
+                        </label>
                         <div className="relative group">
                           <input
                             type="text"
@@ -277,7 +314,9 @@ export default function SellerSettings() {
 
                       {/* Company Name */}
                       <div className="md:col-span-2 space-y-2.5">
-                        <label className="text-sm font-medium text-gray-400 ml-1">Company / Dealership Name (Optional)</label>
+                        <label className="text-sm font-medium text-gray-400 ml-1">
+                          Company / Dealership Name (Optional)
+                        </label>
                         <div className="relative group">
                           <input
                             type="text"
@@ -303,7 +342,9 @@ export default function SellerSettings() {
               {activeTab === "security" && (
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                   <div className="mb-8 font-clash">
-                    <h3 className="text-2xl font-medium text-white">Change Password</h3>
+                    <h3 className="text-2xl font-medium text-white">
+                      Change Password
+                    </h3>
                     <div className="h-0.5 bg-linear-to-r from-[#2C2C2E] to-transparent mt-4 w-full" />
                   </div>
 
@@ -311,7 +352,9 @@ export default function SellerSettings() {
                     <div className="space-y-6">
                       {/* Current Password */}
                       <div className="space-y-2.5">
-                        <label className="text-sm font-medium text-gray-400 ml-1">Current Password</label>
+                        <label className="text-sm font-medium text-gray-400 ml-1">
+                          Current Password
+                        </label>
                         <input
                           type="password"
                           placeholder="••••••••"
@@ -321,7 +364,9 @@ export default function SellerSettings() {
 
                       {/* New Password */}
                       <div className="space-y-2.5">
-                        <label className="text-sm font-medium text-gray-400 ml-1">New Password</label>
+                        <label className="text-sm font-medium text-gray-400 ml-1">
+                          New Password
+                        </label>
                         <input
                           type="password"
                           placeholder="••••••••"
@@ -331,7 +376,9 @@ export default function SellerSettings() {
 
                       {/* Confirm New Password */}
                       <div className="space-y-2.5">
-                        <label className="text-sm font-medium text-gray-400 ml-1">Confirm New Password</label>
+                        <label className="text-sm font-medium text-gray-400 ml-1">
+                          Confirm New Password
+                        </label>
                         <input
                           type="password"
                           placeholder="••••••••"
@@ -355,8 +402,13 @@ export default function SellerSettings() {
                   <div className="w-16 h-16 bg-[#1C1C1E] border border-[#2C2C2E] rounded-2xl flex items-center justify-center mb-4">
                     <Bell className="w-8 h-8 text-primary2" />
                   </div>
-                  <h4 className="text-xl font-medium text-white mb-2">Notification Settings</h4>
-                  <p className="text-gray-500 max-w-sm">Manage how you receive alerts and updates about your listings and account.</p>
+                  <h4 className="text-xl font-medium text-white mb-2">
+                    Notification Settings
+                  </h4>
+                  <p className="text-gray-500 max-w-sm">
+                    Manage how you receive alerts and updates about your
+                    listings and account.
+                  </p>
                 </div>
               )}
 
@@ -364,7 +416,9 @@ export default function SellerSettings() {
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
                     <div className="font-clash">
-                      <h3 className="text-2xl font-medium text-white">Payout Methods</h3>
+                      <h3 className="text-2xl font-medium text-white">
+                        Payout Methods
+                      </h3>
                       <div className="h-0.5 bg-linear-to-r from-[#2C2C2E] to-transparent mt-4 w-48" />
                     </div>
                     <button
@@ -380,20 +434,29 @@ export default function SellerSettings() {
                     {paymentMethods.map((method) => (
                       <div
                         key={method.id}
-                        className={`bg-[#111113] border-2 transition-all duration-300 rounded-2xl p-6 ${method.isPrimary ? "border-primary2/20 hover:border-primary2/40" : "border-[#2C2C2E] hover:border-[#3C3C3E]"
-                          }`}
+                        className={`bg-[#111113] border-2 transition-all duration-300 rounded-2xl p-6 ${
+                          method.isPrimary
+                            ? "border-primary2/20 hover:border-primary2/40"
+                            : "border-[#2C2C2E] hover:border-[#3C3C3E]"
+                        }`}
                       >
                         <div className="flex items-center gap-5">
                           <div className="w-14 h-14 rounded-2xl bg-[#1C1C1E] border border-[#2C2C2E] flex items-center justify-center shadow-inner">
                             {method.type === "bank" ? (
-                              <Building2 className={`w-7 h-7 ${method.isPrimary ? "text-primary2" : "text-gray-500"}`} />
+                              <Building2
+                                className={`w-7 h-7 ${method.isPrimary ? "text-primary2" : "text-gray-500"}`}
+                              />
                             ) : (
-                              <CreditCard className={`w-7 h-7 ${method.isPrimary ? "text-primary2" : "text-gray-500"}`} />
+                              <CreditCard
+                                className={`w-7 h-7 ${method.isPrimary ? "text-primary2" : "text-gray-500"}`}
+                              />
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex flex-wrap items-center gap-3">
-                              <h4 className="text-xl font-semibold text-white tracking-tight">{method.provider}</h4>
+                              <h4 className="text-xl font-semibold text-white tracking-tight">
+                                {method.provider}
+                              </h4>
                               {method.isPrimary && (
                                 <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-bold uppercase tracking-widest border border-emerald-500/20">
                                   Primary
@@ -401,7 +464,11 @@ export default function SellerSettings() {
                               )}
                             </div>
                             <p className="text-gray-400 text-[15px] mt-1.5 flex items-center gap-2">
-                              {method.bankType || "Credit Card"} <span className="text-gray-600 font-bold">••••</span> {method.lastFour}
+                              {method.bankType || "Credit Card"}{" "}
+                              <span className="text-gray-600 font-bold">
+                                ••••
+                              </span>{" "}
+                              {method.lastFour}
                             </p>
                           </div>
                           <div className="hidden sm:flex items-center gap-4">
@@ -470,9 +537,14 @@ export default function SellerSettings() {
                           <ShieldCheck className="w-5 h-5 text-primary2" />
                         </div>
                         <div>
-                          <h5 className="text-base font-semibold text-white mb-2">Secure Transactions</h5>
+                          <h5 className="text-base font-semibold text-white mb-2">
+                            Secure Transactions
+                          </h5>
                           <p className="text-gray-500 text-sm leading-relaxed max-w-2xl">
-                            All wire transfers and payouts are verified through Escrow.com integration. Large transfers may require additional voice verification to ensure the highest level of security for your funds.
+                            All wire transfers and payouts are verified through
+                            Escrow.com integration. Large transfers may require
+                            additional voice verification to ensure the highest
+                            level of security for your funds.
                           </p>
                         </div>
                       </div>
@@ -480,7 +552,6 @@ export default function SellerSettings() {
                   </div>
                 </div>
               )}
-
             </div>
           </div>
         </AnimationWrapper>
@@ -500,7 +571,9 @@ export default function SellerSettings() {
                 {/* Modal Header */}
                 <div className="flex items-center justify-between">
                   <h3 className="text-2xl font-semibold text-white tracking-tight">
-                    {editingMethod ? "Edit Payment Method" : "Add Payment Method"}
+                    {editingMethod
+                      ? "Edit Payment Method"
+                      : "Add Payment Method"}
                   </h3>
                   <button
                     onClick={() => setIsModalOpen(false)}
@@ -514,12 +587,16 @@ export default function SellerSettings() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Name on Card */}
                   <div className="space-y-2.5">
-                    <label className="text-[15px] font-medium text-white/90 ml-1">Name on Card</label>
+                    <label className="text-[15px] font-medium text-white/90 ml-1">
+                      Name on Card
+                    </label>
                     <input
                       type="text"
                       placeholder="Alexander Kingston"
                       value={formData.nameOnCard}
-                      onChange={(e) => setFormData({ ...formData, nameOnCard: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, nameOnCard: e.target.value })
+                      }
                       className="w-full bg-[#1C1C1E] border border-[#2C2C2E] rounded-2xl px-5 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50 transition-all shadow-inner"
                       required
                     />
@@ -527,12 +604,16 @@ export default function SellerSettings() {
 
                   {/* Card Number */}
                   <div className="space-y-2.5">
-                    <label className="text-[15px] font-medium text-white/90 ml-1">Card Number</label>
+                    <label className="text-[15px] font-medium text-white/90 ml-1">
+                      Card Number
+                    </label>
                     <input
                       type="text"
                       placeholder="1234 5678 9012 3456"
                       value={formData.cardNumber}
-                      onChange={(e) => setFormData({ ...formData, cardNumber: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, cardNumber: e.target.value })
+                      }
                       className="w-full bg-[#1C1C1E] border border-[#2C2C2E] rounded-2xl px-5 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50 transition-all shadow-inner"
                       required
                     />
@@ -541,23 +622,31 @@ export default function SellerSettings() {
                   {/* Expiry and CVC */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2.5">
-                      <label className="text-[15px] font-medium text-white/90 ml-1">Expiry</label>
+                      <label className="text-[15px] font-medium text-white/90 ml-1">
+                        Expiry
+                      </label>
                       <input
                         type="text"
                         placeholder="MM/YY"
                         value={formData.expiry}
-                        onChange={(e) => setFormData({ ...formData, expiry: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({ ...formData, expiry: e.target.value })
+                        }
                         className="w-full bg-[#1C1C1E] border border-[#2C2C2E] rounded-2xl px-5 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50 transition-all shadow-inner"
                         required
                       />
                     </div>
                     <div className="space-y-2.5">
-                      <label className="text-[15px] font-medium text-white/90 ml-1">CVC</label>
+                      <label className="text-[15px] font-medium text-white/90 ml-1">
+                        CVC
+                      </label>
                       <input
                         type="password"
                         placeholder="•••"
                         value={formData.cvc}
-                        onChange={(e) => setFormData({ ...formData, cvc: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({ ...formData, cvc: e.target.value })
+                        }
                         className="w-full bg-[#1C1C1E] border border-[#2C2C2E] rounded-2xl px-5 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50 transition-all shadow-inner"
                         required
                         maxLength={4}

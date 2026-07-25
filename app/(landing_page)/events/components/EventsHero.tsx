@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 export default function EventsHero() {
   return (
-    <section className="relative h-screen min-h-150 w-full overflow-hidden flex flex-col justify-center">
+    <section className="relative py-35.25 w-full overflow-hidden flex flex-col justify-center">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img
@@ -19,7 +19,7 @@ export default function EventsHero() {
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-6 md:px-12 pt-20">
-        <div className="max-w-4xl space-y-6">
+        <div className="  space-y-6">
           <motion.h4
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -42,7 +42,7 @@ export default function EventsHero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-white/70 text-lg md:text-[24px] max-w-3xl leading-relaxed"
+            className="text-white/70 text-lg md:text-[24px] max-w-5xl leading-relaxed"
           >
             From intimate VIP gatherings to world-class automotive concours,
             ExoticWorld curates the most exclusive events in the luxury asset
