@@ -201,6 +201,7 @@ export default function EventDetailsPage() {
       <RegistrationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        eventId={slug || apiEvent?.id}
         eventTitle={event.title}
         eventDate={event.date}
         eventLocation={event.location}

@@ -1,11 +1,45 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AnimationWrapper from '@/app/components/AnimationWrapper';
-import { ChevronDown, CheckCircle2, ClipboardList, Search, Lock, Monitor,   LogOut } from 'lucide-react';
+import { ChevronDown, CheckCircle2, ClipboardList, Search, Lock, Monitor, LogOut, Loader2, RefreshCw } from 'lucide-react';
+import { useAdminSettingsQuery, useUpdateAdminSettingsMutation, useUpdateGeneralSettingsMutation, useUpdateModerationSettingsMutation, useUpdateLogsSettingsMutation } from '@/hooks/useAdminSettings';
+
+const logRetentionToPeriod = (days?: number): string => {
+    if (!days) return '30 days';
+    if (days <= 7) return '7 days';
+    if (days <= 30) return '30 days';
+    if (days <= 90) return '90 days';
+    if (days <= 365) return '1 year';
+    return 'Forever';
+};
+
+const periodToLogRetentionDays = (period: string): number => {
+    switch (period) {
+        case '7 days':
+            return 7;
+        case '30 days':
+            return 30;
+        case '90 days':
+            return 90;
+        case '1 year':
+            return 365;
+        case 'Forever':
+            return 3650;
+        default:
+            return 30;
+    }
+};
 
 export default function AdminSettings() {
     const [activeTab, setActiveTab] = useState('General');
+
+    const { data: settings, isLoading, isError, refetch } = useAdminSettingsQuery();
+    const updateSettingsMutation = useUpdateAdminSettingsMutation();
+    const updateGeneralSettingsMutation = useUpdateGeneralSettingsMutation();
+    const updateModerationSettingsMutation = useUpdateModerationSettingsMutation();
+    const updateLogsSettingsMutation = useUpdateLogsSettingsMutation();
+
     const [notifications, setNotifications] = useState({
         newListing: true,
         dealFlagged: true,
@@ -24,6 +58,28 @@ export default function AdminSettings() {
         detailedLogin: false,
     });
 
+    // Populate state from API data
+    useEffect(() => {
+        if (settings) {
+            setNotifications({
+                newListing: settings.notifyNewListings ?? true,
+                dealFlagged: settings.notifyFlaggedDeals ?? true,
+                dealerActivity: settings.notifyDealerActivity ?? false,
+            });
+
+            setModeration({
+                requireApproval: settings.requireAdminApproval ?? true,
+                autoApproveDealers: settings.autoApproveTrustedDealers ?? false,
+                flagInactiveDeals: settings.autoFlagInactiveDeals ?? true,
+                flagMissingData: settings.autoFlagMissingData ?? false,
+            });
+
+            setAuditLogs({
+                retentionPeriod: logRetentionToPeriod(settings.logRetentionDays),
+                detailedLogin: settings.detailedLogging ?? false,
+            });
+        }
+    }, [settings]);
 
     const tabs = ['General', 'Moderation', 'Security', 'Audit and logs'];
 
@@ -31,29 +87,71 @@ export default function AdminSettings() {
         setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
     };
 
+    const handleSaveNotifications = () => {
+        updateGeneralSettingsMutation.mutate({
+            notifyNewListings: notifications.newListing,
+            notifyFlaggedDeals: notifications.dealFlagged,
+            notifyDealerActivity: notifications.dealerActivity,
+        });
+    };
+
+    const handleSaveModeration = () => {
+        updateModerationSettingsMutation.mutate({
+            requireAdminApproval: moderation.requireApproval,
+            autoApproveTrustedDealers: moderation.autoApproveDealers,
+            autoFlagInactiveDeals: moderation.flagInactiveDeals,
+            autoFlagMissingData: moderation.flagMissingData,
+        });
+    };
+
+    const handleToggleRequireApprovalInSecurity = () => {
+        const nextVal = !moderation.requireApproval;
+        setModeration(prev => ({ ...prev, requireApproval: nextVal }));
+        updateModerationSettingsMutation.mutate({
+            requireAdminApproval: nextVal,
+        });
+    };
+
+    const handleSaveAuditLogs = () => {
+        updateLogsSettingsMutation.mutate({
+            logRetentionDays: periodToLogRetentionDays(auditLogs.retentionPeriod),
+            detailedLogging: auditLogs.detailedLogin,
+        });
+    };
+
     return (
         <AnimationWrapper>
             <div className="max-w-250 mb-20">
-                <header className="mb-10">
-                    <h1 className="text-[32px] md:text-[40px] font-bold text-white mb-2 leading-tight">
-                        {activeTab === 'General' ? 'General settings' :
-                            activeTab === 'Moderation' ? 'Moderation settings' :
-                                activeTab === 'Security' ? 'Security settings' : 'Audit and logs'}
-                    </h1>
-                    <p className="text-[#888] text-sm md:text-base">
-                        {activeTab === 'General' ? 'Define your platform identity and defaults' :
-                            activeTab === 'Moderation' ? 'Manage listings approval and automated flag rules' :
-                                activeTab === 'Security' ? 'Configure platform security and access' : 'Control listing approval workflow and quality rules'}
-                    </p>
+                <header className="mb-10 flex items-start justify-between">
+                    <div>
+                        <h1 className="text-[32px] md:text-[40px] font-bold text-white mb-2 leading-tight">
+                            {activeTab === 'General' ? 'General settings' :
+                                activeTab === 'Moderation' ? 'Moderation settings' :
+                                    activeTab === 'Security' ? 'Security settings' : 'Audit and logs'}
+                        </h1>
+                        <p className="text-[#888] text-sm md:text-base">
+                            {activeTab === 'General' ? 'Define your platform identity and defaults' :
+                                activeTab === 'Moderation' ? 'Manage listings approval and automated flag rules' :
+                                    activeTab === 'Security' ? 'Configure platform security and access' : 'Control listing approval workflow and quality rules'}
+                        </p>
+                    </div>
+                    {isError && (
+                        <button
+                            onClick={() => refetch()}
+                            className="flex items-center gap-2 text-xs font-semibold px-3 py-2 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg hover:bg-red-500/20 transition-all cursor-pointer"
+                        >
+                            <RefreshCw className="w-3.5 h-3.5" />
+                            Retry
+                        </button>
+                    )}
                 </header>
-
 
                 <div className="flex flex-wrap gap-3 mb-12">
                     {tabs.map(tab => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
-                            className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ${activeTab === tab
+                            className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer ${activeTab === tab
                                 ? 'bg-primary text-black'
                                 : 'bg-[#1A1A1C] text-[#888] hover:text-white hover:bg-[#252528]'
                                 }`}
@@ -63,7 +161,14 @@ export default function AdminSettings() {
                     ))}
                 </div>
 
-                {activeTab === 'General' ? (
+                {isLoading ? (
+                    <div className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-10 shadow-2xl space-y-6 animate-pulse">
+                        <div className="h-6 bg-[#222] rounded w-1/4 mb-4"></div>
+                        <div className="h-12 bg-[#1A1A1A] rounded-xl w-full"></div>
+                        <div className="h-12 bg-[#1A1A1A] rounded-xl w-full"></div>
+                        <div className="h-12 bg-[#1A1A1A] rounded-xl w-full"></div>
+                    </div>
+                ) : activeTab === 'General' ? (
                     <div className="space-y-12">
                         {/* System profile Section */}
                         <section>
@@ -112,7 +217,7 @@ export default function AdminSettings() {
                                     </div>
                                 </div>
                                 <div className="flex justify-end">
-                                    <button className="bg-primary cursor-pointer   text-black px-8 py-3 rounded-xl text-sm font-bold transition-all ">
+                                    <button className="bg-primary cursor-pointer text-black px-8 py-3 rounded-xl text-sm font-bold transition-all">
                                         Save Changes
                                     </button>
                                 </div>
@@ -147,7 +252,14 @@ export default function AdminSettings() {
                                 </div>
 
                                 <div className="flex justify-end">
-                                    <button className="bg-primary cursor-pointer   text-black px-8 py-3 rounded-xl text-sm font-bold transition-all ">
+                                    <button
+                                        onClick={handleSaveNotifications}
+                                        disabled={updateGeneralSettingsMutation.isPending}
+                                        className="bg-primary cursor-pointer text-black px-8 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2 disabled:opacity-50 hover:opacity-90"
+                                    >
+                                        {updateGeneralSettingsMutation.isPending && (
+                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                        )}
                                         Save Changes
                                     </button>
                                 </div>
@@ -221,7 +333,14 @@ export default function AdminSettings() {
                             </section>
 
                             <div className="flex justify-end pt-4">
-                                <button className="bg-[#facc15] hover:bg-[#eab308] text-black px-10 py-4 rounded-xl text-sm font-bold transition-all shadow-lg shadow-[#facc15]/10 hover:scale-[1.02] active:scale-[0.98]">
+                                <button
+                                    onClick={handleSaveModeration}
+                                    disabled={updateModerationSettingsMutation.isPending}
+                                    className="bg-[#facc15] hover:bg-[#eab308] text-black px-10 py-4 rounded-xl text-sm font-bold transition-all shadow-lg shadow-[#facc15]/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center gap-2 disabled:opacity-50"
+                                >
+                                    {updateModerationSettingsMutation.isPending && (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                    )}
                                     Save Changes
                                 </button>
                             </div>
@@ -267,7 +386,7 @@ export default function AdminSettings() {
                                         />
                                     </div>
                                 </div>
-                                <button className="border border-[#facc15]/50 text-[#facc15] hover:bg-[#facc15] hover:text-black hover:border-[#facc15] px-8 py-3 rounded-xl text-sm font-bold transition-all duration-300">
+                                <button className="border border-[#facc15]/50 text-[#facc15] hover:bg-[#facc15] hover:text-black hover:border-[#facc15] px-8 py-3 rounded-xl text-sm font-bold transition-all duration-300 cursor-pointer">
                                     Save Changes
                                 </button>
                             </section>
@@ -284,8 +403,9 @@ export default function AdminSettings() {
                                     </div>
                                 </div>
                                 <button
-                                    onClick={() => setModeration(prev => ({ ...prev, requireApproval: !prev.requireApproval }))}
-                                    className={`relative inline-flex h-[34px] w-[64px] items-center rounded-full transition-all duration-300 focus:outline-none ${moderation.requireApproval ? 'bg-[#facc15]' : 'bg-[#2A2A2A]'}`}
+                                    onClick={handleToggleRequireApprovalInSecurity}
+                                    disabled={updateModerationSettingsMutation.isPending}
+                                    className={`relative inline-flex h-[34px] w-[64px] items-center rounded-full transition-all duration-300 focus:outline-none cursor-pointer ${moderation.requireApproval ? 'bg-[#facc15]' : 'bg-[#2A2A2A]'}`}
                                 >
                                     <div className={`inline-block h-7 w-7 transform rounded-full transition-all duration-300 ${moderation.requireApproval ? 'translate-x-[32px] bg-black shadow-lg' : 'translate-x-1 bg-[#444]'}`} />
                                 </button>
@@ -316,7 +436,7 @@ export default function AdminSettings() {
                                             <h4 className="text-white font-medium">i phone 16 pro max - safari</h4>
                                             <span className="text-[#666] text-sm">New York, US</span>
                                         </div>
-                                        <button className="w-10 h-10 rounded-xl bg-orange-500/5 hover:bg-orange-500/10 flex items-center justify-center transition-all group/btn border border-transparent hover:border-orange-500/20">
+                                        <button className="w-10 h-10 rounded-xl bg-orange-500/5 hover:bg-orange-500/10 flex items-center justify-center transition-all group/btn border border-transparent hover:border-orange-500/20 cursor-pointer">
                                             <LogOut className="w-5 h-5 text-[#f97316] group-hover/btn:scale-110 transition-all" />
                                         </button>
                                     </div>
@@ -369,7 +489,7 @@ export default function AdminSettings() {
                                         </div>
                                         <button
                                             onClick={() => setAuditLogs(prev => ({ ...prev, detailedLogin: !prev.detailedLogin }))}
-                                            className={`relative inline-flex h-8 w-15 shrink-0 items-center rounded-full transition-all duration-300 focus:outline-none ${auditLogs.detailedLogin ? 'bg-primary' : 'bg-[#2A2A2A]'}`}
+                                            className={`relative inline-flex h-8 w-15 shrink-0 items-center rounded-full transition-all duration-300 focus:outline-none cursor-pointer ${auditLogs.detailedLogin ? 'bg-primary' : 'bg-[#2A2A2A]'}`}
                                         >
                                             <div
                                                 className={`inline-block h-6 w-6 transform rounded-full transition-all duration-300 ease-in-out ${auditLogs.detailedLogin ? 'translate-x-7.5 bg-black shadow-lg' : 'translate-x-1 bg-[#444]'}`}
@@ -380,7 +500,14 @@ export default function AdminSettings() {
                             </section>
 
                             <div className="flex justify-end pt-4">
-                                <button className="bg-primary hover:bg-[#eab308] text-black px-10 py-4 rounded-xl text-sm font-bold transition-all shadow-lg cursor-pointer shadow-[#facc15]/10 hover:scale-[1.02] active:scale-[0.98]">
+                                <button
+                                    onClick={handleSaveAuditLogs}
+                                    disabled={updateLogsSettingsMutation.isPending}
+                                    className="bg-primary hover:bg-[#eab308] text-black px-10 py-4 rounded-xl text-sm font-bold transition-all shadow-lg cursor-pointer shadow-[#facc15]/10 hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2 disabled:opacity-50"
+                                >
+                                    {updateLogsSettingsMutation.isPending && (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                    )}
                                     Save Changes
                                 </button>
                             </div>
@@ -401,7 +528,7 @@ function NotificationToggle({ label, isActive, onToggle }: { label: string, isAc
             </span>
             <button
                 onClick={onToggle}
-                className={`relative inline-flex h-7.5 w-14 items-center rounded-full transition-all duration-300 focus:outline-none ${isActive ? 'bg-primary' : 'bg-[#2A2A2A]'
+                className={`relative inline-flex h-7.5 w-14 items-center rounded-full transition-all duration-300 focus:outline-none cursor-pointer ${isActive ? 'bg-primary' : 'bg-[#2A2A2A]'
                     }`}
             >
                 <div
@@ -424,7 +551,7 @@ function ToggleItem({ label, subtext, isActive, onToggle }: { label: string, sub
             </div>
             <button
                 onClick={onToggle}
-                className={`relative inline-flex h-7.5 w-14 shrink-0 items-center rounded-full transition-all duration-300 focus:outline-none ${isActive ? 'bg-primary' : 'bg-[#2A2A2A]'}`}
+                className={`relative inline-flex h-7.5 w-14 shrink-0 items-center rounded-full transition-all duration-300 focus:outline-none cursor-pointer ${isActive ? 'bg-primary' : 'bg-[#2A2A2A]'}`}
             >
                 <div
                     className={`inline-block h-6 w-6 transform rounded-full transition-all duration-300 ease-in-out ${isActive ? 'translate-x-6.5 bg-black shadow-lg' : 'translate-x-1 bg-[#444]'}`}

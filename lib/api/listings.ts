@@ -70,6 +70,12 @@ export interface ListingItem {
   };
   savedCount?: number;
   offersCount?: number;
+  isSaved?: boolean;
+}
+
+export interface SaveListingResponse {
+  saved: boolean;
+  message: string;
 }
 
 export interface ListingsMeta {
@@ -87,6 +93,8 @@ export interface ListingsResponse {
 export interface GetListingsParams {
   category?: string;
   subCategory?: string;
+  brand?: string;
+  isFeatured?: boolean;
   minPrice?: number;
   maxPrice?: number;
   locationCity?: string;
@@ -107,6 +115,12 @@ export const getListingsApi = async (params?: GetListingsParams): Promise<Listin
     }
     if (params.subCategory && params.subCategory !== "ALL" && params.subCategory !== "All") {
       queryParams.subCategory = params.subCategory;
+    }
+    if (params.brand && params.brand !== "ALL" && params.brand !== "All") {
+      queryParams.brand = params.brand;
+    }
+    if (params.isFeatured !== undefined) {
+      queryParams.isFeatured = params.isFeatured;
     }
     if (params.minPrice !== undefined && params.minPrice !== null && params.minPrice > 0) {
       queryParams.minPrice = params.minPrice;
@@ -221,4 +235,147 @@ export const createListingApi = async (data: CreateListingInput): Promise<Listin
   const response = await apiClient.post<ListingItem>("/listings", data);
   return response.data;
 };
+
+export interface UpdateListingInput {
+  title?: string;
+  category?: string;
+  subCategory?: string;
+  saleType?: string;
+  allowCounterOffers?: boolean;
+  askingPrice?: number;
+  startingBid?: number;
+  auctionEndsAt?: string;
+  currency?: string;
+  isOffMarket?: boolean;
+  isFeatured?: boolean;
+  locationCity?: string;
+  locationCountry?: string;
+  buildYear?: number;
+  brand?: string;
+  specifications?: string;
+  media?: CreateListingMediaInput[];
+  status?: string;
+}
+
+export const updateListingApi = async (
+  id: string,
+  data: UpdateListingInput
+): Promise<ListingItem> => {
+  const response = await apiClient.patch<ListingItem>(`/listings/${id}`, data);
+  return response.data;
+};
+
+
+export interface GetAdminListingsParams {
+  page?: number;
+  limit?: number;
+  status?: string;
+  search?: string;
+}
+
+/**
+ * Fetch admin listings via GET /admin/listings
+ */
+export const getAdminListingsApi = async (
+  params?: GetAdminListingsParams
+): Promise<ListingsResponse> => {
+  const queryParams: Record<string, any> = {};
+
+  if (params) {
+    if (params.page !== undefined) queryParams.page = params.page;
+    if (params.limit !== undefined) queryParams.limit = params.limit;
+    if (params.status && params.status !== "ALL" && params.status !== "All listings") {
+      queryParams.status = params.status;
+    }
+    if (params.search && params.search.trim()) {
+      queryParams.search = params.search.trim();
+    }
+  }
+
+  const response = await apiClient.get<ListingsResponse>("/admin/listings", {
+    params: queryParams,
+  });
+
+  return response.data;
+};
+
+/**
+ * Update admin listing status via PATCH /listings/:id/status
+ */
+export const updateAdminListingStatusApi = async (
+  id: string,
+  status: string,
+  rejectionReason?: string
+): Promise<ListingItem> => {
+  const response = await apiClient.patch<ListingItem>(`/listings/${id}/status`, {
+    status,
+    ...(rejectionReason ? { rejectionReason } : {}),
+  });
+  return response.data;
+};
+
+export const updateListingStatusApi = updateAdminListingStatusApi;
+
+export interface DeleteListingResponse {
+  message: string;
+  id: string;
+}
+
+/**
+ * Delete listing via DELETE /listings/:id
+ */
+export const deleteListingApi = async (id: string): Promise<DeleteListingResponse> => {
+  const response = await apiClient.delete<DeleteListingResponse>(`/listings/${id}`);
+  return response.data;
+};
+
+/**
+ * Alias for backward compatibility
+ */
+export const deleteAdminListingApi = deleteListingApi;
+
+/**
+ * Save / toggle favorite listing via POST /listings/:id/save
+ */
+export const saveListingApi = async (id: string): Promise<SaveListingResponse> => {
+  const response = await apiClient.post<SaveListingResponse>(`/listings/${id}/save`);
+  return response.data;
+};
+
+export interface GetSavedListingsParams {
+  maxPrice?: number;
+  page?: number;
+  limit?: number;
+}
+
+/**
+ * Fetch current user's saved listings via GET /listings/me/saved
+ */
+export const getSavedListingsApi = async (
+  params?: GetSavedListingsParams
+): Promise<ListingsResponse> => {
+  const queryParams: Record<string, any> = {};
+
+  if (params) {
+    if (params.maxPrice !== undefined && params.maxPrice !== null && params.maxPrice > 0) {
+      queryParams.maxPrice = params.maxPrice;
+    }
+    if (params.page) {
+      queryParams.page = params.page;
+    }
+    if (params.limit) {
+      queryParams.limit = params.limit;
+    }
+  }
+
+  const response = await apiClient.get<ListingsResponse>("/listings/me/saved", {
+    params: queryParams,
+  });
+
+  return response.data;
+};
+
+
+
+
 

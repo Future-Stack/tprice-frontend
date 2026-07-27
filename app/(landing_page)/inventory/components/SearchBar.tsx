@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Search, ChevronDown, SlidersHorizontal, ListFilter } from "lucide-react";
+import { Search, ChevronDown, SlidersHorizontal, ListFilter, X } from "lucide-react";
 
 interface SearchBarProps {
   search: string;
@@ -11,7 +11,13 @@ interface SearchBarProps {
   onMobileFilterOpen: () => void;
 }
 
-export default function SearchBar({ search, setSearch, sortBy, setSortBy, onMobileFilterOpen }: SearchBarProps) {
+export default function SearchBar({
+  search,
+  setSearch,
+  sortBy,
+  setSortBy,
+  onMobileFilterOpen,
+}: SearchBarProps) {
   return (
     <div className="flex flex-col md:flex-row items-center gap-4 mb-10">
       {/* Search Input */}
@@ -19,19 +25,27 @@ export default function SearchBar({ search, setSearch, sortBy, setSortBy, onMobi
         <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20" />
         <input
           type="text"
-          placeholder="Search by name and location"
+          placeholder="Search by title, brand, or location..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full bg-[#111] border border-white/5 rounded-lg py-3 pl-16 pr-6 text-white placeholder:text-white/20 focus:outline-none focus:border-primary/50 transition-all font-medium"
+          className="w-full bg-[#111] border border-white/5 rounded-lg py-3 pl-16 pr-10 text-white placeholder:text-white/20 focus:outline-none focus:border-primary/50 transition-all font-medium"
         />
+        {search && (
+          <button
+            onClick={() => setSearch("")}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       {/* Mobile Filter Button */}
-      <button 
+      <button
         onClick={onMobileFilterOpen}
-        className="md:hidden flex items-center justify-center gap-2 w-full bg-[#111] border border-white/5 rounded-lg py-5 text-white hover:bg-primary/10 transition-colors"
+        className="md:hidden flex items-center justify-center gap-2 w-full bg-[#111] border border-white/5 rounded-lg py-3.5 text-white hover:bg-primary/10 transition-colors text-sm font-medium"
       >
-        <SlidersHorizontal className="w-5 h-5" />
+        <SlidersHorizontal className="w-4 h-4 text-primary" />
         Filters
       </button>
 
@@ -41,12 +55,12 @@ export default function SearchBar({ search, setSearch, sortBy, setSortBy, onMobi
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
-          className="w-full bg-[#111] border border-white/5 rounded-lg py-3 pl-16 pr-12 text-white/80 appearance-none focus:outline-none focus:border-primary/50 cursor-pointer font-medium"
+          className="w-full bg-[#111] border border-white/5 rounded-lg py-3 pl-16 pr-12 text-white/80 appearance-none focus:outline-none focus:border-primary/50 cursor-pointer font-medium text-sm"
         >
-          <option value="newest" className="bg-[#111]">Newest</option>
-          <option value="oldest" className="bg-[#111]">Oldest</option>
-          <option value="price-low" className="bg-[#111]">Price: Low to High</option>
-          <option value="price-high" className="bg-[#111]">Price: High to Low</option>
+          <option value="Best Match" className="bg-[#111]">Best Match</option>
+          <option value="Newest Arrivals" className="bg-[#111]">Newest Arrivals</option>
+          <option value="Price: Low to High" className="bg-[#111]">Price: Low to High</option>
+          <option value="Price: High to Low" className="bg-[#111]">Price: High to Low</option>
         </select>
         <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 pointer-events-none group-hover:text-primary transition-colors" />
       </div>

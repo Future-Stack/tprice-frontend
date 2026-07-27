@@ -15,9 +15,12 @@ import {
   Phone,
 } from "lucide-react";
 import Link from "next/link";
+import Cookies from "js-cookie";
+import { toast } from "sonner";
 
 import AnimationWrapper from "@/app/components/AnimationWrapper";
-import { useListingByIdQuery } from "@/hooks/useListings";
+import { useListingByIdQuery, useSaveListingMutation, useSavedListingsQuery } from "@/hooks/useListings";
+import { useAuthStore } from "@/lib/store/useAuthStore";
 
 /* ─── Helper utilities for dynamic key-value specifications ─── */
 function formatSpecKey(key: string): string {
@@ -26,7 +29,7 @@ function formatSpecKey(key: string): string {
     .replace(/_/g, " ")
     .replace(/-/g, " ")
     .trim();
-  return formatted.toUpperCase();
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
 }
 
 function formatSpecValue(key: string, val: any): string {
@@ -36,12 +39,8 @@ function formatSpecValue(key: string, val: any): string {
   const lowerKey = key.toLowerCase();
   if (typeof val === "number") {
     if (lowerKey.includes("mileage")) return `${val.toLocaleString()} mi`;
-    if (
-      lowerKey.includes("power") ||
-      lowerKey.includes("horsepower") ||
-      lowerKey === "hp"
-    )
-      return `${val.toLocaleString()} HP`;
+    if (lowerKey.includes("horsepower") || lowerKey.includes("power") || lowerKey === "hp")
+      return `${val.toLocaleString()} hp`;
     if (lowerKey.includes("sqft") || lowerKey.includes("squarefeet"))
       return `${val.toLocaleString()} sq ft`;
     return val.toLocaleString();
@@ -50,18 +49,15 @@ function formatSpecValue(key: string, val: any): string {
   const strVal = String(val);
   if (lowerKey.includes("mileage") && !strVal.toLowerCase().includes("mi"))
     return `${strVal} mi`;
-  if (
-    (lowerKey.includes("power") || lowerKey.includes("horsepower")) &&
-    !strVal.toLowerCase().includes("hp")
-  )
-    return `${strVal} HP`;
+  if ((lowerKey.includes("horsepower") || lowerKey.includes("power")) && !strVal.toLowerCase().includes("hp"))
+    return `${strVal} hp`;
 
   return strVal;
 }
 
-export default function ProductDetailsPage() {
+export default function BuyerListingDetailPage() {
   const params = useParams();
-  const idOrSlug = (params?.id as string) || "2024-ferrari-sf90-stradale";
+  const idOrSlug = (params?.id as string) || "";
 
   const {
     data: product,
@@ -74,7 +70,30 @@ export default function ProductDetailsPage() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [inclFees, setInclFees] = useState(true);
   const [isBiddingMode, setIsBiddingMode] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
+
+  const saveMutation = useSaveListingMutation();
+  const token = Cookies.get("access_token") || useAuthStore((state) => state.token);
+
+  const { data: savedResponse } = useSavedListingsQuery(
+    { page: 1, limit: 100 },
+    { enabled: Boolean(token) }
+  );
+
+  const isSavedInListings = savedResponse?.data?.some((savedItem) => savedItem.id === product?.id) ?? false;
+  const isSaved = product?.isSaved !== undefined ? product.isSaved : isSavedInListings;
+
+  const handleToggleSave = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (!product?.id) return;
+    if (!token) {
+      toast.error("Please sign in to save listings to your favorites.");
+      return;
+    }
+    saveMutation.mutate(product.id);
+  };
 
   // Extract images or use fallback
   const productImages =
@@ -230,7 +249,8 @@ export default function ProductDetailsPage() {
                 {/* Floating actions */}
                 <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <button
-                    onClick={() => setIsSaved(!isSaved)}
+                    onClick={handleToggleSave}
+                    disabled={saveMutation.isPending}
                     className={`w-10 h-10 bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center transition-colors border border-white/10 cursor-pointer ${
                       isSaved
                         ? "text-red-500"
@@ -580,8 +600,9 @@ export default function ProductDetailsPage() {
                     </button>
                     <div className="grid grid-cols-2 gap-3">
                       <button
-                        onClick={() => setIsSaved(!isSaved)}
-                        className="flex items-center justify-center gap-2 py-4 bg-[#161618] text-white text-[13px] font-semibold rounded-xl border border-white/5 hover:bg-white/8 transition-colors cursor-pointer"
+                        onClick={handleToggleSave}
+                        disabled={saveMutation.isPending}
+                        className="flex items-center justify-center gap-2 py-4 bg-[#161618] text-white text-[13px] font-semibold rounded-xl border border-white/5 hover:bg-white/8 transition-colors cursor-pointer disabled:opacity-50"
                       >
                         <Heart
                           className="w-4 h-4 text-primary"

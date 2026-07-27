@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { X, SlidersHorizontal, ChevronDown } from "lucide-react";
+import { useGetCategoriesQuery } from "@/hooks/useCategories";
+import { useGetBrandsQuery } from "@/hooks/useBrands";
 
 interface DualRangeState {
   min: number;
@@ -11,8 +13,13 @@ interface DualRangeState {
 interface FilterSidebarProps {
   sortBy: string;
   setSortBy: (val: string) => void;
+
+  category: string;
+  setCategory: (val: string) => void;
+
   brands: string[];
   setBrands: (val: string[]) => void;
+
   conditions: string[];
   setConditions: (val: string[]) => void;
 
@@ -28,7 +35,15 @@ interface FilterSidebarProps {
   onClear: () => void;
 }
 
-const BRANDS = ["Bugatti", "Ferrari", "Lamborghini", "Porsche", "McLaren", "Rolls-Royce", "Bentley"];
+const FALLBACK_BRANDS = [
+  "Bugatti",
+  "Ferrari",
+  "Lamborghini",
+  "Porsche",
+  "McLaren",
+  "Rolls-Royce",
+  "Bentley",
+];
 const CONDITIONS = ["New", "Used"];
 
 interface DualSliderProps {
@@ -41,7 +56,15 @@ interface DualSliderProps {
   formatValue?: (val: number) => string;
 }
 
-const DualRangeSlider = ({ label, min, max, step, value, onChange, formatValue }: DualSliderProps) => {
+const DualRangeSlider = ({
+  label,
+  min,
+  max,
+  step,
+  value,
+  onChange,
+  formatValue,
+}: DualSliderProps) => {
   const handleMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newMin = Math.min(Number(e.target.value), value.max);
     onChange({ ...value, min: newMin });
@@ -52,13 +75,20 @@ const DualRangeSlider = ({ label, min, max, step, value, onChange, formatValue }
     onChange({ ...value, max: newMax });
   };
 
-  const leftPercent = ((value.min - min) / (max - min)) * 100;
-  const rightPercent = ((value.max - min) / (max - min)) * 100;
+  const leftPercent = Math.max(
+    0,
+    Math.min(100, ((value.min - min) / (max - min)) * 100),
+  );
+  const rightPercent = Math.max(
+    0,
+    Math.min(100, ((value.max - min) / (max - min)) * 100),
+  );
 
   return (
     <div className="mb-6">
       <div className="text-white/80 text-sm mb-3 font-light">
-        {label}: {formatValue ? formatValue(value.min) : value.min} - {formatValue ? formatValue(value.max) : value.max}
+        {label}: {formatValue ? formatValue(value.min) : value.min} -{" "}
+        {formatValue ? formatValue(value.max) : value.max}
       </div>
 
       <div className="relative h-6 flex items-center">
@@ -73,11 +103,21 @@ const DualRangeSlider = ({ label, min, max, step, value, onChange, formatValue }
 
         {/* Inputs */}
         <input
-          type="range" min={min} max={max} step={step} value={value.min} onChange={handleMinChange}
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={value.min}
+          onChange={handleMinChange}
           className="absolute w-full appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-black [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-primary [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer z-10"
         />
         <input
-          type="range" min={min} max={max} step={step} value={value.max} onChange={handleMaxChange}
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={value.max}
+          onChange={handleMaxChange}
           className="absolute w-full appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-black [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-primary [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer z-20"
         />
       </div>
@@ -86,39 +126,89 @@ const DualRangeSlider = ({ label, min, max, step, value, onChange, formatValue }
 };
 
 export default function FilterSidebar({
-  sortBy, setSortBy,
-  brands, setBrands,
-  conditions, setConditions,
-  priceRange, setPriceRange,
-  yearRange, setYearRange,
-  mileageRange, setMileageRange,
-  isOpen, onClose, onClear
+  sortBy,
+  setSortBy,
+  category,
+  setCategory,
+  brands,
+  setBrands,
+  conditions,
+  setConditions,
+  priceRange,
+  setPriceRange,
+  yearRange,
+  setYearRange,
+  mileageRange,
+  setMileageRange,
+  isOpen,
+  onClose,
+  onClear,
 }: FilterSidebarProps) {
   const [isSortOpen, setIsSortOpen] = useState(false);
 
-  const toggleBrand = (brand: string) => {
-    setBrands(brands.includes(brand) ? brands.filter(b => b !== brand) : [...brands, brand]);
+  // Dynamic Categories and Brands from React Query hooks
+  const { data: categoriesResponse } = useGetCategoriesQuery();
+  const { data: brandsResponse } = useGetBrandsQuery({ limit: 100 });
+
+  const categoriesList = useMemo(() => {
+    const items = categoriesResponse?.data;
+    if (items && items.length > 0) {
+      return ["All", ...items.map((c) => c.name)];
+    }
+    return [
+      "All",
+      "Supercars",
+      "Automotive",
+      "Real Estate",
+      "Yachts",
+      "Aviation",
+    ];
+  }, [categoriesResponse]);
+
+  const brandsList = useMemo(() => {
+    const items = brandsResponse?.data;
+    if (items && items.length > 0) {
+      return Array.from(new Set(items.map((b) => b.name)));
+    }
+    return FALLBACK_BRANDS;
+  }, [brandsResponse]);
+
+  const toggleBrand = (brandName: string) => {
+    setBrands(
+      brands.includes(brandName)
+        ? brands.filter((b) => b !== brandName)
+        : [...brands, brandName],
+    );
   };
 
   const toggleCondition = (cond: string) => {
-    setConditions(conditions.includes(cond) ? conditions.filter(c => c !== cond) : [...conditions, cond]);
+    setConditions(
+      conditions.includes(cond)
+        ? conditions.filter((c) => c !== cond)
+        : [...conditions, cond],
+    );
   };
 
   const content = (
-    <div className="flex flex-col h-full space-y-6 ">
+    <div className="flex flex-col h-full space-y-6">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-3">
           <SlidersHorizontal className="w-5 h-5 text-primary" />
-          <h2 className="text-2xl font-serif text-white tracking-wide">Filters</h2>
+          <h2 className="text-2xl font-serif text-white tracking-wide">
+            Filters
+          </h2>
         </div>
-        <button onClick={onClose} className="lg:hidden p-2 text-white/50 hover:text-white transition-colors">
+        <button
+          onClick={onClose}
+          className="lg:hidden p-2 text-white/50 hover:text-white transition-colors"
+        >
           <X className="w-6 h-6" />
         </button>
       </div>
 
       {/* Sort By Dropdown */}
       <div className="relative">
-        <h3 className="text-white text-sm mb-3">Sort By</h3>
+        <h3 className="text-white text-sm mb-3 font-medium">Sort By</h3>
         <button
           onClick={() => setIsSortOpen(!isSortOpen)}
           className="w-full flex items-center justify-between bg-white/5 border border-primary/30 rounded-md py-3 px-4 text-white/80 text-sm hover:border-primary/50 transition-colors"
@@ -128,10 +218,18 @@ export default function FilterSidebar({
         </button>
         {isSortOpen && (
           <div className="absolute z-50 w-full mt-2 bg-[#1a1a1a] border border-white/10 rounded-md shadow-2xl py-2">
-            {["Best Match", "Price: Low to High", "Price: High to Low", "Newest Arrivals"].map((option) => (
+            {[
+              "Best Match",
+              "Price: Low to High",
+              "Price: High to Low",
+              "Newest Arrivals",
+            ].map((option) => (
               <button
                 key={option}
-                onClick={() => { setSortBy(option); setIsSortOpen(false); }}
+                onClick={() => {
+                  setSortBy(option);
+                  setIsSortOpen(false);
+                }}
                 className="w-full text-left px-4 py-2 text-sm text-white/70 hover:bg-white/5 hover:text-white transition-colors"
               >
                 {option}
@@ -141,62 +239,129 @@ export default function FilterSidebar({
         )}
       </div>
 
-      {/* <div className="mt-8 border-t border-white/5 pt-8" /> */}
+      {/* Category Filter */}
+      <div className="mb-6 space-y-3">
+        <h3 className="text-white text-sm font-medium mb-3">Category</h3>
+        <div className="flex flex-wrap gap-2">
+          {categoriesList.map((catItem) => {
+            const isSelected =
+              (catItem === "All" &&
+                (!category || category === "ALL" || category === "All")) ||
+              category === catItem;
+            return (
+              <button
+                key={catItem}
+                onClick={() => setCategory(catItem === "All" ? "ALL" : catItem)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                  isSelected
+                    ? "bg-primary text-black font-semibold shadow-md shadow-primary/20"
+                    : "bg-white/5 text-white/70 hover:text-white hover:bg-white/10"
+                }`}
+              >
+                {catItem}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
-      {/* Sliders */}
+      {/* Price Range Slider */}
       <DualRangeSlider
         label="Price Range"
-        min={0} max={20000000} step={50000}
-        value={priceRange} onChange={setPriceRange}
-        formatValue={(val) => val >= 1000000 ? `$${(val / 1000000).toFixed(1)}M` : `$${(val / 1000).toFixed(0)}k`}
+        min={0}
+        max={20000000}
+        step={50000}
+        value={priceRange}
+        onChange={setPriceRange}
+        formatValue={(val) =>
+          val >= 1000000
+            ? `$${(val / 1000000).toFixed(1)}M`
+            : `$${(val / 1000).toFixed(0)}k`
+        }
       />
 
-      {/* Brands */}
+      {/* Brands List */}
       <div className="mb-6 space-y-3">
-        <h3 className="text-white text-sm mb-4">Brand</h3>
-        {BRANDS.map(brand => (
-          <label key={brand} className="flex items-center gap-3 cursor-pointer group" onClick={() => toggleBrand(brand)}>
-            <div className={`w-4 h-4 rounded-sm border flex items-center justify-center transition-colors ${brands.includes(brand) ? "bg-primary border-primary" : "border-white/20 group-hover:border-primary/50"
-              }`}>
-              {brands.includes(brand) && <div className="w-2 h-2 bg-black rounded-sm" />}
-            </div>
-            <span className="text-white/60 text-sm font-light group-hover:text-white/90 transition-colors">{brand}</span>
-          </label>
-        ))}
+        <h3 className="text-white text-sm font-medium mb-3">Brand</h3>
+        <div className="max-h-48 overflow-y-auto custom-scrollbar space-y-2 pr-1">
+          {brandsList.map((bName) => (
+            <label
+              key={bName}
+              className="flex items-center gap-3 cursor-pointer group py-0.5"
+              onClick={() => toggleBrand(bName)}
+            >
+              <div
+                className={`w-4 h-4 rounded-sm border flex items-center justify-center transition-colors ${
+                  brands.includes(bName)
+                    ? "bg-primary border-primary"
+                    : "border-white/20 group-hover:border-primary/50"
+                }`}
+              >
+                {brands.includes(bName) && (
+                  <div className="w-2 h-2 bg-black rounded-sm" />
+                )}
+              </div>
+              <span className="text-white/70 text-sm font-light group-hover:text-white transition-colors">
+                {bName}
+              </span>
+            </label>
+          ))}
+        </div>
       </div>
 
       {/* Condition */}
       <div className="mb-6 space-y-3">
-        <h3 className="text-white text-sm mb-4">Condition</h3>
-        {CONDITIONS.map(cond => (
-          <label key={cond} className="flex items-center gap-3 cursor-pointer group" onClick={() => toggleCondition(cond)}>
-            <div className={`w-4 h-4 rounded-sm border flex items-center justify-center transition-colors ${conditions.includes(cond) ? "bg-primary border-primary" : "border-white/20 group-hover:border-primary/50"
-              }`}>
-              {conditions.includes(cond) && <div className="w-2 h-2 bg-black rounded-sm" />}
+        <h3 className="text-white text-sm font-medium mb-3">Condition</h3>
+        {CONDITIONS.map((cond) => (
+          <label
+            key={cond}
+            className="flex items-center gap-3 cursor-pointer group"
+            onClick={() => toggleCondition(cond)}
+          >
+            <div
+              className={`w-4 h-4 rounded-sm border flex items-center justify-center transition-colors ${
+                conditions.includes(cond)
+                  ? "bg-primary border-primary"
+                  : "border-white/20 group-hover:border-primary/50"
+              }`}
+            >
+              {conditions.includes(cond) && (
+                <div className="w-2 h-2 bg-black rounded-sm" />
+              )}
             </div>
-            <span className="text-white/60 text-sm font-light group-hover:text-white/90 transition-colors">{cond}</span>
+            <span className="text-white/70 text-sm font-light group-hover:text-white transition-colors">
+              {cond}
+            </span>
           </label>
         ))}
       </div>
 
+      {/* Year Range Slider */}
       <DualRangeSlider
-        label="Year"
-        min={1990} max={2025} step={1}
-        value={yearRange} onChange={setYearRange}
+        label="Build Year"
+        min={1990}
+        max={2026}
+        step={1}
+        value={yearRange}
+        onChange={setYearRange}
       />
 
+      {/* Mileage Slider */}
       <DualRangeSlider
         label="Mileage"
-        min={0} max={100000} step={1000}
-        value={mileageRange} onChange={setMileageRange}
+        min={0}
+        max={100000}
+        step={1000}
+        value={mileageRange}
+        onChange={setMileageRange}
         formatValue={(val) => `${val.toLocaleString()} mi`}
       />
 
       {/* Reset Button */}
-      <div className="pt-8">
+      <div className="pt-4">
         <button
           onClick={onClear}
-          className="w-full text-center text-[#00E5FF] text-sm hover:text-[#00E5FF]/80 transition-colors tracking-wide"
+          className="w-full py-2.5 text-center text-[#00E5FF] text-sm hover:text-[#00E5FF]/80 transition-colors tracking-wide border border-[#00E5FF]/30 rounded-lg hover:border-[#00E5FF]/60"
         >
           Reset All Filters
         </button>
@@ -213,13 +378,18 @@ export default function FilterSidebar({
 
       {/* Mobile Drawer */}
       <div
-        className={`fixed inset-0 z-[200] lg:hidden transition-all duration-500 ${isOpen ? "visible opacity-100" : "invisible opacity-0"
-          }`}
+        className={`fixed inset-0 z-[200] lg:hidden transition-all duration-500 ${
+          isOpen ? "visible opacity-100" : "invisible opacity-0"
+        }`}
       >
-        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
         <div
-          className={`absolute left-0 top-0 bottom-0 w-80 bg-[#111111] p-8 overflow-y-auto transition-transform duration-500 ease-out ${isOpen ? "translate-x-0" : "-translate-x-full"
-            }`}
+          className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+          onClick={onClose}
+        />
+        <div
+          className={`absolute left-0 top-0 bottom-0 w-80 bg-[#111111] p-8 overflow-y-auto transition-transform duration-500 ease-out ${
+            isOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
         >
           {content}
         </div>

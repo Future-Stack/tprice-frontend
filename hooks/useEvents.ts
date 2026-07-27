@@ -4,10 +4,12 @@ import {
   getEventByIdApi,
   createEventApi,
   deleteEventApi,
+  registerEventApi,
   GetEventsParams,
   EventsResponse,
   EventItem,
   CreateEventInput,
+  RegisterEventInput,
 } from "@/lib/api/events";
 
 export const EVENTS_QUERY_KEYS = {
@@ -56,6 +58,25 @@ export const useCreateEventMutation = () => {
 };
 
 /**
+ * Hook to register for an event (RSVP)
+ */
+export const useRegisterEventMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      eventId,
+      data,
+    }: {
+      eventId: string;
+      data: RegisterEventInput;
+    }) => registerEventApi(eventId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: EVENTS_QUERY_KEYS.all });
+    },
+  });
+};
+
+/**
  * Hook to delete an event
  */
 export const useDeleteEventMutation = () => {
@@ -67,3 +88,4 @@ export const useDeleteEventMutation = () => {
     },
   });
 };
+

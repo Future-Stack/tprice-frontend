@@ -33,3 +33,48 @@ export const uploadMediaApi = async ({
 
   return response.data;
 };
+
+export interface LandingMediaItem {
+  id: string;
+  title: string;
+  category?: string;
+  type: string;
+  mediaUrl: string;
+  thumbnailUrl?: string;
+  caption?: string;
+  badgeText?: string;
+  displayOrder?: number;
+  isPublished?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LandingMediaMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface LandingMediaResponse {
+  data: LandingMediaItem[];
+  meta: LandingMediaMeta;
+}
+
+export interface GetLandingMediaParams {
+  page?: number;
+  limit?: number;
+  category?: string;
+  type?: string;
+  search?: string;
+}
+
+export const getLandingMediaApi = async (
+  params: GetLandingMediaParams = {}
+): Promise<LandingMediaResponse> => {
+  const response = await apiClient.get<LandingMediaResponse>("/landing-media", {
+    params,
+  });
+  return response.data;
+};
+

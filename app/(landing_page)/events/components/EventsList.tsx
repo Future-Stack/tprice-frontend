@@ -98,11 +98,10 @@ export default function EventsList() {
               <button
                 key={cat.value}
                 onClick={() => handleTabChange(cat.value)}
-                className={`px-6 py-2 rounded-full border text-xs font-bold tracking-widest uppercase transition-all duration-300 cursor-pointer ${
-                  activeTab === cat.value
-                    ? "border-primary bg-primary text-black shadow-lg shadow-primary/20"
-                    : "border-white/20 text-white/60 hover:border-white/40 hover:text-white"
-                }`}
+                className={`px-6 py-2 rounded-full border text-xs font-bold tracking-widest uppercase transition-all duration-300 cursor-pointer ${activeTab === cat.value
+                  ? "border-primary bg-primary text-black shadow-lg shadow-primary/20"
+                  : "border-white/20 text-white/60 hover:border-white/40 hover:text-white"
+                  }`}
               >
                 {cat.label}
               </button>

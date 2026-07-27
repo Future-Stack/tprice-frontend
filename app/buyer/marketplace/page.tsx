@@ -13,12 +13,16 @@ import {
   ChevronLeft,
   ChevronRight,
   CheckCircle2,
+  Heart,
 } from "lucide-react";
 import Link from "next/link";
+import Cookies from "js-cookie";
+import { toast } from "sonner";
 import AnimationWrapper from "../../components/AnimationWrapper";
-import { useListingsQuery } from "@/hooks/useListings";
+import { useListingsQuery, useSaveListingMutation, useSavedListingsQuery } from "@/hooks/useListings";
 import { useGetCategoriesQuery } from "@/hooks/useCategories";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useAuthStore } from "@/lib/store/useAuthStore";
 import { ListingItem } from "@/lib/api/listings";
 
 const SORT_OPTIONS = [
@@ -627,6 +631,33 @@ function ListingsSkeleton() {
 
 /* ─── MarketplaceCard Component ─── */
 function MarketplaceCard({ asset }: { asset: ListingItem }) {
+  const saveMutation = useSaveListingMutation();
+  const token = Cookies.get("access_token") || useAuthStore((state) => state.token);
+
+  const { data: savedResponse } = useSavedListingsQuery(
+    { page: 1, limit: 100 },
+    { enabled: Boolean(token) }
+  );
+
+  const isSavedInListings = useMemo(() => {
+    if (!savedResponse?.data) return false;
+    return savedResponse.data.some((savedItem) => savedItem.id === asset.id);
+  }, [savedResponse, asset.id]);
+
+  const isSaved = asset.isSaved !== undefined ? asset.isSaved : isSavedInListings;
+
+  const handleToggleSave = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!token) {
+      toast.error("Please sign in to save listings to your favorites.");
+      return;
+    }
+
+    saveMutation.mutate(asset.id);
+  };
+
   const imageUrl = asset.media?.[0]?.url;
 
   const formattedPrice = asset.askingPrice
@@ -652,7 +683,7 @@ function MarketplaceCard({ asset }: { asset: ListingItem }) {
         />
 
         {/* Badges */}
-        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
+        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
           {asset.category && (
             <span className="bg-black/70 backdrop-blur-md text-primary text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border border-primary/30">
               {asset.category}
@@ -663,13 +694,26 @@ function MarketplaceCard({ asset }: { asset: ListingItem }) {
               {asset.buildYear}
             </span>
           )}
+          {asset.isFeatured && (
+            <span className="bg-primary text-black text-[10px] font-bold px-2.5 py-1 rounded-full shadow">
+              FEATURED
+            </span>
+          )}
         </div>
 
-        {asset.isFeatured && (
-          <div className="absolute top-3 right-3 bg-primary text-black text-[10px] font-bold px-2 py-0.5 rounded shadow">
-            FEATURED
-          </div>
-        )}
+        {/* Heart Wishlist Button */}
+        <button
+          onClick={handleToggleSave}
+          disabled={saveMutation.isPending}
+          className={`absolute top-3 right-3 p-2 rounded-full flex items-center justify-center transition-all z-10 backdrop-blur-md border hover:scale-110 active:scale-95 cursor-pointer disabled:opacity-50 ${
+            isSaved
+              ? "text-red-500 bg-black/70 border-red-500/50 shadow-lg shadow-red-500/20"
+              : "text-white hover:text-white bg-black/40 border-white/20 hover:border-white/50"
+          }`}
+          title={isSaved ? "Remove from saved" : "Save listing"}
+        >
+          <Heart className={`w-4 h-4 transition-transform duration-200 ${isSaved ? "fill-current scale-110" : ""}`} />
+        </button>
       </div>
 
       {/* Content Container */}

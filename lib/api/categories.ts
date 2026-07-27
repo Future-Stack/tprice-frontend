@@ -8,6 +8,7 @@ export interface CategoryCount {
 export interface Category {
   id: string;
   name: string;
+  slug?: string;
   description: string | null;
   imageUrl: string | null;
   iconName: string | null;
@@ -60,7 +61,7 @@ export interface UpdateCategoryInput {
  * Fetch categories with pagination & filtering from GET /categories
  */
 export const getCategoriesApi = async (
-  params?: GetCategoriesParams
+  params?: GetCategoriesParams,
 ): Promise<CategoriesResponse> => {
   const queryParams: Record<string, any> = {};
 
@@ -91,13 +92,17 @@ export const getCategoriesApi = async (
       items = items.filter(
         (cat) =>
           cat.name.toLowerCase().includes(q) ||
-          (cat.description && cat.description.toLowerCase().includes(q))
+          (cat.description && cat.description.toLowerCase().includes(q)),
       );
     }
 
     if (params?.status && params.status !== "ALL") {
       const isActive = params.status === "ACTIVE";
       items = items.filter((cat) => cat.isActive === isActive);
+    }
+
+    if (params?.isActive !== undefined) {
+      items = items.filter((cat) => cat.isActive === params.isActive);
     }
 
     const total = items.length;
@@ -126,7 +131,7 @@ export const getCategoriesApi = async (
  * Create a new category via POST /categories
  */
 export const createCategoryApi = async (
-  data: CreateCategoryInput
+  data: CreateCategoryInput,
 ): Promise<Category> => {
   const response = await apiClient.post<Category>("/categories", data);
   return response.data;
@@ -137,7 +142,7 @@ export const createCategoryApi = async (
  */
 export const updateCategoryApi = async (
   id: string,
-  data: UpdateCategoryInput
+  data: UpdateCategoryInput,
 ): Promise<Category> => {
   const response = await apiClient.patch<Category>(`/categories/${id}`, data);
   return response.data;
