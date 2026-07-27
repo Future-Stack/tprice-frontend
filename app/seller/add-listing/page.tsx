@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import AnimationWrapper from "../../components/AnimationWrapper";
 import { useGetCategoriesQuery } from "@/hooks/useCategories";
+import { useGetBrandsQuery } from "@/hooks/useBrands";
 import { useUploadMediaMutation } from "@/hooks/useMedia";
 import { useCreateListingMutation } from "@/hooks/useListings";
 import { toast } from "sonner";
@@ -43,22 +44,14 @@ interface UploadedMediaItem {
   displayOrder: number;
 }
 
-const COMMON_SPEC_SUGGESTIONS = [
-  "horsepower",
-  "engine",
-  "transmission",
-  "exteriorColor",
-  "mileage",
-  "interiorColor",
-  "bedrooms",
-  "bathrooms",
-];
-
 export default function AddListing() {
   const router = useRouter();
 
   // Queries & Mutations
-  const { data: categoriesResponse, isLoading: isLoadingCategories } = useGetCategoriesQuery();
+  const { data: categoriesResponse, isLoading: isLoadingCategories } =
+    useGetCategoriesQuery();
+  const { data: brandsResponse, isLoading: isLoadingBrands } =
+    useGetBrandsQuery({ limit: 100 });
   const uploadMediaMutation = useUploadMediaMutation();
   const createListingMutation = useCreateListingMutation();
 
@@ -70,7 +63,6 @@ export default function AddListing() {
   // Form State
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
-  const [subCategory, setSubCategory] = useState("");
   const [brand, setBrand] = useState("");
   const [buildYear, setBuildYear] = useState<number | "">(2024);
   const [locationCity, setLocationCity] = useState("");
@@ -78,28 +70,28 @@ export default function AddListing() {
   const [isOffMarket, setIsOffMarket] = useState(false);
 
   // Dynamic Specifications state
-  const [specifications, setSpecifications] = useState<KeyValuePair[]>([
-    { id: "1", key: "horsepower", value: "986" },
-    { id: "2", key: "engine", value: "4.0L V8 Twin-Turbo" },
-    { id: "3", key: "transmission", value: "8-Speed DCT" },
-    { id: "4", key: "exteriorColor", value: "Rosso Corsa" },
-    { id: "5", key: "mileage", value: "450" },
-  ]);
+  const [specifications, setSpecifications] = useState<KeyValuePair[]>([]);
 
   // Media Gallery state
   const [mediaList, setMediaList] = useState<UploadedMediaItem[]>([]);
   const [isDragging, setIsDragging] = useState(false);
 
   // Pricing & Sale Type
-  const [saleType, setSaleType] = useState<"FIXED_PRICE" | "AUCTION" | "PRIVATE">("FIXED_PRICE");
+  const [saleType, setSaleType] = useState<
+    "FIXED_PRICE" | "AUCTION" | "PRIVATE"
+  >("FIXED_PRICE");
   const [askingPrice, setAskingPrice] = useState<string>("625000");
   const [startingBid, setStartingBid] = useState<string>("500000");
-  const [auctionEndsAt, setAuctionEndsAt] = useState<string>("2026-12-31T23:59:59.000Z");
+  const [auctionEndsAt, setAuctionEndsAt] = useState<string>(
+    "2026-12-31T23:59:59.000Z",
+  );
   const [currency, setCurrency] = useState("USD");
   const [allowCounterOffers, setAllowCounterOffers] = useState(true);
 
   // Plan Selection
-  const [selectedPlan, setSelectedPlan] = useState<"standard" | "featured">("standard");
+  const [selectedPlan, setSelectedPlan] = useState<"standard" | "featured">(
+    "standard",
+  );
 
   // Dynamic Specification handlers
   const handleAddSpecRow = () => {
@@ -109,25 +101,18 @@ export default function AddListing() {
     ]);
   };
 
-  const handleSpecChange = (id: string, field: "key" | "value", val: string) => {
+  const handleSpecChange = (
+    id: string,
+    field: "key" | "value",
+    val: string,
+  ) => {
     setSpecifications((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, [field]: val } : item))
+      prev.map((item) => (item.id === id ? { ...item, [field]: val } : item)),
     );
   };
 
   const handleRemoveSpecRow = (id: string) => {
     setSpecifications((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const handleAddSuggestion = (keyName: string) => {
-    if (specifications.some((s) => s.key.toLowerCase() === keyName.toLowerCase())) {
-      toast.info(`"${keyName}" specification key is already added.`);
-      return;
-    }
-    setSpecifications((prev) => [
-      ...prev,
-      { id: Date.now().toString(), key: keyName, value: "" },
-    ]);
   };
 
   // Image Upload handler using useMedia mutation
@@ -161,7 +146,9 @@ export default function AddListing() {
       }
     } catch (err: any) {
       const errMsg =
-        err?.response?.data?.message || err?.message || "Failed to upload image.";
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to upload image.";
       toast.error(errMsg);
     }
   };
@@ -211,7 +198,10 @@ export default function AddListing() {
       }
     }
     if (currentStep === 3) {
-      if (saleType === "FIXED_PRICE" && (!askingPrice || Number(askingPrice) <= 0)) {
+      if (
+        saleType === "FIXED_PRICE" &&
+        (!askingPrice || Number(askingPrice) <= 0)
+      ) {
         toast.error("Please enter a valid asking price.");
         return false;
       }
@@ -257,30 +247,33 @@ export default function AddListing() {
       }
     });
 
-    const specificationsJson = Object.keys(specsObject).length > 0
-      ? JSON.stringify(specsObject)
-      : undefined;
+    const specificationsJson =
+      Object.keys(specsObject).length > 0
+        ? JSON.stringify(specsObject)
+        : undefined;
 
     const askingPriceNum = askingPrice
       ? Number(askingPrice)
       : saleType === "AUCTION" && startingBid
-      ? Number(startingBid)
-      : 0;
+        ? Number(startingBid)
+        : 0;
 
     const payload = {
       title: title.trim(),
       category,
-      subCategory: subCategory.trim() || undefined,
       brand: brand.trim() || undefined,
       buildYear: buildYear ? Number(buildYear) : undefined,
       locationCity: locationCity.trim() || undefined,
       locationCountry: locationCountry.trim() || undefined,
       isOffMarket,
       saleType,
-      allowCounterOffers,
+      allowCounterOffers:
+        saleType === "FIXED_PRICE" ? allowCounterOffers : false,
       askingPrice: askingPriceNum,
-      startingBid: saleType === "AUCTION" && startingBid ? Number(startingBid) : undefined,
-      auctionEndsAt: saleType === "AUCTION" && auctionEndsAt ? auctionEndsAt : undefined,
+      startingBid:
+        saleType === "AUCTION" && startingBid ? Number(startingBid) : undefined,
+      auctionEndsAt:
+        saleType === "AUCTION" && auctionEndsAt ? auctionEndsAt : undefined,
       currency: currency || "USD",
       isFeatured: selectedPlan === "featured",
       specifications: specificationsJson,
@@ -297,13 +290,16 @@ export default function AddListing() {
       router.push("/seller/my-listing");
     } catch (err: any) {
       const errMsg =
-        err?.response?.data?.message || err?.message || "Failed to create listing. Please check required fields.";
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to create listing. Please check required fields.";
       toast.error(errMsg);
     }
   };
 
-  // Categories extraction
+  // Categories & Brands extraction
   const categoriesList = categoriesResponse?.data || [];
+  const brandsList = brandsResponse?.data || [];
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -329,11 +325,12 @@ export default function AddListing() {
               />
             </div>
 
-            {/* Category & SubCategory */}
+            {/* Category & Brand / Manufacturer */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <Layers className="w-3.5 h-3.5 text-primary2" /> Category <span className="text-primary2">*</span>
+                  <Layers className="w-3.5 h-3.5 text-primary2" /> Category{" "}
+                  <span className="text-primary2">*</span>
                 </label>
                 <div className="relative">
                   <select
@@ -342,7 +339,9 @@ export default function AddListing() {
                     className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-primary2/60 transition-colors appearance-none cursor-pointer"
                   >
                     <option value="">
-                      {isLoadingCategories ? "Loading categories..." : "Select Category"}
+                      {isLoadingCategories
+                        ? "Loading categories..."
+                        : "Select Category"}
                     </option>
                     {categoriesList.map((cat) => (
                       <option key={cat.id} value={cat.name}>
@@ -357,46 +356,48 @@ export default function AddListing() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider">
-                  Sub Category
+                <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <Briefcase className="w-3.5 h-3.5 text-primary2" /> Brand /
+                  Manufacturer
                 </label>
-                <input
-                  type="text"
-                  value={subCategory}
-                  onChange={(e) => setSubCategory(e.target.value)}
-                  placeholder="e.g. Hypercar"
-                  className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors shadow-inner"
-                />
+                <div className="relative">
+                  <select
+                    value={brand}
+                    onChange={(e) => setBrand(e.target.value)}
+                    className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-primary2/60 transition-colors appearance-none cursor-pointer"
+                  >
+                    <option value="">
+                      {isLoadingBrands ? "Loading brands..." : "Select Brand"}
+                    </option>
+                    {brandsList.map((b) => (
+                      <option key={b.id} value={b.name}>
+                        {b.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                    <ChevronRight className="w-4 h-4 rotate-90" />
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Brand & Build Year */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <Briefcase className="w-3.5 h-3.5 text-primary2" /> Brand / Manufacturer
-                </label>
-                <input
-                  type="text"
-                  value={brand}
-                  onChange={(e) => setBrand(e.target.value)}
-                  placeholder="e.g. Ferrari"
-                  className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors shadow-inner"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5 text-primary2" /> Build Year
-                </label>
-                <input
-                  type="number"
-                  value={buildYear}
-                  onChange={(e) => setBuildYear(e.target.value ? parseInt(e.target.value, 10) : "")}
-                  placeholder="e.g. 2024"
-                  className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors shadow-inner"
-                />
-              </div>
+            {/* Build Year */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-primary2" /> Build Year
+              </label>
+              <input
+                type="number"
+                value={buildYear}
+                onChange={(e) =>
+                  setBuildYear(
+                    e.target.value ? parseInt(e.target.value, 10) : "",
+                  )
+                }
+                placeholder="e.g. 2024"
+                className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors shadow-inner"
+              />
             </div>
 
             {/* Location City & Country */}
@@ -431,8 +432,12 @@ export default function AddListing() {
             {/* Off Market Toggle */}
             <div className="flex items-center justify-between p-4 bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl">
               <div>
-                <p className="text-sm font-semibold text-white">Private Off-Market Listing</p>
-                <p className="text-xs text-gray-400">Keep this listing visible only to verified VIP buyers</p>
+                <p className="text-sm font-semibold text-white">
+                  Private Off-Market Listing
+                </p>
+                <p className="text-xs text-gray-400">
+                  Keep this listing visible only to verified VIP buyers
+                </p>
               </div>
               <input
                 type="checkbox"
@@ -450,7 +455,8 @@ export default function AddListing() {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-clash font-medium text-white flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-primary2" /> Specifications System
+                  <Sparkles className="w-5 h-5 text-primary2" /> Specifications
+                  System
                 </h3>
                 <p className="text-xs text-gray-400 mt-1">
                   Add dynamic key-value specifications for your luxury item.
@@ -466,32 +472,17 @@ export default function AddListing() {
               </button>
             </div>
 
-            {/* Common Suggestion Chips */}
-            <div className="space-y-2">
-              <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                Quick Preset Keys
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {COMMON_SPEC_SUGGESTIONS.map((preset) => (
-                  <button
-                    key={preset}
-                    type="button"
-                    onClick={() => handleAddSuggestion(preset)}
-                    className="px-3 py-1 bg-[#1c1c1e] border border-[#2C2C2E] hover:border-primary2/50 text-gray-300 hover:text-primary2 rounded-lg text-xs transition-colors cursor-pointer flex items-center gap-1 font-mono"
-                  >
-                    <Plus className="w-3 h-3" /> {preset}
-                  </button>
-                ))}
-              </div>
-            </div>
-
             {/* Key-Value Pair Inputs */}
             <div className="space-y-3 pt-2">
               {specifications.length === 0 ? (
                 <div className="p-8 text-center border-2 border-dashed border-[#2C2C2E] rounded-xl bg-[#1c1c1e]/50">
                   <AlertCircle className="w-8 h-8 text-gray-500 mx-auto mb-2" />
-                  <p className="text-sm font-medium text-gray-400">No specifications added yet</p>
-                  <p className="text-xs text-gray-600 mt-0.5">Click "Add Field" or choose a preset above.</p>
+                  <p className="text-sm font-medium text-gray-400">
+                    No specifications added yet
+                  </p>
+                  <p className="text-xs text-gray-600 mt-0.5">
+                    Click &quot;Add Field&quot; or choose a preset above.
+                  </p>
                 </div>
               ) : (
                 specifications.map((item) => (
@@ -503,7 +494,9 @@ export default function AddListing() {
                       <input
                         type="text"
                         value={item.key}
-                        onChange={(e) => handleSpecChange(item.id, "key", e.target.value)}
+                        onChange={(e) =>
+                          handleSpecChange(item.id, "key", e.target.value)
+                        }
                         placeholder="Key (e.g. horsepower)"
                         className="w-full bg-[#111113] border border-[#2C2C2E] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors font-mono"
                       />
@@ -512,7 +505,9 @@ export default function AddListing() {
                       <input
                         type="text"
                         value={item.value}
-                        onChange={(e) => handleSpecChange(item.id, "value", e.target.value)}
+                        onChange={(e) =>
+                          handleSpecChange(item.id, "value", e.target.value)
+                        }
                         placeholder="Value (e.g. 986)"
                         className="w-full bg-[#111113] border border-[#2C2C2E] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors"
                       />
@@ -545,7 +540,7 @@ export default function AddListing() {
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className={`relative border-2 border-dashed rounded-2xl aspect-[16/6] flex flex-col items-center justify-center p-6 text-center cursor-pointer transition-all duration-300 ${
+              className={`relative border-2 border-dashed rounded-2xl aspect-16/6 flex flex-col items-center justify-center p-6 text-center cursor-pointer transition-all duration-300 ${
                 isDragging
                   ? "border-primary2 bg-primary2/10"
                   : "border-[#2C2C2E] bg-[#1c1c1e] hover:border-primary2/50 hover:bg-[#252528]"
@@ -563,7 +558,9 @@ export default function AddListing() {
               {uploadMediaMutation.isPending ? (
                 <div className="flex flex-col items-center justify-center space-y-2 py-4">
                   <Loader2 className="w-8 h-8 text-primary2 animate-spin" />
-                  <p className="text-sm font-medium text-primary2">Uploading image to cloud media service...</p>
+                  <p className="text-sm font-medium text-primary2">
+                    Uploading image to cloud media service...
+                  </p>
                   <p className="text-xs text-gray-500">Please wait</p>
                 </div>
               ) : (
@@ -590,7 +587,9 @@ export default function AddListing() {
               </label>
 
               {mediaList.length === 0 ? (
-                <p className="text-xs text-gray-500 italic">No images uploaded yet.</p>
+                <p className="text-xs text-gray-500 italic">
+                  No images uploaded yet.
+                </p>
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                   {mediaList.map((item, idx) => (
@@ -626,15 +625,28 @@ export default function AddListing() {
         return (
           <div className="space-y-8">
             <h3 className="text-xl font-clash font-medium text-white flex items-center gap-2 mb-4">
-              <DollarSign className="w-5 h-5 text-primary2" /> Pricing & Sale Type
+              <DollarSign className="w-5 h-5 text-primary2" /> Pricing & Sale
+              Type
             </h3>
 
             {/* Sale Type Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
-                { id: "FIXED_PRICE", title: "Fixed Price", desc: "Set a specific asking price" },
-                { id: "AUCTION", title: "Auction", desc: "Set starting bid and auction end date" },
-                { id: "PRIVATE", title: "Private Sale", desc: "Price on Application (POA)" },
+                {
+                  id: "FIXED_PRICE",
+                  title: "Fixed Price",
+                  desc: "Set a specific asking price",
+                },
+                {
+                  id: "AUCTION",
+                  title: "Auction",
+                  desc: "Set starting bid and auction end date",
+                },
+                {
+                  id: "PRIVATE",
+                  title: "Private Sale",
+                  desc: "Price on Application (POA)",
+                },
               ].map((type) => (
                 <button
                   key={type.id}
@@ -664,7 +676,8 @@ export default function AddListing() {
               {(saleType === "FIXED_PRICE" || saleType === "PRIVATE") && (
                 <div className="space-y-2">
                   <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider">
-                    Asking Price ({currency}) <span className="text-primary2">*</span>
+                    Asking Price ({currency}){" "}
+                    <span className="text-primary2">*</span>
                   </label>
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-sm">
@@ -686,7 +699,8 @@ export default function AddListing() {
                 <>
                   <div className="space-y-2">
                     <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider">
-                      Starting Bid ({currency}) <span className="text-primary2">*</span>
+                      Starting Bid ({currency}){" "}
+                      <span className="text-primary2">*</span>
                     </label>
                     <div className="relative">
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-sm">
@@ -704,7 +718,8 @@ export default function AddListing() {
 
                   <div className="space-y-2">
                     <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5 text-primary2" /> Auction Ends At (ISO Date)
+                      <Clock className="w-3.5 h-3.5 text-primary2" /> Auction
+                      Ends At (ISO Date)
                     </label>
                     <input
                       type="text"
@@ -735,22 +750,24 @@ export default function AddListing() {
               </div>
             </div>
 
-            {/* Allow Counter Offers */}
-            <div className="flex items-center gap-3 bg-[#1c1c1e] border border-[#2C2C2E] p-4 rounded-xl">
-              <input
-                type="checkbox"
-                id="allowCounterOffers"
-                checked={allowCounterOffers}
-                onChange={(e) => setAllowCounterOffers(e.target.checked)}
-                className="w-4 h-4 rounded border-[#2C2C2E] text-primary2 focus:ring-primary2 accent-[#E78F23] cursor-pointer"
-              />
-              <label
-                htmlFor="allowCounterOffers"
-                className="text-xs font-semibold text-gray-200 cursor-pointer"
-              >
-                Allow potential buyers to submit counter-offers
-              </label>
-            </div>
+            {/* Allow Counter Offers - Only for FIXED_PRICE */}
+            {saleType === "FIXED_PRICE" && (
+              <div className="flex items-center gap-3 bg-[#1c1c1e] border border-[#2C2C2E] p-4 rounded-xl">
+                <input
+                  type="checkbox"
+                  id="allowCounterOffers"
+                  checked={allowCounterOffers}
+                  onChange={(e) => setAllowCounterOffers(e.target.checked)}
+                  className="w-4 h-4 rounded border-[#2C2C2E] text-primary2 focus:ring-primary2 accent-[#E78F23] cursor-pointer"
+                />
+                <label
+                  htmlFor="allowCounterOffers"
+                  className="text-xs font-semibold text-gray-200 cursor-pointer"
+                >
+                  Allow potential buyers to submit counter-offers
+                </label>
+              </div>
+            )}
           </div>
         );
 
@@ -765,7 +782,8 @@ export default function AddListing() {
                 Review & Confirm Listing
               </h3>
               <p className="text-gray-400 text-xs max-w-md mx-auto">
-                Review listing details and choose visibility package before submission.
+                Review listing details and choose visibility package before
+                submission.
               </p>
             </div>
 
@@ -773,14 +791,20 @@ export default function AddListing() {
             <div className="p-5 bg-[#1c1c1e] border border-[#2C2C2E] rounded-2xl space-y-4">
               <div className="flex items-center justify-between border-b border-[#2C2C2E] pb-3">
                 <div>
-                  <h4 className="text-base font-bold text-white">{title || "Untitled Listing"}</h4>
+                  <h4 className="text-base font-bold text-white">
+                    {title || "Untitled Listing"}
+                  </h4>
                   <p className="text-xs text-gray-400">
-                    Category: <span className="text-primary2 font-semibold">{category || "Unassigned"}</span>{" "}
-                    {subCategory && `• ${subCategory}`} {brand && `• Brand: ${brand}`}
+                    Category:{" "}
+                    <span className="text-primary2 font-semibold">
+                      {category || "Unassigned"}
+                    </span>{" "}
+                    {brand && `• Brand: ${brand}`}
                   </p>
                 </div>
                 <span className="px-3 py-1 bg-primary2/10 border border-primary2/20 text-primary2 text-xs font-bold rounded-lg">
-                  {currency} {askingPrice ? Number(askingPrice).toLocaleString() : "0"}
+                  {currency}{" "}
+                  {askingPrice ? Number(askingPrice).toLocaleString() : "0"}
                 </span>
               </div>
 
@@ -791,15 +815,21 @@ export default function AddListing() {
                 </div>
                 <div>
                   <span className="text-gray-500 block">Build Year</span>
-                  <span className="text-white font-semibold">{buildYear || "N/A"}</span>
+                  <span className="text-white font-semibold">
+                    {buildYear || "N/A"}
+                  </span>
                 </div>
                 <div>
                   <span className="text-gray-500 block">Specifications</span>
-                  <span className="text-white font-semibold">{specifications.filter(s => s.key).length} keys</span>
+                  <span className="text-white font-semibold">
+                    {specifications.filter((s) => s.key).length} keys
+                  </span>
                 </div>
                 <div>
                   <span className="text-gray-500 block">Uploaded Media</span>
-                  <span className="text-white font-semibold">{mediaList.length} files</span>
+                  <span className="text-white font-semibold">
+                    {mediaList.length} files
+                  </span>
                 </div>
               </div>
             </div>
@@ -818,7 +848,9 @@ export default function AddListing() {
                 <div className="flex items-start gap-4">
                   <div
                     className={`mt-1 transition-colors ${
-                      selectedPlan === "standard" ? "text-primary2" : "text-gray-600"
+                      selectedPlan === "standard"
+                        ? "text-primary2"
+                        : "text-gray-600"
                     }`}
                   >
                     {selectedPlan === "standard" ? (
@@ -828,8 +860,12 @@ export default function AddListing() {
                     )}
                   </div>
                   <div>
-                    <h4 className="text-lg font-clash font-medium text-white">Standard Listing (Free)</h4>
-                    <p className="text-gray-400 text-xs mt-1">List your luxury item on marketplace standard queue.</p>
+                    <h4 className="text-lg font-clash font-medium text-white">
+                      Standard Listing (Free)
+                    </h4>
+                    <p className="text-gray-400 text-xs mt-1">
+                      List your luxury item on marketplace standard queue.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -846,7 +882,9 @@ export default function AddListing() {
                 <div className="flex items-start gap-4">
                   <div
                     className={`mt-1 transition-colors ${
-                      selectedPlan === "featured" ? "text-primary2" : "text-gray-600"
+                      selectedPlan === "featured"
+                        ? "text-primary2"
+                        : "text-gray-600"
                     }`}
                   >
                     {selectedPlan === "featured" ? (
@@ -856,8 +894,12 @@ export default function AddListing() {
                     )}
                   </div>
                   <div>
-                    <h4 className="text-lg font-clash font-medium text-white">Featured Listing (VIP)</h4>
-                    <p className="text-gray-400 text-xs mt-1">Priority placement for higher buyer conversion.</p>
+                    <h4 className="text-lg font-clash font-medium text-white">
+                      Featured Listing (VIP)
+                    </h4>
+                    <p className="text-gray-400 text-xs mt-1">
+                      Priority placement for higher buyer conversion.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -893,7 +935,9 @@ export default function AddListing() {
             <div className="w-full bg-[#111113] h-1.5 rounded-full overflow-hidden mb-6">
               <div
                 className="bg-primary2 h-full transition-all duration-500 ease-out"
-                style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+                style={{
+                  width: `${((currentStep + 1) / steps.length) * 100}%`,
+                }}
               />
             </div>
 
@@ -902,7 +946,9 @@ export default function AddListing() {
                 <span
                   key={step}
                   className={`transition-colors duration-300 cursor-default ${
-                    index <= currentStep ? "text-primary2 font-semibold" : "text-gray-500"
+                    index <= currentStep
+                      ? "text-primary2 font-semibold"
+                      : "text-gray-500"
                   }`}
                 >
                   {index + 1}. {step}
@@ -942,7 +988,10 @@ export default function AddListing() {
               <button
                 type="button"
                 onClick={handleSubmitListing}
-                disabled={createListingMutation.isPending || uploadMediaMutation.isPending}
+                disabled={
+                  createListingMutation.isPending ||
+                  uploadMediaMutation.isPending
+                }
                 className="flex items-center gap-2 px-8 py-3 bg-primary2 text-[#111113] rounded-xl text-sm font-bold hover:bg-yellow-400 transition-all duration-300 shadow-lg shadow-primary2/20 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer active:scale-95 ml-auto"
               >
                 {createListingMutation.isPending ? (

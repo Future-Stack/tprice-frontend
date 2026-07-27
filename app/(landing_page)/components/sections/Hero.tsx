@@ -2,6 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+import { useAuthStore } from "@/lib/store/useAuthStore";
+import { useCreateCheckoutSessionMutation } from "@/hooks/usePayments";
+import { useGetMeQuery } from "@/hooks/useAuth";
 
 const HERO_ASSETS = [
   { type: "video", src: "/video/hero.mp4" },
@@ -20,6 +27,14 @@ const STATS = [
 export default function Hero() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const currentAsset = HERO_ASSETS[currentIndex];
+  const router = useRouter();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const storeUser = useAuthStore((state) => state.user);
+  const { data: userProfile } = useGetMeQuery(isAuthenticated);
+  const user = userProfile || storeUser;
+  const { mutate: createCheckoutSession, isPending } = useCreateCheckoutSessionMutation();
+
+  const showVipButton = !user || (!user.vipStatus && user.role?.toUpperCase() === "BUYER");
 
   const nextAsset = () => {
     setCurrentIndex((prev) => (prev + 1) % HERO_ASSETS.length);
@@ -34,6 +49,41 @@ export default function Hero() {
       return () => clearTimeout(timer);
     }
   }, [currentIndex, currentAsset]);
+
+  const handleBecomeVip = () => {
+    if (!isAuthenticated) {
+      toast.error("Please sign in to become a VIP buyer");
+      router.push("/login");
+      return;
+    }
+
+    const origin = typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
+
+    createCheckoutSession(
+      {
+        type: "VIP_BUYER_MEMBERSHIP",
+        successUrl: `${origin}/payment/success`,
+        cancelUrl: `${origin}/payment/cancel`,
+      },
+      {
+        onSuccess: (data) => {
+          if (data?.checkoutUrl) {
+            toast.success("Redirecting to checkout...");
+            window.location.href = data.checkoutUrl;
+          } else {
+            toast.error("Failed to retrieve checkout URL.");
+          }
+        },
+        onError: (error: any) => {
+          const errorMessage =
+            error?.response?.data?.message ||
+            error?.message ||
+            "Failed to create checkout session";
+          toast.error(errorMessage);
+        },
+      }
+    );
+  };
 
   return (
     <section className="relative h-screen min-h-175 w-full overflow-hidden flex flex-col justify-center items-center text-center px-6">
@@ -89,7 +139,7 @@ export default function Hero() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-5xl md:text-7xl lg:text-[80px] font-medium italic font-cormorant text-land leading-tight"
         >
-          Luxury  Marketplace
+          Luxury Marketplace
         </motion.h1>
 
         <motion.p
@@ -107,12 +157,28 @@ export default function Hero() {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-6"
         >
-          <button className="px-10 py-4 border border-land rounded-sm cursor-pointer text-white text-sm font-semibold tracking-wide hover:bg-primary hover:text-black transition-all duration-300 font-montserrat">
+          <Link
+            href="/inventory"
+            className="px-10 py-4 border border-land rounded-sm cursor-pointer text-white text-sm font-semibold tracking-wide hover:bg-primary hover:text-black transition-all duration-300 font-montserrat"
+          >
             Explore Listings
-          </button>
-          <button className="px-10 font-montserrat py-4 bg-land text-black rounded-sm cursor-pointer text-sm font-bold tracking-wide hover:bg-white hover:text-black transition-all duration-300  ">
-            Become a VIP Buyer
-          </button>
+          </Link>
+          {showVipButton && (
+            <button
+              onClick={handleBecomeVip}
+              disabled={isPending}
+              className="px-10 font-montserrat py-4 bg-land text-black rounded-sm cursor-pointer text-sm font-bold tracking-wide hover:bg-white hover:text-black transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-black" />
+                  <span>Redirecting...</span>
+                </>
+              ) : (
+                "Become a VIP Buyer"
+              )}
+            </button>
+          )}
         </motion.div>
 
         {/* Indicators */}
@@ -120,16 +186,17 @@ export default function Hero() {
           {HERO_ASSETS.map((_, i) => (
             <div
               key={i}
-              className={`h-1 rounded-full transition-all duration-500 ${currentIndex === i ? "w-8 bg-primary" : "w-4 bg-white/20"
-                }`}
+              className={`h-1 rounded-full transition-all duration-500 ${
+                currentIndex === i ? "w-8 bg-primary" : "w-4 bg-white/20"
+              }`}
             />
           ))}
         </div>
       </div>
 
       {/* Stats Bar */}
-      <div className="absolute bottom-0 left-0 w-full z-10 border-t border-white/10 hidden md:block"
-
+      <div
+        className="absolute bottom-0 left-0 w-full z-10 border-t border-white/10 hidden md:block"
         style={{
           background: "rgba(217, 217, 217, 0.10)",
           backdropFilter: "blur(6px)",

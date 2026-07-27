@@ -15,6 +15,8 @@ import {
   Calendar,
   FolderTree,
   Award,
+  Users,
+  Image as ImageIcon,
 } from "lucide-react";
 
 const navItems = [
@@ -24,7 +26,9 @@ const navItems = [
   { href: "/admin/listings", icon: Building2, label: "Listings" },
   { href: "/admin/deals", icon: Gavel, label: "Deals" },
   { href: "/admin/events", icon: Calendar, label: "Events" },
-  { href: "/admin/dealers", icon: BadgePercent, label: "Dealers" },
+  { href: "/admin/media", icon: ImageIcon, label: "Media" },
+  // { href: "/admin/dealers", icon: BadgePercent, label: "Dealers" },
+  { href: "/admin/users", icon: Users, label: "Users" },
   { href: "/admin/activity", icon: Heart, label: "Activity" },
   { href: "/admin/settings", icon: Settings, label: "Settings" },
 ];

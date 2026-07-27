@@ -1,43 +1,73 @@
 "use client";
 
-import React, { useState } from "react";
-import { Eye, MapPin, ChevronDown, RotateCcw, Filter, X, Search, AlertTriangle, ChevronLeft, ChevronRight, CheckCircle2 } from "lucide-react";
+import React, { useState, useMemo } from "react";
+import {
+  Eye,
+  MapPin,
+  ChevronDown,
+  RotateCcw,
+  Filter,
+  X,
+  Search,
+  AlertTriangle,
+  ChevronLeft,
+  ChevronRight,
+  CheckCircle2,
+  Heart,
+} from "lucide-react";
 import Link from "next/link";
+import Cookies from "js-cookie";
+import { toast } from "sonner";
 import AnimationWrapper from "../../components/AnimationWrapper";
-import { useListingsQuery } from "@/hooks/useListings";
+import { useListingsQuery, useSaveListingMutation, useSavedListingsQuery } from "@/hooks/useListings";
+import { useGetCategoriesQuery } from "@/hooks/useCategories";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useAuthStore } from "@/lib/store/useAuthStore";
 import { ListingItem } from "@/lib/api/listings";
 
-/* ─── Category Configuration ─── */
-const CATEGORIES = [
-  { label: "All", value: "ALL" },
-  { label: "Supercar", value: "SUPERCAR" },
-  { label: "Yacht", value: "YACHT" },
-  { label: "Jet", value: "JET" },
-  { label: "Real Estate", value: "REAL_ESTATE" },
-  { label: "Watch", value: "WATCH" },
-];
-
 const SORT_OPTIONS = [
-  { label: "Newest Listed", value: "newest" },
-  { label: "Price: Low to High", value: "price_asc" },
-  { label: "Price: High to Low", value: "price_desc" },
-  { label: "Oldest Listed", value: "oldest" },
+  { label: "Newest Listed", value: "NEWEST" },
+  { label: "Price: Low to High", value: "PRICE_ASC" },
+  { label: "Price: High to Low", value: "PRICE_DESC" },
+  { label: "Most Viewed", value: "VIEWS" },
 ];
 
 export default function MarketplacePage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
+  // Fetch dynamic categories using React Query
+  const { data: categoriesResponse } = useGetCategoriesQuery();
+
+  const categories = useMemo(() => {
+    const fetchedCats = categoriesResponse?.data;
+    if (fetchedCats && fetchedCats.length > 0) {
+      return [
+        { label: "All", value: "ALL" },
+        ...fetchedCats.map((cat) => ({
+          label: cat.name,
+          value: cat.name,
+        })),
+      ];
+    }
+    return [
+      { label: "All", value: "ALL" },
+      { label: "Supercar", value: "SUPERCAR" },
+      { label: "Yacht", value: "YACHT" },
+      { label: "Jet", value: "JET" },
+      { label: "Real Estate", value: "REAL_ESTATE" },
+      { label: "Watch", value: "WATCH" },
+    ];
+  }, [categoriesResponse]);
+
   // Filter state
   const [activeCategory, setActiveCategory] = useState("ALL");
   const [search, setSearch] = useState("");
-  const [subCategory, setSubCategory] = useState("");
   const [locationCity, setLocationCity] = useState("");
   const [locationCountry, setLocationCountry] = useState("");
   const [buildYear, setBuildYear] = useState("");
   const [priceMin, setPriceMin] = useState<number>(0);
   const [priceMax, setPriceMax] = useState<number>(100000000);
-  const [sortBy, setSortBy] = useState("newest");
+  const [sortBy, setSortBy] = useState("NEWEST");
   const [page, setPage] = useState(1);
   const limit = 9;
 
@@ -50,19 +80,19 @@ export default function MarketplacePage() {
   const debouncedPriceMax = useDebounce(priceMax, 400);
 
   // Fetch listings using React Query
-  const { data, isLoading, isError, error, refetch, isFetching } = useListingsQuery({
-    category: activeCategory,
-    subCategory: subCategory || undefined,
-    search: debouncedSearch || undefined,
-    locationCity: debouncedCity || undefined,
-    locationCountry: debouncedCountry || undefined,
-    buildYear: debouncedBuildYear ? Number(debouncedBuildYear) : undefined,
-    minPrice: debouncedPriceMin > 0 ? debouncedPriceMin : undefined,
-    maxPrice: debouncedPriceMax < 100000000 ? debouncedPriceMax : undefined,
-    sortBy: sortBy,
-    page: page,
-    limit: limit,
-  });
+  const { data, isLoading, isError, error, refetch, isFetching } =
+    useListingsQuery({
+      category: activeCategory,
+      search: debouncedSearch || undefined,
+      locationCity: debouncedCity || undefined,
+      locationCountry: debouncedCountry || undefined,
+      buildYear: debouncedBuildYear ? Number(debouncedBuildYear) : undefined,
+      minPrice: debouncedPriceMin > 0 ? debouncedPriceMin : undefined,
+      maxPrice: debouncedPriceMax < 100000000 ? debouncedPriceMax : undefined,
+      sortBy: sortBy,
+      page: page,
+      limit: limit,
+    });
 
   const listings = data?.data || [];
   const meta = data?.meta;
@@ -70,13 +100,12 @@ export default function MarketplacePage() {
   const handleResetFilters = () => {
     setActiveCategory("ALL");
     setSearch("");
-    setSubCategory("");
     setLocationCity("");
     setLocationCountry("");
     setBuildYear("");
     setPriceMin(0);
     setPriceMax(100000000);
-    setSortBy("newest");
+    setSortBy("NEWEST");
     setPage(1);
   };
 
@@ -86,7 +115,7 @@ export default function MarketplacePage() {
   };
 
   return (
-    <div className="mx-auto relative z-0 px-4 sm:px-6 lg:px-8">
+    <div className="mx-auto relative z-0 px-4 sm:px-6 lg:px-0">
       {/* ── Page Header ── */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6 lg:mb-8">
         <AnimationWrapper type="fade-down" duration={0.5}>
@@ -95,7 +124,8 @@ export default function MarketplacePage() {
               Exclusive Collection
             </h2>
             <p className="text-gray-400 text-xs sm:text-sm mt-1 sm:mt-2 font-medium">
-              Discover the world&apos;s finest luxury assets available for acquisition.
+              Discover the world&apos;s finest luxury assets available for
+              acquisition.
             </p>
           </div>
         </AnimationWrapper>
@@ -104,14 +134,15 @@ export default function MarketplacePage() {
         <AnimationWrapper type="fade-down" duration={0.5} delay={0.1}>
           <div className="overflow-x-auto pb-1 -mx-4 px-4 lg:mx-0 lg:px-0">
             <div className="flex items-center gap-1.5 bg-[#18181A] border border-[#2C2C2E] rounded-full p-1.5 w-max">
-              {CATEGORIES.map((cat) => (
+              {categories.map((cat) => (
                 <button
                   key={cat.value}
                   onClick={() => handleCategoryChange(cat.value)}
-                  className={`px-4 sm:px-5 py-2 rounded-full text-[11px] sm:text-[13px] font-medium transition-all duration-200 whitespace-nowrap ${activeCategory === cat.value
-                    ? "bg-[#E78F23] text-white shadow-[0_2px_12px_rgba(231,143,35,0.4)]"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
-                    }`}
+                  className={`px-4 sm:px-5 py-2 rounded-full text-[11px] sm:text-[13px] font-medium transition-all duration-200 whitespace-nowrap ${
+                    activeCategory === cat.value
+                      ? "bg-primary text-white shadow-[0_2px_12px_rgba(231,143,35,0.4)]"
+                      : "text-gray-400 hover:text-white hover:bg-white/5"
+                  }`}
                 >
                   {cat.label}
                 </button>
@@ -160,7 +191,9 @@ export default function MarketplacePage() {
 
           {/* Sort By Dropdown */}
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-400 hidden sm:inline whitespace-nowrap">Sort by:</span>
+            <span className="text-xs text-gray-400 hidden sm:inline whitespace-nowrap">
+              Sort by:
+            </span>
             <div className="relative">
               <select
                 value={sortBy}
@@ -168,10 +201,14 @@ export default function MarketplacePage() {
                   setSortBy(e.target.value);
                   setPage(1);
                 }}
-                className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-lg pl-3 pr-8 py-2 text-xs font-medium text-white appearance-none cursor-pointer focus:outline-none focus:border-[#E78F23]"
+                className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-lg pl-3 pr-8 py-2 text-xs font-medium text-white appearance-none cursor-pointer focus:outline-none focus:border-primary"
               >
                 {SORT_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value} className="bg-[#1C1C1E] text-white">
+                  <option
+                    key={opt.value}
+                    value={opt.value}
+                    className="bg-[#1C1C1E] text-white"
+                  >
                     {opt.label}
                   </option>
                 ))}
@@ -187,14 +224,10 @@ export default function MarketplacePage() {
         {/* Desktop Sidebar */}
         <aside className="hidden lg:block w-72 shrink-0">
           <FilterSidebar
+            categories={categories}
             activeCategory={activeCategory}
             setActiveCategory={(cat) => {
               setActiveCategory(cat);
-              setPage(1);
-            }}
-            subCategory={subCategory}
-            setSubCategory={(val) => {
-              setSubCategory(val);
               setPage(1);
             }}
             locationCity={locationCity}
@@ -235,7 +268,9 @@ export default function MarketplacePage() {
             />
             <div className="absolute right-0 top-0 h-full w-full max-w-[340px] bg-[#1C1C1E] shadow-2xl overflow-y-auto">
               <div className="sticky top-0 bg-[#1C1C1E] p-4 border-b border-[#2C2C2E] flex items-center justify-between z-10">
-                <h3 className="text-lg font-semibold text-white">Filter Listings</h3>
+                <h3 className="text-lg font-semibold text-white">
+                  Filter Listings
+                </h3>
                 <button
                   onClick={() => setIsFilterOpen(false)}
                   className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5"
@@ -245,14 +280,10 @@ export default function MarketplacePage() {
               </div>
               <div className="p-5">
                 <FilterSidebar
+                  categories={categories}
                   activeCategory={activeCategory}
                   setActiveCategory={(cat) => {
                     setActiveCategory(cat);
-                    setPage(1);
-                  }}
-                  subCategory={subCategory}
-                  setSubCategory={(val) => {
-                    setSubCategory(val);
                     setPage(1);
                   }}
                   locationCity={locationCity}
@@ -293,13 +324,17 @@ export default function MarketplacePage() {
           {isError && (
             <div className="bg-[#2A1616] border border-red-500/30 rounded-2xl p-6 mb-8 text-center">
               <AlertTriangle className="w-10 h-10 text-red-400 mx-auto mb-3" />
-              <h3 className="text-lg font-semibold text-white mb-1">Failed to load listings</h3>
+              <h3 className="text-lg font-semibold text-white mb-1">
+                Failed to load listings
+              </h3>
               <p className="text-sm text-gray-400 mb-4">
-                {(error as any)?.response?.data?.message || error?.message || "An unexpected error occurred while fetching listings."}
+                {(error as any)?.response?.data?.message ||
+                  error?.message ||
+                  "An unexpected error occurred while fetching listings."}
               </p>
               <button
                 onClick={() => refetch()}
-                className="px-5 py-2.5 bg-[#E78F23] hover:bg-[#D47D17] text-black font-semibold text-xs rounded-xl transition-all"
+                className="px-5 py-2.5 bg-primary hover:bg-primary text-black font-semibold text-xs rounded-xl transition-all"
               >
                 Try Again
               </button>
@@ -314,7 +349,12 @@ export default function MarketplacePage() {
               {/* Listings Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {listings.map((item, index) => (
-                  <AnimationWrapper key={item.id} type="fade-up" duration={0.4} delay={0.04 * (index % 3)}>
+                  <AnimationWrapper
+                    key={item.id}
+                    type="fade-up"
+                    duration={0.4}
+                    delay={0.04 * (index % 3)}
+                  >
                     <Link href={`/buyer/marketplace/${item.slug || item.id}`}>
                       <MarketplaceCard asset={item} />
                     </Link>
@@ -326,8 +366,15 @@ export default function MarketplacePage() {
               {meta && meta.totalPages > 1 && (
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-10 pt-6 border-t border-[#2C2C2E]">
                   <p className="text-xs text-gray-400">
-                    Showing <span className="font-semibold text-white">{listings.length}</span> of{" "}
-                    <span className="font-semibold text-white">{meta.total}</span> listings
+                    Showing{" "}
+                    <span className="font-semibold text-white">
+                      {listings.length}
+                    </span>{" "}
+                    of{" "}
+                    <span className="font-semibold text-white">
+                      {meta.total}
+                    </span>{" "}
+                    listings
                   </p>
                   <div className="flex items-center gap-2">
                     <button
@@ -341,7 +388,9 @@ export default function MarketplacePage() {
                       Page {page} of {meta.totalPages}
                     </span>
                     <button
-                      onClick={() => setPage((p) => Math.min(p + 1, meta.totalPages))}
+                      onClick={() =>
+                        setPage((p) => Math.min(p + 1, meta.totalPages))
+                      }
                       disabled={page >= meta.totalPages || isFetching}
                       className="p-2 rounded-lg bg-[#1C1C1E] border border-[#2C2C2E] text-white disabled:opacity-40 disabled:cursor-not-allowed hover:border-[#E78F23] transition-colors"
                     >
@@ -359,13 +408,16 @@ export default function MarketplacePage() {
                   <div className="w-16 h-16 rounded-full bg-[#2C2C2E] flex items-center justify-center mb-4">
                     <Search className="w-8 h-8 text-gray-400" />
                   </div>
-                  <h3 className="text-lg font-semibold text-white">No listings found</h3>
+                  <h3 className="text-lg font-semibold text-white">
+                    No listings found
+                  </h3>
                   <p className="text-sm text-gray-400 mt-1 max-w-sm">
-                    We couldn&apos;t find any assets matching your active filter criteria. Try adjusting your filters or search term.
+                    We couldn&apos;t find any assets matching your active filter
+                    criteria. Try adjusting your filters or search term.
                   </p>
                   <button
                     onClick={handleResetFilters}
-                    className="mt-5 flex items-center gap-2 px-5 py-2.5 bg-[#E78F23] hover:bg-[#D47D17] text-black font-semibold text-xs rounded-xl transition-all"
+                    className="mt-5 flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary text-black font-semibold text-xs rounded-xl transition-all"
                   >
                     <RotateCcw className="w-3.5 h-3.5" /> Reset Filters
                   </button>
@@ -379,12 +431,11 @@ export default function MarketplacePage() {
   );
 }
 
-/* ─── Filter Sidebar Component (onChange implementation) ─── */
+/* ─── Filter Sidebar Component ─── */
 interface FilterSidebarProps {
+  categories: { label: string; value: string }[];
   activeCategory: string;
   setActiveCategory: (cat: string) => void;
-  subCategory: string;
-  setSubCategory: (val: string) => void;
   locationCity: string;
   setLocationCity: (val: string) => void;
   locationCountry: string;
@@ -399,10 +450,9 @@ interface FilterSidebarProps {
 }
 
 function FilterSidebar({
+  categories,
   activeCategory,
   setActiveCategory,
-  subCategory,
-  setSubCategory,
   locationCity,
   setLocationCity,
   locationCountry,
@@ -422,10 +472,12 @@ function FilterSidebar({
     <div className="bg-[#1C1C1E] border border-[#2C2C2E] rounded-2xl p-5 sm:p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="text-base sm:text-lg font-semibold text-white">Filter Listings</h3>
+        <h3 className="text-base sm:text-lg font-semibold text-white">
+          Filter Listings
+        </h3>
         <button
           onClick={handleResetFilters}
-          className="text-[#E78F23] text-xs sm:text-sm font-medium hover:underline flex items-center gap-1"
+          className="text-primary text-xs sm:text-sm font-medium hover:underline flex items-center gap-1"
         >
           <RotateCcw className="w-3.5 h-3.5" /> Reset
         </button>
@@ -438,33 +490,20 @@ function FilterSidebar({
           Category
         </label>
         <div className="flex flex-col gap-1">
-          {CATEGORIES.map((cat) => (
+          {categories.map((cat) => (
             <button
               key={cat.value}
               onClick={() => setActiveCategory(cat.value)}
-              className={`text-left px-3.5 py-2 rounded-lg text-sm transition-all ${activeCategory === cat.value
-                ? "bg-[#E78F23]/15 text-[#E78F23] font-semibold border border-[#E78F23]/30"
-                : "text-gray-400 hover:text-white hover:bg-white/5"
-                }`}
+              className={`text-left px-3.5 py-2 rounded-lg text-sm transition-all ${
+                activeCategory === cat.value
+                  ? "bg-[#E78F23]/15 text-primary font-semibold "
+                  : "text-gray-400 hover:text-white hover:bg-white/5"
+              }`}
             >
               {cat.label}
             </button>
           ))}
         </div>
-      </div>
-
-      {/* SubCategory */}
-      <div>
-        <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
-          Sub Category
-        </label>
-        <input
-          type="text"
-          value={subCategory}
-          onChange={(e) => setSubCategory(e.target.value)}
-          placeholder="e.g. Hypercar, Villa, Yacht"
-          className="w-full bg-[#18181A] border border-[#2C2C2E] rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#E78F23] transition-colors"
-        />
       </div>
 
       {/* Location City & Country */}
@@ -477,14 +516,14 @@ function FilterSidebar({
           value={locationCity}
           onChange={(e) => setLocationCity(e.target.value)}
           placeholder="City (e.g. Miami, Geneva)"
-          className="w-full bg-[#18181A] border border-[#2C2C2E] rounded-lg px-3.5 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#E78F23] transition-colors"
+          className="w-full bg-[#18181A] border border-[#2C2C2E] rounded-lg px-3.5 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary transition-colors"
         />
         <input
           type="text"
           value={locationCountry}
           onChange={(e) => setLocationCountry(e.target.value)}
           placeholder="Country (e.g. United States)"
-          className="w-full bg-[#18181A] border border-[#2C2C2E] rounded-lg px-3.5 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#E78F23] transition-colors"
+          className="w-full bg-[#18181A] border border-[#2C2C2E] rounded-lg px-3.5 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary transition-colors"
         />
       </div>
 
@@ -498,7 +537,7 @@ function FilterSidebar({
           value={buildYear}
           onChange={(e) => setBuildYear(e.target.value)}
           placeholder="e.g. 2024"
-          className="w-full bg-[#18181A] border border-[#2C2C2E] rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#E78F23] transition-colors"
+          className="w-full bg-[#18181A] border border-[#2C2C2E] rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary transition-colors"
         />
       </div>
 
@@ -514,30 +553,36 @@ function FilterSidebar({
 
         <div className="grid grid-cols-2 gap-2 mb-4">
           <div>
-            <span className="text-[10px] text-gray-500 block mb-1">Min Price</span>
+            <span className="text-[10px] text-gray-500 block mb-1">
+              Min Price
+            </span>
             <input
               type="number"
               value={priceMin || ""}
               onChange={(e) => setPriceMin(Number(e.target.value))}
               placeholder="0"
-              className="w-full bg-[#18181A] border border-[#2C2C2E] rounded-lg px-3 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-[#E78F23]"
+              className="w-full bg-[#18181A] border border-[#2C2C2E] rounded-lg px-3 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-primary"
             />
           </div>
           <div>
-            <span className="text-[10px] text-gray-500 block mb-1">Max Price</span>
+            <span className="text-[10px] text-gray-500 block mb-1">
+              Max Price
+            </span>
             <input
               type="number"
               value={priceMax >= 100000000 ? "" : priceMax}
-              onChange={(e) => setPriceMax(e.target.value ? Number(e.target.value) : 100000000)}
+              onChange={(e) =>
+                setPriceMax(e.target.value ? Number(e.target.value) : 100000000)
+              }
               placeholder="Max"
-              className="w-full bg-[#18181A] border border-[#2C2C2E] rounded-lg px-3 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-[#E78F23]"
+              className="w-full bg-[#18181A] border border-[#2C2C2E] rounded-lg px-3 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-primary"
             />
           </div>
         </div>
 
         <div className="relative h-1.5 bg-[#2C2C2E] rounded-full mb-3">
           <div
-            className="absolute h-full bg-[#E78F23] rounded-full"
+            className="absolute h-full bg-primary rounded-full"
             style={{
               left: `${Math.min(100, Math.max(0, (priceMin / maxLimit) * 100))}%`,
               right: `${Math.min(100, Math.max(0, 100 - (Math.min(priceMax, maxLimit) / maxLimit) * 100))}%`,
@@ -546,7 +591,11 @@ function FilterSidebar({
         </div>
         <div className="flex justify-between text-[11px] text-gray-400 font-medium">
           <span>${priceMin.toLocaleString()}</span>
-          <span>{priceMax >= 100000000 ? "Any Max" : `$${priceMax.toLocaleString()}`}</span>
+          <span>
+            {priceMax >= 100000000
+              ? "Any Max"
+              : `$${priceMax.toLocaleString()}`}
+          </span>
         </div>
       </div>
     </div>
@@ -582,16 +631,45 @@ function ListingsSkeleton() {
 
 /* ─── MarketplaceCard Component ─── */
 function MarketplaceCard({ asset }: { asset: ListingItem }) {
-  const imageUrl = asset.media?.[0]?.url || "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&q=80&w=800";
+  const saveMutation = useSaveListingMutation();
+  const token = Cookies.get("access_token") || useAuthStore((state) => state.token);
+
+  const { data: savedResponse } = useSavedListingsQuery(
+    { page: 1, limit: 100 },
+    { enabled: Boolean(token) }
+  );
+
+  const isSavedInListings = useMemo(() => {
+    if (!savedResponse?.data) return false;
+    return savedResponse.data.some((savedItem) => savedItem.id === asset.id);
+  }, [savedResponse, asset.id]);
+
+  const isSaved = asset.isSaved !== undefined ? asset.isSaved : isSavedInListings;
+
+  const handleToggleSave = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!token) {
+      toast.error("Please sign in to save listings to your favorites.");
+      return;
+    }
+
+    saveMutation.mutate(asset.id);
+  };
+
+  const imageUrl = asset.media?.[0]?.url;
 
   const formattedPrice = asset.askingPrice
     ? `${asset.currency || "$"}${Number(asset.askingPrice).toLocaleString()}`
     : "Price on Request";
 
-  const locationText = [asset.locationCity, asset.locationCountry].filter(Boolean).join(", ") || "Worldwide";
+  const locationText =
+    [asset.locationCity, asset.locationCountry].filter(Boolean).join(", ") ||
+    "Worldwide";
 
   return (
-    <div className="bg-[#1C1C1E] rounded-xl border border-[#2C2C2E] overflow-hidden group hover:border-[#E78F23]/40 transition-all duration-300 shadow-xl hover:shadow-[#E78F23]/5 flex flex-col h-full">
+    <div className="bg-[#1C1C1E] rounded-xl border border-[#2C2C2E] overflow-hidden group hover:border-primary/40 transition-all duration-300 shadow-xl hover:shadow-[#E78F23]/5 flex flex-col h-full">
       {/* Media Container */}
       <div className="relative h-48 sm:h-52 overflow-hidden bg-black/40">
         <img
@@ -599,14 +677,15 @@ function MarketplaceCard({ asset }: { asset: ListingItem }) {
           alt={asset.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out opacity-90 group-hover:opacity-100"
           onError={(e) => {
-            (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&q=80&w=800";
+            (e.target as HTMLImageElement).src =
+              "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&q=80&w=800";
           }}
         />
 
         {/* Badges */}
-        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
+        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
           {asset.category && (
-            <span className="bg-black/70 backdrop-blur-md text-[#E78F23] text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border border-[#E78F23]/30">
+            <span className="bg-black/70 backdrop-blur-md text-primary text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border border-primary/30">
               {asset.category}
             </span>
           )}
@@ -615,13 +694,26 @@ function MarketplaceCard({ asset }: { asset: ListingItem }) {
               {asset.buildYear}
             </span>
           )}
+          {asset.isFeatured && (
+            <span className="bg-primary text-black text-[10px] font-bold px-2.5 py-1 rounded-full shadow">
+              FEATURED
+            </span>
+          )}
         </div>
 
-        {asset.isFeatured && (
-          <div className="absolute top-3 right-3 bg-[#E78F23] text-black text-[10px] font-bold px-2 py-0.5 rounded shadow">
-            FEATURED
-          </div>
-        )}
+        {/* Heart Wishlist Button */}
+        <button
+          onClick={handleToggleSave}
+          disabled={saveMutation.isPending}
+          className={`absolute top-3 right-3 p-2 rounded-full flex items-center justify-center transition-all z-10 backdrop-blur-md border hover:scale-110 active:scale-95 cursor-pointer disabled:opacity-50 ${
+            isSaved
+              ? "text-red-500 bg-black/70 border-red-500/50 shadow-lg shadow-red-500/20"
+              : "text-white hover:text-white bg-black/40 border-white/20 hover:border-white/50"
+          }`}
+          title={isSaved ? "Remove from saved" : "Save listing"}
+        >
+          <Heart className={`w-4 h-4 transition-transform duration-200 ${isSaved ? "fill-current scale-110" : ""}`} />
+        </button>
       </div>
 
       {/* Content Container */}
@@ -629,7 +721,7 @@ function MarketplaceCard({ asset }: { asset: ListingItem }) {
         <div>
           <div className="flex justify-between items-center text-[11px] text-gray-400 mb-2 font-medium">
             <span className="flex items-center gap-1 truncate pr-2">
-              <MapPin className="w-3.5 h-3.5 text-[#E78F23] shrink-0" />
+              <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
               <span className="truncate">{locationText}</span>
             </span>
             {asset.owner?.isVerified && (
@@ -639,16 +731,16 @@ function MarketplaceCard({ asset }: { asset: ListingItem }) {
             )}
           </div>
 
-          <h4 className="font-semibold text-white text-base sm:text-lg line-clamp-1 mb-2 group-hover:text-[#E78F23] transition-colors">
+          <h4 className="font-semibold text-white text-base sm:text-lg line-clamp-1 mb-2 group-hover:text-primary transition-colors">
             {asset.title}
           </h4>
 
-          <div className="text-lg sm:text-xl font-bold font-clash text-[#E78F23] mb-4">
+          <div className="text-lg sm:text-xl font-bold font-clash text-primary mb-4">
             {formattedPrice}
           </div>
         </div>
 
-        <button className="w-full py-2.5 cursor-pointer bg-[#D98728] hover:bg-[#E6983A] text-white text-xs sm:text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#D98728]/20 active:scale-[0.98]">
+        <button className="w-full py-2.5 cursor-pointer bg-primary hover:bg-primary text-white text-xs sm:text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#D98728]/20 active:scale-[0.98]">
           View Details <Eye className="w-4 h-4" />
         </button>
       </div>

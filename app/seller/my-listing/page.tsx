@@ -11,10 +11,13 @@ import {
   ChevronRight,
   PackageOpen,
   RefreshCw,
+  Edit3,
 } from "lucide-react";
 import AnimationWrapper from "../../components/AnimationWrapper";
 import { useMyListingsQuery } from "@/hooks/useListings";
 import { useDebounce } from "@/hooks/useDebounce";
+import { ListingItem } from "@/lib/api/listings";
+import UpdateListingModal from "./UpdateListingModal";
 
 const getStatusStyles = (status: string) => {
   const normalized = status?.toUpperCase();
@@ -123,6 +126,9 @@ const SellerListing = () => {
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
+  const [editingListing, setEditingListing] = useState<ListingItem | null>(
+    null,
+  );
 
   const debouncedSearch = useDebounce(searchQuery, 400);
 
@@ -159,7 +165,7 @@ const SellerListing = () => {
 
         <AnimationWrapper type="fade-down" delay={0.1}>
           <Link href="/seller/add-listing">
-            <button className="flex items-center gap-2 px-8 py-3 bg-[#E78F23] hover:bg-[#E78F23]/90 transition-all duration-300 text-black font-bold rounded-xl shadow-[0_0_25px_rgba(231,143,35,0.3)] hover:scale-[1.02] active:scale-[0.98] cursor-pointer">
+            <button className="flex items-center gap-2 px-8 py-3 bg-primary hover:bg-[#E78F23]/90 transition-all duration-300 text-black font-bold rounded-xl shadow-[0_0_25px_rgba(231,143,35,0.3)] hover:scale-[1.02] active:scale-[0.98] cursor-pointer">
               Add Listing
             </button>
           </Link>
@@ -180,21 +186,26 @@ const SellerListing = () => {
                   setPage(1);
                 }}
                 placeholder="Search listings..."
-                className="w-full bg-[#121212] border border-[#2D2D2D] rounded-xl py-3 pl-12 pr-4 text-gray-200 placeholder:text-gray-600 focus:outline-none focus:border-[#E78F23]/40 focus:ring-1 focus:ring-[#E78F23]/40 transition-all duration-300"
+                className="w-full bg-[#121212] border border-[#2D2D2D] rounded-xl py-3 pl-12 pr-4 text-gray-200 placeholder:text-gray-600 focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-[#E78F23]/40 transition-all duration-300"
               />
             </div>
 
             <div className="flex items-center gap-6 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
               <button
                 onClick={() => refetch()}
-                className="flex items-center gap-2 px-6 py-2.5 border border-[#E78F23]/60 text-[#E78F23] rounded-xl hover:bg-[#E78F23]/10 transition-all duration-300 font-medium whitespace-nowrap cursor-pointer"
+                className="flex items-center gap-2 px-6 py-2.5 border border-primary/60 text-primary rounded-xl hover:bg-[#E78F23]/10 transition-all duration-300 font-medium whitespace-nowrap cursor-pointer"
                 title="Refresh listings"
               >
-                <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`} />
+                <RefreshCw
+                  className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`}
+                />
                 <span>Refresh</span>
               </button>
               <span className="text-gray-400 font-medium text-sm whitespace-nowrap">
-                Showing <span className="text-white font-bold text-lg">{meta.total}</span>{" "}
+                Showing{" "}
+                <span className="text-white font-bold text-lg">
+                  {meta.total}
+                </span>{" "}
                 items
               </span>
             </div>
@@ -205,7 +216,7 @@ const SellerListing = () => {
         <AnimationWrapper type="fade-up" delay={0.3}>
           <div className="relative bg-[#0D0D0D] border border-[#1F1F1F] rounded-[24px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
             {/* Table bottom glow effect */}
-            <div className="absolute bottom-0 left-1/4 right-1/4 h-px bg-[#E78F23] blur-[2px] opacity-40"></div>
+            <div className="absolute bottom-0 left-1/4 right-1/4 h-px bg-primary blur-[2px] opacity-40"></div>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse min-w-250">
@@ -298,7 +309,7 @@ const SellerListing = () => {
                           <td className="px-8 py-6">
                             <span
                               className={`px-4 py-1.5 text-[11px] font-bold rounded-full border tracking-wide inline-block ${getStatusStyles(
-                                item.status
+                                item.status,
                               )}`}
                             >
                               {formatStatusLabel(item.status)}
@@ -311,9 +322,16 @@ const SellerListing = () => {
                             </div>
                           </td>
                           <td className="px-8 py-6 text-right">
-                            <button className="p-3 text-gray-500 hover:text-white hover:bg-white/5 rounded-full transition-all duration-300 cursor-pointer">
-                              <MoreVertical className="w-6 h-6" />
-                            </button>
+                            <div className="flex items-center justify-end gap-2">
+                              <button
+                                onClick={() => setEditingListing(item)}
+                                className="px-3.5 py-2 bg-[#E78F23]/10 hover:bg-[#E78F23] text-[#E78F23] hover:text-black border border-[#E78F23]/30 font-bold text-xs rounded-xl transition-all duration-300 flex items-center gap-1.5 cursor-pointer shadow-sm hover:scale-105"
+                                title="Edit listing"
+                              >
+                                <Edit3 className="w-3.5 h-3.5" />
+                                <span>Edit</span>
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       );
@@ -335,7 +353,8 @@ const SellerListing = () => {
                   <span className="font-bold text-white">
                     {Math.min(meta.page * meta.limit, meta.total)}
                   </span>{" "}
-                  of <span className="font-bold text-white">{meta.total}</span> items
+                  of <span className="font-bold text-white">{meta.total}</span>{" "}
+                  items
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -349,21 +368,22 @@ const SellerListing = () => {
                   </button>
 
                   <div className="flex items-center gap-1.5">
-                    {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map(
-                      (pageNum) => (
-                        <button
-                          key={pageNum}
-                          onClick={() => handlePageChange(pageNum)}
-                          className={`w-9 h-9 rounded-xl border font-bold text-xs transition-all duration-300 cursor-pointer ${
-                            pageNum === meta.page
-                              ? "bg-[#E78F23] text-black border-[#E78F23] shadow-[0_0_15px_rgba(231,143,35,0.4)]"
-                              : "bg-[#121212] border-[#2D2D2D] text-gray-400 hover:text-white hover:border-[#E78F23]/40"
-                          }`}
-                        >
-                          {pageNum}
-                        </button>
-                      )
-                    )}
+                    {Array.from(
+                      { length: meta.totalPages },
+                      (_, i) => i + 1,
+                    ).map((pageNum) => (
+                      <button
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`w-9 h-9 rounded-xl border font-bold text-xs transition-all duration-300 cursor-pointer ${
+                          pageNum === meta.page
+                            ? "bg-[#E78F23] text-black border-[#E78F23] shadow-[0_0_15px_rgba(231,143,35,0.4)]"
+                            : "bg-[#121212] border-[#2D2D2D] text-gray-400 hover:text-white hover:border-[#E78F23]/40"
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    ))}
                   </div>
 
                   <button
@@ -380,6 +400,13 @@ const SellerListing = () => {
           </div>
         </AnimationWrapper>
       </div>
+
+      {/* Edit Listing Modal */}
+      <UpdateListingModal
+        isOpen={Boolean(editingListing)}
+        onClose={() => setEditingListing(null)}
+        listing={editingListing}
+      />
     </div>
   );
 };

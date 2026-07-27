@@ -55,11 +55,7 @@ export default function Topbar({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const menuItems = [
-    { icon: UserIcon, label: "View Profile", desc: "Your personal details" },
-    { icon: Settings, label: "Settings", desc: "Account preferences" },
-    { icon: Shield, label: "Security", desc: "Privacy & security" },
-  ];
+  const menuItems = [{ icon: Settings, label: "Settings", desc: "/settings" }];
 
   return (
     <header className="h-20 lg:h-24 flex items-center justify-between px-4 lg:px-10 z-20 backdrop-blur-md">
@@ -145,7 +141,7 @@ export default function Topbar({
                     )}
                   </div>
                   <p className="text-sm font-semibold text-white/90 truncate mt-0.5">
-                    {user?.email || "guest@example.com"}
+                    {user?.email || ""}
                   </p>
                 </div>
 
