@@ -4,45 +4,28 @@ import React, { useState } from "react";
 import {
   Image as ImageIcon,
   Film,
-  Search,
   RefreshCw,
   ChevronLeft,
   ChevronRight,
   Eye,
   Calendar,
-  Tag,
-  Sparkles,
-  Filter,
-  Layers,
-  ExternalLink,
   X,
-  Copy,
-  Check,
   CheckCircle2,
   XCircle,
-  Hash,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
 import Image from "next/image";
-import { useLandingMediaQuery } from "@/hooks/useMedia";
+import {
+  useLandingMediaQuery,
+  useDeleteLandingMediaMutation,
+} from "@/hooks/useMedia";
 import { LandingMediaItem } from "@/lib/api/media";
 import { useDebounce } from "@/hooks/useDebounce";
 import { toast } from "sonner";
-
-const CATEGORY_OPTIONS = [
-  { label: "All Categories", value: "ALL" },
-  { label: "Aviation", value: "AVIATION" },
-  { label: "Yacht", value: "YACHT" },
-  { label: "Automotive", value: "AUTOMOTIVE" },
-  { label: "Real Estate", value: "REAL_ESTATE" },
-  { label: "Watches", value: "WATCH" },
-];
-
-const TYPE_OPTIONS = [
-  { label: "All Types", value: "ALL" },
-  { label: "Images", value: "IMAGE" },
-  { label: "Videos", value: "VIDEO" },
-];
+import CreateMediaModal from "./CreateMediaModal";
+import DeleteMediaModal from "./DeleteMediaModal";
 
 const LIMIT_OPTIONS = [10, 20, 40, 80];
 
@@ -69,7 +52,7 @@ const MediaGridSkeleton = ({ count = 8 }: { count?: number }) => (
     {Array.from({ length: count }).map((_, idx) => (
       <div
         key={idx}
-        className="bg-[#18181A] border border-[#262626] rounded-2xl overflow-hidden animate-pulse flex flex-col h-[340px]"
+        className="bg-[#18181A] border border-[#262626] rounded-2xl overflow-hidden animate-pulse flex flex-col h-85"
       >
         {/* Media Thumbnail Skeleton */}
         <div className="w-full h-48 bg-white/5 relative">
@@ -99,8 +82,33 @@ export default function AdminMediaPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("ALL");
   const [activeType, setActiveType] = useState("ALL");
-  const [selectedMedia, setSelectedMedia] = useState<LandingMediaItem | null>(null);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [selectedMedia, setSelectedMedia] = useState<LandingMediaItem | null>(
+    null,
+  );
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [mediaToDelete, setMediaToDelete] = useState<LandingMediaItem | null>(
+    null,
+  );
+
+  const deleteMediaMutation = useDeleteLandingMediaMutation();
+
+  const handleDeleteConfirm = async () => {
+    if (!mediaToDelete) return;
+    try {
+      await deleteMediaMutation.mutateAsync(mediaToDelete.id);
+      toast.success("Landing media asset deleted successfully");
+      setMediaToDelete(null);
+      if (selectedMedia?.id === mediaToDelete.id) {
+        setSelectedMedia(null);
+      }
+    } catch (err: any) {
+      const errMsg =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to delete media asset";
+      toast.error(errMsg);
+    }
+  };
 
   const debouncedSearch = useDebounce(searchQuery, 400);
 
@@ -118,26 +126,9 @@ export default function AdminMediaPage() {
   const totalPages = meta?.totalPages || 1;
   const totalItems = meta?.total || mediaList.length;
 
-  const handleCategoryChange = (catValue: string) => {
-    setActiveCategory(catValue);
-    setPage(1);
-  };
-
-  const handleTypeChange = (typeValue: string) => {
-    setActiveType(typeValue);
-    setPage(1);
-  };
-
   const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit);
     setPage(1);
-  };
-
-  const handleCopyUrl = (url: string, id: string) => {
-    navigator.clipboard.writeText(url);
-    setCopiedId(id);
-    toast.success("Media URL copied to clipboard");
-    setTimeout(() => setCopiedId(null), 2000);
   };
 
   return (
@@ -146,30 +137,34 @@ export default function AdminMediaPage() {
         {/* Page Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-[#E78F23]/10 border border-[#E78F23]/20 rounded-2xl text-[#E78F23]">
-                <ImageIcon className="w-6 h-6" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold font-clash text-white tracking-wide">
-                  Media Management
-                </h1>
-                <p className="text-gray-400 text-sm mt-1">
-                  Browse, filter, and inspect landing page media assets and promotional banners.
-                </p>
-              </div>
+            <div>
+              <h1 className="text-3xl font-bold font-montserrat text-white tracking-wide">
+                Media Management
+              </h1>
+              <p className="text-gray-400 text-sm mt-1">
+                Browse, filter, and inspect landing page media assets and
+                promotional banners.
+              </p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary hover:bg-yellow-400 text-black text-sm font-semibold transition-all shadow-[0_4px_20px_rgba(231,143,35,0.25)] active:scale-95 cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Create Media</span>
+            </button>
+
+            <button
               onClick={() => refetch()}
               disabled={isFetching}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#262626] bg-[#18181A] text-gray-300 hover:text-white hover:border-[#E78F23]/50 transition-all text-sm font-medium disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#262626] bg-[#18181A] text-gray-300 hover:text-white hover:border-primary/50 transition-all text-sm font-medium disabled:opacity-50 cursor-pointer"
               title="Refresh data"
             >
               <RefreshCw
-                className={`w-4 h-4 text-[#E78F23] ${
+                className={`w-4 h-4 text-primary ${
                   isFetching ? "animate-spin" : ""
                 }`}
               />
@@ -178,104 +173,44 @@ export default function AdminMediaPage() {
           </div>
         </div>
 
-        {/* Filters and Search Toolbar */}
-        <div className="bg-[#18181A] border border-[#262626] rounded-2xl p-4 md:p-5 space-y-4">
-          <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
-            {/* Search Box */}
-            <div className="relative flex-1 min-w-[260px]">
-              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search media by title or caption..."
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setPage(1);
-                }}
-                className="w-full bg-[#111111] border border-[#262626] focus:border-[#E78F23] rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none transition-all"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-
-            {/* Filter Dropdowns */}
-            <div className="flex flex-wrap items-center gap-3">
-              {/* Category Filter */}
-              <div className="flex items-center gap-2 bg-[#111111] border border-[#262626] rounded-xl px-3 py-1.5">
-                <Filter className="w-4 h-4 text-[#E78F23]" />
-                <span className="text-xs text-gray-400 hidden sm:inline">Category:</span>
-                <select
-                  value={activeCategory}
-                  onChange={(e) => handleCategoryChange(e.target.value)}
-                  className="bg-transparent text-sm text-white focus:outline-none cursor-pointer pr-2"
-                >
-                  {CATEGORY_OPTIONS.map((cat) => (
-                    <option
-                      key={cat.value}
-                      value={cat.value}
-                      className="bg-[#18181A] text-white"
-                    >
-                      {cat.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Type Filter */}
-              <div className="flex items-center gap-2 bg-[#111111] border border-[#262626] rounded-xl px-3 py-1.5">
-                <Layers className="w-4 h-4 text-[#E78F23]" />
-                <span className="text-xs text-gray-400 hidden sm:inline">Type:</span>
-                <select
-                  value={activeType}
-                  onChange={(e) => handleTypeChange(e.target.value)}
-                  className="bg-transparent text-sm text-white focus:outline-none cursor-pointer pr-2"
-                >
-                  {TYPE_OPTIONS.map((t) => (
-                    <option
-                      key={t.value}
-                      value={t.value}
-                      className="bg-[#18181A] text-white"
-                    >
-                      {t.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Media Grid Section */}
         {isLoading ? (
           <MediaGridSkeleton count={limit} />
         ) : mediaList.length === 0 ? (
-          <div className="bg-[#18181A] border border-[#262626] rounded-2xl p-12 text-center flex flex-col items-center justify-center min-h-[300px]">
-            <div className="w-16 h-16 rounded-full bg-[#E78F23]/10 border border-[#E78F23]/20 flex items-center justify-center text-[#E78F23] mb-4">
+          <div className="bg-[#18181A] border border-[#262626] rounded-2xl p-12 text-center flex flex-col items-center justify-center min-h-75">
+            <div className="w-16 h-16 rounded-full bg-[#E78F23]/10 border border-[#E78F23]/20 flex items-center justify-center text-primary mb-4">
               <ImageIcon className="w-8 h-8" />
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">No Media Found</h3>
+            <h3 className="text-xl font-semibold text-white mb-2">
+              No Media Found
+            </h3>
             <p className="text-gray-400 text-sm max-w-md mb-6">
-              No media items matching your selected criteria were found. Try adjusting your search query or filter options.
+              No media items matching your selected criteria were found. Try
+              adjusting your search query or create a new media asset.
             </p>
-            {(searchQuery || activeCategory !== "ALL" || activeType !== "ALL") && (
+            <div className="flex items-center gap-3">
               <button
-                onClick={() => {
-                  setSearchQuery("");
-                  setActiveCategory("ALL");
-                  setActiveType("ALL");
-                  setPage(1);
-                }}
-                className="px-4 py-2 bg-[#E78F23]/10 border border-[#E78F23]/30 text-[#E78F23] rounded-xl text-sm font-medium hover:bg-[#E78F23]/20 transition-all"
+                onClick={() => setIsCreateModalOpen(true)}
+                className="px-4 py-2 bg-primary hover:bg-yellow-400 text-black rounded-xl text-sm font-bold transition-all cursor-pointer"
               >
-                Reset All Filters
+                Create Media
               </button>
-            )}
+              {(searchQuery ||
+                activeCategory !== "ALL" ||
+                activeType !== "ALL") && (
+                <button
+                  onClick={() => {
+                    setSearchQuery("");
+                    setActiveCategory("ALL");
+                    setActiveType("ALL");
+                    setPage(1);
+                  }}
+                  className="px-4 py-2 bg-[#E78F23]/10 border border-[#E78F23]/30 text-primary rounded-xl text-sm font-medium hover:bg-[#E78F23]/20 transition-all cursor-pointer"
+                >
+                  Reset All Filters
+                </button>
+              )}
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -310,13 +245,13 @@ export default function AdminMediaPage() {
                     {/* Top Overlay Badges */}
                     <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 pointer-events-none">
                       {item.category && (
-                        <span className="bg-black/70 backdrop-blur-md border border-[#E78F23]/40 text-[#E78F23] text-[11px] font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                        <span className="bg-black/70 backdrop-blur-md border border-primary/40 text-primary text-[11px] font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                           {item.category}
                         </span>
                       )}
 
                       {item.badgeText && (
-                        <span className="bg-[#E78F23] text-black text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-md uppercase tracking-wider ml-auto">
+                        <span className="bg-primary text-black text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-md uppercase tracking-wider ml-auto">
                           {item.badgeText}
                         </span>
                       )}
@@ -332,7 +267,7 @@ export default function AdminMediaPage() {
                           </>
                         ) : (
                           <>
-                            <ImageIcon className="w-3 h-3 text-[#E78F23]" />
+                            <ImageIcon className="w-3 h-3 text-primary" />
                             <span>IMAGE</span>
                           </>
                         )}
@@ -341,7 +276,7 @@ export default function AdminMediaPage() {
 
                     {/* Hover Inspect Overlay */}
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                      <span className="p-2.5 bg-[#E78F23] text-black rounded-full shadow-xl transform scale-95 group-hover:scale-100 transition-transform">
+                      <span className="p-2.5 bg-primary text-black rounded-full shadow-xl transform scale-95 group-hover:scale-100 transition-transform">
                         <Eye className="w-5 h-5" />
                       </span>
                     </div>
@@ -353,7 +288,7 @@ export default function AdminMediaPage() {
                       <div className="flex items-start justify-between gap-2 mb-1.5">
                         <h3
                           onClick={() => setSelectedMedia(item)}
-                          className="font-semibold text-white group-hover:text-[#E78F23] transition-colors cursor-pointer line-clamp-1 text-base"
+                          className="font-semibold text-white group-hover:text-primary transition-colors cursor-pointer line-clamp-1 text-base"
                           title={item.title}
                         >
                           {item.title}
@@ -380,7 +315,7 @@ export default function AdminMediaPage() {
                             className={`flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full border ${
                               item.isPublished
                                 ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
-                                : "bg-amber-500/10 text-amber-400 border-amber-500/30"
+                                : "bg-amber-500/10 text-primary border-amber-500/30"
                             }`}
                           >
                             {item.isPublished ? (
@@ -399,10 +334,21 @@ export default function AdminMediaPage() {
 
                         <button
                           onClick={() => setSelectedMedia(item)}
-                          className="p-1.5 hover:bg-white/10 text-gray-300 hover:text-white rounded-lg transition-colors"
+                          className="p-1.5 hover:bg-white/10 text-gray-300 hover:text-white rounded-lg transition-colors cursor-pointer"
                           title="Inspect Details"
                         >
                           <Eye className="w-4 h-4" />
+                        </button>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMediaToDelete(item);
+                          }}
+                          className="p-1.5 hover:bg-red-500/20 text-gray-400 hover:text-red-400 rounded-lg transition-colors cursor-pointer"
+                          title="Delete Media Asset"
+                        >
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
@@ -425,7 +371,8 @@ export default function AdminMediaPage() {
               <strong className="text-white">
                 {Math.min(page * limit, totalItems)}
               </strong>{" "}
-              of <strong className="text-white">{totalItems}</strong> media assets
+              of <strong className="text-white">{totalItems}</strong> media
+              assets
             </span>
 
             <div className="flex items-center gap-2 border-l border-[#262626] pl-4">
@@ -448,7 +395,7 @@ export default function AdminMediaPage() {
             <button
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
               disabled={page <= 1 || isFetching}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#262626] bg-[#111111] text-xs font-medium text-gray-300 hover:text-white hover:border-[#E78F23]/50 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#262626] bg-[#111111] text-xs font-medium text-gray-300 hover:text-white hover:border-primary/50 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <ChevronLeft className="w-4 h-4" />
               <span>Previous</span>
@@ -481,24 +428,32 @@ export default function AdminMediaPage() {
             >
               {/* Modal Header */}
               <div className="p-5 border-b border-[#262626] flex items-center justify-between bg-[#111111]">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-[#E78F23]/10 border border-[#E78F23]/30 rounded-xl text-[#E78F23]">
-                    <Sparkles className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-bold text-white font-clash">
-                      Media Inspection
-                    </h2>
-                    <p className="text-xs text-gray-400">ID: {selectedMedia.id}</p>
-                  </div>
+                <div>
+                  <h2 className="text-lg font-bold text-white font-clash">
+                    Media Inspection
+                  </h2>
+                  <p className="text-xs text-gray-400">
+                    ID: {selectedMedia.id}
+                  </p>
                 </div>
 
-                <button
-                  onClick={() => setSelectedMedia(null)}
-                  className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setMediaToDelete(selectedMedia)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
+                    title="Delete Media Asset"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Delete</span>
+                  </button>
+
+                  <button
+                    onClick={() => setSelectedMedia(null)}
+                    className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl transition-colors cursor-pointer"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
 
               {/* Modal Preview Area */}
@@ -512,7 +467,9 @@ export default function AdminMediaPage() {
                     unoptimized
                   />
                 ) : (
-                  <div className="text-gray-500 text-sm">No Preview Available</div>
+                  <div className="text-gray-500 text-sm">
+                    No Preview Available
+                  </div>
                 )}
               </div>
 
@@ -521,7 +478,7 @@ export default function AdminMediaPage() {
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     {selectedMedia.category && (
-                      <span className="px-3 py-1 bg-[#E78F23]/10 border border-[#E78F23]/30 text-[#E78F23] text-xs font-semibold rounded-full uppercase">
+                      <span className="px-3 py-1 bg-[#E78F23]/10 border border-[#E78F23]/30 text-primary text-xs font-semibold rounded-full uppercase">
                         {selectedMedia.category}
                       </span>
                     )}
@@ -529,7 +486,7 @@ export default function AdminMediaPage() {
                       {selectedMedia.type || "IMAGE"}
                     </span>
                     {selectedMedia.badgeText && (
-                      <span className="px-3 py-1 bg-[#E78F23] text-black text-xs font-bold rounded-full uppercase">
+                      <span className="px-3 py-1 bg-primary text-black text-xs font-bold rounded-full uppercase">
                         {selectedMedia.badgeText}
                       </span>
                     )}
@@ -551,58 +508,31 @@ export default function AdminMediaPage() {
                   <div className="p-3 bg-[#111111] rounded-xl border border-[#262626]">
                     <span className="text-gray-400 block mb-1">Status</span>
                     <span className="font-semibold text-emerald-400">
-                      {selectedMedia.isPublished !== false ? "Published" : "Draft"}
+                      {selectedMedia.isPublished !== false
+                        ? "Published"
+                        : "Draft"}
                     </span>
                   </div>
-
-                  <div className="p-3 bg-[#111111] rounded-xl border border-[#262626]">
-                    <span className="text-gray-400 block mb-1">Display Order</span>
-                    <span className="font-semibold text-white">
-                      {selectedMedia.displayOrder ?? 0}
-                    </span>
-                  </div>
-
-                  <div className="p-3 bg-[#111111] rounded-xl border border-[#262626]">
-                    <span className="text-gray-400 block mb-1">Created At</span>
-                    <span className="font-semibold text-white">
-                      {formatDate(selectedMedia.createdAt)}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Media URL Copy / Actions */}
-                <div className="pt-4 border-t border-[#262626] flex items-center justify-between gap-3">
-                  <button
-                    onClick={() => handleCopyUrl(selectedMedia.mediaUrl, selectedMedia.id)}
-                    className="flex items-center gap-2 px-4 py-2.5 bg-[#111111] border border-[#262626] hover:border-[#E78F23]/50 rounded-xl text-xs text-gray-300 hover:text-white transition-all"
-                  >
-                    {copiedId === selectedMedia.id ? (
-                      <>
-                        <Check className="w-4 h-4 text-emerald-400" />
-                        <span className="text-emerald-400">Copied URL</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-4 h-4 text-[#E78F23]" />
-                        <span>Copy Direct Media URL</span>
-                      </>
-                    )}
-                  </button>
-
-                  <a
-                    href={selectedMedia.mediaUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-4 py-2.5 bg-[#E78F23] hover:bg-[#d47f1c] text-black font-semibold text-xs rounded-xl transition-all"
-                  >
-                    <span>Open Original</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
                 </div>
               </div>
             </div>
           </div>
         )}
+
+        {/* Create Media Modal */}
+        <CreateMediaModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+        />
+
+        {/* Delete Media Modal */}
+        <DeleteMediaModal
+          isOpen={!!mediaToDelete}
+          onClose={() => setMediaToDelete(null)}
+          onConfirm={handleDeleteConfirm}
+          mediaItem={mediaToDelete}
+          isDeleting={deleteMediaMutation.isPending}
+        />
       </div>
     </AnimationWrapper>
   );

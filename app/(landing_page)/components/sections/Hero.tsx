@@ -9,6 +9,7 @@ import { Loader2 } from "lucide-react";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 import { useCreateCheckoutSessionMutation } from "@/hooks/usePayments";
 import { useGetMeQuery } from "@/hooks/useAuth";
+import { usePlatformStatsQuery, formatAssetsValue } from "@/hooks/usePlatformStats";
 
 const HERO_ASSETS = [
   { type: "video", src: "/video/hero.mp4" },
@@ -16,12 +17,6 @@ const HERO_ASSETS = [
   { type: "image", src: "/images/landing/hero-yacht.png" },
   { type: "image", src: "/images/landing/hero-jet.png" },
   { type: "image", src: "/images/landing/hero-villa.png" },
-];
-
-const STATS = [
-  { label: "Assets", value: "$2.4 B+" },
-  { label: "VIP Members", value: "1500+" },
-  { label: "Client Satisfaction", value: "97%" },
 ];
 
 export default function Hero() {
@@ -33,6 +28,22 @@ export default function Hero() {
   const { data: userProfile } = useGetMeQuery(isAuthenticated);
   const user = userProfile || storeUser;
   const { mutate: createCheckoutSession, isPending } = useCreateCheckoutSessionMutation();
+  const { data: statsData, isLoading: isStatsLoading } = usePlatformStatsQuery();
+
+  const stats = [
+    {
+      label: "Assets",
+      value: statsData ? formatAssetsValue(statsData.totalAssetsValue) : "$0",
+    },
+    {
+      label: "VIP Members",
+      value: statsData ? `${statsData.vipMembersCount.toLocaleString()}+` : "0+",
+    },
+    {
+      label: "Client Satisfaction",
+      value: statsData ? `${statsData.clientSatisfactionPct}%` : "0%",
+    },
+  ];
 
   const showVipButton = !user || (!user.vipStatus && user.role?.toUpperCase() === "BUYER");
 
@@ -203,17 +214,21 @@ export default function Hero() {
         }}
       >
         <div className="container mx-auto px-12 grid grid-cols-3 divide-x divide-white/10">
-          {STATS.map((stat, i) => (
+          {stats.map((stat, i) => (
             <motion.div
               key={stat.label}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.8 + i * 0.1 }}
-              className="py-10 text-center"
+              className="py-10 text-center flex flex-col items-center justify-center"
             >
-              <h3 className="text-3xl lg:text-[32px] font-semibold text-land font-montserrat mb-2">
-                {stat.value}
-              </h3>
+              {isStatsLoading ? (
+                <div className="h-9 w-32 bg-white/15 animate-pulse rounded-md mb-2 my-0.5" />
+              ) : (
+                <h3 className="text-3xl lg:text-[32px] font-semibold text-land font-montserrat mb-2">
+                  {stat.value}
+                </h3>
+              )}
               <p className="text-white/50 text-[20px] font-medium font-montserrat uppercase tracking-[0.2em]">
                 {stat.label}
               </p>

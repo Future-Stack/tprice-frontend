@@ -13,6 +13,7 @@ import {
   RefreshCw,
   Mail,
   Phone,
+  Lock,
 } from "lucide-react";
 import Link from "next/link";
 import Cookies from "js-cookie";
@@ -121,6 +122,18 @@ export default function BuyerListingDetailPage() {
     numericPrice > 0
       ? `${currencySymbol}${numericPrice.toLocaleString()}`
       : "Price on Request";
+
+  // Sale type classification
+  const normalizedSaleType = (product?.saleType || "").toUpperCase();
+  const isAuction =
+    normalizedSaleType === "AUCTION" ||
+    (Boolean(product?.startingBid) &&
+      normalizedSaleType !== "FIXED_PRICE" &&
+      normalizedSaleType !== "PRIVATE_SALE" &&
+      normalizedSaleType !== "PRIVATE");
+  const isPrivateSale =
+    normalizedSaleType === "PRIVATE_SALE" || normalizedSaleType === "PRIVATE";
+  const isFixedPrice = !isAuction && !isPrivateSale;
 
   // Calculations for bidding mode
   const vipFeeRate = 0.015;
@@ -351,7 +364,11 @@ export default function BuyerListingDetailPage() {
                 <AnimationWrapper type="fade-left" duration={0.5} delay={0.15}>
                   <div className="pt-2">
                     <p className="text-[11px] text-gray-500 uppercase tracking-[0.15em] font-semibold mb-1">
-                      CURRENT PRICE / ASK
+                      {isAuction
+                        ? "STARTING BID / CURRENT BID"
+                        : isPrivateSale
+                        ? "ESTIMATED VALUE / ASK"
+                        : "CURRENT PRICE / ASK"}
                     </p>
                     <p className="text-3xl font-inter font-medium text-primary">
                       {formattedPrice}
@@ -361,17 +378,32 @@ export default function BuyerListingDetailPage() {
 
                 {/* Action Buttons */}
                 <AnimationWrapper type="fade-left" duration={0.5} delay={0.2}>
-                  <div className="flex flex-col md:flex-row gap-3">
+                  {isFixedPrice && (
+                    <button
+                      onClick={() => toast.info("Send offer feature initiated")}
+                      className="w-full py-4 bg-primary hover:bg-primary/90 text-white text-sm font-bold rounded-xl transition-all shadow-[0_6px_24px_rgba(231,143,35,0.35)] hover:shadow-[0_8px_30px_rgba(231,143,35,0.5)] active:scale-[0.98] capitalize tracking-wide cursor-pointer"
+                    >
+                      Send Offer
+                    </button>
+                  )}
+
+                  {isAuction && (
                     <button
                       onClick={() => setIsBiddingMode(true)}
                       className="w-full py-4 bg-primary hover:bg-primary/90 text-white text-sm font-bold rounded-xl transition-all shadow-[0_6px_24px_rgba(231,143,35,0.35)] hover:shadow-[0_8px_30px_rgba(231,143,35,0.5)] active:scale-[0.98] capitalize tracking-wide cursor-pointer"
                     >
                       Place Bid
                     </button>
-                    <button className="w-full py-4 bg-white/5 hover:bg-white/10 text-white text-sm font-bold rounded-xl transition-all border border-white/10 active:scale-[0.98] capitalize tracking-wide cursor-pointer">
-                      send offer
-                    </button>
-                  </div>
+                  )}
+
+                  {isPrivateSale && (
+                    <div className="w-full py-4 px-4 bg-[#161618] border border-[#E78F23]/30 rounded-xl text-center flex items-center justify-center gap-2.5 shadow-lg">
+                      <Lock className="w-4 h-4 text-primary shrink-0" />
+                      <p className="text-sm font-medium text-gray-300">
+                        This item is available for <span className="text-primary font-semibold">Private Sale</span> only.
+                      </p>
+                    </div>
+                  )}
                 </AnimationWrapper>
 
                 {/* Key Specifications (Dynamic Key & Value) */}
