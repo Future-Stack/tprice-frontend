@@ -7,8 +7,12 @@ import {
   registerApi,
   logoutApi,
   getMeApi,
+  updateMeApi,
+  changePasswordApi,
   LoginPayload,
   RegisterPayload,
+  UpdateProfilePayload,
+  ChangePasswordPayload,
   User,
   LogoutResponse,
 } from "@/lib/api/auth";
@@ -126,3 +130,43 @@ export const useGetMeQuery = (enabled: boolean = true) => {
     retry: false,
   });
 };
+
+/**
+ * Mutation Hook for Profile Update
+ */
+export const useUpdateProfileMutation = () => {
+  const queryClient = useQueryClient();
+  const setUser = useAuthStore((state) => state.setUser);
+
+  return useMutation({
+    mutationFn: (payload: UpdateProfilePayload) => updateMeApi(payload),
+    onSuccess: (data) => {
+      if (data) {
+        setUser(data);
+      }
+      queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.user });
+      toast.success("Profile updated successfully!");
+    },
+    onError: (error: any) => {
+      const msg = error.response?.data?.message || "Failed to update profile";
+      toast.error(msg);
+    },
+  });
+};
+
+/**
+ * Mutation Hook for Changing Password
+ */
+export const useChangePasswordMutation = () => {
+  return useMutation({
+    mutationFn: (payload: ChangePasswordPayload) => changePasswordApi(payload),
+    onSuccess: (data) => {
+      toast.success(data?.message || "Password changed successfully!");
+    },
+    onError: (error: any) => {
+      const msg = error.response?.data?.message || "Failed to change password";
+      toast.error(msg);
+    },
+  });
+};
+

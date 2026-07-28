@@ -78,3 +78,31 @@ export const getLandingMediaApi = async (
   return response.data;
 };
 
+export interface CreateLandingMediaPayload {
+  title: string;
+  category?: string;
+  type: string;
+  mediaUrl: string;
+  thumbnailUrl?: string;
+  caption?: string;
+  badgeText?: string;
+  displayOrder?: number;
+  isPublished?: boolean;
+}
+
+export const createLandingMediaApi = async (
+  payload: CreateLandingMediaPayload
+): Promise<LandingMediaItem> => {
+  const response = await apiClient.post<LandingMediaItem>(
+    "/admin/landing-media",
+    payload
+  );
+  return response.data;
+};
+
+export const deleteLandingMediaApi = async (id: string): Promise<void> => {
+  await apiClient.delete(`/admin/landing-media/${id}`);
+};
+
+
+

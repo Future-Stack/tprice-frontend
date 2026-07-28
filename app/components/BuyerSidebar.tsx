@@ -13,6 +13,7 @@ import {
   X,
   Heart,
   Lock,
+  Star,
 } from "lucide-react";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 import { useGetMeQuery } from "@/hooks/useAuth";
@@ -27,11 +28,28 @@ const navItems = [
 ];
 
 const secondaryItems = [
-  { href: "/buyer/vip-deals", icon: Crown, label: "VIP Deals", isVipOnly: true },
+  {
+    href: "/buyer/vip-deals",
+    icon: Crown,
+    label: "VIP Deals",
+    isVipOnly: true,
+  },
+  {
+    href: "/buyer/reviews",
+    icon: Star,
+    label: "Reviews",
+    isVipOnly: true,
+  },
   { href: "/buyer/settings", icon: Settings, label: "Settings" },
 ];
 
-export default function BuyerSidebar({ isSidebarOpen, onClose }: { isSidebarOpen: boolean, onClose: () => void }) {
+export default function BuyerSidebar({
+  isSidebarOpen,
+  onClose,
+}: {
+  isSidebarOpen: boolean;
+  onClose: () => void;
+}) {
   const pathname = usePathname();
   const { user: storeUser } = useAuthStore();
   const { data: apiUser } = useGetMeQuery();
@@ -42,16 +60,19 @@ export default function BuyerSidebar({ isSidebarOpen, onClose }: { isSidebarOpen
     <>
       {/* Overlay for mobile */}
       <div
-        className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300 ${isSidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-          }`}
+        className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300 ${
+          isSidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
         onClick={onClose}
       />
 
       <aside
-        className={`fixed lg:static inset-y-0 left-0 w-64 lg:mt-8 lg:ml-8 border border-primary/30 lg:rounded-[8px] bg-[#18181A] flex flex-col border-r overflow-y-auto shrink-0 z-50 shadow-2xl transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-          }`}
+        className={`fixed lg:static inset-y-0 left-0 w-64 lg:mt-8 lg:ml-8 border border-primary/30 lg:rounded-[8px] bg-[#18181A] flex flex-col border-r overflow-y-auto shrink-0 z-50 shadow-2xl transform transition-transform duration-300 ease-in-out ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        }`}
         style={{
-          boxShadow: " 50px 0 40px 0 rgba(212, 175, 55, 0.00), 50px 0 40px 0 rgba(212, 175, 55, 0.01), 9px 0 40px 0 rgba(212, 175, 55, 0.05), 35px 0 166px 0 rgba(212, 175, 55, 0.02), -3px 0 43.6px 0 rgba(212, 175, 55, 0.01)"
+          boxShadow:
+            " 50px 0 40px 0 rgba(212, 175, 55, 0.00), 50px 0 40px 0 rgba(212, 175, 55, 0.01), 9px 0 40px 0 rgba(212, 175, 55, 0.05), 35px 0 166px 0 rgba(212, 175, 55, 0.02), -3px 0 43.6px 0 rgba(212, 175, 55, 0.01)",
         }}
       >
         {/* Logo and Close Button (mobile only) */}
@@ -72,7 +93,8 @@ export default function BuyerSidebar({ isSidebarOpen, onClose }: { isSidebarOpen
         {/* Navigation */}
         <nav className="flex-1 px-4 space-y-2 mt-4">
           {navItems.map((item) => {
-            const isActive = item.href === "/" ? pathname === "/" : pathname === item.href;
+            const isActive =
+              item.href === "/" ? pathname === "/" : pathname === item.href;
             return (
               <Link
                 key={item.label}
@@ -80,10 +102,11 @@ export default function BuyerSidebar({ isSidebarOpen, onClose }: { isSidebarOpen
                 onClick={() => {
                   if (window.innerWidth < 1024) onClose();
                 }}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${isActive
-                  ? "bg-primary text-white shadow-[0_4px_20px_rgba(231,143,35,0.4)]"
-                  : "text-gray-400 hover:text-white hover:bg-white/5"
-                  }`}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${
+                  isActive
+                    ? "bg-primary text-white shadow-[0_4px_20px_rgba(231,143,35,0.4)]"
+                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                }`}
               >
                 <item.icon className="w-4.5 h-4.5" />
                 {item.label}
@@ -92,20 +115,25 @@ export default function BuyerSidebar({ isSidebarOpen, onClose }: { isSidebarOpen
           })}
           <div className="pt-4 mt-2 mb-2 border-t border-[#2C2C2E]/50"></div>
           {secondaryItems.map((item) => {
-            const isActive = item.href === "/" ? pathname === "/" : pathname === item.href;
+            const isActive =
+              item.href === "/" ? pathname === "/" : pathname === item.href;
             const isDisabled = item.isVipOnly && !isVip;
 
             if (isDisabled) {
               return (
                 <div
                   key={item.label}
-                  onClick={() => toast.error("VIP Deals are exclusive to VIP members.")}
-                  className="flex items-center justify-between px-4 py-3 text-gray-500 rounded-xl bg-white/[0.02] cursor-not-allowed opacity-50 select-none transition-all group"
+                  onClick={() =>
+                    toast.error(`${item.label} are exclusive to VIP members.`)
+                  }
+                  className="flex items-center justify-between px-4 py-3 text-gray-400 rounded-xl bg-white/2 cursor-not-allowed opacity-50 select-none transition-all group"
                   title="VIP Membership Required"
                 >
                   <div className="flex items-center gap-3">
-                    <item.icon className="w-4.5 h-4.5 text-gray-500" />
-                    <span className="font-medium text-gray-500">{item.label}</span>
+                    <item.icon className="w-4.5 h-4.5 text-gray-300" />
+                    <span className="font-medium text-gray-300">
+                      {item.label}
+                    </span>
                   </div>
                   <Lock className="w-3.5 h-3.5 text-gray-500" />
                 </div>
@@ -119,10 +147,11 @@ export default function BuyerSidebar({ isSidebarOpen, onClose }: { isSidebarOpen
                 onClick={() => {
                   if (window.innerWidth < 1024) onClose();
                 }}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${isActive
-                  ? "bg-primary text-white shadow-[0_4px_20px_rgba(231,143,35,0.4)]"
-                  : "text-gray-400 hover:text-white hover:bg-white/5"
-                  }`}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${
+                  isActive
+                    ? "bg-primary text-white shadow-[0_4px_20px_rgba(231,143,35,0.4)]"
+                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                }`}
               >
                 <item.icon className="w-4.5 h-4.5" />
                 {item.label}
@@ -138,8 +167,12 @@ export default function BuyerSidebar({ isSidebarOpen, onClose }: { isSidebarOpen
             <button className="absolute top-3 right-3 text-white/70 hover:text-white z-10 transition-colors">
               <X className="w-3.5 h-3.5" />
             </button>
-            <h3 className="font-bold text-lg mb-1.5 font-clash">Upgrade to VIP!</h3>
-            <p className="text-[11px] text-white/90 mb-5 leading-relaxed">Unlock Premium Features And Offers</p>
+            <h3 className="font-bold text-lg mb-1.5 font-clash">
+              Upgrade to VIP!
+            </h3>
+            <p className="text-[11px] text-white/90 mb-5 leading-relaxed">
+              Unlock Premium Features And Offers
+            </p>
             <button className="bg-[#111113] w-full py-2.5 rounded-lg text-[#E78F23] font-semibold text-xs flex items-center justify-center gap-2 hover:bg-black transition-colors shadow-lg">
               Upgrade Now
               <Crown className="w-3.5 h-3.5" fill="currentColor" />
@@ -150,4 +183,3 @@ export default function BuyerSidebar({ isSidebarOpen, onClose }: { isSidebarOpen
     </>
   );
 }
-

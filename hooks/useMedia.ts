@@ -1,4 +1,4 @@
-import { useMutation, useQuery, keepPreviousData } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import {
   uploadMediaApi,
   UploadMediaParams,
@@ -6,6 +6,10 @@ import {
   getLandingMediaApi,
   GetLandingMediaParams,
   LandingMediaResponse,
+  createLandingMediaApi,
+  CreateLandingMediaPayload,
+  LandingMediaItem,
+  deleteLandingMediaApi,
 } from "@/lib/api/media";
 
 export const MEDIA_QUERY_KEYS = {
@@ -38,4 +42,32 @@ export const useLandingMediaQuery = (
     retry: 2,
   });
 };
+
+/**
+ * Hook to create new landing media with automatic cache invalidation
+ */
+export const useCreateLandingMediaMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation<LandingMediaItem, Error, CreateLandingMediaPayload>({
+    mutationFn: (payload: CreateLandingMediaPayload) => createLandingMediaApi(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: MEDIA_QUERY_KEYS.all });
+    },
+  });
+};
+
+/**
+ * Hook to delete landing media asset with automatic cache invalidation
+ */
+export const useDeleteLandingMediaMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, string>({
+    mutationFn: (id: string) => deleteLandingMediaApi(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: MEDIA_QUERY_KEYS.all });
+    },
+  });
+};
+
+
 

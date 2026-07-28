@@ -17,6 +17,8 @@ import {
   Award,
   Users,
   Image as ImageIcon,
+  Star,
+  HelpCircle,
 } from "lucide-react";
 
 const navItems = [
@@ -27,6 +29,8 @@ const navItems = [
   { href: "/admin/deals", icon: Gavel, label: "Deals" },
   { href: "/admin/events", icon: Calendar, label: "Events" },
   { href: "/admin/media", icon: ImageIcon, label: "Media" },
+  { href: "/admin/reviews", icon: Star, label: "Reviews" },
+  { href: "/admin/inquiries", icon: HelpCircle, label: "Inquiries" },
   // { href: "/admin/dealers", icon: BadgePercent, label: "Dealers" },
   { href: "/admin/users", icon: Users, label: "Users" },
   { href: "/admin/activity", icon: Heart, label: "Activity" },

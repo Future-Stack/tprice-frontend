@@ -42,7 +42,6 @@ export default function EditBrandModal({
 
   const [formData, setFormData] = useState({
     name: "",
-    slug: "",
     description: "",
     websiteUrl: "",
     logoUrl: "",
@@ -56,7 +55,6 @@ export default function EditBrandModal({
     if (brand) {
       setFormData({
         name: brand.name || "",
-        slug: brand.slug || "",
         description: brand.description || "",
         websiteUrl: brand.websiteUrl || "",
         logoUrl: brand.logoUrl || "",
@@ -155,7 +153,6 @@ export default function EditBrandModal({
         id: brand.id,
         data: {
           name: formData.name.trim(),
-          slug: formData.slug.trim() || undefined,
           description: formData.description.trim() || undefined,
           websiteUrl: formData.websiteUrl.trim() || undefined,
           logoUrl: formData.logoUrl.trim() || undefined,
@@ -196,36 +193,20 @@ export default function EditBrandModal({
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          {/* Brand Name & Slug */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <Tag className="w-3.5 h-3.5 text-primary" /> Brand Name <span className="text-primary">*</span>
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="e.g. Bugatti"
-                className="w-full bg-[#0E0E10] border border-[#262626] rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary/60 transition-colors"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <Tag className="w-3.5 h-3.5 text-gray-400" /> Slug
-              </label>
-              <input
-                type="text"
-                name="slug"
-                value={formData.slug}
-                onChange={handleChange}
-                placeholder="e.g. bugatti"
-                className="w-full bg-[#0E0E10] border border-[#262626] rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary/60 transition-colors"
-              />
-            </div>
+          {/* Brand Name */}
+          <div>
+            <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+              <Tag className="w-3.5 h-3.5 text-primary" /> Brand Name <span className="text-primary">*</span>
+            </label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="e.g. Bugatti"
+              className="w-full bg-[#0E0E10] border border-[#262626] rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary/60 transition-colors"
+              required
+            />
           </div>
 
           {/* Category Dropdown & Website URL */}
