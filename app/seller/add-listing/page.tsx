@@ -275,7 +275,6 @@ export default function AddListing() {
       auctionEndsAt:
         saleType === "AUCTION" && auctionEndsAt ? auctionEndsAt : undefined,
       currency: currency || "USD",
-      isFeatured: selectedPlan === "featured",
       specifications: specificationsJson,
       media: mediaList.map((m, idx) => ({
         url: m.url,

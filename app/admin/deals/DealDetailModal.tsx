@@ -3,21 +3,72 @@
 import React from "react";
 import { X, Flag, FileText } from "lucide-react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
+import { DealItem } from "@/lib/api/deals";
 
 interface DealDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
-  deal: any;
+  deal: DealItem | null | any;
 }
+
+const formatPrice = (priceStr?: string | number) => {
+  if (!priceStr) return "$0";
+  const num = typeof priceStr === "number" ? priceStr : parseFloat(priceStr);
+  if (isNaN(num)) return `${priceStr}`;
+  return `$${num.toLocaleString()}`;
+};
+
+const formatDate = (dateString?: string) => {
+  if (!dateString) return { date: "N/A", time: "N/A" };
+  try {
+    const d = new Date(dateString);
+    if (isNaN(d.getTime())) return { date: dateString, time: "" };
+    const dateStr = d.toISOString().split("T")[0];
+    const timeStr = d.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    return { date: dateStr, time: timeStr };
+  } catch {
+    return { date: dateString || "N/A", time: "" };
+  }
+};
 
 const DealDetailModal = ({ isOpen, onClose, deal }: DealDetailModalProps) => {
   if (!isOpen || !deal) return null;
 
+  const buyerName =
+    deal.buyer
+      ? `${deal.buyer.firstName || ""} ${deal.buyer.lastName || ""}`.trim() ||
+        deal.buyer.email ||
+        "Unknown Buyer"
+      : deal.buyer || "Unknown Buyer";
+
+  const dealerName =
+    deal.seller
+      ? `${deal.seller.firstName || ""} ${deal.seller.lastName || ""}`.trim() ||
+        deal.seller.email ||
+        "Unknown Dealer"
+      : deal.dealer || "Unknown Dealer";
+
+  const offerPrice = deal.agreedPrice !== undefined
+    ? formatPrice(deal.agreedPrice)
+    : deal.offer || "$0";
+
+  const createdTime = formatDate(deal.createdAt);
+  const updatedTime = formatDate(deal.updatedAt);
+
   const timeline = [
-    { title: "Deal Created", date: "2025-04-05", time: "10:30 AM" },
-    { title: "Initial Offer Submitted", date: "2025-04-05", time: "11:05 AM" },
-    { title: "Counter offer from Dealer", date: "2025-04-05", time: "02:15 AM" },
-    { title: "Buyer Counter Offer", date: "2025-04-05", time: "09:30 PM" },
+    {
+      title: "Deal Created",
+      date: createdTime.date,
+      time: createdTime.time,
+    },
+    {
+      title: `Stage: ${deal.stage || "NEGOTIATION"}`,
+      date: updatedTime.date,
+      time: updatedTime.time,
+    },
   ];
 
   return (
@@ -33,38 +84,68 @@ const DealDetailModal = ({ isOpen, onClose, deal }: DealDetailModalProps) => {
           </button>
 
           <div className="p-8">
-            <h2 className="text-xl font-bold mb-8">Deal Id : {deal.id.toString().padStart(2, '0')}</h2>
+            <h2 className="text-xl font-bold mb-8">
+              Deal Id : {deal.id ? String(deal.id).slice(0, 8) : "N/A"}
+            </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Left Column */}
               <div className="space-y-4">
                 {/* Current Offer */}
                 <div className="bg-[#1A1A14] border border-yellow-500/30 rounded-2xl p-6 shadow-[0_0_20px_rgba(234,179,8,0.05)]">
-                  <p className="text-[10px] font-bold text-yellow-500 uppercase tracking-widest mb-2">Current Offer</p>
-                  <p className="text-3xl font-bold text-white tracking-tight">{deal.offer}</p>
+                  <p className="text-[10px] font-bold text-yellow-500 uppercase tracking-widest mb-2">
+                    Current Offer
+                  </p>
+                  <p className="text-3xl font-bold text-white tracking-tight">
+                    {offerPrice}
+                  </p>
                 </div>
+
+                {/* Listing Title if available */}
+                {deal.listing?.title && (
+                  <div className="bg-[#161616] border border-[#262626] rounded-2xl p-6">
+                    <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">
+                      Listing
+                    </p>
+                    <p className="text-sm font-medium text-white truncate">
+                      {deal.listing.title}
+                    </p>
+                  </div>
+                )}
 
                 {/* Buyer */}
                 <div className="bg-[#161616] border border-[#262626] rounded-2xl p-6">
-                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Buyer</p>
-                  <p className="text-xl font-medium text-white">{deal.buyer}</p>
+                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">
+                    Buyer
+                  </p>
+                  <p className="text-xl font-medium text-white">{buyerName}</p>
                 </div>
 
                 {/* Dealer */}
                 <div className="bg-[#161616] border border-[#262626] rounded-2xl p-6">
-                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Dealer</p>
-                  <p className="text-xl font-medium text-white">{deal.dealer}</p>
+                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">
+                    Dealer
+                  </p>
+                  <p className="text-xl font-medium text-white">{dealerName}</p>
                 </div>
 
                 {/* Stage and Status */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-[#161616] border border-[#262626] rounded-xl p-4">
-                    <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Stage</p>
-                    <p className="text-sm font-medium text-white">{deal.stage}</p>
+                    <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">
+                      Stage
+                    </p>
+                    <p className="text-sm font-medium text-white">
+                      {deal.stage || "NEGOTIATION"}
+                    </p>
                   </div>
                   <div className="bg-[#161616] border border-[#262626] rounded-xl p-4">
-                    <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Stage</p>
-                    <p className="text-sm font-medium text-white">{deal.stage}</p>
+                    <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">
+                      Status
+                    </p>
+                    <p className="text-sm font-medium text-white">
+                      {deal.isFlagged ? "Flagged" : "Active"}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -76,12 +157,18 @@ const DealDetailModal = ({ isOpen, onClose, deal }: DealDetailModalProps) => {
                   <div className="absolute left-[31px] top-8 bottom-8 w-[1px] bg-[#262626]" />
                   <div className="space-y-8 relative">
                     {timeline.map((item, index) => (
-                      <div key={index} className="flex gap-4 items-start translate-x-1">
+                      <div
+                        key={index}
+                        className="flex gap-4 items-start translate-x-1"
+                      >
                         <div className="relative z-10 w-3 h-3 rounded-full bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.8)] mt-1.5" />
                         <div>
-                          <p className="text-sm font-medium text-white mb-1">{item.title}</p>
+                          <p className="text-sm font-medium text-white mb-1">
+                            {item.title}
+                          </p>
                           <p className="text-[10px] text-gray-500 uppercase tracking-widest">
-                            {item.date} <span className="ml-2">{item.time}</span>
+                            {item.date}{" "}
+                            {item.time && <span className="ml-2">{item.time}</span>}
                           </p>
                         </div>
                       </div>
@@ -93,7 +180,9 @@ const DealDetailModal = ({ isOpen, onClose, deal }: DealDetailModalProps) => {
 
             {/* Admin Action */}
             <div className="mt-10 pt-6 border-t border-[#262626]">
-              <p className="text-sm font-medium text-gray-400 mb-6">Admin Action</p>
+              <p className="text-sm font-medium text-gray-400 mb-6">
+                Admin Action
+              </p>
               <div className="grid grid-cols-2 gap-4">
                 <button className="flex items-center justify-center gap-2 px-6 py-4 bg-[#161616] border border-[#262626] rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:border-gray-600 transition-all group">
                   <Flag className="w-4 h-4 text-gray-600 group-hover:text-red-500 transition-colors" />

@@ -30,6 +30,7 @@ import { useGetBrandsQuery } from "@/hooks/useBrands";
 import { useUpdateListingMutation } from "@/hooks/useListings";
 import { useUploadMediaMutation } from "@/hooks/useMedia";
 import { toast } from "sonner";
+import Image from "next/image";
 
 interface UpdateListingModalProps {
   isOpen: boolean;
@@ -68,7 +69,9 @@ export default function UpdateListingModal({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Form Tabs State
-  const [activeTab, setActiveTab] = useState<"general" | "pricing" | "specs" | "media">("general");
+  const [activeTab, setActiveTab] = useState<
+    "general" | "pricing" | "specs" | "media"
+  >("general");
 
   // Form Field States
   const [title, setTitle] = useState("");
@@ -78,10 +81,11 @@ export default function UpdateListingModal({
   const [locationCity, setLocationCity] = useState("");
   const [locationCountry, setLocationCountry] = useState("");
   const [isOffMarket, setIsOffMarket] = useState(false);
-  const [isFeatured, setIsFeatured] = useState(false);
 
   // Pricing & Sale Type States
-  const [saleType, setSaleType] = useState<"FIXED_PRICE" | "AUCTION" | "PRIVATE">("FIXED_PRICE");
+  const [saleType, setSaleType] = useState<
+    "FIXED_PRICE" | "AUCTION" | "PRIVATE"
+  >("FIXED_PRICE");
   const [askingPrice, setAskingPrice] = useState<string>("");
   const [startingBid, setStartingBid] = useState<string>("");
   const [auctionEndsAt, setAuctionEndsAt] = useState<string>("");
@@ -95,7 +99,9 @@ export default function UpdateListingModal({
   const [mediaList, setMediaList] = useState<UploadedMediaItem[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [directImageUrl, setDirectImageUrl] = useState("");
-  const [editingMediaIndex, setEditingMediaIndex] = useState<number | null>(null);
+  const [editingMediaIndex, setEditingMediaIndex] = useState<number | null>(
+    null,
+  );
   const [editingMediaUrl, setEditingMediaUrl] = useState("");
 
   // Populate form state when listing prop changes
@@ -108,15 +114,15 @@ export default function UpdateListingModal({
       setLocationCity(listing.locationCity || "");
       setLocationCountry(listing.locationCountry || "");
       setIsOffMarket(Boolean(listing.isOffMarket));
-      setIsFeatured(Boolean(listing.isFeatured));
 
       setSaleType(
-        (listing.saleType as "FIXED_PRICE" | "AUCTION" | "PRIVATE") || "FIXED_PRICE"
+        (listing.saleType as "FIXED_PRICE" | "AUCTION" | "PRIVATE") ||
+          "FIXED_PRICE",
       );
       setAskingPrice(
         listing.askingPrice !== undefined && listing.askingPrice !== null
           ? String(listing.askingPrice)
-          : ""
+          : "",
       );
       setStartingBid(listing.startingBid ? String(listing.startingBid) : "");
       setAuctionEndsAt(listing.auctionEndsAt || "");
@@ -155,7 +161,7 @@ export default function UpdateListingModal({
             url: m.url,
             type: m.type || "IMAGE",
             displayOrder: m.displayOrder ?? idx + 1,
-          }))
+          })),
         );
       } else {
         setMediaList([]);
@@ -176,9 +182,13 @@ export default function UpdateListingModal({
     ]);
   };
 
-  const handleSpecChange = (id: string, field: "key" | "value", val: string) => {
+  const handleSpecChange = (
+    id: string,
+    field: "key" | "value",
+    val: string,
+  ) => {
     setSpecifications((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, [field]: val } : item))
+      prev.map((item) => (item.id === id ? { ...item, [field]: val } : item)),
     );
   };
 
@@ -217,7 +227,9 @@ export default function UpdateListingModal({
       }
     } catch (err: any) {
       const errMsg =
-        err?.response?.data?.message || err?.message || "Failed to upload image.";
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to upload image.";
       toast.error(errMsg);
     }
   };
@@ -284,8 +296,8 @@ export default function UpdateListingModal({
     }
     setMediaList((prev) =>
       prev.map((item, i) =>
-        i === index ? { ...item, url: editingMediaUrl.trim() } : item
-      )
+        i === index ? { ...item, url: editingMediaUrl.trim() } : item,
+      ),
     );
     setEditingMediaIndex(null);
     setEditingMediaUrl("");
@@ -306,7 +318,11 @@ export default function UpdateListingModal({
     }
 
     if (saleType === "FIXED_PRICE" || saleType === "PRIVATE") {
-      if (askingPrice === "" || isNaN(Number(askingPrice)) || Number(askingPrice) <= 0) {
+      if (
+        askingPrice === "" ||
+        isNaN(Number(askingPrice)) ||
+        Number(askingPrice) <= 0
+      ) {
         toast.error("Please enter a valid asking price greater than 0.");
         setActiveTab("pricing");
         return false;
@@ -314,7 +330,11 @@ export default function UpdateListingModal({
     }
 
     if (saleType === "AUCTION") {
-      if (startingBid === "" || isNaN(Number(startingBid)) || Number(startingBid) <= 0) {
+      if (
+        startingBid === "" ||
+        isNaN(Number(startingBid)) ||
+        Number(startingBid) <= 0
+      ) {
         toast.error("Please enter a valid starting bid greater than 0.");
         setActiveTab("pricing");
         return false;
@@ -360,12 +380,14 @@ export default function UpdateListingModal({
       locationCity: locationCity.trim() || undefined,
       locationCountry: locationCountry.trim() || undefined,
       isOffMarket,
-      isFeatured,
       saleType,
-      allowCounterOffers: saleType === "FIXED_PRICE" ? allowCounterOffers : false,
+      allowCounterOffers:
+        saleType === "FIXED_PRICE" ? allowCounterOffers : false,
       askingPrice: askingPriceNum,
-      startingBid: saleType === "AUCTION" && startingBid ? Number(startingBid) : undefined,
-      auctionEndsAt: saleType === "AUCTION" && auctionEndsAt ? auctionEndsAt : undefined,
+      startingBid:
+        saleType === "AUCTION" && startingBid ? Number(startingBid) : undefined,
+      auctionEndsAt:
+        saleType === "AUCTION" && auctionEndsAt ? auctionEndsAt : undefined,
       currency: currency || "USD",
       specifications: specificationsJson,
       media: mediaList.map((m, idx) => ({
@@ -396,17 +418,18 @@ export default function UpdateListingModal({
       <div className="relative w-full max-w-4xl bg-[#0D0D0D] border border-[#2A2A2A] rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.8)] text-white overflow-hidden my-8">
         {/* Modal Header */}
         <div className="flex items-center justify-between px-8 py-5 border-b border-[#1F1F1F] bg-[#121212]">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-[#E78F23]/10 border border-[#E78F23]/20 rounded-xl text-[#E78F23]">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold font-clash text-white">Update Listing</h2>
-              <p className="text-xs text-gray-400 font-medium">
-                Edit details for <span className="text-[#E78F23] font-semibold">{listing.title}</span>
-              </p>
-            </div>
+          <div>
+            <h2 className="text-xl font-bold font-montserrat mb-2 text-white">
+              Update Listing
+            </h2>
+            <p className="text-xs text-gray-400 font-medium">
+              Edit details for{" "}
+              <span className="text-primary font-semibold">
+                {listing.title}
+              </span>
+            </p>
           </div>
+
           <button
             onClick={onClose}
             className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl transition-all cursor-pointer"
@@ -431,10 +454,11 @@ export default function UpdateListingModal({
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center gap-2 px-4 py-3 text-xs font-bold transition-all border-b-2 cursor-pointer whitespace-nowrap ${isActive
-                  ? "border-[#E78F23] text-[#E78F23] bg-[#E78F23]/5"
-                  : "border-transparent text-gray-400 hover:text-gray-200"
-                  }`}
+                className={`flex items-center gap-2 px-4 py-3 text-xs font-bold transition-all border-b-2 cursor-pointer whitespace-nowrap ${
+                  isActive
+                    ? "border-primary text-primary bg-[#E78F23]/5"
+                    : "border-transparent text-gray-400 hover:text-gray-200"
+                }`}
               >
                 <Icon className="w-4 h-4" />
                 <span>{tab.label}</span>
@@ -444,21 +468,24 @@ export default function UpdateListingModal({
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-8 space-y-6 max-h-[65vh] overflow-y-auto">
+        <form
+          onSubmit={handleSubmit}
+          className="p-8 space-y-6 max-h-[65vh] overflow-y-auto"
+        >
           {/* TAB 1: GENERAL INFO */}
           {activeTab === "general" && (
             <div className="space-y-6 animate-fade-in">
               {/* Title */}
               <div className="space-y-2">
                 <label className="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
-                  Title <span className="text-[#E78F23]">*</span>
+                  Title <span className="text-primary">*</span>
                 </label>
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. 2024 Ferrari SF90 Stradale Assetto Fiorano"
-                  className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-[#E78F23]/60 transition-all"
+                  className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/60 transition-all"
                   required
                 />
               </div>
@@ -466,16 +493,18 @@ export default function UpdateListingModal({
               {/* Category */}
               <div className="space-y-2">
                 <label className="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <Layers className="w-3.5 h-3.5 text-[#E78F23]" /> Category{" "}
-                  <span className="text-[#E78F23]">*</span>
+                  <Layers className="w-3.5 h-3.5 text-primary" /> Category{" "}
+                  <span className="text-primary">*</span>
                 </label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#E78F23]/60 transition-all cursor-pointer"
+                  className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary/60 transition-all cursor-pointer"
                 >
                   <option value="">
-                    {isLoadingCategories ? "Loading categories..." : "Select Category"}
+                    {isLoadingCategories
+                      ? "Loading categories..."
+                      : "Select Category"}
                   </option>
                   {categoriesList.map((cat) => (
                     <option key={cat.id} value={cat.name}>
@@ -489,7 +518,8 @@ export default function UpdateListingModal({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
-                    <Briefcase className="w-3.5 h-3.5 text-[#E78F23]" /> Brand / Manufacturer
+                    <Briefcase className="w-3.5 h-3.5 text-primary" /> Brand /
+                    Manufacturer
                   </label>
                   <select
                     value={brand}
@@ -509,16 +539,18 @@ export default function UpdateListingModal({
 
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-[#E78F23]" /> Build Year
+                    <Calendar className="w-3.5 h-3.5 text-primary" /> Build Year
                   </label>
                   <input
                     type="number"
                     value={buildYear}
                     onChange={(e) =>
-                      setBuildYear(e.target.value ? parseInt(e.target.value, 10) : "")
+                      setBuildYear(
+                        e.target.value ? parseInt(e.target.value, 10) : "",
+                      )
                     }
                     placeholder="e.g. 2024"
-                    className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-[#E78F23]/60 transition-all"
+                    className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/60 transition-all"
                   />
                 </div>
               </div>
@@ -527,14 +559,15 @@ export default function UpdateListingModal({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-[#E78F23]" /> Location City
+                    <MapPin className="w-3.5 h-3.5 text-primary" /> Location
+                    City
                   </label>
                   <input
                     type="text"
                     value={locationCity}
                     onChange={(e) => setLocationCity(e.target.value)}
                     placeholder="e.g. Miami"
-                    className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-[#E78F23]/60 transition-all"
+                    className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/60 transition-all"
                   />
                 </div>
 
@@ -547,36 +580,25 @@ export default function UpdateListingModal({
                     value={locationCountry}
                     onChange={(e) => setLocationCountry(e.target.value)}
                     placeholder="e.g. United States"
-                    className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-[#E78F23]/60 transition-all"
+                    className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/60 transition-all"
                   />
                 </div>
               </div>
 
-              {/* Toggles: Off Market & Featured */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+              {/* Toggle: Off Market */}
+              <div className="grid grid-cols-1 gap-4 pt-2">
                 <div className="flex items-center justify-between p-4 bg-[#141414] border border-[#2A2A2A] rounded-xl">
                   <div>
-                    <p className="text-xs font-bold text-white">Private Off-Market</p>
+                    <p className="text-xs font-bold text-white">
+                      Private Off-Market
+                    </p>
                     <p className="text-[11px] text-gray-400">VIP buyers only</p>
                   </div>
                   <input
                     type="checkbox"
                     checked={isOffMarket}
                     onChange={(e) => setIsOffMarket(e.target.checked)}
-                    className="w-4 h-4 rounded border-[#2D2D2D] accent-[#E78F23] cursor-pointer"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between p-4 bg-[#141414] border border-[#2A2A2A] rounded-xl">
-                  <div>
-                    <p className="text-xs font-bold text-white">Featured Item</p>
-                    <p className="text-[11px] text-gray-400">Highlight listing</p>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={isFeatured}
-                    onChange={(e) => setIsFeatured(e.target.checked)}
-                    className="w-4 h-4 rounded border-[#2D2D2D] accent-[#E78F23] cursor-pointer"
+                    className="w-4 h-4 rounded border-[#2D2D2D] accent-primary cursor-pointer"
                   />
                 </div>
               </div>
@@ -601,10 +623,11 @@ export default function UpdateListingModal({
                       key={type.id}
                       type="button"
                       onClick={() => setSaleType(type.id as any)}
-                      className={`p-4 rounded-xl border text-center font-bold text-xs transition-all cursor-pointer ${saleType === type.id
-                        ? "border-[#E78F23] bg-[#E78F23]/10 text-[#E78F23]"
-                        : "border-[#2D2D2D] bg-[#141414] text-gray-400 hover:text-white"
-                        }`}
+                      className={`p-4 rounded-xl border text-center font-bold text-xs transition-all cursor-pointer ${
+                        saleType === type.id
+                          ? "border-[#E78F23] bg-[#E78F23]/10 text-primary"
+                          : "border-[#2D2D2D] bg-[#141414] text-gray-400 hover:text-white"
+                      }`}
                     >
                       {type.title}
                     </button>
@@ -617,7 +640,8 @@ export default function UpdateListingModal({
                 {(saleType === "FIXED_PRICE" || saleType === "PRIVATE") && (
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-gray-300 uppercase tracking-wider">
-                      Asking Price ({currency}) <span className="text-[#E78F23]">*</span>
+                      Asking Price ({currency}){" "}
+                      <span className="text-[#E78F23]">*</span>
                     </label>
                     <div className="relative">
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-sm">
@@ -628,7 +652,7 @@ export default function UpdateListingModal({
                         value={askingPrice}
                         onChange={(e) => setAskingPrice(e.target.value)}
                         placeholder="625000"
-                        className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl pl-8 pr-4 py-3 text-sm text-white focus:outline-none focus:border-[#E78F23]/60 transition-all"
+                        className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl pl-8 pr-4 py-3 text-sm text-white focus:outline-none focus:border-primary/60 transition-all"
                       />
                     </div>
                   </div>
@@ -638,7 +662,8 @@ export default function UpdateListingModal({
                   <>
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-gray-300 uppercase tracking-wider">
-                        Starting Bid ({currency}) <span className="text-[#E78F23]">*</span>
+                        Starting Bid ({currency}){" "}
+                        <span className="text-[#E78F23]">*</span>
                       </label>
                       <div className="relative">
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-sm">
@@ -649,21 +674,22 @@ export default function UpdateListingModal({
                           value={startingBid}
                           onChange={(e) => setStartingBid(e.target.value)}
                           placeholder="500000"
-                          className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl pl-8 pr-4 py-3 text-sm text-white focus:outline-none focus:border-[#E78F23]/60 transition-all"
+                          className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl pl-8 pr-4 py-3 text-sm text-white focus:outline-none focus:border-primary/60 transition-all"
                         />
                       </div>
                     </div>
 
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5 text-[#E78F23]" /> Auction Ends At (ISO Date)
+                        <Clock className="w-3.5 h-3.5 text-primary" /> Auction
+                        Ends At (ISO Date)
                       </label>
                       <input
                         type="text"
                         value={auctionEndsAt}
                         onChange={(e) => setAuctionEndsAt(e.target.value)}
                         placeholder="2026-12-31T23:59:59.000Z"
-                        className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl px-4 py-3 text-sm text-white font-mono focus:outline-none focus:border-[#E78F23]/60 transition-all"
+                        className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl px-4 py-3 text-sm text-white font-mono focus:outline-none focus:border-primary/60 transition-all"
                       />
                     </div>
                   </>
@@ -676,7 +702,7 @@ export default function UpdateListingModal({
                   <select
                     value={currency}
                     onChange={(e) => setCurrency(e.target.value)}
-                    className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#E78F23]/60 transition-all cursor-pointer"
+                    className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary/60 transition-all cursor-pointer"
                   >
                     <option value="USD">USD ($)</option>
                     <option value="EUR">EUR (€)</option>
@@ -693,7 +719,7 @@ export default function UpdateListingModal({
                     id="modalAllowCounterOffers"
                     checked={allowCounterOffers}
                     onChange={(e) => setAllowCounterOffers(e.target.checked)}
-                    className="w-4 h-4 rounded border-[#2D2D2D] accent-[#E78F23] cursor-pointer"
+                    className="w-4 h-4 rounded border-[#2D2D2D] accent-primary cursor-pointer"
                   />
                   <label
                     htmlFor="modalAllowCounterOffers"
@@ -711,16 +737,19 @@ export default function UpdateListingModal({
             <div className="space-y-6 animate-fade-in">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-sm font-bold text-white">Item Specifications</h4>
+                  <h4 className="text-sm font-bold text-white">
+                    Item Specifications
+                  </h4>
                   <p className="text-xs text-gray-400">
-                    Add key-value metadata (e.g. horsepower, engine, mileage, exteriorColor)
+                    Add key-value metadata (e.g. horsepower, engine, mileage,
+                    exteriorColor)
                   </p>
                 </div>
 
                 <button
                   type="button"
                   onClick={handleAddSpecRow}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#E78F23]/10 border border-[#E78F23]/30 text-[#E78F23] hover:bg-[#E78F23] hover:text-black font-bold text-xs transition-all cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#E78F23]/10 border border-primary/30 text-primary hover:bg-primary hover:text-black font-bold text-xs transition-all cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" /> Add Key-Value
                 </button>
@@ -743,16 +772,20 @@ export default function UpdateListingModal({
                       <input
                         type="text"
                         value={item.key}
-                        onChange={(e) => handleSpecChange(item.id, "key", e.target.value)}
+                        onChange={(e) =>
+                          handleSpecChange(item.id, "key", e.target.value)
+                        }
                         placeholder="Key (e.g. engine)"
-                        className="flex-1 bg-[#1A1A1A] border border-[#2D2D2D] rounded-lg px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-[#E78F23]"
+                        className="flex-1 bg-[#1A1A1A] border border-[#2D2D2D] rounded-lg px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-primary"
                       />
                       <input
                         type="text"
                         value={item.value}
-                        onChange={(e) => handleSpecChange(item.id, "value", e.target.value)}
+                        onChange={(e) =>
+                          handleSpecChange(item.id, "value", e.target.value)
+                        }
                         placeholder="Value (e.g. 4.0L V8 Twin-Turbo)"
-                        className="flex-1 bg-[#1A1A1A] border border-[#2D2D2D] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#E78F23]"
+                        className="flex-1 bg-[#1A1A1A] border border-[#2D2D2D] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary"
                       />
                       <button
                         type="button"
@@ -789,10 +822,11 @@ export default function UpdateListingModal({
                   files.forEach((file) => handleFileUpload(file));
                 }}
                 onClick={() => fileInputRef.current?.click()}
-                className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${isDragging
-                  ? "border-[#E78F23] bg-[#E78F23]/10"
-                  : "border-[#2D2D2D] bg-[#141414] hover:border-[#E78F23]/50"
-                  }`}
+                className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
+                  isDragging
+                    ? "border-primary bg-[#E78F23]/10"
+                    : "border-[#2D2D2D] bg-[#141414] hover:border-primary/50"
+                }`}
               >
                 <input
                   ref={fileInputRef}
@@ -803,17 +837,19 @@ export default function UpdateListingModal({
                   className="hidden"
                 />
                 {uploadMediaMutation.isPending ? (
-                  <div className="flex items-center justify-center gap-2 text-[#E78F23] text-sm py-2 font-medium">
+                  <div className="flex items-center justify-center gap-2 text-primary text-sm py-2 font-medium">
                     <Loader2 className="w-5 h-5 animate-spin" />
                     <span>Uploading image to cloud media service...</span>
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <UploadCloud className="w-8 h-8 text-[#E78F23] mx-auto" />
+                    <UploadCloud className="w-8 h-8 text-primary mx-auto" />
                     <p className="text-xs text-gray-300 font-bold">
                       Click or drag images to upload new photos
                     </p>
-                    <p className="text-[11px] text-gray-500">JPG, PNG, WEBP up to 10MB</p>
+                    <p className="text-[11px] text-gray-500">
+                      JPG, PNG, WEBP up to 10MB
+                    </p>
                   </div>
                 )}
               </div>
@@ -821,7 +857,8 @@ export default function UpdateListingModal({
               {/* Direct Image URL Input */}
               <div className="p-4 bg-[#141414] border border-[#2A2A2A] rounded-xl space-y-2">
                 <label className="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <LinkIcon className="w-3.5 h-3.5 text-[#E78F23]" /> Add Media by URL
+                  <LinkIcon className="w-3.5 h-3.5 text-primary" /> Add Media by
+                  URL
                 </label>
                 <div className="flex items-center gap-2">
                   <input
@@ -829,7 +866,7 @@ export default function UpdateListingModal({
                     value={directImageUrl}
                     onChange={(e) => setDirectImageUrl(e.target.value)}
                     placeholder="https://cdn.exoticworld.com/listings/photo.jpg"
-                    className="flex-1 bg-[#1A1A1A] border border-[#2D2D2D] rounded-lg px-3 py-2 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-[#E78F23]"
+                    className="flex-1 bg-[#1A1A1A] border border-[#2D2D2D] rounded-lg px-3 py-2 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-primary"
                   />
                   <button
                     type="button"
@@ -855,7 +892,9 @@ export default function UpdateListingModal({
                 {mediaList.length === 0 ? (
                   <div className="p-8 text-center border border-dashed border-[#2A2A2A] rounded-xl bg-[#121212]">
                     <ImageIcon className="w-8 h-8 text-gray-500 mx-auto mb-2" />
-                    <p className="text-xs font-semibold text-gray-400">No media items added yet</p>
+                    <p className="text-xs font-semibold text-gray-400">
+                      No media items added yet
+                    </p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -866,22 +905,27 @@ export default function UpdateListingModal({
                       return (
                         <div
                           key={idx}
-                          className={`relative rounded-xl border bg-[#141414] overflow-hidden flex flex-col transition-all ${isCover ? "border-[#E78F23] ring-1 ring-[#E78F23]/40" : "border-[#2D2D2D]"
-                            }`}
+                          className={`relative rounded-xl border bg-[#141414] overflow-hidden flex flex-col transition-all ${
+                            isCover
+                              ? "border-[#E78F23] ring-1 ring-[#E78F23]/40"
+                              : "border-[#2D2D2D]"
+                          }`}
                         >
                           {/* Image Preview & Cover Badge */}
                           <div className="relative aspect-16/10 w-full bg-black">
-                            <img
+                            <Image
                               src={m.url}
                               alt={`Media ${idx + 1}`}
                               className="w-full h-full object-cover"
+                              width={300}
+                              height={300}
                             />
                             <div className="absolute top-2 left-2 flex items-center gap-1.5 z-10">
-                              <span className="px-2 py-0.5 bg-black/80 rounded text-[10px] text-[#E78F23] font-mono font-bold">
+                              <span className="px-2 py-0.5 bg-black/80 rounded text-[10px] text-primary font-mono font-bold">
                                 #{m.displayOrder}
                               </span>
                               {isCover && (
-                                <span className="px-2 py-0.5 bg-[#E78F23] text-black font-bold rounded text-[10px] flex items-center gap-1 shadow-md">
+                                <span className="px-2 py-0.5 bg-primary text-black font-bold rounded text-[10px] flex items-center gap-1 shadow-md">
                                   <Star className="w-3 h-3 fill-black" /> Cover
                                 </span>
                               )}
@@ -904,8 +948,10 @@ export default function UpdateListingModal({
                                 <input
                                   type="url"
                                   value={editingMediaUrl}
-                                  onChange={(e) => setEditingMediaUrl(e.target.value)}
-                                  className="w-full bg-[#1A1A1A] border border-[#E78F23] rounded px-2.5 py-1 text-xs text-white"
+                                  onChange={(e) =>
+                                    setEditingMediaUrl(e.target.value)
+                                  }
+                                  className="w-full bg-[#1A1A1A] border border-primary rounded px-2.5 py-1 text-xs text-white"
                                   placeholder="Image URL"
                                 />
                                 <div className="flex justify-end gap-1.5">
@@ -931,7 +977,7 @@ export default function UpdateListingModal({
                                   <button
                                     type="button"
                                     onClick={() => handleSetCoverMedia(idx)}
-                                    className="text-[11px] font-bold text-[#E78F23] hover:underline flex items-center gap-1 cursor-pointer"
+                                    className="text-[11px] font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
                                   >
                                     <Star className="w-3 h-3" /> Make Cover
                                   </button>
@@ -996,8 +1042,10 @@ export default function UpdateListingModal({
             </button>
             <button
               type="submit"
-              disabled={updateListingMutation.isPending || uploadMediaMutation.isPending}
-              className="flex items-center gap-2 px-8 py-2.5 bg-[#E78F23] hover:bg-[#E78F23]/90 text-black font-extrabold text-xs rounded-xl shadow-[0_0_20px_rgba(231,143,35,0.3)] disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer"
+              disabled={
+                updateListingMutation.isPending || uploadMediaMutation.isPending
+              }
+              className="flex items-center gap-2 px-8 py-2.5 bg-primary hover:bg-primary/90 text-black font-extrabold text-xs rounded-xl shadow-[0_0_20px_rgba(231,143,35,0.3)] disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer"
             >
               {updateListingMutation.isPending ? (
                 <>

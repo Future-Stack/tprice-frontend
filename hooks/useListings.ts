@@ -1,8 +1,16 @@
-import { useQuery, useMutation, useQueryClient, keepPreviousData, QueryKey } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  keepPreviousData,
+  QueryKey,
+} from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   getListingsApi,
+  getVipListingsApi,
   getListingByIdApi,
+  getListingBySlugApi,
   createListingApi,
   updateListingApi,
   getMyListingsApi,
@@ -10,7 +18,6 @@ import {
   getAdminListingsApi,
   updateAdminListingStatusApi,
   deleteListingApi,
-  deleteAdminListingApi,
   saveListingApi,
   GetListingsParams,
   GetMyListingsParams,
@@ -23,13 +30,18 @@ import {
   DeleteListingResponse,
   SaveListingResponse,
 } from "@/lib/api/listings";
+import { ADMIN_DASHBOARD_QUERY_KEYS } from "@/hooks/useAdminDashboard";
+import { AdminDashboardOverviewResponse } from "@/lib/api/dashboard";
 
 export const LISTINGS_QUERY_KEYS = {
   all: ["listings"] as const,
   list: (params: GetListingsParams) => ["listings", "list", params] as const,
+  vip: (params: GetListingsParams) => ["listings", "vip", params] as const,
   me: (params: GetMyListingsParams) => ["listings", "me", params] as const,
-  saved: (params: GetSavedListingsParams) => ["listings", "saved", params] as const,
-  admin: (params: GetAdminListingsParams) => ["listings", "admin", params] as const,
+  saved: (params: GetSavedListingsParams) =>
+    ["listings", "saved", params] as const,
+  admin: (params: GetAdminListingsParams) =>
+    ["listings", "admin", params] as const,
   detail: (id: string) => ["listings", "detail", id] as const,
 };
 
@@ -42,7 +54,7 @@ export interface SaveListingContext {
  * Custom React Query hook for fetching current seller's listings
  */
 export const useMyListingsQuery = (
-  params: GetMyListingsParams = { page: 1, limit: 10, sortBy: "NEWEST" }
+  params: GetMyListingsParams = { page: 1, limit: 10, sortBy: "NEWEST" },
 ) => {
   return useQuery<ListingsResponse>({
     queryKey: LISTINGS_QUERY_KEYS.me(params),
@@ -59,7 +71,7 @@ export const useMyListingsQuery = (
  */
 export const useSavedListingsQuery = (
   params: GetSavedListingsParams = { page: 1, limit: 10 },
-  options?: { enabled?: boolean }
+  options?: { enabled?: boolean },
 ) => {
   return useQuery<ListingsResponse>({
     queryKey: LISTINGS_QUERY_KEYS.saved(params),
@@ -76,7 +88,7 @@ export const useSavedListingsQuery = (
  * Custom React Query hook for fetching admin listings with pagination & filter parameters
  */
 export const useAdminListingsQuery = (
-  params: GetAdminListingsParams = { page: 1, limit: 10 }
+  params: GetAdminListingsParams = { page: 1, limit: 10 },
 ) => {
   return useQuery<ListingsResponse>({
     queryKey: LISTINGS_QUERY_KEYS.admin(params),
@@ -91,7 +103,9 @@ export const useAdminListingsQuery = (
 /**
  * Custom React Query hook for fetching marketplace listings with caching, error handling, and smooth transitions
  */
-export const useListingsQuery = (params: GetListingsParams = { page: 1, limit: 9 }) => {
+export const useListingsQuery = (
+  params: GetListingsParams = { page: 1, limit: 9 },
+) => {
   return useQuery<ListingsResponse>({
     queryKey: LISTINGS_QUERY_KEYS.list(params),
     queryFn: () => getListingsApi(params),
@@ -103,13 +117,42 @@ export const useListingsQuery = (params: GetListingsParams = { page: 1, limit: 9
 };
 
 /**
- * Custom React Query hook for fetching single listing by ID
+ * Custom React Query hook for fetching VIP marketplace listings with caching, error handling, and smooth transitions
  */
-export const useListingByIdQuery = (id: string) => {
+export const useVipListingsQuery = (
+  params: GetListingsParams = { page: 1, limit: 10 },
+) => {
+  return useQuery<ListingsResponse>({
+    queryKey: LISTINGS_QUERY_KEYS.vip(params),
+    queryFn: () => getVipListingsApi(params),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    placeholderData: keepPreviousData,
+    retry: 2,
+  });
+};
+
+/**
+ * Custom React Query hook for fetching single listing by ID or Slug
+ */
+export const useListingByIdQuery = (idOrSlug: string) => {
   return useQuery<ListingItem>({
-    queryKey: LISTINGS_QUERY_KEYS.detail(id),
-    queryFn: () => getListingByIdApi(id),
-    enabled: Boolean(id),
+    queryKey: LISTINGS_QUERY_KEYS.detail(idOrSlug),
+    queryFn: () => getListingByIdApi(idOrSlug),
+    enabled: Boolean(idOrSlug),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+};
+
+/**
+ * Custom React Query hook for fetching single listing by Slug
+ */
+export const useListingBySlugQuery = (slug: string) => {
+  return useQuery<ListingItem>({
+    queryKey: LISTINGS_QUERY_KEYS.detail(slug),
+    queryFn: () => getListingBySlugApi(slug),
+    enabled: Boolean(slug),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
@@ -142,13 +185,23 @@ export const useUpdateListingMutation = () => {
   });
 };
 
+export interface UpdateAdminListingStatusContext {
+  previousQueries: [QueryKey, ListingsResponse | undefined][];
+  previousDashboard?: AdminDashboardOverviewResponse;
+}
+
 /**
  * Hook to update an admin listing status (e.g. approve with LIVE or reject with REJECTED)
  * Includes optimistic update for instant smooth UI response.
  */
 export const useUpdateAdminListingStatusMutation = () => {
   const queryClient = useQueryClient();
-  return useMutation({
+  return useMutation<
+    ListingItem,
+    Error,
+    { id: string; status: string; rejectionReason?: string },
+    UpdateAdminListingStatusContext
+  >({
     mutationFn: ({
       id,
       status,
@@ -161,13 +214,21 @@ export const useUpdateAdminListingStatusMutation = () => {
     onMutate: async ({ id, status, rejectionReason }) => {
       // Cancel any outgoing refetches to prevent optimistic cache overwrites
       await queryClient.cancelQueries({ queryKey: LISTINGS_QUERY_KEYS.all });
+      await queryClient.cancelQueries({
+        queryKey: ADMIN_DASHBOARD_QUERY_KEYS.overview,
+      });
 
       // Snapshot previous query data across all listing query keys
       const previousQueries = queryClient.getQueriesData<ListingsResponse>({
         queryKey: LISTINGS_QUERY_KEYS.all,
       });
 
-      // Optimistically update matching items in cache instantly
+      const previousDashboard =
+        queryClient.getQueryData<AdminDashboardOverviewResponse>(
+          ADMIN_DASHBOARD_QUERY_KEYS.overview,
+        );
+
+      // Optimistically update matching items in listings cache instantly
       queryClient.setQueriesData<ListingsResponse>(
         { queryKey: LISTINGS_QUERY_KEYS.all },
         (oldData) => {
@@ -177,43 +238,150 @@ export const useUpdateAdminListingStatusMutation = () => {
             data: oldData.data.map((item) =>
               item.id === id
                 ? {
-                    ...item,
-                    status,
-                    rejectionReason: rejectionReason !== undefined ? rejectionReason : item.rejectionReason,
-                  }
-                : item
+                  ...item,
+                  status,
+                  rejectionReason:
+                    rejectionReason !== undefined
+                      ? rejectionReason
+                      : item.rejectionReason,
+                }
+                : item,
             ),
           };
-        }
+        },
       );
 
-      return { previousQueries };
+      // Optimistically update Admin Dashboard Overview cache
+      if (previousDashboard && previousDashboard.pendingApprovals) {
+        queryClient.setQueryData<AdminDashboardOverviewResponse>(
+          ADMIN_DASHBOARD_QUERY_KEYS.overview,
+          (old) => {
+            if (!old) return old;
+            const updatedPending = (old.pendingApprovals || []).filter(
+              (item) => item.id !== id,
+            );
+            return {
+              ...old,
+              pendingApprovals: updatedPending,
+              metrics: old.metrics
+                ? {
+                  ...old.metrics,
+                  pendingListingsCount: Math.max(
+                    0,
+                    old.metrics.pendingListingsCount - 1,
+                  ),
+                }
+                : old.metrics,
+            };
+          },
+        );
+      }
+
+      return { previousQueries, previousDashboard };
     },
-    onError: (_err, _variables, context) => {
+    onError: (err, _variables, context) => {
       // Rollback cache if mutation fails
       if (context?.previousQueries) {
         context.previousQueries.forEach(([queryKey, data]) => {
           queryClient.setQueryData(queryKey, data);
         });
       }
+      if (context?.previousDashboard) {
+        queryClient.setQueryData(
+          ADMIN_DASHBOARD_QUERY_KEYS.overview,
+          context.previousDashboard,
+        );
+      }
+      const errMsg =
+        (err as any)?.response?.data?.message ||
+        err.message ||
+        "Failed to update listing status";
+      toast.error(errMsg);
+    },
+    onSuccess: (_data, variables) => {
+      const isApproved =
+        variables.status === "LIVE" || variables.status === "APPROVED";
+      const statusLabel = isApproved ? "approved and live" : "rejected";
+      toast.success(`Listing status updated to ${statusLabel} successfully`);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: LISTINGS_QUERY_KEYS.all });
+      queryClient.invalidateQueries({
+        queryKey: ADMIN_DASHBOARD_QUERY_KEYS.overview,
+      });
     },
   });
 };
 
-export const useUpdateListingStatusMutation = useUpdateAdminListingStatusMutation;
+export const useUpdateListingStatusMutation =
+  useUpdateAdminListingStatusMutation;
+
+export interface DeleteListingContext {
+  previousQueries: [QueryKey, ListingsResponse | undefined][];
+}
 
 /**
- * Hook to delete a listing with tag invalidation
+ * Hook to delete a listing with instant optimistic UI update and cache invalidation
  */
 export const useDeleteListingMutation = () => {
   const queryClient = useQueryClient();
-  return useMutation<DeleteListingResponse, Error, string>({
+  return useMutation<
+    DeleteListingResponse,
+    Error,
+    string,
+    DeleteListingContext
+  >({
     mutationFn: (id: string) => deleteListingApi(id),
-    onSuccess: () => {
-      // Invalidate all query tags matching ["listings"] to trigger UI refetch
+    onMutate: async (id: string) => {
+      // Cancel outgoing refetches to prevent optimistic cache overwrites
+      await queryClient.cancelQueries({ queryKey: LISTINGS_QUERY_KEYS.all });
+
+      // Snapshot previous query data across all listing query keys
+      const previousQueries = queryClient.getQueriesData<ListingsResponse>({
+        queryKey: LISTINGS_QUERY_KEYS.all,
+      });
+
+      // Optimistically remove deleted listing from query cache immediately
+      queryClient.setQueriesData<ListingsResponse>(
+        { queryKey: LISTINGS_QUERY_KEYS.all },
+        (oldData) => {
+          if (!oldData || !oldData.data) return oldData;
+          return {
+            ...oldData,
+            data: oldData.data.filter((item) => item.id !== id),
+            meta: oldData.meta
+              ? {
+                ...oldData.meta,
+                total: Math.max(0, oldData.meta.total - 1),
+              }
+              : oldData.meta,
+          };
+        },
+      );
+
+      return { previousQueries };
+    },
+    onError: (err, _id, context) => {
+      // Rollback cache if mutation fails
+      if (context?.previousQueries) {
+        context.previousQueries.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
+      const errMsg =
+        (err as any)?.response?.data?.message ||
+        err.message ||
+        "Failed to delete listing";
+      toast.error(errMsg);
+    },
+    onSuccess: (data) => {
+      if (data?.message) {
+        toast.success(data.message);
+      } else {
+        toast.success("Asset listing deleted successfully");
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: LISTINGS_QUERY_KEYS.all });
     },
   });
@@ -238,7 +406,7 @@ export const useSaveListingMutation = () => {
         queryKey: LISTINGS_QUERY_KEYS.all,
       });
       const previousDetail = queryClient.getQueryData<ListingItem>(
-        LISTINGS_QUERY_KEYS.detail(id)
+        LISTINGS_QUERY_KEYS.detail(id),
       );
 
       // Optimistically update list queries in cache
@@ -251,7 +419,8 @@ export const useSaveListingMutation = () => {
             data: oldData.data.map((item) => {
               if (item.id === id) {
                 const nextSaved = !item.isSaved;
-                const currentCount = item.savedCount ?? item._count?.savedBy ?? 0;
+                const currentCount =
+                  item.savedCount ?? item._count?.savedBy ?? 0;
                 const nextCount = nextSaved
                   ? currentCount + 1
                   : Math.max(0, currentCount - 1);
@@ -259,25 +428,32 @@ export const useSaveListingMutation = () => {
                   ...item,
                   isSaved: nextSaved,
                   savedCount: nextCount,
-                  _count: item._count ? { ...item._count, savedBy: nextCount } : { savedBy: nextCount },
+                  _count: item._count
+                    ? { ...item._count, savedBy: nextCount }
+                    : { savedBy: nextCount },
                 };
               }
               return item;
             }),
           };
-        }
+        },
       );
 
       // Optimistically update single listing detail cache if present
       if (previousDetail) {
         const nextSaved = !previousDetail.isSaved;
-        const currentCount = previousDetail.savedCount ?? previousDetail._count?.savedBy ?? 0;
-        const nextCount = nextSaved ? currentCount + 1 : Math.max(0, currentCount - 1);
+        const currentCount =
+          previousDetail.savedCount ?? previousDetail._count?.savedBy ?? 0;
+        const nextCount = nextSaved
+          ? currentCount + 1
+          : Math.max(0, currentCount - 1);
         queryClient.setQueryData<ListingItem>(LISTINGS_QUERY_KEYS.detail(id), {
           ...previousDetail,
           isSaved: nextSaved,
           savedCount: nextCount,
-          _count: previousDetail._count ? { ...previousDetail._count, savedBy: nextCount } : { savedBy: nextCount },
+          _count: previousDetail._count
+            ? { ...previousDetail._count, savedBy: nextCount }
+            : { savedBy: nextCount },
         });
       }
 
@@ -291,10 +467,15 @@ export const useSaveListingMutation = () => {
         });
       }
       if (context?.previousDetail) {
-        queryClient.setQueryData(LISTINGS_QUERY_KEYS.detail(id), context.previousDetail);
+        queryClient.setQueryData(
+          LISTINGS_QUERY_KEYS.detail(id),
+          context.previousDetail,
+        );
       }
       const errMsg =
-        (err as any)?.response?.data?.message || err.message || "Failed to save listing";
+        (err as any)?.response?.data?.message ||
+        err.message ||
+        "Failed to save listing";
       toast.error(errMsg);
     },
     onSuccess: (data, id) => {
@@ -317,22 +498,21 @@ export const useSaveListingMutation = () => {
               return item;
             }),
           };
-        }
+        },
       );
-      queryClient.setQueryData<ListingItem>(LISTINGS_QUERY_KEYS.detail(id), (oldData) => {
-        if (!oldData) return oldData;
-        return {
-          ...oldData,
-          isSaved: data.saved,
-        };
-      });
+      queryClient.setQueryData<ListingItem>(
+        LISTINGS_QUERY_KEYS.detail(id),
+        (oldData) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            isSaved: data.saved,
+          };
+        },
+      );
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["listings", "saved"] });
     },
   });
 };
-
-
-
-

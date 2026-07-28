@@ -5,11 +5,8 @@ import {
   Search,
   ChevronLeft,
   ChevronRight,
-  ShieldCheck,
   ShieldAlert,
   Crown,
-  UserCheck,
-  Building,
   RefreshCw,
   Users as UsersIcon,
   Trash2,
@@ -52,7 +49,8 @@ const getRoleBadge = (role: string) => {
     case "ADMIN":
       return {
         label: "ADMIN",
-        className: "bg-purple-500/10 text-purple-400 border border-purple-500/20",
+        className:
+          "bg-purple-500/10 text-purple-400 border border-purple-500/20",
       };
     case "DEALER":
       return {
@@ -68,7 +66,8 @@ const getRoleBadge = (role: string) => {
     default:
       return {
         label: "BUYER",
-        className: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
+        className:
+          "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
       };
   }
 };
@@ -151,29 +150,31 @@ export default function AdminUsersPage() {
     setIsUpdateModalOpen(true);
   };
 
-  const handleConfirmStatusUpdate = async (payload: UpdateUserStatusPayload) => {
+  const handleConfirmStatusUpdate = async (
+    payload: UpdateUserStatusPayload,
+  ) => {
     if (!selectedUser) return;
     try {
       await updateStatusMutation.mutateAsync({
         id: selectedUser.id,
         payload,
       });
-      toast.success(`Updated status for ${selectedUser.firstName || selectedUser.email} successfully.`);
+      toast.success(
+        `Updated status for ${selectedUser.firstName || selectedUser.email} successfully.`,
+      );
       setIsUpdateModalOpen(false);
       setSelectedUser(null);
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Failed to update user status. Please try again.");
+      toast.error(
+        error?.response?.data?.message ||
+          "Failed to update user status. Please try again.",
+      );
     }
   };
 
   const usersList = data?.data || [];
   const meta = data?.meta || { total: 0, page: 1, limit: 10, totalPages: 1 };
   const totalPages = meta.totalPages || 1;
-
-  // Stats calculation
-  const verifiedCount = usersList.filter((u) => u.isVerified).length;
-  const vipCount = usersList.filter((u) => u.vipStatus).length;
-  const dealerCount = usersList.filter((u) => u.role === "DEALER").length;
 
   return (
     <div className="min-h-screen text-white font-sans space-y-8 pb-12">
@@ -188,60 +189,18 @@ export default function AdminUsersPage() {
                 className="p-1.5 text-gray-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
                 title="Refresh users"
               >
-                <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin text-primary" : ""}`} />
+                <RefreshCw
+                  className={`w-4 h-4 ${isFetching ? "animate-spin text-primary" : ""}`}
+                />
               </button>
             </h1>
             <p className="text-sm text-gray-400 mt-1">
-              Manage platform members, roles, verification status, and VIP privileges
+              Manage platform members, roles, verification status, and VIP
+              privileges
             </p>
           </div>
         </AnimationWrapper>
       </div>
-
-      {/* Overview Cards */}
-      <AnimationWrapper type="fade-up" duration={0.5} delay={0.1}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-[#111111] border border-[#262626] rounded-2xl p-5 flex items-center gap-4">
-            <div className="p-3 bg-primary/10 border border-primary/20 rounded-xl text-primary">
-              <UsersIcon className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Users</p>
-              <h3 className="text-2xl font-bold text-white mt-0.5">{meta.total}</h3>
-            </div>
-          </div>
-
-          <div className="bg-[#111111] border border-[#262626] rounded-2xl p-5 flex items-center gap-4">
-            <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-xl text-green-500">
-              <ShieldCheck className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Verified Users</p>
-              <h3 className="text-2xl font-bold text-white mt-0.5">{verifiedCount}</h3>
-            </div>
-          </div>
-
-          <div className="bg-[#111111] border border-[#262626] rounded-2xl p-5 flex items-center gap-4">
-            <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-400">
-              <Crown className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">VIP Members</p>
-              <h3 className="text-2xl font-bold text-white mt-0.5">{vipCount}</h3>
-            </div>
-          </div>
-
-          <div className="bg-[#111111] border border-[#262626] rounded-2xl p-5 flex items-center gap-4">
-            <div className="p-3 bg-purple-500/10 border border-purple-500/20 rounded-xl text-purple-400">
-              <Building className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Active Dealers</p>
-              <h3 className="text-2xl font-bold text-white mt-0.5">{dealerCount}</h3>
-            </div>
-          </div>
-        </div>
-      </AnimationWrapper>
 
       {/* Controls Bar: Role Tabs + Search */}
       <AnimationWrapper type="fade-up" duration={0.5} delay={0.2}>
@@ -254,10 +213,11 @@ export default function AdminUsersPage() {
                 <button
                   key={tab}
                   onClick={() => handleRoleChange(tab)}
-                  className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${isActive
-                    ? "bg-primary text-white shadow-[0_4px_15px_rgba(231,143,35,0.3)]"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
-                    }`}
+                  className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                    isActive
+                      ? "bg-primary text-white shadow-[0_4px_15px_rgba(231,143,35,0.3)]"
+                      : "text-gray-400 hover:text-white hover:bg-white/5"
+                  }`}
                 >
                   {tab}
                 </button>
@@ -266,7 +226,7 @@ export default function AdminUsersPage() {
           </div>
 
           {/* Search Box */}
-          <div className="relative min-w-[260px]">
+          <div className="relative min-w-65">
             <Search className="w-4 h-4 text-gray-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
@@ -283,7 +243,7 @@ export default function AdminUsersPage() {
       <AnimationWrapper type="fade-up" duration={0.6} delay={0.3}>
         <div className="bg-[#111111] border border-[#262626] rounded-2xl overflow-hidden shadow-xl">
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse min-w-[1000px]">
+            <table className="w-full text-left border-collapse min-w-250">
               <thead>
                 <tr className="border-b border-[#1A1A1A] bg-[#141416]">
                   <th className="px-6 py-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
@@ -314,7 +274,9 @@ export default function AdminUsersPage() {
                     <td colSpan={6} className="px-6 py-12 text-center">
                       <div className="flex flex-col items-center justify-center text-gray-400 space-y-3">
                         <ShieldAlert className="w-10 h-10 text-red-400" />
-                        <p className="text-sm font-semibold">Failed to load user data</p>
+                        <p className="text-sm font-semibold">
+                          Failed to load user data
+                        </p>
                         <button
                           onClick={() => refetch()}
                           className="px-4 py-2 bg-primary/10 border border-primary/30 text-primary text-xs font-semibold rounded-xl hover:bg-primary hover:text-white transition-all cursor-pointer"
@@ -329,7 +291,9 @@ export default function AdminUsersPage() {
                     <td colSpan={6} className="px-6 py-12 text-center">
                       <div className="flex flex-col items-center justify-center text-gray-400 space-y-2">
                         <UsersIcon className="w-10 h-10 text-gray-600 mb-1" />
-                        <p className="text-sm font-semibold text-gray-300">No users found</p>
+                        <p className="text-sm font-semibold text-gray-300">
+                          No users found
+                        </p>
                         <p className="text-xs text-gray-500">
                           Try adjusting your role filter or search query.
                         </p>
@@ -352,7 +316,7 @@ export default function AdminUsersPage() {
                         {/* User & Details */}
                         <td className="px-6 py-5">
                           <div className="flex items-center gap-3.5">
-                            <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-primary/30 to-amber-600/30 border border-primary/30 flex items-center justify-center text-primary font-bold text-sm shrink-0">
+                            <div className="relative w-10 h-10 rounded-xl bg-linear-to-br from-primary/30 to-amber-600/30 border border-primary/30 flex items-center justify-center text-primary font-bold text-sm shrink-0">
                               {user.avatarUrl ? (
                                 // eslint-disable-next-line @next/next/no-img-element
                                 <img
@@ -368,9 +332,13 @@ export default function AdminUsersPage() {
                               <h4 className="font-semibold text-sm text-white group-hover:text-primary transition-colors truncate">
                                 {fullName}
                               </h4>
-                              <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                              <p className="text-xs text-gray-400 truncate">
+                                {user.email}
+                              </p>
                               {user.phone && (
-                                <p className="text-[11px] text-gray-500 mt-0.5">{user.phone}</p>
+                                <p className="text-[11px] text-gray-500 mt-0.5">
+                                  {user.phone}
+                                </p>
                               )}
                               {user.dealerProfile?.companyName && (
                                 <span className="inline-block mt-1 text-[10px] px-2 py-0.5 bg-white/5 border border-white/10 rounded text-gray-300 font-medium">
@@ -396,14 +364,18 @@ export default function AdminUsersPage() {
                         <td className="px-6 py-5">
                           <div className="flex items-center justify-center gap-2 flex-wrap">
                             <span
-                              className={`px-3 py-1 rounded-full text-[11px] font-medium flex items-center gap-1.5 ${user.isVerified
-                                ? "bg-green-500/10 text-green-500 border border-green-500/20"
-                                : "bg-yellow-500/10 text-yellow-500 border border-yellow-500/20"
-                                }`}
+                              className={`px-3 py-1 rounded-full text-[11px] font-medium flex items-center gap-1.5 ${
+                                user.isVerified
+                                  ? "bg-green-500/10 text-green-500 border border-green-500/20"
+                                  : "bg-yellow-500/10 text-yellow-500 border border-yellow-500/20"
+                              }`}
                             >
                               <span
-                                className={`w-1.5 h-1.5 rounded-full ${user.isVerified ? "bg-green-500" : "bg-yellow-500"
-                                  }`}
+                                className={`w-1.5 h-1.5 rounded-full ${
+                                  user.isVerified
+                                    ? "bg-green-500"
+                                    : "bg-yellow-500"
+                                }`}
                               />
                               {user.isVerified ? "Verified" : "Unverified"}
                             </span>
@@ -421,13 +393,24 @@ export default function AdminUsersPage() {
                           {user._count ? (
                             <div className="flex justify-center gap-3 text-[11px]">
                               <span title="Listings">
-                                📦 <strong className="text-gray-200">{user._count.listings}</strong>
+                                📦{" "}
+                                <strong className="text-gray-200">
+                                  {user._count.listings}
+                                </strong>
                               </span>
                               <span title="Offers">
-                                💬 <strong className="text-gray-200">{user._count.offersAsBuyer + user._count.offersAsSeller}</strong>
+                                💬{" "}
+                                <strong className="text-gray-200">
+                                  {user._count.offersAsBuyer +
+                                    user._count.offersAsSeller}
+                                </strong>
                               </span>
                               <span title="Deals">
-                                🤝 <strong className="text-gray-200">{user._count.dealsAsBuyer + user._count.dealsAsSeller}</strong>
+                                🤝{" "}
+                                <strong className="text-gray-200">
+                                  {user._count.dealsAsBuyer +
+                                    user._count.dealsAsSeller}
+                                </strong>
                               </span>
                             </div>
                           ) : (
@@ -537,10 +520,11 @@ export default function AdminUsersPage() {
                       <button
                         key={pageNum}
                         onClick={() => setPage(pageNum)}
-                        className={`w-8 h-8 rounded-xl text-xs font-semibold transition-all cursor-pointer ${isActive
-                          ? "bg-primary text-white shadow-[0_2px_10px_rgba(231,143,35,0.4)]"
-                          : "text-gray-400 hover:text-white hover:bg-white/5"
-                          }`}
+                        className={`w-8 h-8 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                          isActive
+                            ? "bg-primary text-white shadow-[0_2px_10px_rgba(231,143,35,0.4)]"
+                            : "text-gray-400 hover:text-white hover:bg-white/5"
+                        }`}
                       >
                         {pageNum}
                       </button>

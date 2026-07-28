@@ -22,8 +22,10 @@ export interface ListingOwner {
 
 export interface ListingSpecifications {
   engine?: string;
-  mileage?: number;
-  horsepower?: number;
+  engines?: string;
+  mileage?: number | string;
+  horsepower?: number | string;
+  power?: string;
   transmission?: string;
   exteriorColor?: string;
   interiorColor?: string;
@@ -31,6 +33,10 @@ export interface ListingSpecifications {
   bedrooms?: number;
   bathrooms?: number;
   squareFeet?: number;
+  maxMach?: number | string;
+  sleepingCapacity?: number | string;
+  passengerCapacity?: number | string;
+  rangeNauticalMiles?: number | string;
   [key: string]: any;
 }
 
@@ -60,6 +66,7 @@ export interface ListingItem {
   locationCountry?: string | null;
   buildYear?: number | null;
   specifications?: ListingSpecifications;
+  description?: string | null;
   createdAt: string;
   updatedAt: string;
   media: ListingMedia[];
@@ -158,10 +165,69 @@ export const getListingsApi = async (params?: GetListingsParams): Promise<Listin
   return response.data;
 };
 
+/**
+ * Fetch VIP listings via GET /listings/vip
+ */
+export const getVipListingsApi = async (
+  params?: GetListingsParams
+): Promise<ListingsResponse> => {
+  const queryParams: Record<string, any> = {};
+
+  if (params) {
+    if (params.category && params.category !== "ALL" && params.category !== "All") {
+      queryParams.category = params.category;
+    }
+    if (params.subCategory && params.subCategory !== "ALL" && params.subCategory !== "All") {
+      queryParams.subCategory = params.subCategory;
+    }
+    if (params.brand && params.brand !== "ALL" && params.brand !== "All") {
+      queryParams.brand = params.brand;
+    }
+    if (params.isFeatured !== undefined) {
+      queryParams.isFeatured = params.isFeatured;
+    }
+    if (params.minPrice !== undefined && params.minPrice !== null && params.minPrice > 0) {
+      queryParams.minPrice = params.minPrice;
+    }
+    if (params.maxPrice !== undefined && params.maxPrice !== null && params.maxPrice > 0) {
+      queryParams.maxPrice = params.maxPrice;
+    }
+    if (params.locationCity && params.locationCity.trim()) {
+      queryParams.locationCity = params.locationCity.trim();
+    }
+    if (params.locationCountry && params.locationCountry.trim()) {
+      queryParams.locationCountry = params.locationCountry.trim();
+    }
+    if (params.buildYear) {
+      queryParams.buildYear = params.buildYear;
+    }
+    if (params.search && params.search.trim()) {
+      queryParams.search = params.search.trim();
+    }
+    if (params.sortBy) {
+      queryParams.sortBy = params.sortBy;
+    }
+    if (params.page) {
+      queryParams.page = params.page;
+    }
+    if (params.limit) {
+      queryParams.limit = params.limit;
+    }
+  }
+
+  const response = await apiClient.get<ListingsResponse>("/listings/vip", {
+    params: queryParams,
+  });
+
+  return response.data;
+};
+
 export const getListingByIdApi = async (idOrSlug: string): Promise<ListingItem> => {
   const response = await apiClient.get<ListingItem>(`/listings/${idOrSlug}`);
   return response.data;
 };
+
+export const getListingBySlugApi = getListingByIdApi;
 
 export interface GetMyListingsParams {
   sortBy?: string;
@@ -222,7 +288,6 @@ export interface CreateListingInput {
   auctionEndsAt?: string;
   currency?: string;
   isOffMarket?: boolean;
-  isFeatured?: boolean;
   locationCity?: string;
   locationCountry?: string;
   buildYear?: number;
@@ -247,7 +312,6 @@ export interface UpdateListingInput {
   auctionEndsAt?: string;
   currency?: string;
   isOffMarket?: boolean;
-  isFeatured?: boolean;
   locationCity?: string;
   locationCountry?: string;
   buildYear?: number;

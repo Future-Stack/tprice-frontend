@@ -372,13 +372,13 @@ export default function FilterSidebar({
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:block w-[300px] shrink-0 bg-[#111111] border border-white/[0.03] rounded-xl py-8 px-6 sticky top-28 h-fit max-h-[calc(100vh-8rem)] overflow-y-auto custom-scrollbar">
+      <aside className="hidden lg:block w-75 shrink-0 bg-[#111111] border border-white/3 rounded-xl py-8 px-6 sticky top-28 h-fit max-h-[calc(100vh-8rem)] overflow-y-auto custom-scrollbar">
         {content}
       </aside>
 
       {/* Mobile Drawer */}
       <div
-        className={`fixed inset-0 z-[200] lg:hidden transition-all duration-500 ${
+        className={`fixed inset-0 z-200 lg:hidden transition-all duration-500 ${
           isOpen ? "visible opacity-100" : "invisible opacity-0"
         }`}
       >
