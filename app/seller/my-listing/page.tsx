@@ -12,12 +12,15 @@ import {
   PackageOpen,
   RefreshCw,
   Edit3,
+  Trash2,
+  Loader2,
 } from "lucide-react";
 import AnimationWrapper from "../../components/AnimationWrapper";
-import { useMyListingsQuery } from "@/hooks/useListings";
+import { useMyListingsQuery, useDeleteListingMutation } from "@/hooks/useListings";
 import { useDebounce } from "@/hooks/useDebounce";
 import { ListingItem } from "@/lib/api/listings";
 import UpdateListingModal from "./UpdateListingModal";
+import DeleteListingModal from "./DeleteListingModal";
 
 const getStatusStyles = (status: string) => {
   const normalized = status?.toUpperCase();
@@ -129,6 +132,10 @@ const SellerListing = () => {
   const [editingListing, setEditingListing] = useState<ListingItem | null>(
     null,
   );
+  const [deletingListing, setDeletingListing] = useState<ListingItem | null>(
+    null,
+  );
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const debouncedSearch = useDebounce(searchQuery, 400);
 
@@ -138,6 +145,8 @@ const SellerListing = () => {
     search: debouncedSearch,
     sortBy: "NEWEST",
   });
+
+  const deleteListingMutation = useDeleteListingMutation();
 
   const listings = data?.data || [];
   const meta = data?.meta || {
@@ -150,6 +159,20 @@ const SellerListing = () => {
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= meta.totalPages) {
       setPage(newPage);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingListing) return;
+    const targetId = deletingListing.id;
+    setDeletingId(targetId);
+    try {
+      await deleteListingMutation.mutateAsync(targetId);
+      setDeletingListing(null);
+    } catch {
+      // Error handled by mutation onError toast notification
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -331,6 +354,23 @@ const SellerListing = () => {
                                 <Edit3 className="w-3.5 h-3.5" />
                                 <span>Edit</span>
                               </button>
+                              <button
+                                onClick={() => setDeletingListing(item)}
+                                disabled={
+                                  deleteListingMutation.isPending &&
+                                  deletingId === item.id
+                                }
+                                className="px-3.5 py-2 bg-rose-500/10 hover:bg-rose-600 text-rose-500 hover:text-white border border-rose-500/30 font-bold text-xs rounded-xl transition-all duration-300 flex items-center gap-1.5 cursor-pointer shadow-sm hover:scale-105 disabled:opacity-50"
+                                title="Delete listing"
+                              >
+                                {deleteListingMutation.isPending &&
+                                deletingId === item.id ? (
+                                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                ) : (
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                )}
+                                <span>Delete</span>
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -406,6 +446,15 @@ const SellerListing = () => {
         isOpen={Boolean(editingListing)}
         onClose={() => setEditingListing(null)}
         listing={editingListing}
+      />
+
+      {/* Delete Listing Modal */}
+      <DeleteListingModal
+        isOpen={Boolean(deletingListing)}
+        onClose={() => setDeletingListing(null)}
+        onConfirm={handleConfirmDelete}
+        listing={deletingListing}
+        isDeleting={deleteListingMutation.isPending}
       />
     </div>
   );

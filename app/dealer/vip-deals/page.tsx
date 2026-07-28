@@ -225,10 +225,10 @@ export default function VIPDeals() {
         <AnimationWrapper type="fade-down" duration={0.5}>
           <div>
             <h2 className="text-2xl sm:text-3xl font-clash font-medium tracking-wide">
-                 VIP Deals
+              VIP Deals
             </h2>
             <p className="text-white text-xs sm:text-sm mt-1 sm:mt-2 font-medium">
-             Exclusive off-market listings available only to VIP members
+              Exclusive off-market listings available only to VIP members
             </p>
           </div>
         </AnimationWrapper>
