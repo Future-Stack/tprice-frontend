@@ -1,8 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
+
 import Link from "next/link";
 import Image from "next/image";
+import { useParams } from "next/navigation";
 import {
   ChevronRight,
   MapPin,
@@ -14,17 +16,93 @@ import {
   Check,
   ChevronDown,
   Clock,
-  Circle
+  Circle,
+  Loader2,
+  MessageSquare,
 } from "lucide-react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
+import {
+  useDealDetailQuery,
+  useDealMessagesQuery,
+  useSendDealMessageMutation,
+} from "@/hooks/useDeals";
+import { toast } from "sonner";
+import { DealMessage } from "@/lib/api/deals";
+
+const formatDate = (dateString?: string) => {
+  if (!dateString) return "";
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return dateString;
+  }
+};
 
 const DealDetails = () => {
+  const params = useParams();
+  const rawId = params?.deal_id;
+  const dealId = Array.isArray(rawId) ? rawId[0] : (rawId as string) || "";
+
+  const [messageInput, setMessageInput] = useState("");
+  const chatScrollRef = useRef<HTMLDivElement>(null);
+
+  const { data: dealDetail } = useDealDetailQuery(dealId);
+  const { data: dealMessages = [] } = useDealMessagesQuery(dealId);
+  const sendDealMessageMutation = useSendDealMessageMutation();
+
+  useEffect(() => {
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+    }
+  }, [dealMessages, dealDetail]);
+
+  const embeddedDealMessages: DealMessage[] = (dealDetail as any)?.messages || [];
+  const rawMessagesList = [...embeddedDealMessages, ...(dealMessages || [])];
+
+  const uniqueMessagesMap = new Map<string, DealMessage>();
+  rawMessagesList.forEach((m) => {
+    if (m && m.id) {
+      uniqueMessagesMap.set(m.id, m);
+    }
+  });
+  const combinedMessages = Array.from(uniqueMessagesMap.values()).sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  );
+
+  const handleSendMessage = async () => {
+    const trimmed = messageInput.trim();
+    if (!trimmed) return;
+
+    if (!dealId) {
+      toast.error("Deal ID missing.");
+      return;
+    }
+
+    try {
+      await sendDealMessageMutation.mutateAsync({
+        dealId,
+        message: trimmed,
+      });
+      setMessageInput("");
+    } catch {
+      // Error handled by mutation toast
+    }
+  };
+
   // Mock data for the specific offer
   const offer = {
-    id: "LBO-2024-0047",
+    id: dealId || "LBO-2024-0047",
     title: "2024 Lamborghini Revuelto",
     location: "New York, USA",
-    imageUrl: "https://images.unsplash.com/photo-1621135802920-133df287f89c?auto=format&fit=crop&q=80&w=1200",
+    imageUrl:
+      "https://images.unsplash.com/photo-1621135802920-133df287f89c?auto=format&fit=crop&q=80&w=1200",
     seller: {
       name: "David Anderson",
       avatar: "https://i.pravatar.cc/150?u=david",
@@ -37,18 +115,48 @@ const DealDetails = () => {
       listedPrice: "$495,000",
     },
     history: [
-      { id: 1, type: "Initial Offer", entity: "Buyer Offer", amount: "$450,000", date: "Apr 7, 2:30 pm", color: "blue" },
-      { id: 2, type: "Counter Offer", entity: "Dealer Offer", amount: "$495,000", date: "Apr 7, 4:30 pm", color: "yellow" },
-      { id: 3, type: "Updated Offer", entity: "Buyer Offer", amount: "$470,000", date: "Apr 8, 1:30 pm", color: "blue" },
-      { id: 4, type: "Counter Offer", entity: "Dealer Offer", amount: "$490,000", date: "Apr 8, 5:30 pm", color: "yellow" },
-      { id: 5, type: "Updated Offer", entity: "Buyer Offer", amount: "$480,000", date: "Apr 8, 7:30 pm", color: "blue", active: true },
+      {
+        id: 1,
+        type: "Initial Offer",
+        entity: "Buyer Offer",
+        amount: "$450,000",
+        date: "Apr 7, 2:30 pm",
+        color: "blue",
+      },
+      {
+        id: 2,
+        type: "Counter Offer",
+        entity: "Dealer Offer",
+        amount: "$495,000",
+        date: "Apr 7, 4:30 pm",
+        color: "yellow",
+      },
+      {
+        id: 3,
+        type: "Updated Offer",
+        entity: "Buyer Offer",
+        amount: "$470,000",
+        date: "Apr 8, 1:30 pm",
+        color: "blue",
+      },
+      {
+        id: 4,
+        type: "Counter Offer",
+        entity: "Dealer Offer",
+        amount: "$490,000",
+        date: "Apr 8, 5:30 pm",
+        color: "yellow",
+      },
+      {
+        id: 5,
+        type: "Updated Offer",
+        entity: "Buyer Offer",
+        amount: "$480,000",
+        date: "Apr 8, 7:30 pm",
+        color: "blue",
+        active: true,
+      },
     ],
-    messages: [
-      { id: 1, sender: "Buyer", text: "I am very interested in this vehicle. Can we discuss the pricing?", time: "Apr 7, 2:15 pm" },
-      { id: 2, sender: "Seller", text: "Absolutely, this is a pristine example with only 2,400 miles. What price point were you considering?", time: "Apr 7, 2:45 pm" },
-      { id: 3, sender: "Buyer", text: "I have submitted an offer of $480,000. I can move quickly on this", time: "Apr 8, 7:30 pm" },
-      { id: 4, sender: "Seller", text: "Thank you for the updated offer. Let me review and get back to you shortly", time: "Apr 8, 8:00 pm" },
-    ]
   };
 
   return (
@@ -186,21 +294,53 @@ const DealDetails = () => {
                 <h2 className="text-2xl font-semibold font-clash">Conversation</h2>
 
                 <div className="bg-[#111113] rounded-[2rem] border border-white/5 p-6 md:p-8 space-y-6">
-                  <div className="space-y-6 max-h-100 overflow-y-auto pr-2 custom-scrollbar">
-                    {offer.messages.map((msg) => (
-                      <div
-                        key={msg.id}
-                        className={`flex ${msg.sender === 'Buyer' ? 'justify-start' : 'justify-end'}`}
-                      >
-                        <div className={`max-w-[70%] p-5 rounded-2xl text-sm leading-relaxed ${msg.sender === 'Buyer'
-                          ? 'bg-white/5 border border-white/10 text-white/90 rounded-bl-none'
-                          : 'bg-[#2D2D20] border border-[#D4AF37]/20 text-white/90 rounded-br-none'
-                          }`}>
-                          {msg.text}
-                          <div className="text-[10px] text-gray-500 mt-2 uppercase tracking-tight">{msg.time}</div>
-                        </div>
+                  <div
+                    ref={chatScrollRef}
+                    className="space-y-6 max-h-100 overflow-y-auto pr-2 custom-scrollbar"
+                  >
+                    {combinedMessages.length === 0 ? (
+                      <div className="text-center py-12 text-gray-400 text-sm flex flex-col items-center justify-center gap-2">
+                        <MessageSquare size={28} className="text-gray-600 mb-1" />
+                        Not found
                       </div>
-                    ))}
+                    ) : (
+                      combinedMessages.map((msg) => {
+                        const isSelf =
+                          msg.senderId === dealDetail?.sellerId ||
+                          msg.sender?.role === "SELLER" ||
+                          msg.sender?.role === "DEALER";
+                        const senderName = isSelf
+                          ? "You"
+                          : msg.sender
+                          ? `${msg.sender.firstName || "Buyer"} ${msg.sender.lastName || ""}`.trim()
+                          : "Buyer";
+
+                        return (
+                          <div
+                            key={msg.id}
+                            className={`flex ${isSelf ? "justify-end" : "justify-start"}`}
+                          >
+                            <div
+                              className={`max-w-[75%] p-5 rounded-2xl text-sm leading-relaxed ${
+                                isSelf
+                                  ? "bg-[#2D2D20] border border-[#D4AF37]/30 text-white/90 rounded-br-none"
+                                  : "bg-white/5 border border-white/10 text-white/90 rounded-bl-none"
+                              }`}
+                            >
+                              <div className="flex items-center justify-between gap-4 mb-1">
+                                <div className="text-[10px] font-bold uppercase tracking-widest text-[#D4AF37]">
+                                  {senderName}
+                                </div>
+                              </div>
+                              <p className="whitespace-pre-wrap">{msg.message}</p>
+                              <div className="text-[10px] text-gray-500 mt-2 uppercase tracking-tight">
+                                {formatDate(msg.createdAt)}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
                   </div>
 
                   {/* Message Input */}
@@ -208,16 +348,34 @@ const DealDetails = () => {
                     <input
                       type="text"
                       placeholder="Type your message"
+                      value={messageInput}
+                      onChange={(e) => setMessageInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !sendDealMessageMutation.isPending) {
+                          e.preventDefault();
+                          handleSendMessage();
+                        }
+                      }}
                       className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-5 pr-14 text-sm focus:outline-hidden focus:border-[#D4AF37]/50 transition-all placeholder:text-gray-600"
                     />
-                    <button className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-lg bg-[#D4AF37] text-black flex items-center justify-center hover:bg-[#c4a132] transition-colors">
-                      <Send size={18} />
+                    <button
+                      onClick={handleSendMessage}
+                      disabled={sendDealMessageMutation.isPending || !messageInput.trim()}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-lg bg-[#D4AF37] text-black flex items-center justify-center hover:bg-[#c4a132] disabled:opacity-50 transition-colors"
+                    >
+                      {sendDealMessageMutation.isPending ? (
+                        <Loader2 size={18} className="animate-spin" />
+                      ) : (
+                        <Send size={18} />
+                      )}
                     </button>
                   </div>
                 </div>
               </div>
             </AnimationWrapper>
           </div>
+
+
 
           {/* Right Column (Order History) */}
           <div className="lg:col-span-4">

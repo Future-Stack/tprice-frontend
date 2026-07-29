@@ -31,6 +31,8 @@ import { useUpdateListingMutation } from "@/hooks/useListings";
 import { useUploadMediaMutation } from "@/hooks/useMedia";
 import { toast } from "sonner";
 import Image from "next/image";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 interface UpdateListingModalProps {
   isOpen: boolean;
@@ -682,14 +684,26 @@ export default function UpdateListingModal({
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center gap-1">
                         <Clock className="w-3.5 h-3.5 text-primary" /> Auction
-                        Ends At (ISO Date)
+                        Ends At
                       </label>
-                      <input
-                        type="text"
-                        value={auctionEndsAt}
-                        onChange={(e) => setAuctionEndsAt(e.target.value)}
-                        placeholder="2026-12-31T23:59:59.000Z"
-                        className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl px-4 py-3 text-sm text-white font-mono focus:outline-none focus:border-primary/60 transition-all"
+                      <DatePicker
+                        selected={auctionEndsAt ? new Date(auctionEndsAt) : null}
+                        onChange={(date: Date | null) => {
+                          if (date) {
+                            setAuctionEndsAt(date.toISOString());
+                          } else {
+                            setAuctionEndsAt("");
+                          }
+                        }}
+                        showTimeSelect
+                        timeFormat="HH:mm"
+                        timeIntervals={15}
+                        timeCaption="Time"
+                        dateFormat="MMMM d, yyyy h:mm aa"
+                        placeholderText="Select date and time"
+                        minDate={new Date()}
+                        className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary/60 transition-all cursor-pointer"
+                        wrapperClassName="w-full"
                       />
                     </div>
                   </>

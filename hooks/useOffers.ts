@@ -4,10 +4,16 @@ import {
   getOffersApi,
   getOfferDetailApi,
   acceptOfferApi,
+  createOfferApi,
+  withdrawOfferApi,
+  counterOfferApi,
   GetOffersParams,
   GetOffersResponse,
   OfferDetailItem,
   AcceptOfferResponse,
+  WithdrawOfferResponse,
+  CreateOfferPayload,
+  CounterOfferPayload,
 } from "@/lib/api/offers";
 
 export const OFFERS_QUERY_KEYS = {
@@ -24,13 +30,17 @@ export interface AcceptOfferContext {
 /**
  * React Query hook to fetch offers with caching and stale time configuration
  */
-export const useOffersQuery = (params?: GetOffersParams) => {
+export const useOffersQuery = (
+  params?: GetOffersParams,
+  options?: { enabled?: boolean }
+) => {
   return useQuery<GetOffersResponse>({
     queryKey: OFFERS_QUERY_KEYS.list(params),
     queryFn: () => getOffersApi(params),
     staleTime: 30 * 1000, // 30 seconds stale time
     gcTime: 5 * 60 * 1000, // 5 minutes cache time
     retry: 2,
+    ...options,
   });
 };
 
@@ -47,6 +57,29 @@ export const useOfferDetailQuery = (offerId: string) => {
     retry: 2,
   });
 };
+
+/**
+ * React Query hook to create a new offer
+ */
+export const useCreateOfferMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<OfferDetailItem, Error, CreateOfferPayload>({
+    mutationFn: (payload: CreateOfferPayload) => createOfferApi(payload),
+    onSuccess: (data) => {
+      toast.success("Offer sent successfully!");
+      queryClient.invalidateQueries({ queryKey: OFFERS_QUERY_KEYS.all });
+    },
+    onError: (err) => {
+      const errMsg =
+        (err as any)?.response?.data?.message ||
+        err.message ||
+        "Failed to send offer";
+      toast.error(errMsg);
+    },
+  });
+};
+
 
 /**
  * React Query hook to accept an offer with instant optimistic UI update
@@ -121,6 +154,56 @@ export const useAcceptOfferMutation = () => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: OFFERS_QUERY_KEYS.all });
+    },
+  });
+};
+
+/**
+ * React Query hook to withdraw an offer
+ */
+export const useWithdrawOfferMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<WithdrawOfferResponse, Error, string>({
+    mutationFn: (offerId: string) => withdrawOfferApi(offerId),
+    onSuccess: (data) => {
+      toast.success(data?.message || "Offer withdrawn successfully!");
+      queryClient.invalidateQueries({ queryKey: OFFERS_QUERY_KEYS.all });
+    },
+    onError: (err) => {
+      const errMsg =
+        (err as any)?.response?.data?.message ||
+        err.message ||
+        "Failed to withdraw offer";
+      toast.error(errMsg);
+    },
+  });
+};
+
+export interface CounterOfferParams {
+  offerId: string;
+  payload: CounterOfferPayload;
+}
+
+/**
+ * React Query hook to send a counter-offer for an existing offer
+ */
+export const useCounterOfferMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<OfferDetailItem, Error, CounterOfferParams>({
+    mutationFn: ({ offerId, payload }: CounterOfferParams) =>
+      counterOfferApi(offerId, payload),
+    onSuccess: () => {
+      toast.success("Counter offer sent successfully!");
+      queryClient.invalidateQueries({ queryKey: OFFERS_QUERY_KEYS.all });
+    },
+    onError: (err) => {
+      const errMsg =
+        (err as any)?.response?.data?.message ||
+        err.message ||
+        "Failed to send counter offer";
+      toast.error(errMsg);
     },
   });
 };

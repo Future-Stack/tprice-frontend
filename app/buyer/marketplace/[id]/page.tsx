@@ -14,6 +14,13 @@ import {
   Mail,
   Phone,
   Lock,
+  X,
+  Send,
+  Clock,
+  Loader2,
+  DollarSign,
+  ArrowUpRight,
+  Gavel,
 } from "lucide-react";
 import Link from "next/link";
 import Cookies from "js-cookie";
@@ -21,6 +28,7 @@ import { toast } from "sonner";
 
 import AnimationWrapper from "@/app/components/AnimationWrapper";
 import { useListingByIdQuery, useSaveListingMutation, useSavedListingsQuery } from "@/hooks/useListings";
+import { useOffersQuery, useCreateOfferMutation } from "@/hooks/useOffers";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 
 /* ─── Helper utilities for dynamic key-value specifications ─── */
@@ -72,12 +80,33 @@ export default function BuyerListingDetailPage() {
   const [inclFees, setInclFees] = useState(true);
   const [isBiddingMode, setIsBiddingMode] = useState(false);
 
+  // Offer & Bid modal states
+  const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
+  const [isViewOfferModalOpen, setIsViewOfferModalOpen] = useState(false);
+  const [offerAmount, setOfferAmount] = useState<string>("");
+  const [offerNote, setOfferNote] = useState<string>("");
+
+  const [isBidModalOpen, setIsBidModalOpen] = useState(false);
+  const [bidAmount, setBidAmount] = useState<string>("");
+  const [bidNote, setBidNote] = useState<string>("");
+
   const saveMutation = useSaveListingMutation();
+  const createOfferMutation = useCreateOfferMutation();
   const token = Cookies.get("access_token") || useAuthStore((state) => state.token);
 
   const { data: savedResponse } = useSavedListingsQuery(
     { page: 1, limit: 100 },
     { enabled: Boolean(token) }
+  );
+
+  const { data: userOffersData, isLoading: isUserOffersLoading } = useOffersQuery(
+    { limit: 100 },
+    { enabled: Boolean(token) }
+  );
+
+  const existingOffer = userOffersData?.data?.find(
+    (offer) =>
+      offer.listingId === product?.id || offer.listing?.id === product?.id
   );
 
   const isSavedInListings = savedResponse?.data?.some((savedItem) => savedItem.id === product?.id) ?? false;
@@ -94,6 +123,103 @@ export default function BuyerListingDetailPage() {
       return;
     }
     saveMutation.mutate(product.id);
+  };
+
+  const handleOpenSendOfferModal = () => {
+    if (!token) {
+      toast.error("Please sign in to send an offer.");
+      return;
+    }
+    const initialPrice = product?.askingPrice ? Number(product.askingPrice) : 0;
+    setOfferAmount(initialPrice > 0 ? String(initialPrice) : "");
+    setOfferNote(
+      "Flexible on delivery timeline and ready to complete escrow verification."
+    );
+    setIsOfferModalOpen(true);
+  };
+
+  const handleSubmitOffer = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!product?.id) return;
+    const numericAmount = parseFloat(offerAmount);
+    if (isNaN(numericAmount) || numericAmount <= 0) {
+      toast.error("Please enter a valid offer amount.");
+      return;
+    }
+
+    createOfferMutation.mutate(
+      {
+        listingId: product.id,
+        amount: numericAmount,
+        note: offerNote.trim() || undefined,
+      },
+      {
+        onSuccess: () => {
+          setIsOfferModalOpen(false);
+        },
+      }
+    );
+  };
+
+  const handleOpenPlaceBidModal = () => {
+    if (!token) {
+      toast.error("Please sign in to place a bid.");
+      return;
+    }
+    const currentVal = existingOffer
+      ? Number(existingOffer.currentAmount || existingOffer.initialAmount)
+      : product?.startingBid
+      ? Number(product.startingBid)
+      : product?.askingPrice
+      ? Number(product.askingPrice)
+      : 0;
+
+    // Suggested min bid: if existing bid present, suggest +5%, else current starting bid
+    const suggested = existingOffer
+      ? Math.round(currentVal * 1.05)
+      : currentVal > 0
+      ? currentVal
+      : 1000;
+    setBidAmount(String(suggested));
+    setBidNote("Escrow verified bidder ready to complete verification.");
+    setIsBidModalOpen(true);
+  };
+
+  const handleSubmitBid = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!product?.id) return;
+    const numericAmount = parseFloat(bidAmount);
+    if (isNaN(numericAmount) || numericAmount <= 0) {
+      toast.error("Please enter a valid bid amount.");
+      return;
+    }
+
+    const currentVal = existingOffer
+      ? Number(existingOffer.currentAmount || existingOffer.initialAmount)
+      : 0;
+
+    if (existingOffer && numericAmount <= currentVal) {
+      toast.error(
+        `Your new bid must be higher than your current bid of $${currentVal.toLocaleString()}`
+      );
+      return;
+    }
+
+    createOfferMutation.mutate(
+      {
+        listingId: product.id,
+        amount: numericAmount,
+        note: bidNote.trim() || undefined,
+      },
+      {
+        onSuccess: () => {
+          setIsBidModalOpen(false);
+          toast.success(
+            existingOffer ? "Bid increased successfully!" : "Bid placed successfully!"
+          );
+        },
+      }
+    );
   };
 
   // Extract images or use fallback
@@ -379,21 +505,57 @@ export default function BuyerListingDetailPage() {
                 {/* Action Buttons */}
                 <AnimationWrapper type="fade-left" duration={0.5} delay={0.2}>
                   {isFixedPrice && (
-                    <button
-                      onClick={() => toast.info("Send offer feature initiated")}
-                      className="w-full py-4 bg-primary hover:bg-primary/90 text-white text-sm font-bold rounded-xl transition-all shadow-[0_6px_24px_rgba(231,143,35,0.35)] hover:shadow-[0_8px_30px_rgba(231,143,35,0.5)] active:scale-[0.98] capitalize tracking-wide cursor-pointer"
-                    >
-                      Send Offer
-                    </button>
+                    <>
+                      {isUserOffersLoading ? (
+                        <div className="w-full h-13 bg-[#1C1C1E] border border-[#2C2C2E] rounded-xl animate-pulse" />
+                      ) : existingOffer &&
+                        ["PENDING", "COUNTERED", "ACCEPTED"].includes(
+                          (existingOffer.status || "").toUpperCase()
+                        ) ? (
+                        <button
+                          onClick={() => setIsViewOfferModalOpen(true)}
+                          className="w-full py-4 bg-[#E78F23]/15 border border-[#E78F23]/40 text-primary hover:bg-[#E78F23]/25 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-[0.98]"
+                        >
+                          <Clock className="w-4.5 h-4.5 text-primary" />
+                          Offer Sent (${Number(existingOffer.currentAmount || existingOffer.initialAmount).toLocaleString()})
+                        </button>
+                      ) : (
+                        <button
+                          onClick={handleOpenSendOfferModal}
+                          className="w-full py-4 bg-primary hover:bg-primary/90 text-white text-sm font-bold rounded-xl transition-all shadow-[0_6px_24px_rgba(231,143,35,0.35)] hover:shadow-[0_8px_30px_rgba(231,143,35,0.5)] active:scale-[0.98] capitalize tracking-wide cursor-pointer flex items-center justify-center gap-2"
+                        >
+                          <Send className="w-4 h-4" />
+                          Send Offer
+                        </button>
+                      )}
+                    </>
                   )}
 
                   {isAuction && (
-                    <button
-                      onClick={() => setIsBiddingMode(true)}
-                      className="w-full py-4 bg-primary hover:bg-primary/90 text-white text-sm font-bold rounded-xl transition-all shadow-[0_6px_24px_rgba(231,143,35,0.35)] hover:shadow-[0_8px_30px_rgba(231,143,35,0.5)] active:scale-[0.98] capitalize tracking-wide cursor-pointer"
-                    >
-                      Place Bid
-                    </button>
+                    <>
+                      {isUserOffersLoading ? (
+                        <div className="w-full h-13 bg-[#1C1C1E] border border-[#2C2C2E] rounded-xl animate-pulse" />
+                      ) : existingOffer &&
+                        ["PENDING", "LEADING", "OUTBID", "COUNTERED", "ACCEPTED"].includes(
+                          (existingOffer.status || "").toUpperCase()
+                        ) ? (
+                        <button
+                          onClick={handleOpenPlaceBidModal}
+                          className="w-full py-4 bg-[#E78F23]/15 border border-[#E78F23]/40 text-primary hover:bg-[#E78F23]/25 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-[0.98]"
+                        >
+                          <Gavel className="w-4.5 h-4.5 text-primary" />
+                          Increase Bid (${Number(existingOffer.currentAmount || existingOffer.initialAmount).toLocaleString()})
+                        </button>
+                      ) : (
+                        <button
+                          onClick={handleOpenPlaceBidModal}
+                          className="w-full py-4 bg-primary hover:bg-primary/90 text-white text-sm font-bold rounded-xl transition-all shadow-[0_6px_24px_rgba(231,143,35,0.35)] hover:shadow-[0_8px_30px_rgba(231,143,35,0.5)] active:scale-[0.98] capitalize tracking-wide cursor-pointer flex items-center justify-center gap-2"
+                        >
+                          <Gavel className="w-4 h-4" />
+                          Place Bid
+                        </button>
+                      )}
+                    </>
                   )}
 
                   {isPrivateSale && (
@@ -627,8 +789,15 @@ export default function BuyerListingDetailPage() {
                 {/* Bidding Actions */}
                 <AnimationWrapper type="fade-up" duration={0.5} delay={0.4}>
                   <div className="space-y-3 pt-2">
-                    <button className="w-full py-4.5 bg-primary hover:brightness-110 text-black text-sm font-bold rounded-xl transition-all shadow-[0_10px_30px_rgba(231,143,35,0.2)] active:scale-[0.98] cursor-pointer">
-                      Place Bid
+                    <button
+                      onClick={handleOpenPlaceBidModal}
+                      disabled={createOfferMutation.isPending}
+                      className="w-full py-4.5 bg-primary hover:brightness-110 text-white text-sm font-bold rounded-xl transition-all shadow-[0_10px_30px_rgba(231,143,35,0.2)] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+                    >
+                      <Gavel className="w-4.5 h-4.5" />
+                      {existingOffer
+                        ? `Increase Bid ($${Number(existingOffer.currentAmount || existingOffer.initialAmount).toLocaleString()})`
+                        : "Place Bid"}
                     </button>
                     <div className="grid grid-cols-2 gap-3">
                       <button
@@ -695,6 +864,473 @@ export default function BuyerListingDetailPage() {
             </Link>
           </div>
         </AnimationWrapper>
+      )}
+
+      {/* ── Send Offer Modal ── */}
+      {isOfferModalOpen && product && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !createOfferMutation.isPending) {
+              setIsOfferModalOpen(false);
+            }
+          }}
+        >
+          <div className="relative w-full max-w-lg bg-[#161618] border border-[#2C2C2E] rounded-2xl shadow-2xl overflow-hidden p-6 sm:p-7 space-y-6">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div>
+                <h3 className="text-xl font-clash font-bold text-white">
+                  Make an Offer
+                </h3>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  Submit your offer directly to the seller for review.
+                </p>
+              </div>
+              <button
+                onClick={() => setIsOfferModalOpen(false)}
+                disabled={createOfferMutation.isPending}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer disabled:opacity-50"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Item Summary Card */}
+            <div className="flex items-center gap-4 bg-[#1C1C1E] border border-white/5 p-3.5 rounded-xl">
+              <img
+                src={productImages[0]}
+                alt={product.title}
+                className="w-16 h-12 rounded-lg object-cover border border-white/10 shrink-0"
+              />
+              <div className="min-w-0 flex-1">
+                <h4 className="text-sm font-semibold text-white truncate">
+                  {product.title}
+                </h4>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  Asking Price:{" "}
+                  <span className="text-primary font-medium">{formattedPrice}</span>
+                </p>
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmitOffer} className="space-y-5">
+              {/* Offer Amount Input */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-gray-300">
+                    Your Offer Amount (USD) <span className="text-red-400">*</span>
+                  </label>
+                  {/* Quick preset percentage pills */}
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        numericPrice > 0 &&
+                        setOfferAmount(String(numericPrice))
+                      }
+                      className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-gray-300 transition-colors"
+                    >
+                      Asking
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        numericPrice > 0 &&
+                        setOfferAmount(String(Math.round(numericPrice * 0.95)))
+                      }
+                      className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-gray-300 transition-colors"
+                    >
+                      -5%
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        numericPrice > 0 &&
+                        setOfferAmount(String(Math.round(numericPrice * 0.9)))
+                      }
+                      className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-gray-300 transition-colors"
+                    >
+                      -10%
+                    </button>
+                  </div>
+                </div>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                    <DollarSign className="w-4 h-4 text-primary" />
+                  </div>
+                  <input
+                    type="number"
+                    min="1"
+                    step="any"
+                    required
+                    value={offerAmount}
+                    onChange={(e) => setOfferAmount(e.target.value)}
+                    placeholder="e.g. 900000"
+                    className="w-full pl-9 pr-4 py-3 bg-[#111111] border border-[#2C2C2E] focus:border-primary rounded-xl text-white font-medium text-base outline-none transition-colors"
+                  />
+                </div>
+              </div>
+
+              {/* Note / Terms Textarea */}
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">
+                  Note / Special Terms{" "}
+                  <span className="text-gray-500 font-normal lowercase">
+                    (optional)
+                  </span>
+                </label>
+                <textarea
+                  rows={3}
+                  value={offerNote}
+                  onChange={(e) => setOfferNote(e.target.value)}
+                  placeholder="Add any details about payment timeline, escrow verification, or delivery..."
+                  className="w-full px-4 py-3 bg-[#111111] border border-[#2C2C2E] focus:border-primary rounded-xl text-white text-sm outline-none transition-colors resize-none"
+                />
+              </div>
+
+              {/* Dynamic VIP Fee estimate summary */}
+              {Boolean(parseFloat(offerAmount)) && parseFloat(offerAmount) > 0 && (
+                <div className="bg-[#111111] border border-white/5 p-3.5 rounded-xl text-xs space-y-1.5">
+                  <div className="flex justify-between text-gray-400">
+                    <span>Offer Amount</span>
+                    <span className="text-white font-medium">
+                      ${parseFloat(offerAmount).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-gray-400">
+                    <span>Estimated VIP Fee (1.5%)</span>
+                    <span className="text-white font-medium">
+                      ${Math.round(parseFloat(offerAmount) * 0.015).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="pt-1.5 border-t border-white/5 flex justify-between font-semibold">
+                    <span className="text-gray-300">Total Commitment</span>
+                    <span className="text-primary">
+                      ${Math.round(parseFloat(offerAmount) * 1.015).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Footer Actions */}
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsOfferModalOpen(false)}
+                  disabled={createOfferMutation.isPending}
+                  className="px-5 py-3 text-xs font-semibold text-gray-400 hover:text-white transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={createOfferMutation.isPending}
+                  className="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-bold text-xs rounded-xl transition-all shadow-[0_4px_16px_rgba(231,143,35,0.3)] flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  {createOfferMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Sending Offer...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" />
+                      Submit Offer
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── View Sent Offer Modal ── */}
+      {isViewOfferModalOpen && existingOffer && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setIsViewOfferModalOpen(false);
+            }
+          }}
+        >
+          <div className="relative w-full max-w-md bg-[#161618] border border-[#2C2C2E] rounded-2xl shadow-2xl overflow-hidden p-6 space-y-6">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div>
+                <h3 className="text-xl font-clash font-bold text-white">
+                  Your Submitted Offer
+                </h3>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  Details of your offer for this listing
+                </p>
+              </div>
+              <button
+                onClick={() => setIsViewOfferModalOpen(false)}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Details Card */}
+            <div className="bg-[#111111] border border-[#2C2C2E] rounded-xl p-4 space-y-3.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-400">Offer Status</span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#E78F23]/10 text-primary border border-[#E78F23]/20">
+                  <Clock className="w-3.5 h-3.5" />
+                  {existingOffer.status || "PENDING"}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                <span className="text-xs text-gray-400">Offered Amount</span>
+                <span className="text-lg font-clash font-bold text-white">
+                  ${Number(existingOffer.currentAmount || existingOffer.initialAmount).toLocaleString()}
+                </span>
+              </div>
+
+              {existingOffer.histories?.[0]?.note && (
+                <div className="pt-2 border-t border-white/5">
+                  <span className="text-xs text-gray-400 block mb-1">
+                    Buyer Note
+                  </span>
+                  <p className="text-xs text-gray-300 bg-[#161618] p-2.5 rounded-lg border border-white/5 italic">
+                    &quot;{existingOffer.histories[0].note}&quot;
+                  </p>
+                </div>
+              )}
+
+              {existingOffer.createdAt && (
+                <div className="flex items-center justify-between pt-2 border-t border-white/5 text-[11px] text-gray-500">
+                  <span>Submitted On</span>
+                  <span>
+                    {new Date(existingOffer.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center justify-between gap-3 pt-2">
+              <button
+                onClick={() => setIsViewOfferModalOpen(false)}
+                className="px-4 py-2.5 text-xs font-semibold text-gray-400 hover:text-white transition-colors cursor-pointer"
+              >
+                Close
+              </button>
+              <Link
+                href="/buyer/mybids"
+                className="px-5 py-2.5 bg-primary hover:bg-primary/90 text-white font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 shadow-lg"
+              >
+                View in My Bids
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Place / Increase Bid Modal ── */}
+      {isBidModalOpen && product && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !createOfferMutation.isPending) {
+              setIsBidModalOpen(false);
+            }
+          }}
+        >
+          <div className="relative w-full max-w-lg bg-[#161618] border border-[#2C2C2E] rounded-2xl shadow-2xl overflow-hidden p-6 sm:p-7 space-y-6">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div>
+                <h3 className="text-xl font-clash font-bold text-white flex items-center gap-2">
+                  <Gavel className="w-5 h-5 text-primary" />
+                  {existingOffer ? "Increase Your Bid" : "Place a Bid"}
+                </h3>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  {existingOffer
+                    ? "Submit a higher bid for this auction listing."
+                    : "Enter your bid amount to join the auction."}
+                </p>
+              </div>
+              <button
+                onClick={() => setIsBidModalOpen(false)}
+                disabled={createOfferMutation.isPending}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer disabled:opacity-50"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Item & Current Bid Summary Card */}
+            <div className="flex items-center gap-4 bg-[#1C1C1E] border border-white/5 p-3.5 rounded-xl">
+              <img
+                src={productImages[0]}
+                alt={product.title}
+                className="w-16 h-12 rounded-lg object-cover border border-white/10 shrink-0"
+              />
+              <div className="min-w-0 flex-1">
+                <h4 className="text-sm font-semibold text-white truncate">
+                  {product.title}
+                </h4>
+                <div className="flex items-center gap-3 mt-1 text-xs">
+                  <span className="text-gray-400">
+                    {existingOffer ? "Your Current Bid:" : "Starting / Current Ask:"}
+                  </span>
+                  <span className="text-primary font-bold">
+                    {existingOffer
+                      ? `$${Number(existingOffer.currentAmount || existingOffer.initialAmount).toLocaleString()}`
+                      : formattedPrice}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmitBid} className="space-y-5">
+              {/* Bid Amount Input */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-gray-300">
+                    {existingOffer ? "New Higher Bid Amount (USD)" : "Your Bid Amount (USD)"}{" "}
+                    <span className="text-red-400">*</span>
+                  </label>
+
+                  {/* Increment Pills */}
+                  {existingOffer && (
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const base = Number(
+                            existingOffer.currentAmount || existingOffer.initialAmount
+                          );
+                          setBidAmount(String(Math.round(base * 1.05)));
+                        }}
+                        className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-gray-300 transition-colors"
+                      >
+                        +5%
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const base = Number(
+                            existingOffer.currentAmount || existingOffer.initialAmount
+                          );
+                          setBidAmount(String(Math.round(base * 1.1)));
+                        }}
+                        className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-gray-300 transition-colors"
+                      >
+                        +10%
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const base = Number(
+                            existingOffer.currentAmount || existingOffer.initialAmount
+                          );
+                          setBidAmount(String(Math.round(base * 1.15)));
+                        }}
+                        className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-gray-300 transition-colors"
+                      >
+                        +15%
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                    <DollarSign className="w-4 h-4 text-primary" />
+                  </div>
+                  <input
+                    type="number"
+                    min="1"
+                    step="any"
+                    required
+                    value={bidAmount}
+                    onChange={(e) => setBidAmount(e.target.value)}
+                    placeholder="e.g. 950000"
+                    className="w-full pl-9 pr-4 py-3 bg-[#111111] border border-[#2C2C2E] focus:border-primary rounded-xl text-white font-medium text-base outline-none transition-colors"
+                  />
+                </div>
+              </div>
+
+              {/* Note / Verification Textarea */}
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">
+                  Bidder Note / Terms{" "}
+                  <span className="text-gray-500 font-normal lowercase">
+                    (optional)
+                  </span>
+                </label>
+                <textarea
+                  rows={3}
+                  value={bidNote}
+                  onChange={(e) => setBidNote(e.target.value)}
+                  placeholder="Escrow verified bidder ready to proceed..."
+                  className="w-full px-4 py-3 bg-[#111111] border border-[#2C2C2E] focus:border-primary rounded-xl text-white text-sm outline-none transition-colors resize-none"
+                />
+              </div>
+
+              {/* Dynamic Fee & Total Payable Summary */}
+              {Boolean(parseFloat(bidAmount)) && parseFloat(bidAmount) > 0 && (
+                <div className="bg-[#111111] border border-white/5 p-3.5 rounded-xl text-xs space-y-1.5">
+                  <div className="flex justify-between text-gray-400">
+                    <span>Bid Amount</span>
+                    <span className="text-white font-medium">
+                      ${parseFloat(bidAmount).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-gray-400">
+                    <span>VIP Fee (1.5%)</span>
+                    <span className="text-white font-medium">
+                      ${Math.round(parseFloat(bidAmount) * 0.015).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="pt-1.5 border-t border-white/5 flex justify-between font-semibold">
+                    <span className="text-gray-300">Total Payable</span>
+                    <span className="text-primary font-bold">
+                      ${Math.round(parseFloat(bidAmount) * 1.015).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Footer Actions */}
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsBidModalOpen(false)}
+                  disabled={createOfferMutation.isPending}
+                  className="px-5 py-3 text-xs font-semibold text-gray-400 hover:text-white transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={createOfferMutation.isPending}
+                  className="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-bold text-xs rounded-xl transition-all shadow-[0_4px_16px_rgba(231,143,35,0.3)] flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  {createOfferMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Submitting Bid...
+                    </>
+                  ) : (
+                    <>
+                      <Gavel className="w-4 h-4" />
+                      {existingOffer ? "Increase Bid" : "Place Bid"}
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );

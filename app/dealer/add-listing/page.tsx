@@ -22,7 +22,10 @@ import { useGetCategoriesQuery } from "@/hooks/useCategories";
 import { useGetBrandsQuery } from "@/hooks/useBrands";
 import { useUploadMediaMutation } from "@/hooks/useMedia";
 import { useCreateListingMutation } from "@/hooks/useListings";
+import { useCreateCheckoutSessionMutation } from "@/hooks/usePayments";
 import { toast } from "sonner";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const steps = ["Basic Info", "Specifications", "Media", "Pricing", "Review"];
 
@@ -57,6 +60,7 @@ export default function AddListing() {
   const { data: brandsResponse, isLoading: isLoadingBrands } = useGetBrandsQuery({ limit: 100 });
   const uploadMediaMutation = useUploadMediaMutation();
   const createListingMutation = useCreateListingMutation();
+  const createCheckoutMutation = useCreateCheckoutSessionMutation();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -312,12 +316,66 @@ export default function AddListing() {
     };
 
     try {
-      await createListingMutation.mutateAsync(payload);
-      toast.success("Listing created successfully!");
+      const createdListing = await createListingMutation.mutateAsync(payload);
+      const createdListingId =
+        (createdListing as any)?.id ||
+        (createdListing as any)?.data?.id ||
+        (createdListing as any)?.data?.data?.id ||
+        (createdListing as any)?.listing?.id;
+
+      if (selectedPlan === "featured") {
+        if (!createdListingId) {
+          toast.error("Listing created, but listing ID was not returned for checkout.");
+          router.push("/dealer/listing");
+          return;
+        }
+
+        const origin =
+          typeof window !== "undefined"
+            ? window.location.origin
+            : "https://tprice-frontend.vercel.app";
+
+        try {
+          const checkoutRes = await createCheckoutMutation.mutateAsync({
+            type: "FEATURED_LISTING",
+            targetId: String(createdListingId),
+            successUrl: `${origin}/payment/success`,
+            cancelUrl: `${origin}/payment/cancel`,
+          });
+
+          const checkoutUrl =
+            checkoutRes?.checkoutUrl ||
+            (checkoutRes as any)?.data?.checkoutUrl ||
+            (checkoutRes as any)?.url;
+
+          if (checkoutUrl) {
+            toast.success(
+              "Listing created! Redirecting to Stripe checkout for VIP Featured promotion..."
+            );
+            window.location.assign(checkoutUrl);
+            return;
+          } else {
+            console.error("No checkoutUrl in response:", checkoutRes);
+            toast.error("Checkout session created, but no checkout URL was returned.");
+          }
+        } catch (paymentErr: any) {
+          console.error("Checkout session error:", paymentErr);
+          const payMsg =
+            paymentErr?.response?.data?.message ||
+            paymentErr?.message ||
+            "Failed to initiate checkout session.";
+          toast.error(`Listing created, but payment error: ${payMsg}`);
+        }
+      } else {
+        toast.success("Listing created successfully!");
+      }
+
       router.push("/dealer/listing");
     } catch (err: any) {
       const errMsg =
-        err?.response?.data?.message || err?.message || "Failed to create listing. Please check required fields.";
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to create listing. Please check required fields.";
       toast.error(errMsg);
     }
   };
@@ -686,12 +744,25 @@ export default function AddListing() {
                     </div>
                   </div>
                   <div className="space-y-2.5">
-                    <label className="text-[14px] font-medium text-gray-300">Auction End Date</label>
-                    <input
-                      type="datetime-local"
-                      value={auctionEndsAt.slice(0, 16)}
-                      onChange={(e) => setAuctionEndsAt(new Date(e.target.value).toISOString())}
-                      className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white focus:outline-none focus:border-primary2/50 transition-colors shadow-inner"
+                    <label className="text-[14px] font-medium text-gray-300">Auction End Date & Time</label>
+                    <DatePicker
+                      selected={auctionEndsAt ? new Date(auctionEndsAt) : null}
+                      onChange={(date: Date | null) => {
+                        if (date) {
+                          setAuctionEndsAt(date.toISOString());
+                        } else {
+                          setAuctionEndsAt("");
+                        }
+                      }}
+                      showTimeSelect
+                      timeFormat="HH:mm"
+                      timeIntervals={15}
+                      timeCaption="Time"
+                      dateFormat="MMMM d, yyyy h:mm aa"
+                      placeholderText="Select date and time"
+                      minDate={new Date()}
+                      className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white focus:outline-none focus:border-primary2/50 transition-colors shadow-inner cursor-pointer"
+                      wrapperClassName="w-full"
                     />
                   </div>
                 </div>
@@ -901,13 +972,20 @@ export default function AddListing() {
             <button
               type="button"
               onClick={handleNext}
-              disabled={createListingMutation.isPending || uploadMediaMutation.isPending}
+              disabled={
+                createListingMutation.isPending ||
+                createCheckoutMutation.isPending ||
+                uploadMediaMutation.isPending
+              }
               className="flex items-center gap-2 px-8 py-3 bg-primary2 text-[#111113] rounded-xl text-sm font-bold hover:bg-primary transition-all duration-300 shadow-lg shadow-primary2/10 group cursor-pointer ml-auto disabled:opacity-50"
             >
-              {createListingMutation.isPending ? (
+              {createListingMutation.isPending ||
+              createCheckoutMutation.isPending ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin text-[#111113]" />
-                  Submitting...
+                  {selectedPlan === "featured"
+                    ? "Processing & Redirecting..."
+                    : "Submitting..."}
                 </>
               ) : (
                 <>
