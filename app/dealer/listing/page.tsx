@@ -13,11 +13,17 @@ import {
   ChevronRight,
   PackageOpen,
   RefreshCw,
+  Trash2,
+  Edit3,
+  Loader2,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useMyListingsQuery } from "@/hooks/useListings";
+import { useMyListingsQuery, useDeleteListingMutation } from "@/hooks/useListings";
 import { useDebounce } from "@/hooks/useDebounce";
+import { ListingItem } from "@/lib/api/listings";
+import DeleteListingModal from "./DeleteListingModal";
+import UpdateListingModal from "./UpdateListingModal";
 
 const formatTimeAgo = (dateString?: string) => {
   if (!dateString) return "N/A";
@@ -99,6 +105,9 @@ export default function ListingPage() {
   const [limit] = useState(8);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterTab, setFilterTab] = useState<"ALL" | "ACTIVE_DEALS" | "NO_ACTIVITY">("ALL");
+  const [editingListing, setEditingListing] = useState<ListingItem | null>(null);
+  const [deletingListing, setDeletingListing] = useState<ListingItem | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const debouncedSearch = useDebounce(searchQuery, 400);
 
@@ -108,6 +117,8 @@ export default function ListingPage() {
     search: debouncedSearch,
     sortBy: "NEWEST",
   });
+
+  const deleteListingMutation = useDeleteListingMutation();
 
   const rawListings = data?.data || [];
   const meta = data?.meta || {
@@ -127,6 +138,20 @@ export default function ListingPage() {
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= meta.totalPages) {
       setPage(newPage);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingListing) return;
+    const targetId = deletingListing.id;
+    setDeletingId(targetId);
+    try {
+      await deleteListingMutation.mutateAsync(targetId);
+      setDeletingListing(null);
+    } catch {
+      // Error handled by mutation hook toast notification
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -235,14 +260,18 @@ export default function ListingPage() {
                 const location =
                   [item.locationCity, item.locationCountry].filter(Boolean).join(", ") ||
                   "Monaco";
+                const isItemDeleting =
+                  deleteListingMutation.isPending && deletingId === item.id;
 
                 return (
                   <div
                     key={item.id}
-                    className="bg-[#1C1C1C] rounded-xl overflow-hidden border border-[#2A2A2A] hover:border-[#444] transition-colors flex flex-col group"
+                    className={`bg-[#1C1C1C] rounded-xl overflow-hidden border border-[#2A2A2A] hover:border-[#444] transition-all flex flex-col group relative ${
+                      isItemDeleting ? "opacity-50 pointer-events-none scale-[0.98]" : ""
+                    }`}
                   >
                     {/* Image Section */}
-                    <div className="relative aspect-16/11 w-full bg-[#111] overflow-hidden">
+                    <Link href={`/dealer/deals/${item.id}`} className="relative aspect-16/11 w-full bg-[#111] overflow-hidden block">
                       <Image
                         src={imageUrl}
                         alt={item.title}
@@ -262,7 +291,7 @@ export default function ListingPage() {
                         )}
                       </div>
 
-                      <div className="absolute top-3 right-3 z-10">
+                      <div className="absolute top-3 right-3 z-10 flex items-center gap-2">
                         <div className="relative flex items-center justify-center">
                           {item.isFeatured && (
                             <div className="absolute opacity-80 scale-[1.7] z-0">
@@ -275,13 +304,15 @@ export default function ListingPage() {
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </Link>
 
                     {/* Details Section */}
                     <div className="p-4 flex flex-col flex-1 gap-4">
-                      <h3 className="font-medium text-[16px] text-zinc-100 line-clamp-1">
-                        {item.title}
-                      </h3>
+                      <Link href={`/dealer/deals/${item.id}`}>
+                        <h3 className="font-medium text-[16px] text-zinc-100 line-clamp-1 hover:text-[#EAB308] transition-colors cursor-pointer">
+                          {item.title}
+                        </h3>
+                      </Link>
 
                       <div className="flex items-center justify-between text-[13px]">
                         <div className="flex items-center gap-1.5">
@@ -310,13 +341,36 @@ export default function ListingPage() {
                         </div>
                       </div>
 
-                      <Link
-                        href={`/dealer/my-offer`}
-                        className="w-full mt-2 border border-[#333] hover:border-[#EAB308] hover:bg-[#EAB308]/10 text-zinc-300 hover:text-white transition-all py-2.25 rounded-lg flex items-center justify-center gap-2 text-sm font-medium cursor-pointer"
-                      >
-                        <span>{activeDeals > 0 ? "Manage Deals" : "View Details"}</span>
-                        <ArrowRight className="w-4 h-4" />
-                      </Link>
+                      <div className="flex items-center gap-2 mt-2">
+                        <Link
+                          href={`/dealer/deals/${item.id}`}
+                          className="flex-1 border border-[#333] hover:border-[#EAB308] hover:bg-[#EAB308]/10 text-zinc-300 hover:text-white transition-all py-2.25 rounded-lg flex items-center justify-center gap-2 text-sm font-medium cursor-pointer"
+                        >
+                          <span>{activeDeals > 0 ? "Manage Deals" : "View Details"}</span>
+                          <ArrowRight className="w-4 h-4" />
+                        </Link>
+
+                        <button
+                          onClick={() => setEditingListing(item)}
+                          className="p-2.5 bg-[#EAB308]/10 hover:bg-[#EAB308] text-[#EAB308] hover:text-black border border-[#EAB308]/30 rounded-lg transition-all cursor-pointer flex items-center justify-center hover:scale-105 shrink-0"
+                          title="Edit listing"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+
+                        <button
+                          onClick={() => setDeletingListing(item)}
+                          disabled={isItemDeleting}
+                          className="p-2.5 bg-rose-500/10 hover:bg-rose-600 text-rose-500 hover:text-white border border-rose-500/30 rounded-lg transition-all cursor-pointer flex items-center justify-center disabled:opacity-50 hover:scale-105 shrink-0"
+                          title="Delete listing"
+                        >
+                          {isItemDeleting ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 );
@@ -380,6 +434,22 @@ export default function ListingPage() {
           )}
         </div>
       </div>
+
+      {/* Edit Listing Modal */}
+      <UpdateListingModal
+        isOpen={Boolean(editingListing)}
+        onClose={() => setEditingListing(null)}
+        listing={editingListing}
+      />
+
+      {/* Delete Listing Confirmation Modal */}
+      <DeleteListingModal
+        isOpen={Boolean(deletingListing)}
+        onClose={() => setDeletingListing(null)}
+        onConfirm={handleConfirmDelete}
+        listing={deletingListing}
+        isDeleting={deleteListingMutation.isPending}
+      />
     </AnimationWrapper>
   );
 }

@@ -2,8 +2,11 @@ import apiClient from "./axios";
 
 export interface CreateCheckoutSessionPayload {
   type: string;
+  targetId?: string;
+  listingId?: string;
   successUrl: string;
   cancelUrl: string;
+  [key: string]: any;
 }
 
 export interface TransactionMetadata {

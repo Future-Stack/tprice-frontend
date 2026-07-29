@@ -15,6 +15,10 @@ import {
   AlertCircle,
   RefreshCw,
   Check,
+  DollarSign,
+  Loader2,
+  X,
+  Gavel,
 } from "lucide-react";
 
 import AnimationWrapper from "@/app/components/AnimationWrapper";
@@ -23,6 +27,7 @@ import {
   useSaveListingMutation,
   useSavedListingsQuery,
 } from "@/hooks/useListings";
+import { useOffersQuery, useCreateOfferMutation } from "@/hooks/useOffers";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 import { ListingItem } from "@/lib/api/listings";
 import Image from "next/image";
@@ -124,7 +129,6 @@ const getSpecItems = (listing: ListingItem) => {
     });
   }
 
-  // Include any other key specs not explicitly formatted above
   const knownKeys = new Set([
     "buildYear",
     "year",
@@ -185,6 +189,11 @@ export default function VIPDetailsPage() {
   const [isBiddingMode, setIsBiddingMode] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  // Offer Modal State
+  const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
+  const [offerAmount, setOfferAmount] = useState("");
+  const [offerNote, setOfferNote] = useState("");
+
   const saveMutation = useSaveListingMutation();
   const token =
     Cookies.get("access_token") || useAuthStore((state) => state.token);
@@ -193,6 +202,19 @@ export default function VIPDetailsPage() {
     { page: 1, limit: 100 },
     { enabled: Boolean(token) },
   );
+
+  const { data: offersResponse } = useOffersQuery(
+    { page: 1, limit: 100 },
+    { enabled: Boolean(token) }
+  );
+
+  const existingOffer = offersResponse?.data?.find(
+    (off) =>
+      String(off.listingId) === String(product?.id) ||
+      String(off.listing?.id) === String(product?.id)
+  );
+
+  const createOfferMutation = useCreateOfferMutation();
 
   const isSavedInListings =
     savedResponse?.data?.some((savedItem) => savedItem.id === product?.id) ??
@@ -220,6 +242,50 @@ export default function VIPDetailsPage() {
       toast.success("Listing URL copied to clipboard!");
       setTimeout(() => setCopied(false), 2500);
     }
+  };
+
+  const handleOpenOfferModal = () => {
+    if (!token) {
+      toast.error("Please sign in to submit an offer.");
+      return;
+    }
+    if (existingOffer) {
+      setOfferAmount(
+        String(existingOffer.currentAmount || existingOffer.initialAmount || "")
+      );
+      setOfferNote((existingOffer as any).note || "");
+    } else {
+      const numericPrice = product?.askingPrice ? Number(product.askingPrice) : 0;
+      setOfferAmount(numericPrice > 0 ? String(numericPrice) : "");
+      setOfferNote("");
+    }
+    setIsOfferModalOpen(true);
+  };
+
+  const handleSubmitOffer = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!product?.id) return;
+    const numericAmount = parseFloat(offerAmount);
+    if (isNaN(numericAmount) || numericAmount <= 0) {
+      toast.error("Please enter a valid offer amount.");
+      return;
+    }
+
+    createOfferMutation.mutate(
+      {
+        listingId: product.id,
+        amount: numericAmount,
+        note: offerNote.trim() || undefined,
+      },
+      {
+        onSuccess: () => {
+          setIsOfferModalOpen(false);
+          toast.success(
+            existingOffer ? "Offer updated successfully!" : "Offer submitted successfully!"
+          );
+        },
+      }
+    );
   };
 
   if (isLoading) {
@@ -250,11 +316,11 @@ export default function VIPDetailsPage() {
                 className="px-5 py-2.5 bg-white/10 hover:bg-white/15 text-white text-sm font-semibold rounded-xl transition-all border border-white/10 inline-flex items-center gap-2"
               >
                 <RefreshCw className="w-4 h-4" />
-                Try Again
+                Retry
               </button>
               <Link
                 href={backLink}
-                className="px-5 py-2.5 bg-[#E78F23] hover:bg-[#E78F23]/90 text-white text-sm font-semibold rounded-xl transition-all shadow-[0_4px_16px_rgba(231,143,35,0.3)]"
+                className="px-5 py-2.5 bg-primary hover:bg-primary/90 text-white text-sm font-semibold rounded-xl transition-all shadow-[0_4px_16px_rgba(231,143,35,0.3)]"
               >
                 Back to VIP Deals
               </Link>
@@ -265,234 +331,238 @@ export default function VIPDetailsPage() {
     );
   }
 
-  // Extract images from API media array or fallback
+  // Media setup
   const productImages =
     product.media && product.media.length > 0
       ? product.media
-          .slice()
-          .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
+          .sort((a, b) => a.displayOrder - b.displayOrder)
           .map((m) => m.url)
       : [
-          "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1200&q=80",
+          "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&q=80&w=1200",
+          "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=800",
+          "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=800",
         ];
 
-  const activeImageSrc = productImages[selectedImage] || productImages[0];
+  const safeSelectedImage =
+    selectedImage < productImages.length ? selectedImage : 0;
+
+  // Price calculations
+  const rawPrice = product.askingPrice ? Number(product.askingPrice) : 0;
+  const formattedPrice = formatPrice(product.askingPrice, product.currency);
+  const vipFeeNumber = rawPrice * 0.015;
+  const formattedVipFee =
+    rawPrice > 0
+      ? `$${Math.round(vipFeeNumber).toLocaleString("en-US")}`
+      : "Calculated at offer";
+
+  const totalPayableNumber = rawPrice + vipFeeNumber;
+  const formattedTotalPayable =
+    rawPrice > 0
+      ? `$${Math.round(totalPayableNumber).toLocaleString("en-US")}`
+      : "Price on Request";
 
   // Location string
+  const locationParts = [product.locationCity, product.locationCountry].filter(
+    Boolean,
+  );
   const locationText =
-    [product.locationCity, product.locationCountry]
-      .filter(Boolean)
-      .join(", ") || "Location on Request";
+    locationParts.length > 0 ? locationParts.join(", ") : "Worldwide VIP";
 
-  // Badge label
-  const badgeLabel = product.isOffMarket
-    ? "OFF MARKET VIP"
-    : product.saleType === "AUCTION"
-      ? "AUCTION"
-      : product.category || "VIP ASSET";
+  const specItems = getSpecItems(product);
+  const badgeLabel = (product as any).badgeText || product.saleType || "VIP ASSET";
 
-  // Price formatting
-  const rawPriceNum = parseFloat(
-    product.askingPrice || product.startingBid || "0",
-  );
-  const formattedPrice = formatPrice(
-    product.askingPrice || product.startingBid,
-    product.currency,
-  );
-  const currentBidLabel =
-    product.saleType === "AUCTION" ? "CURRENT BID" : "ASKING PRICE";
-
-  // Seller mapping
+  // Seller details
   const sellerName = product.owner
     ? `${product.owner.firstName || ""} ${product.owner.lastName || ""}`.trim() ||
-      "Verified Dealer"
-    : "Monaco Exotics";
-  const sellerBadge = product.owner?.isVerified
-    ? "Verified Premium Dealer"
-    : product.owner?.role || "Dealer";
-  const sellerInitial =
-    product.owner?.firstName?.[0]?.toUpperCase() ||
-    product.owner?.lastName?.[0]?.toUpperCase() ||
-    "D";
-
-  // Key Specifications
-  const specItems = getSpecItems(product);
-
-  // Overview description
-  const overviewText =
-    product.description ||
-    `${product.title} represents an exceptional ${product.category}${
-      product.subCategory ? ` (${product.subCategory})` : ""
-    } available for acquisition. Meticulously maintained with complete documentation and providence available upon request for verified buyers.`;
-
-  // Bidding fee calculations
-  const vipFee = rawPriceNum * 0.015;
-  const totalPayableNum = inclFees ? rawPriceNum + vipFee : rawPriceNum;
-  const formattedVipFee = formatPrice(vipFee, product.currency);
-  const formattedTotalPayable = formatPrice(totalPayableNum, product.currency);
+      "TPrice Concierge"
+    : "TPrice Concierge";
+  const sellerInitial = sellerName.charAt(0).toUpperCase();
+  const sellerBadge = "Verified VIP Seller";
 
   return (
     <div className="mx-auto relative z-0">
-      {/* ── Page Header ── */}
-      <div className="flex items-start justify-between mb-10">
-        <AnimationWrapper type="fade-down" duration={0.5}>
-          <div>
-            <h2 className="text-[40px] font-clash font-semibold">
-              Exclusive Collection
-            </h2>
-            <p className="text-white text-[20px] mt-1 font-medium">
-              Discover the world&apos;s finest assets available for acquisition.
-            </p>
-          </div>
-        </AnimationWrapper>
-      </div>
-
-      {/* ── Back link ── */}
-      <AnimationWrapper type="fade-right" duration={0.4} delay={0.15}>
-        <Link
-          href={backLink}
-          className="inline-flex items-center gap-2 text-gray-400 hover:text-[#E78F23] text-sm font-medium mb-6 transition-colors group"
-        >
-          <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-          Back to VIP Deals
-        </Link>
+      {/* Top Navigation */}
+      <AnimationWrapper type="fade-down" duration={0.4}>
+        <div className="mb-6">
+          <Link
+            href={backLink}
+            className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors group font-medium"
+          >
+            <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+            <span>Back to VIP Deals</span>
+          </Link>
+        </div>
       </AnimationWrapper>
 
-      {/* ── Product Layout: Image + Details ── */}
+      {/* Main Layout Grid */}
       <div className="flex flex-col lg:flex-row gap-8">
-        {/* Left — Gallery */}
+        {/* Left Column: Gallery & Description */}
         <div className="flex-1 min-w-0">
-          {/* Main Image */}
-          <AnimationWrapper type="zoom" duration={0.6} delay={0.1}>
-            <div className="relative rounded-2xl overflow-hidden bg-black w-full max-h-102.25 group">
-              <img
-                src={activeImageSrc}
-                alt={product.title}
-                className="w-full h-102.25 object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]"
-              />
-              {/* Floating actions */}
-              <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <AnimationWrapper type="fade-right" duration={0.5}>
+            <div className="space-y-4">
+              {/* Main Preview Image */}
+              <div className="relative w-full h-102.25 rounded-2xl overflow-hidden bg-[#161618] border border-white/5 shadow-2xl">
+                <Image
+                  src={productImages[safeSelectedImage]}
+                  alt={product.title}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 60vw"
+                  className="object-cover"
+                  priority
+                />
+                <div className="absolute top-4 left-4 z-10 flex gap-2">
+                  <span className="bg-[#E78F23] text-white text-[11px] font-bold px-3 py-1.5 rounded-lg uppercase tracking-wider shadow-lg">
+                    {badgeLabel}
+                  </span>
+                  {product.category && (
+                    <span className="bg-black/60 backdrop-blur-md text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg uppercase tracking-wider border border-white/10">
+                      {product.category}
+                    </span>
+                  )}
+                </div>
+
                 <button
                   onClick={handleToggleSave}
-                  className={`w-10 h-10 bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center transition-colors border border-white/10 ${
-                    isSaved
-                      ? "text-red-500"
-                      : "text-white/80 hover:text-red-400"
-                  }`}
-                  title={isSaved ? "Remove from Saved" : "Save Listing"}
+                  disabled={saveMutation.isPending}
+                  className="absolute top-4 right-4 z-10 w-10 h-10 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white hover:scale-105 active:scale-95 transition-all cursor-pointer"
                 >
                   <Heart
-                    className="w-4.5 h-4.5"
-                    fill={isSaved ? "currentColor" : "none"}
+                    className="w-5 h-5 text-primary"
+                    fill={isSaved ? "#E78F23" : "none"}
                   />
                 </button>
-                <button
-                  onClick={handleShare}
-                  className="w-10 h-10 bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center text-white/80 hover:text-[#E78F23] transition-colors border border-white/10"
-                  title="Share Listing"
-                >
-                  {copied ? (
-                    <Check className="w-4.5 h-4.5 text-green-400" />
-                  ) : (
-                    <Share2 className="w-4.5 h-4.5" />
-                  )}
-                </button>
               </div>
-              {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-linear-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
+
+              {/* Thumbnail Gallery */}
+              {productImages.length > 1 && (
+                <div className="flex flex-wrap gap-3">
+                  {productImages.map((img, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setSelectedImage(idx)}
+                      className={`relative w-25 h-18 rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${
+                        safeSelectedImage === idx
+                          ? "border-primary scale-[1.02] shadow-lg shadow-[#E78F23]/20"
+                          : "border-transparent opacity-60 hover:opacity-100"
+                      }`}
+                    >
+                      <Image
+                        src={img}
+                        alt={`${product.title} view ${idx + 1}`}
+                        fill
+                        sizes="100px"
+                        className="object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </AnimationWrapper>
 
-          {/* Thumbnails */}
-          {productImages.length > 1 && (
-            <div className="flex flex-wrap gap-3 mt-4">
-              {productImages.map((img, idx) => (
-                <AnimationWrapper
-                  key={idx}
-                  type="fade-up"
-                  duration={0.4}
-                  delay={0.15 + idx * 0.05}
-                >
-                  <button
-                    onClick={() => setSelectedImage(idx)}
-                    className={`relative w-25 h-18 rounded-xl overflow-hidden border-2 transition-all duration-200 shrink-0 ${
-                      selectedImage === idx
-                        ? "border-[#E78F23] shadow-[0_0_12px_rgba(231,143,35,0.3)]"
-                        : "border-[#2C2C2E] hover:border-[#E78F23]/40 opacity-60 hover:opacity-100"
-                    }`}
-                  >
-                    <img
-                      src={img}
-                      alt={`${product.title} ${idx + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                </AnimationWrapper>
-              ))}
-            </div>
-          )}
-
-          {/* Overview Section */}
+          {/* Description Section */}
           <AnimationWrapper type="fade-up" duration={0.5} delay={0.2}>
-            <div className="mt-10">
-              <h3 className="text-xl font-clash font-bold mb-4">Overview</h3>
-              <p className="text-gray-400 text-sm leading-relaxed max-w-2xl whitespace-pre-line">
-                {overviewText}
+            <div className="mt-10 space-y-4 bg-[#161618] border border-[#2C2C2E] rounded-2xl p-7">
+              <h3 className="text-xl font-clash font-semibold text-white">
+                Asset Overview
+              </h3>
+              <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-line font-normal">
+                {product.description ||
+                  "This off-market VIP asset is available exclusively to verified members. Complete privacy, escrow protection, and direct access to concierge negotiation are included."}
               </p>
             </div>
           </AnimationWrapper>
         </div>
 
-        {/* Right — Details Sidebar */}
+        {/* Right Column: Pricing & Quick Actions Sidebar */}
         <div className="max-w-95 w-full shrink-0">
           {!isBiddingMode ? (
-            <div className="space-y-5">
-              {/* Auction Badge & Title */}
-              <AnimationWrapper type="fade-left" duration={0.5} delay={0.1}>
+            <div className="space-y-6">
+              {/* Header Info */}
+              <AnimationWrapper type="fade-left" duration={0.5}>
                 <div>
-                  <span className="inline-block bg-[#E78F23]/10 text-[#E78F23] text-[10px] font-bold px-3 py-1 rounded-md uppercase tracking-wider mb-4 border border-[#E78F23]/20">
-                    {badgeLabel}
-                  </span>
-                  <h2 className="text-[32px] font-clash font-medium tracking-tight leading-tight text-white">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="inline-block bg-[#E78F23]/20 text-primary text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">
+                      {badgeLabel}
+                    </span>
+                    {existingOffer && (
+                      <span className="inline-block bg-teal-500/20 text-teal-400 text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider border border-teal-500/30">
+                        Offer Submitted (${Number(existingOffer.currentAmount || existingOffer.initialAmount).toLocaleString()})
+                      </span>
+                    )}
+                  </div>
+
+                  <h1 className="text-3xl font-clash font-semibold text-white leading-tight">
                     {product.title}
-                  </h2>
-                  <div className="flex items-center gap-2 mt-2.5 text-gray-400 text-sm">
-                    <MapPin className="w-4 h-4 text-gray-500 shrink-0" />
-                    <span className="font-medium">{locationText}</span>
+                  </h1>
+
+                  <div className="flex items-center gap-2 mt-2 text-gray-400 text-sm">
+                    <MapPin className="w-4 h-4 text-primary" />
+                    <span>{locationText}</span>
                   </div>
                 </div>
               </AnimationWrapper>
 
-              {/* Price */}
-              <AnimationWrapper type="fade-left" duration={0.5} delay={0.15}>
-                <div className="pt-2">
-                  <p className="text-[11px] text-gray-500 uppercase tracking-[0.15em] font-semibold mb-1">
-                    {currentBidLabel}
+              {/* Price Card */}
+              <AnimationWrapper type="fade-left" duration={0.5} delay={0.1}>
+                <div className="bg-[#161618] border border-[#2C2C2E] rounded-2xl p-6 space-y-3">
+                  <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold">
+                    Asking Price
                   </p>
-                  <p className="text-3xl font-inter font-medium text-[#E78F23]">
+                  <p className="text-3xl font-clash font-semibold text-primary">
                     {formattedPrice}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Includes VIP Concierge Inspection & Verification
                   </p>
                 </div>
               </AnimationWrapper>
 
-              {/* Action Buttons */}
+              {/* Main Actions */}
               <AnimationWrapper type="fade-left" duration={0.5} delay={0.2}>
-                <div className="flex flex-col md:flex-row gap-3">
+                <div className="space-y-3">
+                  <button
+                    onClick={handleOpenOfferModal}
+                    className="w-full py-4 bg-primary hover:bg-primary/90 text-white font-bold text-sm rounded-xl transition-all shadow-[0_4px_20px_rgba(231,143,35,0.3)] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <DollarSign className="w-4 h-4" />
+                    {existingOffer ? "Update My Offer" : "Make an Offer"}
+                  </button>
+
                   <button
                     onClick={() => setIsBiddingMode(true)}
-                    className="w-full py-4 bg-[#E78F23] hover:bg-[#E78F23]/90 text-white text-sm font-bold rounded-xl transition-all shadow-[0_6px_24px_rgba(231,143,35,0.35)] hover:shadow-[0_8px_30px_rgba(231,143,35,0.5)] active:scale-[0.98] capitalize tracking-wide"
+                    className="w-full py-3.5 bg-white/5 hover:bg-white/10 text-white font-semibold text-xs rounded-xl border border-white/10 transition-all cursor-pointer flex items-center justify-center gap-2"
                   >
-                    Place Bid
+                    <Gavel className="w-4 h-4 text-primary" />
+                    View Fee Breakdown & Bidding
                   </button>
-                  <button
-                    onClick={() => {
-                      toast.info("Sending counter offer process initiated");
-                      setIsBiddingMode(true);
-                    }}
-                    className="w-full py-4 bg-white/5 hover:bg-white/10 text-white text-sm font-bold rounded-xl transition-all border border-white/10 active:scale-[0.98] capitalize tracking-wide"
-                  >
-                    send offer
-                  </button>
+
+                  <div className="grid grid-cols-2 gap-3 pt-1">
+                    <button
+                      onClick={handleToggleSave}
+                      disabled={saveMutation.isPending}
+                      className={`flex items-center justify-center gap-2 py-3.5 bg-[#161618] text-white text-xs font-semibold rounded-xl border border-[#2C2C2E] hover:border-white/20 transition-all cursor-pointer ${
+                        isSaved ? "text-primary border-primary/50" : ""
+                      }`}
+                    >
+                      <Heart
+                        className="w-4 h-4 text-primary"
+                        fill={isSaved ? "#E78F23" : "none"}
+                      />
+                      {isSaved ? "Saved" : "Save"}
+                    </button>
+                    <button
+                      onClick={handleShare}
+                      className="flex items-center justify-center gap-2 py-3.5 bg-[#161618] text-white text-xs font-semibold rounded-xl border border-[#2C2C2E] hover:border-white/20 transition-all cursor-pointer"
+                    >
+                      {copied ? (
+                        <Check className="w-4 h-4 text-green-400" />
+                      ) : (
+                        <Share2 className="w-4 h-4 text-gray-400" />
+                      )}
+                      {copied ? "Copied" : "Share"}
+                    </button>
+                  </div>
                 </div>
               </AnimationWrapper>
 
@@ -500,7 +570,7 @@ export default function VIPDetailsPage() {
               <AnimationWrapper type="fade-left" duration={0.5} delay={0.25}>
                 <div className="border border-[#2C2C2E] rounded-2xl p-6 bg-white/2">
                   <div className="flex items-center gap-2.5 mb-5">
-                    <Info className="w-4 h-4 text-[#E78F23]" />
+                    <Info className="w-4 h-4 text-primary" />
                     <h4 className="text-sm font-semibold text-white">
                       Key Specifications
                     </h4>
@@ -519,7 +589,7 @@ export default function VIPDetailsPage() {
                       <>
                         <SpecItem
                           label="YEAR"
-                          value={String(product.buildYear || 2023)}
+                          value={String(product.buildYear || 2024)}
                         />
                         <SpecItem
                           label="CATEGORY"
@@ -548,7 +618,7 @@ export default function VIPDetailsPage() {
                         height={44}
                       />
                     ) : (
-                      <div className="w-11 h-11 rounded-full bg-[#2C2C2E] font-inter flex items-center justify-center text-[#E78F23] font-bold text-lg border border-[#3C3C3E]">
+                      <div className="w-11 h-11 rounded-full bg-[#2C2C2E] font-inter flex items-center justify-center text-primary font-bold text-lg border border-[#3C3C3E]">
                         {sellerInitial}
                       </div>
                     )}
@@ -571,7 +641,7 @@ export default function VIPDetailsPage() {
               {/* Header */}
               <AnimationWrapper type="fade-down" duration={0.4}>
                 <div>
-                  <span className="inline-block bg-[#E78F23]/20 text-[#E78F23] text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-wider mb-3">
+                  <span className="inline-block bg-[#E78F23]/20 text-primary text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-wider mb-3">
                     {badgeLabel}
                   </span>
                   <h2 className="text-3xl font-clash font-semibold text-white">
@@ -634,7 +704,7 @@ export default function VIPDetailsPage() {
                         Total Payable
                       </span>
                       <div className="text-right">
-                        <p className="text-[32px] font-clash font-medium text-[#E78F23] leading-none mb-1 tracking-tight">
+                        <p className="text-[32px] font-clash font-medium text-primary leading-none mb-1 tracking-tight">
                           {formattedTotalPayable}
                         </p>
                         <p className="text-[11px] text-gray-500">
@@ -645,15 +715,15 @@ export default function VIPDetailsPage() {
                   </div>
 
                   <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#E78F23]/10 rounded-full border border-[#E78F23]/20">
-                    <div className="w-1.5 h-1.5 bg-[#E78F23] rounded-full shadow-[0_0_8px_rgba(231,143,35,0.6)]" />
-                    <span className="text-[9px] text-[#E78F23] font-bold uppercase tracking-widest">
+                    <div className="w-1.5 h-1.5 bg-primary rounded-full shadow-[0_0_8px_rgba(231,143,35,0.6)]" />
+                    <span className="text-[9px] text-primary font-bold uppercase tracking-widest">
                       VIP reduced fee applied
                     </span>
                   </div>
                 </div>
               </AnimationWrapper>
 
-              {/* Attributes Grid (image style 2x2) */}
+              {/* Attributes Grid */}
               <AnimationWrapper type="fade-up" duration={0.5} delay={0.2}>
                 <div className="grid grid-cols-2 gap-3">
                   {specItems.slice(0, 4).map((item, idx) => (
@@ -682,7 +752,7 @@ export default function VIPDetailsPage() {
                 </div>
               </AnimationWrapper>
 
-              {/* Seller - image style */}
+              {/* Seller */}
               <AnimationWrapper type="fade-up" duration={0.5} delay={0.3}>
                 <div className="bg-[#161618] rounded-xl p-4 flex items-center gap-3.5 border border-white/3">
                   {product.owner?.avatarUrl ? (
@@ -714,24 +784,21 @@ export default function VIPDetailsPage() {
               <AnimationWrapper type="fade-up" duration={0.5} delay={0.4}>
                 <div className="space-y-3 pt-2">
                   <button
-                    onClick={() => {
-                      toast.success(
-                        "Your bid has been submitted successfully to the seller!",
-                      );
-                    }}
-                    className="w-full py-4.5 bg-[#E78F23] hover:brightness-110 text-black text-sm font-bold rounded-xl transition-all shadow-[0_10px_30px_rgba(231,143,35,0.2)] active:scale-[0.98]"
+                    onClick={handleOpenOfferModal}
+                    className="w-full py-4.5 bg-primary hover:brightness-110 text-black text-sm font-bold rounded-xl transition-all shadow-[0_10px_30px_rgba(231,143,35,0.2)] active:scale-[0.98] cursor-pointer"
                   >
-                    Place Bid
+                    {existingOffer ? "Update My Offer" : "Make an Offer"}
                   </button>
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       onClick={handleToggleSave}
+                      disabled={saveMutation.isPending}
                       className={`flex items-center justify-center gap-2 py-4 bg-[#161618] text-white text-[13px] font-semibold rounded-xl border border-white/5 hover:bg-white/8 transition-colors ${
-                        isSaved ? "text-[#E78F23]" : ""
+                        isSaved ? "text-primary" : ""
                       }`}
                     >
                       <Heart
-                        className="w-4 h-4 text-[#E78F23]"
+                        className="w-4 h-4 text-primary"
                         fill={isSaved ? "#E78F23" : "none"}
                       />
                       {isSaved ? "Saved" : "Save"}
@@ -762,6 +829,152 @@ export default function VIPDetailsPage() {
           )}
         </div>
       </div>
+
+      {/* ─── MAKE AN OFFER MODAL ─── */}
+      {isOfferModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#161618] border border-[#2C2C2E] rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl space-y-6 p-6 relative">
+            {/* Header */}
+            <div className="flex items-center justify-between pb-4 border-b border-white/10">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                  <DollarSign className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-clash font-semibold text-white">
+                    {existingOffer ? "Update Your Offer" : "Make an Offer"}
+                  </h3>
+                  <p className="text-xs text-gray-400">
+                    {product.title}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsOfferModalOpen(false)}
+                className="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleSubmitOffer} className="space-y-4">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-gray-300">
+                    Offer Amount (USD)
+                  </label>
+                  {rawPrice > 0 && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500">Asking: {formattedPrice}</span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setOfferAmount(String(Math.round(rawPrice * 0.95)))
+                        }
+                        className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-gray-300 transition-colors"
+                      >
+                        -5%
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setOfferAmount(String(Math.round(rawPrice * 0.9)))
+                        }
+                        className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-gray-300 transition-colors"
+                      >
+                        -10%
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                    <DollarSign className="w-4 h-4 text-primary" />
+                  </div>
+                  <input
+                    type="number"
+                    min="1"
+                    step="any"
+                    required
+                    value={offerAmount}
+                    onChange={(e) => setOfferAmount(e.target.value)}
+                    placeholder="e.g. 900000"
+                    className="w-full pl-9 pr-4 py-3 bg-[#111111] border border-[#2C2C2E] focus:border-primary rounded-xl text-white font-medium text-base outline-none transition-colors"
+                  />
+                </div>
+              </div>
+
+              {/* Note / Terms Textarea */}
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">
+                  Note / Special Terms{" "}
+                  <span className="text-gray-500 font-normal lowercase">
+                    (optional)
+                  </span>
+                </label>
+                <textarea
+                  rows={3}
+                  value={offerNote}
+                  onChange={(e) => setOfferNote(e.target.value)}
+                  placeholder="Add any details about payment timeline, escrow verification, or delivery..."
+                  className="w-full px-4 py-3 bg-[#111111] border border-[#2C2C2E] focus:border-primary rounded-xl text-white text-sm outline-none transition-colors resize-none"
+                />
+              </div>
+
+              {/* Dynamic VIP Fee estimate summary */}
+              {Boolean(parseFloat(offerAmount)) && parseFloat(offerAmount) > 0 && (
+                <div className="bg-[#111111] border border-white/5 p-3.5 rounded-xl text-xs space-y-1.5">
+                  <div className="flex justify-between text-gray-400">
+                    <span>Offer Amount</span>
+                    <span className="text-white font-medium">
+                      ${parseFloat(offerAmount).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-gray-400">
+                    <span>Estimated VIP Fee (1.5%)</span>
+                    <span className="text-white font-medium">
+                      ${Math.round(parseFloat(offerAmount) * 0.015).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="pt-1.5 border-t border-white/5 flex justify-between font-semibold">
+                    <span className="text-gray-300">Total Commitment</span>
+                    <span className="text-primary">
+                      ${Math.round(parseFloat(offerAmount) * 1.015).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Footer Actions */}
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsOfferModalOpen(false)}
+                  disabled={createOfferMutation.isPending}
+                  className="px-5 py-3 text-xs font-semibold text-gray-400 hover:text-white transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={createOfferMutation.isPending}
+                  className="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-bold text-xs rounded-xl transition-all shadow-[0_4px_16px_rgba(231,143,35,0.3)] flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  {createOfferMutation.isPending && (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  )}
+                  {createOfferMutation.isPending
+                    ? "Submitting..."
+                    : existingOffer
+                    ? "Update Offer"
+                    : "Submit Offer"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
