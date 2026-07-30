@@ -26,13 +26,5 @@ services:
       - NEXT_PUBLIC_CLOVER_MERCHANT_ID=C233HRQ3TW7N1
       - NEXT_PUBLIC_CLOVER_ENV=development
       - API_BASE_URL=http://app_live_blue:5056/api/v1 # Change 'server' and '5000' to your backend service name and port if needed
-
     ports:
       - "3000:3000"
-    networks:
-      - doc_release
-
-networks:
-  doc_release:
-    external: true
-    name: doc-backend_doc_release
