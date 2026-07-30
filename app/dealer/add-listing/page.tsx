@@ -86,7 +86,7 @@ export default function AddListing() {
   const [isDragging, setIsDragging] = useState(false);
 
   // Pricing & Sale Type State
-  const [saleType, setSaleType] = useState<"FIXED_PRICE" | "AUCTION" | "PRIVATE">("FIXED_PRICE");
+  const [saleType, setSaleType] = useState<"FIXED_PRICE" | "AUCTION" | "PRIVATE_SALE">("FIXED_PRICE");
   const [askingPrice, setAskingPrice] = useState("");
   const [startingBid, setStartingBid] = useState("");
   const [auctionEndsAt, setAuctionEndsAt] = useState("2026-12-31T23:59:59.000Z");
@@ -689,7 +689,7 @@ export default function AddListing() {
               {[
                 { id: "FIXED_PRICE", title: "Fixed Price", desc: "Set a specific asking price" },
                 { id: "AUCTION", title: "Auction", desc: "Set starting bid and duration" },
-                { id: "PRIVATE", title: "Private Sale", desc: "Price on Application (POA)" },
+                { id: "PRIVATE_SALE", title: "Private Sale", desc: "Price on Application (POA)" },
               ].map((type) => (
                 <button
                   key={type.id}

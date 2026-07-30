@@ -20,13 +20,11 @@ export default function MarketplacePage() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("ALL");
   const [brands, setBrands] = useState<string[]>([]);
-  const [conditions, setConditions] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState("Best Match");
+  const [sortBy, setSortBy] = useState("NEWEST");
 
   // Filter sliders state
   const [priceRange, setPriceRange] = useState({ min: 0, max: 20000000 });
   const [yearRange, setYearRange] = useState({ min: 1990, max: 2026 });
-  const [mileageRange, setMileageRange] = useState({ min: 0, max: 100000 });
 
   // Pagination state
   const [page, setPage] = useState(1);
@@ -46,21 +44,12 @@ export default function MarketplacePage() {
   }, [
     category,
     brands,
-    conditions,
     sortBy,
     debouncedSearch,
     debouncedMinPrice,
     debouncedMaxPrice,
     debouncedMinYear,
   ]);
-
-  // Convert UI sortBy selection to backend sort string
-  const getSortByParam = (sort: string) => {
-    if (sort === "Price: Low to High") return "PRICE_ASC";
-    if (sort === "Price: High to Low") return "PRICE_DESC";
-    if (sort === "Newest Arrivals") return "NEWEST";
-    return undefined;
-  };
 
   // React Query hook to fetch listings from GET /api/v1/listings
   const { data, isLoading, isFetching, isError, error, refetch } =
@@ -71,7 +60,7 @@ export default function MarketplacePage() {
       maxPrice: debouncedMaxPrice < 20000000 ? debouncedMaxPrice : undefined,
       buildYear: debouncedMinYear > 1990 ? debouncedMinYear : undefined,
       search: debouncedSearch.trim() || undefined,
-      sortBy: getSortByParam(sortBy),
+      sortBy: sortBy,
       page: page,
       limit: limit,
     });
@@ -89,12 +78,10 @@ export default function MarketplacePage() {
   const handleClearFilters = () => {
     setCategory("ALL");
     setBrands([]);
-    setConditions([]);
     setSearch("");
-    setSortBy("Best Match");
+    setSortBy("NEWEST");
     setPriceRange({ min: 0, max: 20000000 });
     setYearRange({ min: 1990, max: 2026 });
-    setMileageRange({ min: 0, max: 100000 });
     setPage(1);
   };
 
@@ -117,14 +104,10 @@ export default function MarketplacePage() {
             setCategory={setCategory}
             brands={brands}
             setBrands={setBrands}
-            conditions={conditions}
-            setConditions={setConditions}
             priceRange={priceRange}
             setPriceRange={setPriceRange}
             yearRange={yearRange}
             setYearRange={setYearRange}
-            mileageRange={mileageRange}
-            setMileageRange={setMileageRange}
             isOpen={isMobileFilterOpen}
             onClose={() => setIsMobileFilterOpen(false)}
             onClear={handleClearFilters}

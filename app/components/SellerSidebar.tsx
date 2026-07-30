@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -9,14 +10,8 @@ import {
   Gavel,
   BadgePercent,
   List as ListIcon,
-  Crown,
-  Settings,
   X,
-  Lock,
 } from "lucide-react";
-import { useAuthStore } from "@/lib/store/useAuthStore";
-import { useGetMeQuery } from "@/hooks/useAuth";
-import { toast } from "sonner";
 
 const navItems = [
   { href: "/seller", icon: LayoutDashboard, label: "Dashboard" },
@@ -38,10 +33,6 @@ export default function SellerSidebar({
   onClose: () => void;
 }) {
   const pathname = usePathname();
-  const { user: storeUser } = useAuthStore();
-  const { data: apiUser } = useGetMeQuery();
-  const user = apiUser || storeUser;
-  const isVip = Boolean(user?.isVip ?? user?.vipStatus);
 
   return (
     <>
@@ -64,10 +55,15 @@ export default function SellerSidebar({
       >
         {/* Logo and Close Button (mobile only) */}
         <div className="p-8 flex items-center justify-between">
-          <Link href="/">
-            <h1 className="text-2xl font-bold font-clash tracking-wide text-white">
-              Exotic<span className="text-[#E78F23]">World</span>
-            </h1>
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/logo.svg"
+              alt="Logo"
+              width={160}
+              height={30}
+              priority
+              className="h-auto w-auto max-h-8 object-contain"
+            />
           </Link>
           <button
             onClick={onClose}
@@ -101,26 +97,6 @@ export default function SellerSidebar({
             );
           })}
         </nav>
-
-        {/* VIP Upgrade Banner (shown when user is not VIP) */}
-        {!isVip && (
-          <div className="p-5 mt-auto mb-6 mx-4 rounded-2xl bg-linear-to-br from-[#EEA341] to-[#C76E12] relative shadow-[0_10px_30px_rgba(231,143,35,0.2)] text-white overflow-hidden group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full blur-3xl -mr-10 -mt-10 group-hover:opacity-20 transition-opacity"></div>
-            <button className="absolute top-3 right-3 text-white/70 hover:text-white z-10 transition-colors">
-              <X className="w-3.5 h-3.5" />
-            </button>
-            <h3 className="font-bold text-lg mb-1.5 font-clash">
-              Upgrade to VIP!
-            </h3>
-            <p className="text-[11px] text-white/90 mb-5 leading-relaxed">
-              Unlock Premium Features And Offers
-            </p>
-            <button className="bg-[#111113] w-full py-2.5 rounded-lg text-[#E78F23] font-semibold text-xs flex items-center justify-center gap-2 hover:bg-black transition-colors shadow-lg">
-              Upgrade Now
-              <Crown className="w-3.5 h-3.5" fill="currentColor" />
-            </button>
-          </div>
-        )}
       </aside>
     </>
   );

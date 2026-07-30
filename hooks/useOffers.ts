@@ -7,11 +7,13 @@ import {
   createOfferApi,
   withdrawOfferApi,
   counterOfferApi,
+  rejectOfferApi,
   GetOffersParams,
   GetOffersResponse,
   OfferDetailItem,
   AcceptOfferResponse,
   WithdrawOfferResponse,
+  RejectOfferResponse,
   CreateOfferPayload,
   CounterOfferPayload,
 } from "@/lib/api/offers";
@@ -203,6 +205,28 @@ export const useCounterOfferMutation = () => {
         (err as any)?.response?.data?.message ||
         err.message ||
         "Failed to send counter offer";
+      toast.error(errMsg);
+    },
+  });
+};
+
+/**
+ * React Query hook to reject an offer
+ */
+export const useRejectOfferMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<RejectOfferResponse, Error, string>({
+    mutationFn: (offerId: string) => rejectOfferApi(offerId),
+    onSuccess: (data) => {
+      toast.success(data?.message || "Offer rejected successfully!");
+      queryClient.invalidateQueries({ queryKey: OFFERS_QUERY_KEYS.all });
+    },
+    onError: (err) => {
+      const errMsg =
+        (err as any)?.response?.data?.message ||
+        err.message ||
+        "Failed to reject offer";
       toast.error(errMsg);
     },
   });

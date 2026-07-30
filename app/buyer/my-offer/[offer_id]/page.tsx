@@ -39,12 +39,13 @@ import { toast } from "sonner";
 import { OfferDetailItem } from "@/lib/api/offers";
 
 /* ─── Helper Functions ─── */
-const formatPrice = (priceStr?: string | number | null, currency = "USD") => {
-  if (priceStr === undefined || priceStr === null || priceStr === "") return "$0";
+const formatPrice = (priceStr?: string | number | null) => {
+  if (priceStr === undefined || priceStr === null || priceStr === "")
+    return "$0";
   const num = typeof priceStr === "number" ? priceStr : parseFloat(priceStr);
   if (isNaN(num)) return `${priceStr}`;
-  const symbol = currency === "EUR" ? "€" : currency === "GBP" ? "£" : "$";
-  return `${symbol}${num.toLocaleString()}`;
+
+  return `${num.toLocaleString()}`;
 };
 
 const formatDate = (dateString?: string) => {
@@ -139,7 +140,9 @@ const CounterOfferModal = ({
         }`}
       >
         <div className="flex items-center justify-between">
-          <h3 className="text-xl font-bold font-clash text-white">Send Counter Offer</h3>
+          <h3 className="text-xl font-bold font-clash text-white">
+            Send Counter Offer
+          </h3>
           <button
             onClick={handleClose}
             className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-colors"
@@ -154,7 +157,9 @@ const CounterOfferModal = ({
               Counter Amount ($)
             </label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">
+                $
+              </span>
               <input
                 type="number"
                 placeholder="Enter amount..."
@@ -244,10 +249,21 @@ const OfferDetails = () => {
   const [messageInput, setMessageInput] = useState("");
   const chatScrollRef = useRef<HTMLDivElement>(null);
 
-  const { data: offer, isLoading: isLoadingOffer, isError, error, refetch } = useOfferDetailQuery(offerId);
-  const { data: dealsResponse, isLoading: isLoadingDeals } = useDealsQuery({ page: 1, limit: 10 });
+  const {
+    data: offer,
+    isLoading: isLoadingOffer,
+    isError,
+    error,
+    refetch,
+  } = useOfferDetailQuery(offerId);
+  const { data: dealsResponse, isLoading: isLoadingDeals } = useDealsQuery({
+    page: 1,
+    limit: 10,
+  });
   const dealsList = dealsResponse?.data || [];
-  const matchedDeal = dealsList.find((d) => d.offerId === offerId || d.id === offerId);
+  const matchedDeal = dealsList.find(
+    (d) => d.offerId === offerId || d.id === offerId,
+  );
   const targetDealId = matchedDeal?.id || offer?.deal?.id || offer?.id || "";
 
   const { data: dealDetail } = useDealDetailQuery(targetDealId);
@@ -273,9 +289,12 @@ const OfferDetails = () => {
     return (
       <div className="min-h-screen bg-black text-white p-6 font-inter flex flex-col items-center justify-center space-y-4">
         <AlertCircle className="w-12 h-12 text-red-500" />
-        <h2 className="text-2xl font-bold font-clash">Failed to load offer details</h2>
+        <h2 className="text-2xl font-bold font-clash">
+          Failed to load offer details
+        </h2>
         <p className="text-gray-400 text-sm max-w-md text-center">
-          {(error as any)?.message || "The requested offer detail could not be loaded."}
+          {(error as any)?.message ||
+            "The requested offer detail could not be loaded."}
         </p>
         <button
           onClick={() => refetch()}
@@ -310,8 +329,11 @@ const OfferDetails = () => {
     listing?.media?.[0]?.url ||
     "https://images.unsplash.com/photo-1621135802920-133df287f89c?auto=format&fit=crop&q=80&w=1200";
 
-  const sellerName = seller ? `${seller.firstName || ""} ${seller.lastName || ""}`.trim() || "Dealer" : "Dealer";
-  const sellerAvatar = seller?.avatarUrl || "https://i.pravatar.cc/150?u=seller";
+  const sellerName = seller
+    ? `${seller.firstName || ""} ${seller.lastName || ""}`.trim() || "Dealer"
+    : "Dealer";
+  const sellerAvatar =
+    seller?.avatarUrl || "https://i.pravatar.cc/150?u=seller";
 
   const formattedHistories = histories.map((h) => {
     const isBuyer = h.senderId === offer.buyerId;
@@ -324,7 +346,7 @@ const OfferDetails = () => {
         : `${h.sender?.firstName || sellerName} ${h.sender?.lastName || ""}`.trim(),
       senderRole: isBuyer ? "BUYER" : "SELLER",
       senderAvatar: isBuyer ? undefined : sellerAvatar,
-      text: h.note || `Offer updated to ${formatPrice(h.amount, listing?.currency)}`,
+      text: h.note || `Offer updated to ${formatPrice(h.amount)}`,
       amount: h.amount as string | undefined,
       action: h.action as string | undefined,
       createdAt: h.createdAt,
@@ -337,7 +359,10 @@ const OfferDetails = () => {
     ...((dealDetail as any)?.messages || []),
   ];
 
-  const rawDealMessagesList = [...embeddedDealMessages, ...(dealMessages || [])];
+  const rawDealMessagesList = [
+    ...embeddedDealMessages,
+    ...(dealMessages || []),
+  ];
 
   const uniqueMessagesMap = new Map<string, DealMessage>();
   rawDealMessagesList.forEach((m) => {
@@ -351,7 +376,9 @@ const OfferDetails = () => {
     const isBuyer = m.senderId === offer.buyerId || m.sender?.role === "BUYER";
     const senderFirstName =
       m.sender?.firstName ||
-      (isBuyer ? offer.buyer?.firstName || "Buyer" : seller?.firstName || "Seller");
+      (isBuyer
+        ? offer.buyer?.firstName || "Buyer"
+        : seller?.firstName || "Seller");
     const senderLastName =
       m.sender?.lastName ||
       (isBuyer ? offer.buyer?.lastName || "" : seller?.lastName || "");
@@ -364,7 +391,9 @@ const OfferDetails = () => {
       senderId: m.senderId,
       senderName: senderFullName,
       senderRole: senderRole,
-      senderAvatar: m.sender?.avatarUrl || (isBuyer ? offer.buyer?.avatarUrl : sellerAvatar),
+      senderAvatar:
+        m.sender?.avatarUrl ||
+        (isBuyer ? offer.buyer?.avatarUrl : sellerAvatar),
       text: m.message,
       amount: undefined as string | undefined,
       action: undefined as string | undefined,
@@ -372,11 +401,12 @@ const OfferDetails = () => {
     };
   });
 
-  const combinedTimeline = [...formattedHistories, ...formattedDealMessages].sort(
-    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  const combinedTimeline = [
+    ...formattedHistories,
+    ...formattedDealMessages,
+  ].sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
   );
-
-
 
   const handleAccept = () => {
     acceptOfferMutation.mutate(offer.id);
@@ -412,7 +442,10 @@ const OfferDetails = () => {
       <div className="w-full space-y-8">
         {/* Breadcrumbs */}
         <div className="flex items-center gap-2 text-white/60 text-sm md:text-[32px] font-medium font-clash">
-          <Link href="/buyer/my-offer" className="hover:text-white transition-colors">
+          <Link
+            href="/buyer/my-offer"
+            className="hover:text-white transition-colors"
+          >
             My Offers
           </Link>
           <ChevronRight size={16} />
@@ -442,7 +475,9 @@ const OfferDetails = () => {
                         />
                       </div>
                       <div>
-                        <div className="font-bold text-sm text-white/90">{sellerName}</div>
+                        <div className="font-bold text-sm text-white/90">
+                          {sellerName}
+                        </div>
                         <div className="text-[10px] text-green-500/80 flex items-center gap-1">
                           <Check size={10} /> Verified Dealer
                         </div>
@@ -467,12 +502,15 @@ const OfferDetails = () => {
                         <div className="text-[11px] font-bold text-gray-400 mb-1">
                           Current Offer
                         </div>
-                        <div className="text-[32px] md:text-[40px] font-black text-[#D4AF37] leading-none tracking-tight">
-                          {formatPrice(offer.currentAmount || offer.initialAmount, listing?.currency)}
+                        <div className="flex text-[32px] md:text-[40px] font-black text-[#D4AF37] leading-none tracking-tight">
+                          <DollarSign />
+                          {formatPrice(
+                            offer.currentAmount || offer.initialAmount,
+                          )}
                         </div>
                         {listing?.askingPrice && (
                           <div className="text-[11px] font-bold text-gray-500 mt-1 uppercase tracking-wider">
-                            Asking: {formatPrice(listing.askingPrice, listing.currency)}
+                            Asking: {formatPrice(listing.askingPrice)}
                           </div>
                         )}
                       </div>
@@ -480,17 +518,29 @@ const OfferDetails = () => {
 
                     <div className="space-y-4 pt-4 border-t border-white/5">
                       <div className="flex justify-between text-[11px] font-medium">
-                        <span className="text-gray-500 uppercase tracking-widest">Last Updated</span>
-                        <span className="text-white/80">{formatDate(offer.updatedAt || offer.createdAt)}</span>
+                        <span className="text-gray-500 uppercase tracking-widest">
+                          Last Updated
+                        </span>
+                        <span className="text-white/80">
+                          {formatDate(offer.updatedAt || offer.createdAt)}
+                        </span>
                       </div>
                       <div className="flex justify-between text-[11px] font-medium">
-                        <span className="text-gray-500 uppercase tracking-widest">Offer ID</span>
-                        <span className="text-white/80 font-mono tracking-normal">{offer.id}</span>
+                        <span className="text-gray-500 uppercase tracking-widest">
+                          Offer ID
+                        </span>
+                        <span className="text-white/80 font-mono tracking-normal">
+                          {offer.id}
+                        </span>
                       </div>
                       {listing?.askingPrice && (
                         <div className="flex justify-between text-[11px] font-medium">
-                          <span className="text-gray-500 uppercase tracking-widest">Listed Price</span>
-                          <span className="text-white/80">{formatPrice(listing.askingPrice, listing.currency)}</span>
+                          <span className="text-gray-500 uppercase tracking-widest">
+                            Listed Price
+                          </span>
+                          <span className="text-white/80">
+                            {formatPrice(listing.askingPrice)}
+                          </span>
                         </div>
                       )}
                     </div>
@@ -544,7 +594,9 @@ const OfferDetails = () => {
                         className="w-full py-4.5 bg-[#D4AF37] hover:bg-[#c4a132] disabled:opacity-50 text-black font-bold text-xs uppercase tracking-[0.15em] rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
                       >
                         <Handshake size={18} />
-                        {acceptOfferMutation.isPending ? "Accepting..." : "Accept offer"}
+                        {acceptOfferMutation.isPending
+                          ? "Accepting..."
+                          : "Accept offer"}
                       </button>
                     )}
 
@@ -597,7 +649,8 @@ const OfferDetails = () => {
                       </span>
                     </h2>
                     <span className="text-xs text-gray-400">
-                      {combinedTimeline.length} message{combinedTimeline.length !== 1 ? "s" : ""}
+                      {combinedTimeline.length} message
+                      {combinedTimeline.length !== 1 ? "s" : ""}
                     </span>
                   </div>
 
@@ -609,11 +662,14 @@ const OfferDetails = () => {
                       {combinedTimeline.length === 0 ? (
                         <div className="text-center py-8 text-gray-500 text-sm flex flex-col items-center gap-2">
                           <MessageSquare size={24} className="text-gray-600" />
-                          No conversation messages recorded yet. Start the conversation below.
+                          No conversation messages recorded yet. Start the
+                          conversation below.
                         </div>
                       ) : (
                         combinedTimeline.map((item) => {
-                          const isSelf = item.senderId === offer.buyerId || item.senderRole === "BUYER";
+                          const isSelf =
+                            item.senderId === offer.buyerId ||
+                            item.senderRole === "BUYER";
                           return (
                             <div
                               key={item.id}
@@ -626,8 +682,8 @@ const OfferDetails = () => {
                                       ? "bg-[#2D2D20] border border-[#D4AF37]/30 text-white/90 rounded-br-none"
                                       : "bg-white/5 border border-white/10 text-white/90 rounded-bl-none"
                                     : isSelf
-                                    ? "bg-[#2D2D20] border border-[#D4AF37]/40 text-white rounded-br-none"
-                                    : "bg-white/5 border border-white/15 text-white/90 rounded-bl-none"
+                                      ? "bg-[#2D2D20] border border-[#D4AF37]/40 text-white rounded-br-none"
+                                      : "bg-white/5 border border-white/15 text-white/90 rounded-bl-none"
                                 }`}
                               >
                                 <div className="flex items-center justify-between gap-4 mb-2">
@@ -641,11 +697,13 @@ const OfferDetails = () => {
                                   </div>
                                   {item.amount && (
                                     <span className="text-[10px] font-bold text-[#D4AF37] bg-[#D4AF37]/10 px-2 py-0.5 rounded">
-                                      {formatPrice(item.amount, listing?.currency)}
+                                      {formatPrice(item.amount)}
                                     </span>
                                   )}
                                 </div>
-                                <p className="whitespace-pre-wrap">{item.text}</p>
+                                <p className="whitespace-pre-wrap">
+                                  {item.text}
+                                </p>
                                 <div className="text-[10px] text-gray-500 mt-2.5 uppercase tracking-tight flex items-center justify-between">
                                   <span>{formatDate(item.createdAt)}</span>
                                   {item.type === "history" && item.action && (
@@ -658,7 +716,6 @@ const OfferDetails = () => {
                             </div>
                           );
                         })
-
                       )}
                     </div>
 
@@ -670,7 +727,10 @@ const OfferDetails = () => {
                         value={messageInput}
                         onChange={(e) => setMessageInput(e.target.value)}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter" && !sendDealMessageMutation.isPending) {
+                          if (
+                            e.key === "Enter" &&
+                            !sendDealMessageMutation.isPending
+                          ) {
                             e.preventDefault();
                             handleSendMessage();
                           }
@@ -679,7 +739,10 @@ const OfferDetails = () => {
                       />
                       <button
                         onClick={handleSendMessage}
-                        disabled={sendDealMessageMutation.isPending || !messageInput.trim()}
+                        disabled={
+                          sendDealMessageMutation.isPending ||
+                          !messageInput.trim()
+                        }
                         className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-lg bg-[#D4AF37] text-black flex items-center justify-center hover:bg-[#c4a132] disabled:opacity-50 transition-colors"
                       >
                         {sendDealMessageMutation.isPending ? (
@@ -695,13 +758,14 @@ const OfferDetails = () => {
             )}
           </div>
 
-
           {/* Right Column (Order History) */}
           <div className="lg:col-span-4">
             <AnimationWrapper type="fade-left">
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-semibold font-clash">Order History</h2>
+                  <h2 className="text-2xl font-semibold font-clash">
+                    Order History
+                  </h2>
                   <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[11px] font-bold text-white/60 cursor-pointer hover:text-white transition-colors">
                     recent <ChevronDown size={14} />
                   </div>
@@ -729,7 +793,9 @@ const OfferDetails = () => {
                                 <Circle
                                   size={10}
                                   fill={isBuyer ? "#3B82F6" : "#D4AF37"}
-                                  className={isBuyer ? "text-blue-500" : "text-[#D4AF37]"}
+                                  className={
+                                    isBuyer ? "text-blue-500" : "text-[#D4AF37]"
+                                  }
                                 />
                               </div>
 
@@ -751,7 +817,7 @@ const OfferDetails = () => {
                                       isLatest ? "text-white" : "text-white/80"
                                     }`}
                                   >
-                                    {formatPrice(item.amount, listing?.currency)}
+                                    {formatPrice(item.amount)}
                                   </div>
                                 </div>
                               </div>

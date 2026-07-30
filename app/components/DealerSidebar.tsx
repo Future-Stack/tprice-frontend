@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -55,10 +56,15 @@ export default function DealerSidebar({ isSidebarOpen, onClose }: { isSidebarOpe
       >
         {/* Logo and Close Button (mobile only) */}
         <div className="p-8 flex items-center justify-between">
-          <Link href="/">
-            <h1 className="text-2xl font-bold font-clash tracking-wide text-white">
-              Exotic<span className="text-[#E78F23]">World</span>
-            </h1>
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/logo.svg"
+              alt="Logo"
+              width={160}
+              height={30}
+              priority
+              className="h-auto w-auto max-h-8 object-contain"
+            />
           </Link>
           <button
             onClick={onClose}

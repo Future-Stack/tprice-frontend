@@ -25,7 +25,12 @@ import {
   Send,
 } from "lucide-react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
-import { useOfferDetailQuery, useAcceptOfferMutation } from "@/hooks/useOffers";
+import CounterOfferModal from "../CounterOfferModal";
+import {
+  useOfferDetailQuery,
+  useAcceptOfferMutation,
+  useRejectOfferMutation,
+} from "@/hooks/useOffers";
 import {
   useDealsQuery,
   useDealDetailQuery,
@@ -275,6 +280,7 @@ export default function OfferDetailsPage() {
 
   const [accepting, setAccepting] = useState(false);
   const [copiedId, setCopiedId] = useState(false);
+  const [counterModalOpen, setCounterModalOpen] = useState(false);
   const [messageInput, setMessageInput] = useState("");
   const chatScrollRef = React.useRef<HTMLDivElement>(null);
 
@@ -292,7 +298,10 @@ export default function OfferDetailsPage() {
   const { data: dealDetail } = useDealDetailQuery(targetDealId);
   const { data: dealMessages = [] } = useDealMessagesQuery(targetDealId);
 
+  const [rejecting, setRejecting] = useState(false);
+
   const { mutate: acceptOffer } = useAcceptOfferMutation();
+  const { mutate: rejectOffer } = useRejectOfferMutation();
   const sendDealMessageMutation = useSendDealMessageMutation();
 
   React.useEffect(() => {
@@ -307,6 +316,16 @@ export default function OfferDetailsPage() {
     acceptOffer(offerId, {
       onSettled: () => {
         setAccepting(false);
+      },
+    });
+  };
+
+  const handleReject = () => {
+    if (!offerId) return;
+    setRejecting(true);
+    rejectOffer(offerId, {
+      onSettled: () => {
+        setRejecting(false);
       },
     });
   };
@@ -357,10 +376,10 @@ export default function OfferDetailsPage() {
 
   const isPending =
     offer.status?.toUpperCase() === "PENDING" ||
-    offer.status?.toUpperCase() === "ACTION REQUIRED";
+    offer.status?.toUpperCase() === "ACTION REQUIRED" ||
+    offer.status?.toUpperCase() === "COUNTERED";
   const isAccepted = offer.status?.toUpperCase() === "ACCEPTED";
-  const isCountered = offer.status?.toUpperCase() === "COUNTERED";
-  const isAuction = offer.listing?.saleType?.toUpperCase() === "AUCTION";
+  const allowCounterOffers = offer.listing?.allowCounterOffers === true;
 
   const currency = offer.listing?.currency || "USD";
   const formattedCurrentAmount = formatCurrency(offer.currentAmount, currency);
@@ -541,8 +560,9 @@ export default function OfferDetailsPage() {
                   <span>{accepting ? "Accepting..." : "Accept Offer"}</span>
                 </button>
 
-                {!isAuction && (
+                {allowCounterOffers && (
                   <button
+                    onClick={() => setCounterModalOpen(true)}
                     disabled={accepting}
                     className="px-5 py-3 rounded-xl bg-[#E78F23]/10 border border-[#E78F23]/30 text-[#E78F23] hover:bg-[#E78F23] hover:text-black font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -552,11 +572,16 @@ export default function OfferDetailsPage() {
                 )}
 
                 <button
-                  disabled={accepting}
+                  onClick={handleReject}
+                  disabled={accepting || rejecting}
                   className="px-5 py-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500 hover:text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <X size={16} strokeWidth={2.5} />
-                  <span>Reject</span>
+                  {rejecting ? (
+                    <Loader2 size={16} className="animate-spin text-rose-400" />
+                  ) : (
+                    <X size={16} strokeWidth={2.5} />
+                  )}
+                  <span>{rejecting ? "Rejecting..." : "Reject"}</span>
                 </button>
               </div>
             )}
@@ -1020,18 +1045,6 @@ export default function OfferDetailsPage() {
                     This offer has been accepted and a deal is now in progress. You can track progress in your deals dashboard.
                   </p>
                 </div>
-              ) : isCountered ? (
-                <div className="space-y-3 text-center">
-                  <div className="w-12 h-12 rounded-full bg-blue-500/10 text-blue-400 flex items-center justify-center mx-auto">
-                    <Clock size={24} className="animate-pulse" />
-                  </div>
-                  <h4 className="font-bold text-white text-base">
-                    Awaiting Buyer Response
-                  </h4>
-                  <p className="text-xs text-gray-400">
-                    A counter offer has been submitted. The buyer will review your terms soon.
-                  </p>
-                </div>
               ) : isPending ? (
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#E78F23]">
@@ -1039,9 +1052,9 @@ export default function OfferDetailsPage() {
                     <span>Action Required</span>
                   </div>
                   <p className="text-xs text-gray-400">
-                    {isAuction
-                      ? "Review the buyer's offer carefully. You can accept to start a deal or decline."
-                      : "Review the buyer's offer carefully. You can accept to start a deal, send a counter offer, or decline."}
+                    {allowCounterOffers
+                      ? "Review the buyer's offer carefully. You can accept to start a deal, send a counter offer, or decline."
+                      : "Review the buyer's offer carefully. You can accept to start a deal or decline."}
                   </p>
                   <button
                     onClick={handleAccept}
@@ -1070,6 +1083,13 @@ export default function OfferDetailsPage() {
           </div>
         </div>
       </AnimationWrapper>
+
+      {/* Counter Offer Modal */}
+      <CounterOfferModal
+        isOpen={counterModalOpen}
+        onClose={() => setCounterModalOpen(false)}
+        offer={offer}
+      />
     </div>
   );
 }

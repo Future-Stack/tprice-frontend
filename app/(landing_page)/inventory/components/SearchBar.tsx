@@ -57,10 +57,10 @@ export default function SearchBar({
           onChange={(e) => setSortBy(e.target.value)}
           className="w-full bg-[#111] border border-white/5 rounded-lg py-3 pl-16 pr-12 text-white/80 appearance-none focus:outline-none focus:border-primary/50 cursor-pointer font-medium text-sm"
         >
-          <option value="Best Match" className="bg-[#111]">Best Match</option>
-          <option value="Newest Arrivals" className="bg-[#111]">Newest Arrivals</option>
-          <option value="Price: Low to High" className="bg-[#111]">Price: Low to High</option>
-          <option value="Price: High to Low" className="bg-[#111]">Price: High to Low</option>
+          <option value="NEWEST" className="bg-[#111]">Newest</option>
+          <option value="PRICE_ASC" className="bg-[#111]">Price: Low to High</option>
+          <option value="PRICE_DESC" className="bg-[#111]">Price: High to Low</option>
+          <option value="VIEWS" className="bg-[#111]">Most Viewed</option>
         </select>
         <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 pointer-events-none group-hover:text-primary transition-colors" />
       </div>

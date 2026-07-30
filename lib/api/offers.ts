@@ -192,4 +192,23 @@ export const counterOfferApi = async (
   return response.data;
 };
 
+export interface RejectOfferResponse {
+  message?: string;
+  offer?: OfferItem;
+}
+
+/**
+ * Reject an offer by offer ID
+ */
+export const rejectOfferApi = async (
+  offerId: string
+): Promise<RejectOfferResponse> => {
+  const response = await apiClient.post<RejectOfferResponse>(
+    `/offers/${offerId}/reject`,
+    {}
+  );
+  return response.data;
+};
+
+
 

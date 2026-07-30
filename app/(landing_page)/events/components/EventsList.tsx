@@ -81,32 +81,11 @@ export default function EventsList() {
   const events: EventItem[] = data?.data || [];
   const meta = data?.meta;
 
-  const handleTabChange = (catValue: string) => {
-    setActiveTab(catValue);
-    setPage(1);
-  };
-
   return (
     <section className="py-24 bg-black px-6 md:px-12">
       <div className="container mx-auto">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
           <h2 className="text-4xl font-serif text-white">Events</h2>
-
-          {/* Filter Tabs */}
-          <div className="flex flex-wrap gap-3">
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat.value}
-                onClick={() => handleTabChange(cat.value)}
-                className={`px-6 py-2 rounded-full border text-xs font-bold tracking-widest uppercase transition-all duration-300 cursor-pointer ${activeTab === cat.value
-                  ? "border-primary bg-primary text-black shadow-lg shadow-primary/20"
-                  : "border-white/20 text-white/60 hover:border-white/40 hover:text-white"
-                  }`}
-              >
-                {cat.label}
-              </button>
-            ))}
-          </div>
         </div>
 
         {/* Loading Skeleton */}

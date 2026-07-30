@@ -70,14 +70,7 @@ export const useLoginMutation = () => {
     mutationFn: (payload: LoginPayload) => loginApi(payload),
     onSuccess: (data) => {
       if (data?.accessToken) {
-        setAuth(data.user, data.accessToken);
-        if (data.refreshToken) {
-          Cookies.set("refresh_token", data.refreshToken, {
-            expires: 7,
-            secure: true,
-            sameSite: "lax",
-          });
-        }
+        setAuth(data.user, data.accessToken, data.refreshToken);
         queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.user });
       }
     },
@@ -95,14 +88,7 @@ export const useRegisterMutation = () => {
     mutationFn: (payload: RegisterPayload) => registerApi(payload),
     onSuccess: (data) => {
       if (data?.accessToken) {
-        setAuth(data.user, data.accessToken);
-        if (data.refreshToken) {
-          Cookies.set("refresh_token", data.refreshToken, {
-            expires: 7,
-            secure: true,
-            sameSite: "lax",
-          });
-        }
+        setAuth(data.user, data.accessToken, data.refreshToken);
         queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.user });
       }
     },
@@ -113,6 +99,7 @@ export const useRegisterMutation = () => {
  * Custom TanStack Query Hook to fetch current user profile
  */
 export const useGetMeQuery = (enabled: boolean = true) => {
+  const setAuth = useAuthStore((state) => state.setAuth);
   const setUser = useAuthStore((state) => state.setUser);
   const logoutStore = useAuthStore((state) => state.logout);
 
@@ -121,7 +108,12 @@ export const useGetMeQuery = (enabled: boolean = true) => {
     queryFn: async () => {
       const data = await getMeApi();
       if (data) {
-        setUser(data);
+        const token = useAuthStore.getState().token || Cookies.get("access_token");
+        if (token) {
+          setAuth(data, token);
+        } else {
+          setUser(data);
+        }
       }
       return data;
     },
