@@ -287,6 +287,8 @@ function OfferReceieved() {
                     offer.status?.toUpperCase() === "ACTION REQUIRED";
                   const isCountered =
                     offer.status?.toUpperCase() === "COUNTERED";
+                  const isAuction =
+                    offer.listing?.saleType?.toUpperCase() === "AUCTION";
 
                   return (
                     <div
@@ -337,8 +339,8 @@ function OfferReceieved() {
                         </div>
 
                         {/* Actions */}
-                        <div className="col-span-2 flex flex-col items-end gap-2">
-                          {isPending ? (
+                        <div className="col-span-2 flex flex-col items-end gap-2.5">
+                          {isPending && (
                             <div className="flex items-center gap-5">
                               <button
                                 onClick={() => handleAccept(offer.id)}
@@ -359,12 +361,14 @@ function OfferReceieved() {
                                     : "Accept"}
                                 </span>
                               </button>
-                              <button
-                                disabled={acceptingId === offer.id}
-                                className="flex items-center gap-1.5 text-sm font-bold text-primary hover:text-primary transition-all hover:scale-105 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                              >
-                                <RefreshCcw size={16} strokeWidth={3} /> Counter
-                              </button>
+                              {!isAuction && (
+                                <button
+                                  disabled={acceptingId === offer.id}
+                                  className="flex items-center gap-1.5 text-sm font-bold text-primary hover:text-primary transition-all hover:scale-105 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  <RefreshCcw size={16} strokeWidth={3} /> Counter
+                                </button>
+                              )}
                               <button
                                 disabled={acceptingId === offer.id}
                                 className="flex items-center gap-1.5 text-sm font-bold text-red-500 hover:text-red-400 transition-all hover:scale-105 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
@@ -372,26 +376,25 @@ function OfferReceieved() {
                                 <X size={16} strokeWidth={3} /> Reject
                               </button>
                             </div>
-                          ) : (
-                            <div className="flex items-center gap-4">
-                              {isCountered && (
-                                <div className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                  <Clock size={14} className="animate-pulse" />{" "}
-                                  Awaiting Buyer
-                                </div>
-                              )}
-                              <Link
-                                href={`/seller/offer-receieved/${offer.id}`}
-                                className="flex items-center gap-2 px-6 py-2.5 rounded-xl border border-primary/40 text-xs font-black uppercase tracking-widest text-white bg-white/3 hover:bg-primary hover:border-primary hover:text-black transition-all duration-300 active:scale-95 group/btn shadow-[0_0_20px_rgba(231,143,35,0)] hover:shadow-[0_0_20px_rgba(231,143,35,0.2)] cursor-pointer"
-                              >
-                                <Eye
-                                  size={16}
-                                  className="text-primary group-hover/btn:text-black transition-colors"
-                                />{" "}
-                                View Details
-                              </Link>
+                          )}
+
+                          {isCountered && (
+                            <div className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                              <Clock size={14} className="animate-pulse" />{" "}
+                              Awaiting Buyer
                             </div>
                           )}
+
+                          <Link
+                            href={`/seller/offer-receieved/${offer.id}`}
+                            className="flex items-center gap-2 px-5 py-2 rounded-xl border border-primary/40 text-xs font-black uppercase tracking-widest text-white bg-white/3 hover:bg-primary hover:border-primary hover:text-black transition-all duration-300 active:scale-95 group/btn shadow-[0_0_20px_rgba(231,143,35,0)] hover:shadow-[0_0_20px_rgba(231,143,35,0.2)] cursor-pointer"
+                          >
+                            <Eye
+                              size={16}
+                              className="text-primary group-hover/btn:text-black transition-colors"
+                            />{" "}
+                            View Details
+                          </Link>
                         </div>
                       </div>
 
@@ -429,62 +432,69 @@ function OfferReceieved() {
                         </div>
 
                         <div className="pt-2">
-                          {isPending ? (
-                            <div className="grid grid-cols-3 gap-3">
-                              <button
-                                onClick={() => handleAccept(offer.id)}
-                                disabled={acceptingId === offer.id}
-                                className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-green-500 transition-active active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                          <div className="flex flex-col gap-3">
+                            {isPending && (
+                              <div
+                                className={`grid ${
+                                  isAuction ? "grid-cols-2" : "grid-cols-3"
+                                } gap-3`}
                               >
-                                {acceptingId === offer.id ? (
-                                  <Loader2
-                                    size={20}
-                                    className="animate-spin text-green-500"
-                                  />
-                                ) : (
-                                  <Check size={20} strokeWidth={3} />
+                                <button
+                                  onClick={() => handleAccept(offer.id)}
+                                  disabled={acceptingId === offer.id}
+                                  className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-green-500 transition-active active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  {acceptingId === offer.id ? (
+                                    <Loader2
+                                      size={20}
+                                      className="animate-spin text-green-500"
+                                    />
+                                  ) : (
+                                    <Check size={20} strokeWidth={3} />
+                                  )}
+                                  <span className="text-[10px] font-black uppercase tracking-widest">
+                                    {acceptingId === offer.id
+                                      ? "Accepting..."
+                                      : "Accept"}
+                                  </span>
+                                </button>
+                                {!isAuction && (
+                                  <button
+                                    disabled={acceptingId === offer.id}
+                                    className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-[#E78F23]/10 border border-[#E78F23]/20 text-primary transition-active active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    <RefreshCcw size={20} strokeWidth={3} />
+                                    <span className="text-[10px] font-black uppercase tracking-widest">
+                                      Counter
+                                    </span>
+                                  </button>
                                 )}
-                                <span className="text-[10px] font-black uppercase tracking-widest">
-                                  {acceptingId === offer.id
-                                    ? "Accepting..."
-                                    : "Accept"}
-                                </span>
-                              </button>
-                              <button
-                                disabled={acceptingId === offer.id}
-                                className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-[#E78F23]/10 border border-[#E78F23]/20 text-primary transition-active active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                              >
-                                <RefreshCcw size={20} strokeWidth={3} />
-                                <span className="text-[10px] font-black uppercase tracking-widest">
-                                  Counter
-                                </span>
-                              </button>
-                              <button
-                                disabled={acceptingId === offer.id}
-                                className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 transition-active active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                              >
-                                <X size={20} strokeWidth={3} />
-                                <span className="text-[10px] font-black uppercase tracking-widest">
-                                  Reject
-                                </span>
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="flex flex-col gap-3">
-                              {isCountered && (
-                                <div className="flex items-center justify-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest pb-1">
-                                  <Clock size={14} className="animate-pulse" />{" "}
-                                  Awaiting Buyer
-                                </div>
-                              )}
-                              <Link
-                                href={`/seller/offer-receieved/${offer.id}`}
-                                className="flex items-center justify-center gap-3 w-full py-4 rounded-xl border border-[#E78F23]/40 text-xs font-black uppercase tracking-widest text-primary bg-white/3 transition-all active:scale-[0.98] cursor-pointer"
-                              >
-                                <Eye size={18} /> View Details
-                              </Link>
-                            </div>
-                          )}
+                                <button
+                                  disabled={acceptingId === offer.id}
+                                  className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 transition-active active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  <X size={20} strokeWidth={3} />
+                                  <span className="text-[10px] font-black uppercase tracking-widest">
+                                    Reject
+                                  </span>
+                                </button>
+                              </div>
+                            )}
+
+                            {isCountered && (
+                              <div className="flex items-center justify-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest pb-1">
+                                <Clock size={14} className="animate-pulse" />{" "}
+                                Awaiting Buyer
+                              </div>
+                            )}
+
+                            <Link
+                              href={`/seller/offer-receieved/${offer.id}`}
+                              className="flex items-center justify-center gap-3 w-full py-3.5 rounded-xl border border-[#E78F23]/40 text-xs font-black uppercase tracking-widest text-primary bg-white/3 transition-all active:scale-[0.98] cursor-pointer"
+                            >
+                              <Eye size={18} /> View Details
+                            </Link>
+                          </div>
                         </div>
                       </div>
                     </div>

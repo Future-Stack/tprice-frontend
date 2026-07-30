@@ -76,11 +76,33 @@ export const getAdminReviewsApi = async (
   return response.data;
 };
 
+export interface UpdateReviewPayload {
+  reviewerName?: string;
+  reviewerTitle?: string;
+  reviewerLocation?: string;
+  avatarUrl?: string;
+  rating?: number;
+  content?: string;
+  highlightTags?: string[];
+}
+
 /**
  * Delete admin review by ID
  */
 export const deleteAdminReviewApi = async (id: string): Promise<void> => {
   await apiClient.delete(`/admin/reviews/${id}`);
 };
+
+/**
+ * Update an existing review by ID
+ */
+export const updateReviewApi = async (
+  id: string,
+  payload: UpdateReviewPayload
+): Promise<ReviewItem> => {
+  const response = await apiClient.patch<ReviewItem>(`/reviews/${id}`, payload);
+  return response.data;
+};
+
 
 
