@@ -150,79 +150,77 @@ export default function Categories() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {isLoading ? (
-            Array.from({ length: 4 }).map((_, i) => (
-              <div
-                key={`skeleton-${i}`}
-                className="relative h-112.5 overflow-hidden rounded-xl bg-white/5 animate-pulse border border-white/10"
-              >
-                {/* Icon Badge Skeleton */}
-                <div className="absolute top-6 left-6 w-12 h-12 rounded-full bg-white/10" />
-
-                {/* Content Skeleton */}
-                <div className="absolute bottom-8 left-8 right-8 space-y-3">
-                  <div className="h-6 w-3/4 bg-white/10 rounded" />
-                  <div className="h-4 w-1/2 bg-white/10 rounded" />
-                </div>
-
-                {/* Shimmer gradient */}
-                <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
-              </div>
-            ))
-          ) : (
-            categoriesToShow.map((cat, i) => {
-              const IconComponent = getCategoryIcon(cat.iconName, cat.name);
-              const count = cat._count?.listings ?? 0;
-              const countLabel = `${count}+ Listing${count === 1 ? "" : "s"}`;
-              const imageSrc =
-                cat.imageUrl || DEFAULT_IMAGES[i % DEFAULT_IMAGES.length];
-
-              return (
-                <Link
-                  key={cat.id || cat.name}
-                  href={`/buyer/marketplace?category=${encodeURIComponent(cat.slug || cat.name)}`}
-                  className="block"
+          {isLoading
+            ? Array.from({ length: 4 }).map((_, i) => (
+                <div
+                  key={`skeleton-${i}`}
+                  className="relative h-112.5 overflow-hidden rounded-xl bg-white/5 animate-pulse border border-white/10"
                 >
-                  <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
-                    whileHover={{ y: -10 }}
-                    className="group relative h-112.5 overflow-hidden rounded-xl cursor-pointer"
+                  {/* Icon Badge Skeleton */}
+                  <div className="absolute top-6 left-6 w-12 h-12 rounded-full bg-white/10" />
+
+                  {/* Content Skeleton */}
+                  <div className="absolute bottom-8 left-8 right-8 space-y-3">
+                    <div className="h-6 w-3/4 bg-white/10 rounded" />
+                    <div className="h-4 w-1/2 bg-white/10 rounded" />
+                  </div>
+
+                  {/* Shimmer gradient */}
+                  <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
+                </div>
+              ))
+            : categoriesToShow.map((cat, i) => {
+                const IconComponent = getCategoryIcon(cat.iconName, cat.name);
+                const count = cat._count?.listings ?? 0;
+                const countLabel = `${count}+ Listing${count === 1 ? "" : "s"}`;
+                const imageSrc =
+                  cat.imageUrl || DEFAULT_IMAGES[i % DEFAULT_IMAGES.length];
+
+                return (
+                  <Link
+                    key={cat.id || cat.name}
+                    href={`/inventory?category=${encodeURIComponent(cat.slug || cat.name)}`}
+                    className="block"
                   >
-                    {/* Background Image */}
-                    <img
-                      src={imageSrc}
-                      alt={cat.name}
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
+                    <motion.div
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.1 }}
+                      whileHover={{ y: -10 }}
+                      className="group relative h-112.5 overflow-hidden rounded-xl cursor-pointer"
+                    >
+                      {/* Background Image */}
+                      <img
+                        src={imageSrc}
+                        alt={cat.name}
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
 
-                    {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-linear-to-t from-black via-black/20 to-transparent group-hover:via-black/40 transition-all duration-300" />
+                      {/* Gradient Overlay */}
+                      <div className="absolute inset-0 bg-linear-to-t from-black via-black/20 to-transparent group-hover:via-black/40 transition-all duration-300" />
 
-                    {/* Icon / Top Badge */}
-                    <div className="absolute top-6 left-6 w-12 h-12 rounded-full border border-white/20 backdrop-blur-md flex items-center justify-center text-white bg-white/5">
-                      <IconComponent className="w-5 h-5" />
-                    </div>
+                      {/* Icon / Top Badge */}
+                      <div className="absolute top-6 left-6 w-12 h-12 rounded-full border border-white/20 backdrop-blur-md flex items-center justify-center text-white bg-white/5">
+                        <IconComponent className="w-5 h-5" />
+                      </div>
 
-                    {/* Content */}
-                    <div className="absolute bottom-8 left-8 right-8">
-                      <h3 className="text-[20px] font-normal font-cormorant text-white mb-2">
-                        {cat.name}
-                      </h3>
-                      <p className="text-white/60 text-sm font-montserrat">
-                        {countLabel}
-                      </p>
-                    </div>
+                      {/* Content */}
+                      <div className="absolute bottom-8 left-8 right-8">
+                        <h3 className="text-[20px] font-normal font-cormorant text-white mb-2">
+                          {cat.name}
+                        </h3>
+                        <p className="text-white/60 text-sm font-montserrat">
+                          {countLabel}
+                        </p>
+                      </div>
 
-                    {/* Hover Border Glow */}
-                    <div className="absolute inset-0 border border-primary/0 group-hover:border-primary/30 rounded-xl transition-all duration-300 shadow-[inset_0_0_20px_rgba(212,175,55,0)] group-hover:shadow-[inset_0_0_40px_rgba(212,175,55,0.1)]" />
-                  </motion.div>
-                </Link>
-              );
-            })
-          )}
+                      {/* Hover Border Glow */}
+                      <div className="absolute inset-0 border border-primary/0 group-hover:border-primary/30 rounded-xl transition-all duration-300 shadow-[inset_0_0_20px_rgba(212,175,55,0)] group-hover:shadow-[inset_0_0_40px_rgba(212,175,55,0.1)]" />
+                    </motion.div>
+                  </Link>
+                );
+              })}
         </div>
       </div>
     </section>
