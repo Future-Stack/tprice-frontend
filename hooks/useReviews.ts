@@ -4,7 +4,9 @@ import {
   getReviewsApi,
   getAdminReviewsApi,
   deleteAdminReviewApi,
+  updateReviewApi,
   CreateReviewPayload,
+  UpdateReviewPayload,
   GetReviewsParams,
   GetReviewsResponse,
   ReviewItem,
@@ -67,5 +69,24 @@ export const useCreateReviewMutation = () => {
     },
   });
 };
+
+/**
+ * Custom React Query hook for updating a review by ID
+ */
+export const useUpdateReviewMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    ReviewItem,
+    Error,
+    { id: string; payload: UpdateReviewPayload }
+  >({
+    mutationFn: ({ id, payload }) => updateReviewApi(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: REVIEWS_QUERY_KEYS.all });
+    },
+  });
+};
+
 
 

@@ -22,9 +22,17 @@ import {
   Building,
   Copy,
   CheckCircle2,
+  Send,
 } from "lucide-react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
 import { useOfferDetailQuery, useAcceptOfferMutation } from "@/hooks/useOffers";
+import {
+  useDealsQuery,
+  useDealDetailQuery,
+  useDealMessagesQuery,
+  useSendDealMessageMutation,
+} from "@/hooks/useDeals";
+import { DealMessage } from "@/lib/api/deals";
 import { toast } from "sonner";
 
 const StatusBadge = ({ status }: { status?: string }) => {
@@ -262,16 +270,36 @@ const OfferDetailSkeleton = () => (
 export default function OfferDetailsPage() {
   const params = useParams();
   const router = useRouter();
-  const offerId = params?.id as string;
+  const rawId = params?.id;
+  const offerId = Array.isArray(rawId) ? rawId[0] : (rawId as string) || "";
 
   const [accepting, setAccepting] = useState(false);
   const [copiedId, setCopiedId] = useState(false);
+  const [messageInput, setMessageInput] = useState("");
+  const chatScrollRef = React.useRef<HTMLDivElement>(null);
 
   const { data: offer, isLoading, isError, refetch } = useOfferDetailQuery(
     offerId
   );
 
+  const { data: dealsResponse } = useDealsQuery({ page: 1, limit: 10 });
+  const dealsList = dealsResponse?.data || [];
+  const matchedDeal = dealsList.find(
+    (d) => d.offerId === offerId || d.id === offerId
+  );
+  const targetDealId = matchedDeal?.id || offer?.deal?.id || offer?.id || "";
+
+  const { data: dealDetail } = useDealDetailQuery(targetDealId);
+  const { data: dealMessages = [] } = useDealMessagesQuery(targetDealId);
+
   const { mutate: acceptOffer } = useAcceptOfferMutation();
+  const sendDealMessageMutation = useSendDealMessageMutation();
+
+  React.useEffect(() => {
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+    }
+  }, [offer?.histories, dealMessages, dealDetail]);
 
   const handleAccept = () => {
     if (!offerId) return;
@@ -332,6 +360,7 @@ export default function OfferDetailsPage() {
     offer.status?.toUpperCase() === "ACTION REQUIRED";
   const isAccepted = offer.status?.toUpperCase() === "ACCEPTED";
   const isCountered = offer.status?.toUpperCase() === "COUNTERED";
+  const isAuction = offer.listing?.saleType?.toUpperCase() === "AUCTION";
 
   const currency = offer.listing?.currency || "USD";
   const formattedCurrentAmount = formatCurrency(offer.currentAmount, currency);
@@ -368,6 +397,91 @@ export default function OfferDetailsPage() {
       priceDiffPercent = Math.round(((current - asking) / asking) * 100);
     }
   }
+
+  // Combine & format messages for deal conversation section
+  const embeddedDealMessages: DealMessage[] = [
+    ...((matchedDeal as any)?.messages || []),
+    ...((offer?.deal as any)?.messages || []),
+    ...((dealDetail as any)?.messages || []),
+  ];
+
+  const rawDealMessagesList = [...embeddedDealMessages, ...(dealMessages || [])];
+
+  const uniqueMessagesMap = new Map<string, DealMessage>();
+  rawDealMessagesList.forEach((m) => {
+    if (m && m.id) {
+      uniqueMessagesMap.set(m.id, m);
+    }
+  });
+  const combinedDealMessages = Array.from(uniqueMessagesMap.values());
+
+  const formattedDealMessages = combinedDealMessages.map((m) => {
+    const isSeller = m.senderId === offer.sellerId || m.sender?.role === "SELLER";
+    const senderFirstName =
+      m.sender?.firstName ||
+      (isSeller ? offer.seller?.firstName || "Seller" : offer.buyer?.firstName || "Buyer");
+    const senderLastName =
+      m.sender?.lastName ||
+      (isSeller ? offer.seller?.lastName || "" : offer.buyer?.lastName || "");
+    const senderFullName = `${senderFirstName} ${senderLastName}`.trim();
+    const senderRole = m.sender?.role || (isSeller ? "SELLER" : "BUYER");
+
+    return {
+      id: `chat-${m.id}`,
+      type: "chat" as const,
+      senderId: m.senderId,
+      senderName: senderFullName,
+      senderRole: senderRole,
+      senderAvatar: m.sender?.avatarUrl || (isSeller ? offer.seller?.avatarUrl : offer.buyer?.avatarUrl),
+      text: m.message,
+      amount: undefined as string | undefined,
+      action: undefined as string | undefined,
+      createdAt: m.createdAt,
+    };
+  });
+
+  const formattedHistories = (offer.histories || []).map((h) => {
+    const isBuyer = h.senderId === offer.buyerId;
+    return {
+      id: `history-${h.id}`,
+      type: "history" as const,
+      senderId: h.senderId,
+      senderName: isBuyer
+        ? buyerName
+        : `${h.sender?.firstName || sellerName} ${h.sender?.lastName || ""}`.trim(),
+      senderRole: isBuyer ? "BUYER" : "SELLER",
+      senderAvatar: isBuyer ? offer.buyer?.avatarUrl : offer.seller?.avatarUrl,
+      text: h.note || `Offer updated to ${formatCurrency(h.amount, currency)}`,
+      amount: h.amount as string | undefined,
+      action: h.action as string | undefined,
+      createdAt: h.createdAt,
+    };
+  });
+
+  const combinedTimeline = [...formattedHistories, ...formattedDealMessages].sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  );
+
+  const handleSendMessage = async () => {
+    const trimmed = messageInput.trim();
+    if (!trimmed) return;
+
+    const activeDealId = targetDealId || offer.deal?.id || offer.id;
+    if (!activeDealId) {
+      toast.error("Unable to send message: Deal identifier is missing.");
+      return;
+    }
+
+    try {
+      await sendDealMessageMutation.mutateAsync({
+        dealId: activeDealId,
+        message: trimmed,
+      });
+      setMessageInput("");
+    } catch {
+      // Handled in mutation onError toast
+    }
+  };
 
   return (
     <div className="w-full max-w-full mx-auto">
@@ -427,13 +541,15 @@ export default function OfferDetailsPage() {
                   <span>{accepting ? "Accepting..." : "Accept Offer"}</span>
                 </button>
 
-                <button
-                  disabled={accepting}
-                  className="px-5 py-3 rounded-xl bg-[#E78F23]/10 border border-[#E78F23]/30 text-[#E78F23] hover:bg-[#E78F23] hover:text-black font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <RefreshCcw size={16} strokeWidth={2.5} />
-                  <span>Counter</span>
-                </button>
+                {!isAuction && (
+                  <button
+                    disabled={accepting}
+                    className="px-5 py-3 rounded-xl bg-[#E78F23]/10 border border-[#E78F23]/30 text-[#E78F23] hover:bg-[#E78F23] hover:text-black font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <RefreshCcw size={16} strokeWidth={2.5} />
+                    <span>Counter</span>
+                  </button>
+                )}
 
                 <button
                   disabled={accepting}
@@ -701,6 +817,113 @@ export default function OfferDetailsPage() {
                 </div>
               </div>
             )}
+
+            {/* Conversation & Live Chat Section (Shown when offer is accepted or deal exists) */}
+            {(isAccepted || offer.deal) && (
+              <div className="bg-[#111113] rounded-2xl border border-[#E78F23]/20 p-6 md:p-8 shadow-2xl space-y-6">
+                <div className="flex items-center justify-between pb-4 border-b border-white/5">
+                  <div className="flex items-center gap-2.5 text-xs font-bold uppercase tracking-widest text-[#E78F23]">
+                    <MessageSquare size={16} />
+                    <span>Deal Conversation</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-sans font-medium flex items-center gap-1.5 normal-case tracking-normal">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      Live Chat
+                    </span>
+                  </div>
+                  <span className="text-xs font-semibold text-gray-400 bg-white/5 px-3 py-1 rounded-full">
+                    {combinedTimeline.length} message{combinedTimeline.length !== 1 ? "s" : ""}
+                  </span>
+                </div>
+
+                {/* Messages Box */}
+                <div
+                  ref={chatScrollRef}
+                  className="space-y-4 max-h-[420px] overflow-y-auto pr-2 custom-scrollbar"
+                >
+                  {combinedTimeline.length === 0 ? (
+                    <div className="text-center py-10 text-gray-500 text-sm flex flex-col items-center gap-2">
+                      <MessageSquare size={28} className="text-gray-600 stroke-[1.5]" />
+                      <span>No conversation messages recorded yet. Send a message below to communicate with the buyer.</span>
+                    </div>
+                  ) : (
+                    combinedTimeline.map((item) => {
+                      const isSelf = item.senderId === offer.sellerId || item.senderRole === "SELLER";
+                      return (
+                        <div
+                          key={item.id}
+                          className={`flex ${isSelf ? "justify-end" : "justify-start"}`}
+                        >
+                          <div
+                            className={`max-w-[80%] p-4 rounded-2xl text-xs md:text-sm leading-relaxed ${
+                              item.type === "history"
+                                ? isSelf
+                                  ? "bg-[#E78F23]/10 border border-[#E78F23]/25 text-white rounded-br-none"
+                                  : "bg-white/5 border border-white/10 text-white/90 rounded-bl-none"
+                                : isSelf
+                                ? "bg-[#E78F23]/15 border border-[#E78F23]/35 text-white rounded-br-none shadow-[0_0_15px_rgba(231,143,35,0.05)]"
+                                : "bg-white/5 border border-white/15 text-white/90 rounded-bl-none"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between gap-4 mb-1.5">
+                              <div className="text-[10px] font-bold uppercase tracking-wider text-[#E78F23] flex items-center gap-1.5">
+                                {isSelf ? "You (Seller)" : item.senderName}
+                                {item.senderRole && (
+                                  <span className="px-1.5 py-0.5 rounded text-[9px] bg-white/10 text-gray-300 font-mono">
+                                    {item.senderRole}
+                                  </span>
+                                )}
+                              </div>
+                              {item.amount && (
+                                <span className="text-[10px] font-bold text-[#E78F23] bg-[#E78F23]/10 px-2 py-0.5 rounded">
+                                  {formatCurrency(item.amount, currency)}
+                                </span>
+                              )}
+                            </div>
+                            <p className="whitespace-pre-wrap">{item.text}</p>
+                            <div className="text-[10px] text-gray-500 mt-2 flex items-center justify-between gap-2">
+                              <span>{formatDate(item.createdAt)}</span>
+                              {item.type === "history" && (
+                                <span className="italic text-[9px] text-[#E78F23]/70">Offer Event</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+
+                {/* Input Area */}
+                <div className="pt-3 border-t border-white/5">
+                  <div className="relative flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={messageInput}
+                      onChange={(e) => setMessageInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSendMessage();
+                        }
+                      }}
+                      placeholder="Type your message to the buyer..."
+                      className="w-full bg-[#18181b] border border-white/10 rounded-xl py-3.5 px-4 pr-12 text-xs md:text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-[#E78F23] transition-all"
+                    />
+                    <button
+                      onClick={handleSendMessage}
+                      disabled={sendDealMessageMutation.isPending || !messageInput.trim()}
+                      className="absolute right-2 p-2 rounded-lg bg-[#E78F23] hover:bg-[#E78F23]/90 text-black font-bold disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+                    >
+                      {sendDealMessageMutation.isPending ? (
+                        <Loader2 size={16} className="animate-spin text-black" />
+                      ) : (
+                        <Send size={16} />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right Column (User Info & Metadata Sidebar) */}
@@ -816,7 +1039,9 @@ export default function OfferDetailsPage() {
                     <span>Action Required</span>
                   </div>
                   <p className="text-xs text-gray-400">
-                    Review the buyer's offer carefully. You can accept to start a deal, send a counter offer, or decline.
+                    {isAuction
+                      ? "Review the buyer's offer carefully. You can accept to start a deal or decline."
+                      : "Review the buyer's offer carefully. You can accept to start a deal, send a counter offer, or decline."}
                   </p>
                   <button
                     onClick={handleAccept}
