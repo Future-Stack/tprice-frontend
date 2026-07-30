@@ -4,10 +4,18 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ChevronDown, LayoutDashboard, LogOut, Loader2 } from "lucide-react";
+import {
+  Menu,
+  X,
+  ChevronDown,
+  LayoutDashboard,
+  LogOut,
+  Loader2,
+} from "lucide-react";
 import Cookies from "js-cookie";
 import { useAuthStore, User } from "@/lib/store/useAuthStore";
 import { useLogoutMutation, useGetMeQuery } from "@/hooks/useAuth";
+import Image from "next/image";
 
 interface SubLink {
   name: string;
@@ -51,9 +59,12 @@ export default function LandingNavbar() {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
-  const router = useRouter();
 
-  const { user: storeUser, token: storeToken, isAuthenticated } = useAuthStore();
+  const {
+    user: storeUser,
+    token: storeToken,
+    isAuthenticated,
+  } = useAuthStore();
   const logoutMutation = useLogoutMutation();
 
   useEffect(() => {
@@ -62,10 +73,12 @@ export default function LandingNavbar() {
 
   // Fetch user profile via TanStack Query
   const hasToken = mounted && !!(Cookies.get("access_token") || storeToken);
-  const { data: userProfile, isLoading: isUserLoading } = useGetMeQuery(hasToken);
+  const { data: userProfile, isLoading: isUserLoading } =
+    useGetMeQuery(hasToken);
 
   const user = userProfile || storeUser;
   const isLoading = isUserLoading && hasToken;
+  const isLoggedIn = (isAuthenticated || hasToken) && !!user;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -123,16 +136,20 @@ export default function LandingNavbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-100 transition-all duration-300 ${
-        scrolled ? "bg-black/80 backdrop-blur-lg py-4" : "bg-transparent py-6"
+      className={`fixed top-0 left-0 right-0 z-100 transition-all duration-300 bg-black ${
+        scrolled ? "bg-black/80 backdrop-blur-lg py-4" : "bg-black py-6"
       }`}
     >
       <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <span className="text-2xl font-bold tracking-tight text-primary font-montserrat">
-            Exotic<span className="text-white">World</span>
-          </span>
+          <Image
+            src="./logo.svg"
+            alt="Logo"
+            className="w-full"
+            width={40}
+            height={40}
+          />
         </Link>
 
         {/* Desktop Links */}
@@ -179,7 +196,7 @@ export default function LandingNavbar() {
                         exit={{ opacity: 0, y: 10 }}
                         className="absolute top-full left-0 pt-6 z-101"
                       >
-                        <div className="bg-[#0A0A0A] border border-white/10 rounded-sm p-2 min-w-[200px] shadow-2xl backdrop-blur-xl">
+                        <div className="bg-[#0A0A0A] border border-white/10 rounded-sm p-2 min-w-50 shadow-2xl backdrop-blur-xl">
                           {link.subLinks.map((sub) => (
                             <Link
                               key={sub.name}
@@ -229,7 +246,7 @@ export default function LandingNavbar() {
                 <div className="w-12 h-2 bg-white/15 rounded" />
               </div>
             </div>
-          ) : isAuthenticated && user ? (
+          ) : isLoggedIn ? (
             /* Authenticated User Menu */
             <div className="relative" ref={dropdownRef}>
               <button
@@ -280,7 +297,7 @@ export default function LandingNavbar() {
                   >
                     {/* User Card */}
                     <div className="flex items-center gap-3 p-3 bg-white/5 rounded border border-white/5">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 border border-primary/40 flex items-center justify-center shrink-0 overflow-hidden">
+                      <div className="w-10 h-10 rounded-full bg-linear-to-br from-primary/30 to-primary/10 border border-primary/40 flex items-center justify-center shrink-0 overflow-hidden">
                         {user.avatarUrl || user.avatar ? (
                           <img
                             src={user.avatarUrl || user.avatar}
@@ -457,7 +474,7 @@ export default function LandingNavbar() {
                     <div className="w-16 h-2.5 bg-white/15 rounded" />
                   </div>
                 </div>
-              ) : isAuthenticated && user ? (
+              ) : isLoggedIn ? (
                 <div className="flex flex-col gap-4">
                   {/* User Profile Card */}
                   <div className="flex items-center gap-3 p-3 bg-white/5 rounded border border-white/10">

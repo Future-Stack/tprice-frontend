@@ -20,15 +20,10 @@ interface FilterSidebarProps {
   brands: string[];
   setBrands: (val: string[]) => void;
 
-  conditions: string[];
-  setConditions: (val: string[]) => void;
-
   priceRange: DualRangeState;
   setPriceRange: (val: DualRangeState) => void;
   yearRange: DualRangeState;
   setYearRange: (val: DualRangeState) => void;
-  mileageRange: DualRangeState;
-  setMileageRange: (val: DualRangeState) => void;
 
   isOpen: boolean;
   onClose: () => void;
@@ -44,7 +39,13 @@ const FALLBACK_BRANDS = [
   "Rolls-Royce",
   "Bentley",
 ];
-const CONDITIONS = ["New", "Used"];
+
+const SORT_OPTIONS = [
+  { label: "Newest", value: "NEWEST" },
+  { label: "Price: Low to High", value: "PRICE_ASC" },
+  { label: "Price: High to Low", value: "PRICE_DESC" },
+  { label: "Most Viewed", value: "VIEWS" },
+];
 
 interface DualSliderProps {
   label: string;
@@ -132,14 +133,10 @@ export default function FilterSidebar({
   setCategory,
   brands,
   setBrands,
-  conditions,
-  setConditions,
   priceRange,
   setPriceRange,
   yearRange,
   setYearRange,
-  mileageRange,
-  setMileageRange,
   isOpen,
   onClose,
   onClear,
@@ -181,13 +178,8 @@ export default function FilterSidebar({
     );
   };
 
-  const toggleCondition = (cond: string) => {
-    setConditions(
-      conditions.includes(cond)
-        ? conditions.filter((c) => c !== cond)
-        : [...conditions, cond],
-    );
-  };
+  const currentSortLabel =
+    SORT_OPTIONS.find((opt) => opt.value === sortBy)?.label || sortBy;
 
   const content = (
     <div className="flex flex-col h-full space-y-6">
@@ -213,26 +205,21 @@ export default function FilterSidebar({
           onClick={() => setIsSortOpen(!isSortOpen)}
           className="w-full flex items-center justify-between bg-white/5 border border-primary/30 rounded-md py-3 px-4 text-white/80 text-sm hover:border-primary/50 transition-colors"
         >
-          {sortBy}
+          {currentSortLabel}
           <ChevronDown className="w-4 h-4 text-white/50" />
         </button>
         {isSortOpen && (
           <div className="absolute z-50 w-full mt-2 bg-[#1a1a1a] border border-white/10 rounded-md shadow-2xl py-2">
-            {[
-              "Best Match",
-              "Price: Low to High",
-              "Price: High to Low",
-              "Newest Arrivals",
-            ].map((option) => (
+            {SORT_OPTIONS.map((option) => (
               <button
-                key={option}
+                key={option.value}
                 onClick={() => {
-                  setSortBy(option);
+                  setSortBy(option.value);
                   setIsSortOpen(false);
                 }}
                 className="w-full text-left px-4 py-2 text-sm text-white/70 hover:bg-white/5 hover:text-white transition-colors"
               >
-                {option}
+                {option.label}
               </button>
             ))}
           </div>
@@ -309,33 +296,6 @@ export default function FilterSidebar({
         </div>
       </div>
 
-      {/* Condition */}
-      <div className="mb-6 space-y-3">
-        <h3 className="text-white text-sm font-medium mb-3">Condition</h3>
-        {CONDITIONS.map((cond) => (
-          <label
-            key={cond}
-            className="flex items-center gap-3 cursor-pointer group"
-            onClick={() => toggleCondition(cond)}
-          >
-            <div
-              className={`w-4 h-4 rounded-sm border flex items-center justify-center transition-colors ${
-                conditions.includes(cond)
-                  ? "bg-primary border-primary"
-                  : "border-white/20 group-hover:border-primary/50"
-              }`}
-            >
-              {conditions.includes(cond) && (
-                <div className="w-2 h-2 bg-black rounded-sm" />
-              )}
-            </div>
-            <span className="text-white/70 text-sm font-light group-hover:text-white transition-colors">
-              {cond}
-            </span>
-          </label>
-        ))}
-      </div>
-
       {/* Year Range Slider */}
       <DualRangeSlider
         label="Build Year"
@@ -344,17 +304,6 @@ export default function FilterSidebar({
         step={1}
         value={yearRange}
         onChange={setYearRange}
-      />
-
-      {/* Mileage Slider */}
-      <DualRangeSlider
-        label="Mileage"
-        min={0}
-        max={100000}
-        step={1000}
-        value={mileageRange}
-        onChange={setMileageRange}
-        formatValue={(val) => `${val.toLocaleString()} mi`}
       />
 
       {/* Reset Button */}

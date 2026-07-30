@@ -49,8 +49,19 @@ export interface LoginResponse {
   user: User;
 }
 
+export interface RefreshPayload {
+  refreshToken: string;
+}
+
+export interface RefreshResponse {
+  accessToken: string;
+  refreshToken: string;
+  user: User;
+}
+
 export interface LogoutResponse {
   message?: string;
   [key: string]: any;
 }
+
 

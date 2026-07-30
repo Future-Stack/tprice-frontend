@@ -13,6 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Gavel,
+  DollarSign,
 } from "lucide-react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
 import { useOffersQuery } from "@/hooks/useOffers";
@@ -21,11 +22,12 @@ import { toast } from "sonner";
 
 /* ─── Helper Functions ─── */
 const formatPrice = (priceStr?: string | number | null, currency = "USD") => {
-  if (priceStr === undefined || priceStr === null || priceStr === "") return "$0";
+  if (priceStr === undefined || priceStr === null || priceStr === "")
+    return "$0";
   const num = typeof priceStr === "number" ? priceStr : parseFloat(priceStr);
   if (isNaN(num)) return `${priceStr}`;
-  const symbol = currency === "EUR" ? "€" : currency === "GBP" ? "£" : "$";
-  return `${symbol}${num.toLocaleString()}`;
+
+  return `$${num.toLocaleString()}`;
 };
 
 const formatDate = (dateString?: string) => {
@@ -254,7 +256,7 @@ export default function MyBidsPage() {
                         <span className="text-sm font-medium text-gray-400">
                           {formatPrice(
                             bid.initialAmount || bid.currentAmount,
-                            bidCurrency
+                            bidCurrency,
                           )}
                         </span>
 
@@ -274,11 +276,13 @@ export default function MyBidsPage() {
 
                         {/* Actions */}
                         <div className="flex items-center justify-end gap-1 sm:gap-2 pr-2">
-                          {(bid.listing?.saleType || "").toUpperCase() === "AUCTION" &&
+                          {(bid.listing?.saleType || "").toUpperCase() ===
+                            "AUCTION" &&
                             (bid.status || "").toUpperCase() !== "ACCEPTED" &&
                             (bid.status || "").toUpperCase() !== "WON" &&
                             ((bid.status || "").toUpperCase() === "OUTBID" ||
-                              (bid.status || "").toUpperCase() === "COUNTERED") && (
+                              (bid.status || "").toUpperCase() ===
+                                "COUNTERED") && (
                               <Link
                                 href={`/buyer/marketplace/${
                                   bid.listing?.slug || bid.listingId
@@ -358,7 +362,8 @@ export default function MyBidsPage() {
                 {/* Product Info */}
                 <div>
                   <span className="inline-block bg-[#E78F23]/20 text-[#E78F23] text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-wider mb-3">
-                    {selectedBid.listing?.saleType?.replace("_", " ") || "Auction"}
+                    {selectedBid.listing?.saleType?.replace("_", " ") ||
+                      "Auction"}
                   </span>
                   <h2 className="text-2xl sm:text-3xl font-clash font-semibold text-white">
                     {selectedBid.listing?.title || "Listing Details"}
@@ -427,7 +432,7 @@ export default function MyBidsPage() {
                           Asking:{" "}
                           {formatPrice(
                             selectedBid.listing?.askingPrice,
-                            currency
+                            currency,
                           )}
                         </p>
                       </div>
@@ -503,7 +508,8 @@ export default function MyBidsPage() {
 
                 {/* Actions */}
                 <div className="space-y-3 pt-2">
-                  {(selectedBid.listing?.saleType || "").toUpperCase() === "AUCTION" &&
+                  {(selectedBid.listing?.saleType || "").toUpperCase() ===
+                    "AUCTION" &&
                     (selectedBid.status || "").toUpperCase() !== "ACCEPTED" &&
                     (selectedBid.status || "").toUpperCase() !== "WON" && (
                       <Link
@@ -621,7 +627,10 @@ function MyBidsSkeleton() {
 
           <div className="grid grid-cols-2 gap-3">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="bg-[#111111] rounded-xl p-3.5 border border-white/5 space-y-2">
+              <div
+                key={i}
+                className="bg-[#111111] rounded-xl p-3.5 border border-white/5 space-y-2"
+              >
                 <div className="h-2.5 bg-[#252528] rounded w-16" />
                 <div className="h-4 bg-[#252528] rounded w-20" />
               </div>

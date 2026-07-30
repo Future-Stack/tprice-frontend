@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import Cookies from "js-cookie";
 
-import { loginApi } from "@/lib/api/auth";
+import { loginApi, handleGoogleLogin } from "@/lib/api/auth";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 
 export default function LoginPage() {
@@ -76,15 +76,7 @@ export default function LoginPage() {
       const res = await loginApi(payload);
 
       if (res?.accessToken) {
-        useAuthStore.getState().setAuth(res.user, res.accessToken);
-
-        if (res.refreshToken) {
-          Cookies.set("refresh_token", res.refreshToken, {
-            expires: rememberMe ? 30 : 7,
-            secure: true,
-            sameSite: "lax",
-          });
-        }
+        useAuthStore.getState().setAuth(res.user, res.accessToken, res.refreshToken);
       }
 
       toast.success("Welcome back! Login successful.");
@@ -261,6 +253,7 @@ export default function LoginPage() {
 
               <button
                 type="button"
+                onClick={handleGoogleLogin}
                 className="w-full cursor-pointer border border-white/10 bg-transparent py-4 rounded-lg flex items-center justify-center gap-3 text-white/80 text-sm font-medium hover:bg-white/5 transition-all"
               >
                 <svg viewBox="0 0 24 24" className="w-5 h-5">

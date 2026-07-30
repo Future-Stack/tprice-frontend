@@ -14,7 +14,13 @@ import {
   ChevronRight,
   Loader2,
 } from "lucide-react";
-import { useOffersQuery, useAcceptOfferMutation } from "@/hooks/useOffers";
+import {
+  useOffersQuery,
+  useAcceptOfferMutation,
+  useRejectOfferMutation,
+} from "@/hooks/useOffers";
+import CounterOfferModal from "./CounterOfferModal";
+import { OfferItem } from "@/lib/api/offers";
 
 const StatusBadge = ({ status }: { status: string }) => {
   const normalized = status?.toUpperCase() || "";
@@ -155,6 +161,10 @@ const OffersSkeleton = () => (
 function OfferReceieved() {
   const [page, setPage] = useState(1);
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
+  const [rejectingId, setRejectingId] = useState<string | null>(null);
+  const [counterModalOpen, setCounterModalOpen] = useState(false);
+  const [selectedCounterOffer, setSelectedCounterOffer] =
+    useState<OfferItem | null>(null);
   const limit = 10;
 
   const { data, isLoading, isError, refetch } = useOffersQuery({
@@ -163,12 +173,22 @@ function OfferReceieved() {
   });
 
   const { mutate: acceptOffer } = useAcceptOfferMutation();
+  const { mutate: rejectOffer } = useRejectOfferMutation();
 
   const handleAccept = (offerId: string) => {
     setAcceptingId(offerId);
     acceptOffer(offerId, {
       onSettled: () => {
         setAcceptingId(null);
+      },
+    });
+  };
+
+  const handleReject = (offerId: string) => {
+    setRejectingId(offerId);
+    rejectOffer(offerId, {
+      onSettled: () => {
+        setRejectingId(null);
       },
     });
   };
@@ -284,11 +304,10 @@ function OfferReceieved() {
                   );
                   const isPending =
                     offer.status?.toUpperCase() === "PENDING" ||
-                    offer.status?.toUpperCase() === "ACTION REQUIRED";
-                  const isCountered =
+                    offer.status?.toUpperCase() === "ACTION REQUIRED" ||
                     offer.status?.toUpperCase() === "COUNTERED";
-                  const isAuction =
-                    offer.listing?.saleType?.toUpperCase() === "AUCTION";
+                  const allowCounterOffers =
+                    offer.listing?.allowCounterOffers === true;
 
                   return (
                     <div
@@ -361,8 +380,12 @@ function OfferReceieved() {
                                     : "Accept"}
                                 </span>
                               </button>
-                              {!isAuction && (
+                              {allowCounterOffers && (
                                 <button
+                                  onClick={() => {
+                                    setSelectedCounterOffer(offer);
+                                    setCounterModalOpen(true);
+                                  }}
                                   disabled={acceptingId === offer.id}
                                   className="flex items-center gap-1.5 text-sm font-bold text-primary hover:text-primary transition-all hover:scale-105 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
@@ -370,18 +393,27 @@ function OfferReceieved() {
                                 </button>
                               )}
                               <button
-                                disabled={acceptingId === offer.id}
+                                onClick={() => handleReject(offer.id)}
+                                disabled={
+                                  acceptingId === offer.id ||
+                                  rejectingId === offer.id
+                                }
                                 className="flex items-center gap-1.5 text-sm font-bold text-red-500 hover:text-red-400 transition-all hover:scale-105 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                               >
-                                <X size={16} strokeWidth={3} /> Reject
+                                {rejectingId === offer.id ? (
+                                  <Loader2
+                                    size={16}
+                                    className="animate-spin text-red-500"
+                                  />
+                                ) : (
+                                  <X size={16} strokeWidth={3} />
+                                )}
+                                <span>
+                                  {rejectingId === offer.id
+                                    ? "Rejecting..."
+                                    : "Reject"}
+                                </span>
                               </button>
-                            </div>
-                          )}
-
-                          {isCountered && (
-                            <div className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                              <Clock size={14} className="animate-pulse" />{" "}
-                              Awaiting Buyer
                             </div>
                           )}
 
@@ -436,7 +468,9 @@ function OfferReceieved() {
                             {isPending && (
                               <div
                                 className={`grid ${
-                                  isAuction ? "grid-cols-2" : "grid-cols-3"
+                                  allowCounterOffers
+                                    ? "grid-cols-3"
+                                    : "grid-cols-2"
                                 } gap-3`}
                               >
                                 <button
@@ -458,8 +492,12 @@ function OfferReceieved() {
                                       : "Accept"}
                                   </span>
                                 </button>
-                                {!isAuction && (
+                                {allowCounterOffers && (
                                   <button
+                                    onClick={() => {
+                                      setSelectedCounterOffer(offer);
+                                      setCounterModalOpen(true);
+                                    }}
                                     disabled={acceptingId === offer.id}
                                     className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-[#E78F23]/10 border border-[#E78F23]/20 text-primary transition-active active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                   >
@@ -470,21 +508,27 @@ function OfferReceieved() {
                                   </button>
                                 )}
                                 <button
-                                  disabled={acceptingId === offer.id}
+                                  onClick={() => handleReject(offer.id)}
+                                  disabled={
+                                    acceptingId === offer.id ||
+                                    rejectingId === offer.id
+                                  }
                                   className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 transition-active active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                  <X size={20} strokeWidth={3} />
+                                  {rejectingId === offer.id ? (
+                                    <Loader2
+                                      size={20}
+                                      className="animate-spin text-red-500"
+                                    />
+                                  ) : (
+                                    <X size={20} strokeWidth={3} />
+                                  )}
                                   <span className="text-[10px] font-black uppercase tracking-widest">
-                                    Reject
+                                    {rejectingId === offer.id
+                                      ? "Rejecting..."
+                                      : "Reject"}
                                   </span>
                                 </button>
-                              </div>
-                            )}
-
-                            {isCountered && (
-                              <div className="flex items-center justify-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest pb-1">
-                                <Clock size={14} className="animate-pulse" />{" "}
-                                Awaiting Buyer
                               </div>
                             )}
 
@@ -565,6 +609,13 @@ function OfferReceieved() {
           </div>
         </div>
       </AnimationWrapper>
+
+      {/* Counter Offer Modal */}
+      <CounterOfferModal
+        isOpen={counterModalOpen}
+        onClose={() => setCounterModalOpen(false)}
+        offer={selectedCounterOffer}
+      />
     </div>
   );
 }

@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import Cookies from "js-cookie";
 
-import { registerApi } from "@/lib/api/auth";
+import { registerApi, handleGoogleLogin } from "@/lib/api/auth";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 
 export default function RegisterPage() {
@@ -106,14 +106,7 @@ export default function RegisterPage() {
           name: `${payload.firstName} ${payload.lastName}`,
         };
 
-        useAuthStore.getState().setAuth(fullUser, res.accessToken);
-        if (res.refreshToken) {
-          Cookies.set("refresh_token", res.refreshToken, {
-            expires: 7,
-            secure: true,
-            sameSite: "lax",
-          });
-        }
+        useAuthStore.getState().setAuth(fullUser, res.accessToken, res.refreshToken);
       }
 
       toast.success("Registration successful! Welcome to Exoticworld.");
@@ -359,6 +352,7 @@ export default function RegisterPage() {
 
               <button
                 type="button"
+                onClick={handleGoogleLogin}
                 className="w-full cursor-pointer border border-white/10 bg-transparent py-3 rounded-lg flex items-center justify-center gap-3 text-white/80 text-sm font-medium hover:bg-white/5 transition-all"
               >
                 <svg viewBox="0 0 24 24" className="w-5 h-5">

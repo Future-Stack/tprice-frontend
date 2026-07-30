@@ -84,7 +84,7 @@ export default function UpdateListingModal({
 
   // Pricing & Sale Type States
   const [saleType, setSaleType] = useState<
-    "FIXED_PRICE" | "AUCTION" | "PRIVATE"
+    "FIXED_PRICE" | "AUCTION" | "PRIVATE_SALE"
   >("FIXED_PRICE");
   const [askingPrice, setAskingPrice] = useState<string>("");
   const [startingBid, setStartingBid] = useState<string>("");
@@ -115,10 +115,13 @@ export default function UpdateListingModal({
       setLocationCountry(listing.locationCountry || "");
       setIsOffMarket(Boolean(listing.isOffMarket));
 
-      setSaleType(
-        (listing.saleType as "FIXED_PRICE" | "AUCTION" | "PRIVATE") ||
-          "FIXED_PRICE",
-      );
+      const rawSaleType = (listing.saleType as string || "").toUpperCase();
+      const initialSaleType =
+        rawSaleType === "PRIVATE" || rawSaleType === "PRIVATE_SALE"
+          ? "PRIVATE_SALE"
+          : (rawSaleType as "FIXED_PRICE" | "AUCTION" | "PRIVATE_SALE") ||
+            "FIXED_PRICE";
+      setSaleType(initialSaleType);
       setAskingPrice(
         listing.askingPrice !== undefined && listing.askingPrice !== null
           ? String(listing.askingPrice)
@@ -317,7 +320,7 @@ export default function UpdateListingModal({
       return false;
     }
 
-    if (saleType === "FIXED_PRICE" || saleType === "PRIVATE") {
+    if (saleType === "FIXED_PRICE") {
       if (
         askingPrice === "" ||
         isNaN(Number(askingPrice)) ||
@@ -616,7 +619,7 @@ export default function UpdateListingModal({
                   {[
                     { id: "FIXED_PRICE", label: "Fixed Price" },
                     { id: "AUCTION", label: "Auction" },
-                    { id: "PRIVATE", label: "Private Treaty" },
+                    { id: "PRIVATE_SALE", label: "Private Treaty" },
                   ].map((st) => (
                     <button
                       key={st.id}
@@ -635,7 +638,7 @@ export default function UpdateListingModal({
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {(saleType === "FIXED_PRICE" || saleType === "PRIVATE") && (
+                {(saleType === "FIXED_PRICE" || saleType === "PRIVATE_SALE") && (
                   <div>
                     <label className="block text-xs font-semibold text-gray-300 mb-2">
                       Asking Price <span className="text-rose-500">*</span>

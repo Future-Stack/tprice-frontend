@@ -1,9 +1,12 @@
+import axios from "axios";
 import apiClient from "./axios";
 import {
   RegisterPayload,
   RegisterResponse,
   LoginPayload,
   LoginResponse,
+  RefreshPayload,
+  RefreshResponse,
   LogoutResponse,
   User,
 } from "@/lib/types/auth";
@@ -19,6 +22,23 @@ export const loginApi = async (payload: LoginPayload): Promise<LoginResponse> =>
   const response = await apiClient.post<LoginResponse>("/auth/login", payload);
   return response.data;
 };
+
+export const refreshTokenApi = async (payload: RefreshPayload): Promise<RefreshResponse> => {
+  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://tprice.softvenceomegaforce.cloud/api/v1";
+  const response = await axios.post<RefreshResponse>(`${baseURL}/auth/refresh`, payload, {
+    headers: {
+      "Content-Type": "application/json",
+      accept: "*/*",
+    },
+  });
+  return response.data;
+};
+
+export const handleGoogleLogin = (): void => {
+  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://tprice.softvenceomegaforce.cloud/api/v1";
+  window.location.href = `${baseURL}/auth/google`;
+};
+
 
 export interface UpdateProfilePayload {
   firstName?: string;

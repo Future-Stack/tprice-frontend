@@ -82,7 +82,7 @@ export default function AddListing() {
 
   // Pricing & Sale Type
   const [saleType, setSaleType] = useState<
-    "FIXED_PRICE" | "AUCTION" | "PRIVATE"
+    "FIXED_PRICE" | "AUCTION" | "PRIVATE_SALE"
   >("FIXED_PRICE");
   const [askingPrice, setAskingPrice] = useState<string>("625000");
   const [startingBid, setStartingBid] = useState<string>("500000");
@@ -202,10 +202,7 @@ export default function AddListing() {
       }
     }
     if (currentStep === 3) {
-      if (
-        saleType === "FIXED_PRICE" &&
-        (!askingPrice || Number(askingPrice) <= 0)
-      ) {
+      if (saleType === "FIXED_PRICE" && (!askingPrice || Number(askingPrice) <= 0)) {
         toast.error("Please enter a valid asking price.");
         return false;
       }
@@ -706,7 +703,7 @@ export default function AddListing() {
                   desc: "Set starting bid and auction end date",
                 },
                 {
-                  id: "PRIVATE",
+                  id: "PRIVATE_SALE",
                   title: "Private Sale",
                   desc: "Price on Application (POA)",
                 },
@@ -736,26 +733,28 @@ export default function AddListing() {
             {/* Pricing Details */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Asking Price */}
-              {(saleType === "FIXED_PRICE" || saleType === "PRIVATE") && (
-                <div className="space-y-2">
-                  <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider">
-                    Asking Price ({currency}){" "}
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider">
+                  Asking Price ({currency}){" "}
+                  {saleType === "FIXED_PRICE" ? (
                     <span className="text-primary2">*</span>
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-sm">
-                      $
-                    </span>
-                    <input
-                      type="number"
-                      value={askingPrice}
-                      onChange={(e) => setAskingPrice(e.target.value)}
-                      placeholder="625000"
-                      className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl pl-8 pr-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors shadow-inner"
-                    />
-                  </div>
+                  ) : (
+                    <span className="text-gray-500 font-normal normal-case text-xs">(Optional for Private Sale)</span>
+                  )}
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-sm">
+                    $
+                  </span>
+                  <input
+                    type="number"
+                    value={askingPrice}
+                    onChange={(e) => setAskingPrice(e.target.value)}
+                    placeholder="625000"
+                    className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl pl-8 pr-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors shadow-inner"
+                  />
                 </div>
-              )}
+              </div>
 
               {/* Starting Bid if Auction */}
               {saleType === "AUCTION" && (
@@ -806,23 +805,6 @@ export default function AddListing() {
                   </div>
                 </>
               )}
-
-              {/* Currency */}
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider">
-                  Currency
-                </label>
-                <select
-                  value={currency}
-                  onChange={(e) => setCurrency(e.target.value)}
-                  className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-primary2/60 transition-colors cursor-pointer"
-                >
-                  <option value="USD">USD ($)</option>
-                  <option value="EUR">EUR (€)</option>
-                  <option value="GBP">GBP (£)</option>
-                  <option value="AED">AED (د.إ)</option>
-                </select>
-              </div>
             </div>
 
             {/* Allow Counter Offers - Only for FIXED_PRICE */}

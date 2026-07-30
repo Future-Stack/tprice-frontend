@@ -7,7 +7,11 @@ import { toast } from "sonner";
 import ProductGallery from "../components/details/ProductGallery";
 import ProductSpecsGrid from "../components/details/ProductSpecsGrid";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
-import { useListingByIdQuery, useSaveListingMutation, useSavedListingsQuery } from "@/hooks/useListings";
+import {
+  useListingByIdQuery,
+  useSaveListingMutation,
+  useSavedListingsQuery,
+} from "@/hooks/useListings";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 import {
   MapPin,
@@ -28,6 +32,7 @@ import {
   Eye,
   Sparkles,
 } from "lucide-react";
+import Image from "next/image";
 
 // Helper to format specification key names nicely (e.g. exteriorColor -> Exterior Color)
 function formatSpecKey(key: string): string {
@@ -47,7 +52,11 @@ function formatSpecValue(key: string, val: any): string {
   const lowerKey = key.toLowerCase();
   if (typeof val === "number") {
     if (lowerKey.includes("mileage")) return `${val.toLocaleString()} mi`;
-    if (lowerKey.includes("horsepower") || lowerKey.includes("power") || lowerKey === "hp")
+    if (
+      lowerKey.includes("horsepower") ||
+      lowerKey.includes("power") ||
+      lowerKey === "hp"
+    )
       return `${val.toLocaleString()} hp`;
     if (lowerKey.includes("sqft") || lowerKey.includes("squarefeet"))
       return `${val.toLocaleString()} sq ft`;
@@ -57,7 +66,10 @@ function formatSpecValue(key: string, val: any): string {
   const strVal = String(val);
   if (lowerKey.includes("mileage") && !strVal.toLowerCase().includes("mi"))
     return `${strVal} mi`;
-  if ((lowerKey.includes("horsepower") || lowerKey.includes("power")) && !strVal.toLowerCase().includes("hp"))
+  if (
+    (lowerKey.includes("horsepower") || lowerKey.includes("power")) &&
+    !strVal.toLowerCase().includes("hp")
+  )
     return `${strVal} hp`;
 
   return strVal;
@@ -85,15 +97,19 @@ export default function InventoryDetailsPage() {
   } = useListingByIdQuery(listingId || "");
 
   const saveMutation = useSaveListingMutation();
-  const token = Cookies.get("access_token") || useAuthStore((state) => state.token);
+  const token =
+    Cookies.get("access_token") || useAuthStore((state) => state.token);
 
   const { data: savedResponse } = useSavedListingsQuery(
     { page: 1, limit: 100 },
-    { enabled: Boolean(token) }
+    { enabled: Boolean(token) },
   );
 
-  const isSavedInListings = savedResponse?.data?.some((savedItem) => savedItem.id === item?.id) ?? false;
-  const isSaved = item?.isSaved !== undefined ? item.isSaved : isSavedInListings;
+  const isSavedInListings =
+    savedResponse?.data?.some((savedItem) => savedItem.id === item?.id) ??
+    false;
+  const isSaved =
+    item?.isSaved !== undefined ? item.isSaved : isSavedInListings;
 
   const handleToggleSave = () => {
     if (!item?.id) return;
@@ -116,7 +132,9 @@ export default function InventoryDetailsPage() {
         <AnimationWrapper type="zoom">
           <div className="bg-[#0A0A0A] border border-red-500/20 p-8 md:p-12 rounded-sm max-w-md w-full shadow-2xl">
             <AlertTriangle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-            <h2 className="text-2xl font-serif mb-2 text-white">Asset Not Found</h2>
+            <h2 className="text-2xl font-serif mb-2 text-white">
+              Asset Not Found
+            </h2>
             <p className="text-white/50 text-sm mb-6 leading-relaxed">
               {(error as any)?.response?.data?.message ||
                 "The requested luxury listing could not be retrieved or has been removed."}
@@ -146,17 +164,48 @@ export default function InventoryDetailsPage() {
   const formattedSpecsList: { label: string; value: string }[] = [];
 
   // Standard keys priority
-  if (specs.engine) formattedSpecsList.push({ label: "Engine", value: formatSpecValue("engine", specs.engine) });
-  if (specs.mileage) formattedSpecsList.push({ label: "Mileage", value: formatSpecValue("mileage", specs.mileage) });
-  if (specs.horsepower) formattedSpecsList.push({ label: "Horsepower", value: formatSpecValue("horsepower", specs.horsepower) });
-  if (specs.transmission) formattedSpecsList.push({ label: "Transmission", value: formatSpecValue("transmission", specs.transmission) });
-  if (specs.exteriorColor) formattedSpecsList.push({ label: "Exterior Color", value: formatSpecValue("exteriorColor", specs.exteriorColor) });
-  if (specs.interiorColor) formattedSpecsList.push({ label: "Interior Color", value: formatSpecValue("interiorColor", specs.interiorColor) });
+  if (specs.engine)
+    formattedSpecsList.push({
+      label: "Engine",
+      value: formatSpecValue("engine", specs.engine),
+    });
+  if (specs.mileage)
+    formattedSpecsList.push({
+      label: "Mileage",
+      value: formatSpecValue("mileage", specs.mileage),
+    });
+  if (specs.horsepower)
+    formattedSpecsList.push({
+      label: "Horsepower",
+      value: formatSpecValue("horsepower", specs.horsepower),
+    });
+  if (specs.transmission)
+    formattedSpecsList.push({
+      label: "Transmission",
+      value: formatSpecValue("transmission", specs.transmission),
+    });
+  if (specs.exteriorColor)
+    formattedSpecsList.push({
+      label: "Exterior Color",
+      value: formatSpecValue("exteriorColor", specs.exteriorColor),
+    });
+  if (specs.interiorColor)
+    formattedSpecsList.push({
+      label: "Interior Color",
+      value: formatSpecValue("interiorColor", specs.interiorColor),
+    });
 
   // Add any additional dynamic specification keys
   Object.entries(specs).forEach(([k, v]) => {
     if (
-      !["engine", "mileage", "horsepower", "transmission", "exteriorColor", "interiorColor"].includes(k) &&
+      ![
+        "engine",
+        "mileage",
+        "horsepower",
+        "transmission",
+        "exteriorColor",
+        "interiorColor",
+      ].includes(k) &&
       v !== null &&
       v !== undefined &&
       v !== ""
@@ -168,22 +217,29 @@ export default function InventoryDetailsPage() {
     }
   });
 
-  const displaySpecs = formattedSpecsList.length > 0 ? formattedSpecsList : [
-    { label: "Engine", value: "High-Performance V8 / Electric Hybrid" },
-    { label: "Transmission", value: "Automatic Dual-Clutch" },
-    { label: "Exterior Color", value: "Rosso Corsa" },
-    { label: "Interior Color", value: "Premium Leather" },
-  ];
+  const displaySpecs =
+    formattedSpecsList.length > 0
+      ? formattedSpecsList
+      : [
+          { label: "Engine", value: "High-Performance V8 / Electric Hybrid" },
+          { label: "Transmission", value: "Automatic Dual-Clutch" },
+          { label: "Exterior Color", value: "Rosso Corsa" },
+          { label: "Interior Color", value: "Premium Leather" },
+        ];
 
   // Price formatting
   const numericPrice = item.askingPrice ? Number(item.askingPrice) : 0;
-  const currencySymbol = item.currency === "USD" || !item.currency ? "$" : `${item.currency} `;
+  const currencySymbol =
+    item.currency === "USD" || !item.currency ? "$" : `${item.currency} `;
   const formattedPrice =
-    numericPrice > 0 ? `${currencySymbol}${numericPrice.toLocaleString()}` : "Price on Request";
+    numericPrice > 0
+      ? `${currencySymbol}${numericPrice.toLocaleString()}`
+      : "Price on Request";
 
   // Location & Owner text
   const locationText =
-    [item.locationCity, item.locationCountry].filter(Boolean).join(", ") || "Worldwide Collection";
+    [item.locationCity, item.locationCountry].filter(Boolean).join(", ") ||
+    "Worldwide Collection";
 
   const ownerName = item.owner
     ? `${item.owner.firstName} ${item.owner.lastName}`
@@ -195,7 +251,9 @@ export default function InventoryDetailsPage() {
       ? [...item.media]
           .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
           .map((m) => ({
-            type: (m.type?.toLowerCase() === "video" ? "video" : "image") as "video" | "image",
+            type: (m.type?.toLowerCase() === "video" ? "video" : "image") as
+              | "video"
+              | "image",
             url: m.url,
           }))
       : [
@@ -207,18 +265,8 @@ export default function InventoryDetailsPage() {
 
   return (
     <div className="bg-black min-h-screen text-white font-sans overflow-x-hidden">
-      {/* Back Button Bar */}
-      <div className="container mx-auto px-6 pt-6">
-        <button
-          onClick={() => router.push("/inventory")}
-          className="inline-flex items-center gap-2 text-xs text-white/50 hover:text-primary transition-colors tracking-wide cursor-pointer group"
-        >
-          <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" /> Back to Inventory
-        </button>
-      </div>
-
       {/* Product Gallery Section */}
-      <section className="relative w-full mt-4">
+      <section className="relative w-full  ">
         <ProductGallery media={mediaList} />
       </section>
 
@@ -263,7 +311,10 @@ export default function InventoryDetailsPage() {
                       {item.viewsCount !== undefined && (
                         <div className="flex items-center gap-1.5 text-xs text-white/30">
                           <Eye size={14} />
-                          <span>{item.viewsCount} {item.viewsCount === 1 ? "view" : "views"}</span>
+                          <span>
+                            {item.viewsCount}{" "}
+                            {item.viewsCount === 1 ? "view" : "views"}
+                          </span>
                         </div>
                       )}
                     </div>
@@ -275,7 +326,9 @@ export default function InventoryDetailsPage() {
 
                   <div className="flex flex-col items-end gap-2">
                     <span className="px-3 py-1 bg-white/5 border border-white/10 text-[10px] text-white/70 uppercase tracking-widest rounded-sm font-semibold">
-                      {item.saleType ? item.saleType.replace(/_/g, " ") : item.status || "LIVE"}
+                      {item.saleType
+                        ? item.saleType.replace(/_/g, " ")
+                        : item.status || "LIVE"}
                     </span>
                     {item.allowCounterOffers && (
                       <span className="text-[10px] text-emerald-400/80 font-medium tracking-wide">
@@ -284,42 +337,6 @@ export default function InventoryDetailsPage() {
                     )}
                   </div>
                 </div>
-              </div>
-            </AnimationWrapper>
-
-            {/* Quick Specs Grid */}
-            <AnimationWrapper type="fade-up" delay={0.1}>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <QuickSpecBox
-                  icon={<Calendar size={20} className="text-[#D4AF37]" />}
-                  label="Build Year"
-                  value={item.buildYear ? String(item.buildYear) : "N/A"}
-                />
-                <QuickSpecBox
-                  icon={<Gauge size={20} className="text-[#D4AF37]" />}
-                  label="Mileage"
-                  value={
-                    specs.mileage
-                      ? formatSpecValue("mileage", specs.mileage)
-                      : "N/A"
-                  }
-                />
-                <QuickSpecBox
-                  icon={<Zap size={20} className="text-[#D4AF37]" />}
-                  label="Engine / Power"
-                  value={
-                    specs.engine
-                      ? String(specs.engine)
-                      : specs.horsepower
-                      ? `${specs.horsepower} hp`
-                      : "N/A"
-                  }
-                />
-                <QuickSpecBox
-                  icon={<Cog size={20} className="text-[#D4AF37]" />}
-                  label="Transmission"
-                  value={specs.transmission ? String(specs.transmission) : "N/A"}
-                />
               </div>
             </AnimationWrapper>
 
@@ -345,25 +362,6 @@ export default function InventoryDetailsPage() {
                 <ProductSpecsGrid specs={displaySpecs} />
               </div>
             </AnimationWrapper>
-
-            {/* History & Certification */}
-            <AnimationWrapper type="fade-up" delay={0.4}>
-              <div className="bg-[#0A0A0A] border border-white/5 p-8 rounded-sm space-y-6">
-                <h3 className="text-xl font-serif text-white border-b border-white/5 pb-4">
-                  History & Certification
-                </h3>
-                <div className="space-y-4">
-                  {DEFAULT_HISTORY.map((point, idx) => (
-                    <div key={idx} className="flex items-center gap-4 group">
-                      <div className="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-[#D4AF37]/50 transition-colors">
-                        <CheckCircle2 size={14} className="text-white/40 group-hover:text-[#D4AF37]" />
-                      </div>
-                      <span className="text-white/60 text-sm">{point}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </AnimationWrapper>
           </div>
 
           {/* Sidebar */}
@@ -374,10 +372,12 @@ export default function InventoryDetailsPage() {
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 mb-2">
                     {item.owner?.avatarUrl ? (
-                      <img
+                      <Image
                         src={item.owner.avatarUrl}
                         alt={ownerName}
                         className="w-10 h-10 rounded-full object-cover border border-[#D4AF37]/40"
+                        width={40}
+                        height={40}
                       />
                     ) : (
                       <div className="w-10 h-10 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37] font-bold font-serif">
@@ -385,7 +385,9 @@ export default function InventoryDetailsPage() {
                       </div>
                     )}
                     <div>
-                      <h4 className="text-lg font-serif text-white leading-tight">{ownerName}</h4>
+                      <h4 className="text-lg font-serif text-white leading-tight">
+                        {ownerName}
+                      </h4>
                       <p className="text-[10px] text-white/40 uppercase tracking-widest">
                         {item.owner?.role || "Verified Dealer"}
                       </p>
@@ -418,7 +420,8 @@ export default function InventoryDetailsPage() {
                   </div>
 
                   <p className="text-white/50 text-xs leading-relaxed italic pt-1">
-                    Premier luxury asset offering verified provenance and immediate concierge acquisition.
+                    Premier luxury asset offering verified provenance and
+                    immediate concierge acquisition.
                   </p>
                 </div>
 
@@ -439,7 +442,11 @@ export default function InventoryDetailsPage() {
                         : "border-white/10 text-white hover:bg-white hover:text-black"
                     }`}
                   >
-                    <Heart size={16} fill={isSaved ? "currentColor" : "none"} className={isSaved ? "text-[#D4AF37]" : ""} />
+                    <Heart
+                      size={16}
+                      fill={isSaved ? "currentColor" : "none"}
+                      className={isSaved ? "text-[#D4AF37]" : ""}
+                    />
                     {isSaved ? "Saved to Wishlist" : "Save to Wishlist"}
                   </button>
                 </div>
@@ -448,11 +455,18 @@ export default function InventoryDetailsPage() {
                 <div className="pt-6 border-t border-white/5 space-y-4">
                   <div className="flex items-center gap-4 text-white/40 hover:text-white transition-colors cursor-pointer group">
                     <Wrench size={16} className="group-hover:text-[#D4AF37]" />
-                    <span className="text-xs uppercase tracking-widest">Certified Inspection</span>
+                    <span className="text-xs uppercase tracking-widest">
+                      Certified Inspection
+                    </span>
                   </div>
                   <div className="flex items-center gap-4 text-white/40 hover:text-white transition-colors cursor-pointer group">
-                    <ShieldCheck size={16} className="group-hover:text-[#D4AF37]" />
-                    <span className="text-xs uppercase tracking-widest">Warranty & Provenance</span>
+                    <ShieldCheck
+                      size={16}
+                      className="group-hover:text-[#D4AF37]"
+                    />
+                    <span className="text-xs uppercase tracking-widest">
+                      Warranty & Provenance
+                    </span>
                   </div>
                 </div>
               </div>
@@ -464,13 +478,26 @@ export default function InventoryDetailsPage() {
   );
 }
 
-function QuickSpecBox({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function QuickSpecBox({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) {
   return (
     <div className="bg-[#0A0A0A] border border-white/5 p-6 rounded-sm space-y-4 hover:border-[#D4AF37]/30 transition-all group">
       <div className="flex justify-center">{icon}</div>
       <div className="text-center space-y-1">
-        <div className="text-white/30 text-[10px] uppercase tracking-widest font-bold">{label}</div>
-        <div className="text-white text-sm font-bold group-hover:text-white transition-colors truncate" title={value}>
+        <div className="text-white/30 text-[10px] uppercase tracking-widest font-bold">
+          {label}
+        </div>
+        <div
+          className="text-white text-sm font-bold group-hover:text-white transition-colors truncate"
+          title={value}
+        >
           {value}
         </div>
       </div>
@@ -524,7 +551,10 @@ function InventoryDetailsSkeleton() {
             {/* Quick Specs Grid Skeleton */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="bg-[#0A0A0A] border border-white/5 p-6 rounded-sm space-y-3 text-center">
+                <div
+                  key={i}
+                  className="bg-[#0A0A0A] border border-white/5 p-6 rounded-sm space-y-3 text-center"
+                >
                   <div className="w-6 h-6 bg-white/10 rounded-full mx-auto" />
                   <div className="w-14 h-3 bg-white/10 rounded mx-auto" />
                   <div className="w-20 h-4 bg-white/10 rounded mx-auto" />
@@ -545,7 +575,10 @@ function InventoryDetailsSkeleton() {
               <div className="h-6 w-40 bg-white/10 rounded-sm pb-4 border-b border-white/5" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-4">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <div key={i} className="flex justify-between items-center gap-4">
+                  <div
+                    key={i}
+                    className="flex justify-between items-center gap-4"
+                  >
                     <div className="w-24 h-4 bg-white/10 rounded" />
                     <div className="flex-1 border-b border-dotted border-white/10" />
                     <div className="w-28 h-4 bg-white/10 rounded" />

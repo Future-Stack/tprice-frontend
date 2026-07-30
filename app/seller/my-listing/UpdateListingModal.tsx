@@ -86,7 +86,7 @@ export default function UpdateListingModal({
 
   // Pricing & Sale Type States
   const [saleType, setSaleType] = useState<
-    "FIXED_PRICE" | "AUCTION" | "PRIVATE"
+    "FIXED_PRICE" | "AUCTION" | "PRIVATE_SALE"
   >("FIXED_PRICE");
   const [askingPrice, setAskingPrice] = useState<string>("");
   const [startingBid, setStartingBid] = useState<string>("");
@@ -117,10 +117,13 @@ export default function UpdateListingModal({
       setLocationCountry(listing.locationCountry || "");
       setIsOffMarket(Boolean(listing.isOffMarket));
 
-      setSaleType(
-        (listing.saleType as "FIXED_PRICE" | "AUCTION" | "PRIVATE") ||
-          "FIXED_PRICE",
-      );
+      const rawSaleType = (listing.saleType as string || "").toUpperCase();
+      const initialSaleType =
+        rawSaleType === "PRIVATE" || rawSaleType === "PRIVATE_SALE"
+          ? "PRIVATE_SALE"
+          : (rawSaleType as "FIXED_PRICE" | "AUCTION" | "PRIVATE_SALE") ||
+            "FIXED_PRICE";
+      setSaleType(initialSaleType);
       setAskingPrice(
         listing.askingPrice !== undefined && listing.askingPrice !== null
           ? String(listing.askingPrice)
@@ -319,7 +322,7 @@ export default function UpdateListingModal({
       return false;
     }
 
-    if (saleType === "FIXED_PRICE" || saleType === "PRIVATE") {
+    if (saleType === "FIXED_PRICE") {
       if (
         askingPrice === "" ||
         isNaN(Number(askingPrice)) ||
@@ -619,7 +622,7 @@ export default function UpdateListingModal({
                   {[
                     { id: "FIXED_PRICE", title: "Fixed Price" },
                     { id: "AUCTION", title: "Auction" },
-                    { id: "PRIVATE", title: "Private Sale" },
+                    { id: "PRIVATE_SALE", title: "Private Sale" },
                   ].map((type) => (
                     <button
                       key={type.id}
@@ -639,26 +642,28 @@ export default function UpdateListingModal({
 
               {/* Price Fields */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {(saleType === "FIXED_PRICE" || saleType === "PRIVATE") && (
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-gray-300 uppercase tracking-wider">
-                      Asking Price ({currency}){" "}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-gray-300 uppercase tracking-wider">
+                    Asking Price ({currency}){" "}
+                    {saleType === "FIXED_PRICE" ? (
                       <span className="text-[#E78F23]">*</span>
-                    </label>
-                    <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-sm">
-                        $
-                      </span>
-                      <input
-                        type="number"
-                        value={askingPrice}
-                        onChange={(e) => setAskingPrice(e.target.value)}
-                        placeholder="625000"
-                        className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl pl-8 pr-4 py-3 text-sm text-white focus:outline-none focus:border-primary/60 transition-all"
-                      />
-                    </div>
+                    ) : (
+                      <span className="text-gray-500 font-normal normal-case text-xs">(Optional for Private Sale)</span>
+                    )}
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-sm">
+                      $
+                    </span>
+                    <input
+                      type="number"
+                      value={askingPrice}
+                      onChange={(e) => setAskingPrice(e.target.value)}
+                      placeholder="625000"
+                      className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl pl-8 pr-4 py-3 text-sm text-white focus:outline-none focus:border-primary/60 transition-all"
+                    />
                   </div>
-                )}
+                </div>
 
                 {saleType === "AUCTION" && (
                   <>
@@ -703,27 +708,10 @@ export default function UpdateListingModal({
                         placeholderText="Select date and time"
                         minDate={new Date()}
                         className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary/60 transition-all cursor-pointer"
-                        wrapperClassName="w-full"
                       />
                     </div>
                   </>
                 )}
-
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-gray-300 uppercase tracking-wider">
-                    Currency
-                  </label>
-                  <select
-                    value={currency}
-                    onChange={(e) => setCurrency(e.target.value)}
-                    className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary/60 transition-all cursor-pointer"
-                  >
-                    <option value="USD">USD ($)</option>
-                    <option value="EUR">EUR (€)</option>
-                    <option value="GBP">GBP (£)</option>
-                    <option value="AED">AED (د.إ)</option>
-                  </select>
-                </div>
               </div>
 
               {saleType === "FIXED_PRICE" && (
