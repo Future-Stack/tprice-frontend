@@ -257,7 +257,7 @@ export default function Home() {
                 <p className="text-sm">No recent activity recorded</p>
               </div>
             ) : (
-              <div className="space-y-6 max-h-[380px] overflow-y-auto pr-2 custom-scrollbar">
+              <div className="space-y-6 max-h-95 overflow-y-auto pr-2 custom-scrollbar">
                 {recentActivity.map((activity, index) => (
                   <div
                     key={activity.id || index}

@@ -21,6 +21,7 @@ apiClient.interceptors.request.use(
     const token =
       Cookies.get("accessToken") ||
       Cookies.get("token") ||
+      Cookies.get("access_token") ||
       useAuthStore.getState().token;
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -89,6 +90,7 @@ apiClient.interceptors.response.use(
 
       const refreshToken =
         Cookies.get("refreshToken") ||
+        Cookies.get("refresh_token") ||
         useAuthStore.getState().refreshToken;
 
       if (!refreshToken) {

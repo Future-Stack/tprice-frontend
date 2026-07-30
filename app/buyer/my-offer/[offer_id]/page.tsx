@@ -357,6 +357,10 @@ const OfferDetails = () => {
   const allowCounterOffers = listing?.allowCounterOffers ?? false;
   const isFixedWithCounter = saleType === "FIXED_PRICE" && allowCounterOffers;
   const statusUpper = (offer.status || "").toUpperCase();
+  const isAccepted =
+    statusUpper === "ACCEPTED" ||
+    Boolean(offer?.deal) ||
+    Boolean(matchedDeal);
   const isTerminalStatus =
     statusUpper === "ACCEPTED" ||
     statusUpper === "REJECTED" ||
@@ -806,99 +810,101 @@ const OfferDetails = () => {
             <AnimationWrapper type="fade-left">
               <div className="space-y-6">
                 {/* Deal Stage Card */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-2xl font-semibold font-clash">
-                      Deal Stage
-                    </h2>
-                    {currentStage && (
-                      <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] font-bold uppercase tracking-wider text-white/80">
-                        <span
-                          className={`w-2 h-2 rounded-full ${
+                {(isAccepted || Boolean(offer?.deal)) && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-2xl font-semibold font-clash">
+                        Deal Stage
+                      </h2>
+                      {currentStage && (
+                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] font-bold uppercase tracking-wider text-white/80">
+                          <span
+                            className={`w-2 h-2 rounded-full ${
+                              currentStage === "COMPLETED"
+                                ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"
+                                : currentStage === "CANCELLED"
+                                ? "bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.5)]"
+                                : currentStage === "FLAGGED"
+                                ? "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)]"
+                                : "bg-[#D4AF37]"
+                            }`}
+                          />
+                          {currentStage}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="bg-[#0A0A0B] rounded-[2.5rem] border border-white/5 p-6 md:p-8 space-y-4">
+                      <div className="grid grid-cols-3 gap-3">
+                        {/* COMPLETED Button */}
+                        <button
+                          onClick={() => handleUpdateStage("COMPLETED")}
+                          disabled={
+                            updateDealStageMutation.isPending ||
                             currentStage === "COMPLETED"
-                              ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"
-                              : currentStage === "CANCELLED"
-                              ? "bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.5)]"
-                              : currentStage === "FLAGGED"
-                              ? "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)]"
-                              : "bg-[#D4AF37]"
-                          }`}
-                        />
-                        {currentStage}
+                          }
+                          title="Mark deal as COMPLETED"
+                          className={`py-3.5 px-2 rounded-xl text-xs font-bold uppercase tracking-wider flex flex-col items-center justify-center gap-2 transition-all border ${
+                            currentStage === "COMPLETED"
+                              ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]"
+                              : "bg-white/5 hover:bg-emerald-500/10 border-white/10 text-gray-300 hover:text-emerald-400 hover:border-emerald-500/30"
+                          } disabled:opacity-50 cursor-pointer active:scale-95`}
+                        >
+                          {updatingStage === "COMPLETED" ? (
+                            <Loader2 size={18} className="animate-spin text-emerald-400" />
+                          ) : (
+                            <CheckCircle2 size={18} />
+                          )}
+                          <span className="text-[10px]">Completed</span>
+                        </button>
+
+                        {/* CANCELLED Button */}
+                        <button
+                          onClick={() => handleUpdateStage("CANCELLED")}
+                          disabled={
+                            updateDealStageMutation.isPending ||
+                            currentStage === "CANCELLED"
+                          }
+                          title="Mark deal as CANCELLED"
+                          className={`py-3.5 px-2 rounded-xl text-xs font-bold uppercase tracking-wider flex flex-col items-center justify-center gap-2 transition-all border ${
+                            currentStage === "CANCELLED"
+                              ? "bg-red-500/20 border-red-500/50 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.2)]"
+                              : "bg-white/5 hover:bg-red-500/10 border-white/10 text-gray-300 hover:text-red-400 hover:border-red-500/30"
+                          } disabled:opacity-50 cursor-pointer active:scale-95`}
+                        >
+                          {updatingStage === "CANCELLED" ? (
+                            <Loader2 size={18} className="animate-spin text-red-400" />
+                          ) : (
+                            <XCircle size={18} />
+                          )}
+                          <span className="text-[10px]">Cancelled</span>
+                        </button>
+
+                        {/* FLAGGED Button */}
+                        <button
+                          onClick={() => handleUpdateStage("FLAGGED")}
+                          disabled={
+                            updateDealStageMutation.isPending ||
+                            currentStage === "FLAGGED"
+                          }
+                          title="Mark deal as FLAGGED"
+                          className={`py-3.5 px-2 rounded-xl text-xs font-bold uppercase tracking-wider flex flex-col items-center justify-center gap-2 transition-all border ${
+                            currentStage === "FLAGGED"
+                              ? "bg-amber-500/20 border-amber-500/50 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]"
+                              : "bg-white/5 hover:bg-amber-500/10 border-white/10 text-gray-300 hover:text-amber-400 hover:border-amber-500/30"
+                          } disabled:opacity-50 cursor-pointer active:scale-95`}
+                        >
+                          {updatingStage === "FLAGGED" ? (
+                            <Loader2 size={18} className="animate-spin text-amber-400" />
+                          ) : (
+                            <Flag size={18} />
+                          )}
+                          <span className="text-[10px]">Flagged</span>
+                        </button>
                       </div>
-                    )}
-                  </div>
-
-                  <div className="bg-[#0A0A0B] rounded-[2.5rem] border border-white/5 p-6 md:p-8 space-y-4">
-                    <div className="grid grid-cols-3 gap-3">
-                      {/* COMPLETED Button */}
-                      <button
-                        onClick={() => handleUpdateStage("COMPLETED")}
-                        disabled={
-                          updateDealStageMutation.isPending ||
-                          currentStage === "COMPLETED"
-                        }
-                        title="Mark deal as COMPLETED"
-                        className={`py-3.5 px-2 rounded-xl text-xs font-bold uppercase tracking-wider flex flex-col items-center justify-center gap-2 transition-all border ${
-                          currentStage === "COMPLETED"
-                            ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]"
-                            : "bg-white/5 hover:bg-emerald-500/10 border-white/10 text-gray-300 hover:text-emerald-400 hover:border-emerald-500/30"
-                        } disabled:opacity-50 cursor-pointer active:scale-95`}
-                      >
-                        {updatingStage === "COMPLETED" ? (
-                          <Loader2 size={18} className="animate-spin text-emerald-400" />
-                        ) : (
-                          <CheckCircle2 size={18} />
-                        )}
-                        <span className="text-[10px]">Completed</span>
-                      </button>
-
-                      {/* CANCELLED Button */}
-                      <button
-                        onClick={() => handleUpdateStage("CANCELLED")}
-                        disabled={
-                          updateDealStageMutation.isPending ||
-                          currentStage === "CANCELLED"
-                        }
-                        title="Mark deal as CANCELLED"
-                        className={`py-3.5 px-2 rounded-xl text-xs font-bold uppercase tracking-wider flex flex-col items-center justify-center gap-2 transition-all border ${
-                          currentStage === "CANCELLED"
-                            ? "bg-red-500/20 border-red-500/50 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.2)]"
-                            : "bg-white/5 hover:bg-red-500/10 border-white/10 text-gray-300 hover:text-red-400 hover:border-red-500/30"
-                        } disabled:opacity-50 cursor-pointer active:scale-95`}
-                      >
-                        {updatingStage === "CANCELLED" ? (
-                          <Loader2 size={18} className="animate-spin text-red-400" />
-                        ) : (
-                          <XCircle size={18} />
-                        )}
-                        <span className="text-[10px]">Cancelled</span>
-                      </button>
-
-                      {/* FLAGGED Button */}
-                      <button
-                        onClick={() => handleUpdateStage("FLAGGED")}
-                        disabled={
-                          updateDealStageMutation.isPending ||
-                          currentStage === "FLAGGED"
-                        }
-                        title="Mark deal as FLAGGED"
-                        className={`py-3.5 px-2 rounded-xl text-xs font-bold uppercase tracking-wider flex flex-col items-center justify-center gap-2 transition-all border ${
-                          currentStage === "FLAGGED"
-                            ? "bg-amber-500/20 border-amber-500/50 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]"
-                            : "bg-white/5 hover:bg-amber-500/10 border-white/10 text-gray-300 hover:text-amber-400 hover:border-amber-500/30"
-                        } disabled:opacity-50 cursor-pointer active:scale-95`}
-                      >
-                        {updatingStage === "FLAGGED" ? (
-                          <Loader2 size={18} className="animate-spin text-amber-400" />
-                        ) : (
-                          <Flag size={18} />
-                        )}
-                        <span className="text-[10px]">Flagged</span>
-                      </button>
                     </div>
                   </div>
-                </div>
+                )}
 
                 {/* Order History */}
                 <div className="flex items-center justify-between">
