@@ -101,14 +101,17 @@ export const useRegisterMutation = () => {
 export const useGetMeQuery = (enabled: boolean = true) => {
   const setAuth = useAuthStore((state) => state.setAuth);
   const setUser = useAuthStore((state) => state.setUser);
-  const logoutStore = useAuthStore((state) => state.logout);
 
   return useQuery<User>({
     queryKey: AUTH_QUERY_KEYS.user,
     queryFn: async () => {
       const data = await getMeApi();
       if (data) {
-        const token = useAuthStore.getState().token || Cookies.get("access_token");
+        const token =
+          useAuthStore.getState().token ||
+          Cookies.get("access_token") ||
+          Cookies.get("accessToken") ||
+          Cookies.get("token");
         if (token) {
           setAuth(data, token);
         } else {
@@ -117,7 +120,14 @@ export const useGetMeQuery = (enabled: boolean = true) => {
       }
       return data;
     },
-    enabled: enabled && !!(Cookies.get("access_token") || useAuthStore.getState().token),
+    enabled:
+      enabled &&
+      !!(
+        Cookies.get("access_token") ||
+        Cookies.get("accessToken") ||
+        Cookies.get("token") ||
+        useAuthStore.getState().token
+      ),
     staleTime: 5 * 60 * 1000,
     retry: false,
   });

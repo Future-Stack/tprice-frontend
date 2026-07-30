@@ -23,13 +23,19 @@ interface AuthState {
   logout: () => void;
 }
 
+const getCookieToken = () =>
+  Cookies.get("access_token") || Cookies.get("accessToken") || Cookies.get("token") || null;
+
+const getCookieRefreshToken = () =>
+  Cookies.get("refresh_token") || Cookies.get("refreshToken") || null;
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
-      token: Cookies.get("access_token") || null,
-      refreshToken: Cookies.get("refresh_token") || null,
-      isAuthenticated: !!Cookies.get("access_token"),
+      token: getCookieToken(),
+      refreshToken: getCookieRefreshToken(),
+      isAuthenticated: !!getCookieToken(),
 
       setAuth: (user, token, refreshToken) => {
         Cookies.set("access_token", token, { expires: 7, secure: true, sameSite: "lax" });
@@ -39,7 +45,7 @@ export const useAuthStore = create<AuthState>()(
         set({
           user,
           token,
-          refreshToken: refreshToken || Cookies.get("refresh_token") || null,
+          refreshToken: refreshToken || getCookieRefreshToken(),
           isAuthenticated: true,
         });
       },
@@ -47,7 +53,7 @@ export const useAuthStore = create<AuthState>()(
       setUser: (user) =>
         set((state) => ({
           user,
-          isAuthenticated: !!(user && (state.token || Cookies.get("access_token"))),
+          isAuthenticated: !!(user && (state.token || getCookieToken())),
         })),
 
       setToken: (token, refreshToken) => {

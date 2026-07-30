@@ -15,7 +15,11 @@ export const apiClient = axios.create({
 // Request Interceptor: Attach Auth Token
 apiClient.interceptors.request.use(
   (config) => {
-    const token = Cookies.get("access_token") || useAuthStore.getState().token;
+    const token =
+      Cookies.get("access_token") ||
+      Cookies.get("accessToken") ||
+      Cookies.get("token") ||
+      useAuthStore.getState().token;
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
