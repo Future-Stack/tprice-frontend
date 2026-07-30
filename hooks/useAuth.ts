@@ -16,7 +16,7 @@ import {
   User,
   LogoutResponse,
 } from "@/lib/api/auth";
-import { useAuthStore } from "@/lib/store/useAuthStore";
+import { useAuthStore, clearAuthCookies } from "@/lib/store/useAuthStore";
 
 export const AUTH_QUERY_KEYS = {
   user: ["auth", "me"] as const,
@@ -35,8 +35,7 @@ export const useLogoutMutation = () => {
     onSuccess: (data: LogoutResponse) => {
       // Clear Zustand auth state and cookies
       logoutStore();
-      Cookies.remove("access_token");
-      Cookies.remove("refresh_token");
+      clearAuthCookies();
 
       // Invalidate and clear all TanStack Query cache
       queryClient.clear();
@@ -49,8 +48,7 @@ export const useLogoutMutation = () => {
 
       // Perform local cleanup as fallback even if backend request fails
       logoutStore();
-      Cookies.remove("access_token");
-      Cookies.remove("refresh_token");
+      clearAuthCookies();
       queryClient.clear();
 
       toast.success("Logged out successfully");
@@ -108,10 +106,7 @@ export const useGetMeQuery = (enabled: boolean = true) => {
       const data = await getMeApi();
       if (data) {
         const token =
-          useAuthStore.getState().token ||
-          Cookies.get("access_token") ||
-          Cookies.get("accessToken") ||
-          Cookies.get("token");
+          useAuthStore.getState().token || Cookies.get("accessToken");
         if (token) {
           setAuth(data, token);
         } else {
@@ -120,14 +115,7 @@ export const useGetMeQuery = (enabled: boolean = true) => {
       }
       return data;
     },
-    enabled:
-      enabled &&
-      !!(
-        Cookies.get("access_token") ||
-        Cookies.get("accessToken") ||
-        Cookies.get("token") ||
-        useAuthStore.getState().token
-      ),
+    enabled: enabled,
     staleTime: 5 * 60 * 1000,
     retry: false,
   });
@@ -171,4 +159,3 @@ export const useChangePasswordMutation = () => {
     },
   });
 };
-

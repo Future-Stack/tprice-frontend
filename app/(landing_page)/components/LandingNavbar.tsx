@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Menu,
@@ -12,7 +12,6 @@ import {
   LogOut,
   Loader2,
 } from "lucide-react";
-import Cookies from "js-cookie";
 import { useAuthStore, User } from "@/lib/store/useAuthStore";
 import { useLogoutMutation, useGetMeQuery } from "@/hooks/useAuth";
 import Image from "next/image";
@@ -72,20 +71,13 @@ export default function LandingNavbar() {
   }, []);
 
   // Fetch user profile via TanStack Query
-  const hasToken =
-    mounted &&
-    !!(
-      Cookies.get("access_token") ||
-      Cookies.get("accessToken") ||
-      Cookies.get("token") ||
-      storeToken
-    );
   const { data: userProfile, isLoading: isUserLoading } =
-    useGetMeQuery(hasToken);
+    useGetMeQuery(mounted);
 
   const user = userProfile || storeUser;
-  const isLoading = isUserLoading && hasToken;
-  const isLoggedIn = (isAuthenticated || hasToken) && !!user;
+  const isLoading = isUserLoading && mounted && !user;
+  const isLoggedIn =
+    (isAuthenticated || !!userProfile || !!storeUser) && !!user;
 
   useEffect(() => {
     const handleScroll = () => {

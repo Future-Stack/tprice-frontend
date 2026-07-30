@@ -19,7 +19,11 @@ import Link from "next/link";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
 import AnimationWrapper from "../../components/AnimationWrapper";
-import { useListingsQuery, useSaveListingMutation, useSavedListingsQuery } from "@/hooks/useListings";
+import {
+  useListingsQuery,
+  useSaveListingMutation,
+  useSavedListingsQuery,
+} from "@/hooks/useListings";
 import { useGetCategoriesQuery } from "@/hooks/useCategories";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useAuthStore } from "@/lib/store/useAuthStore";
@@ -632,11 +636,14 @@ function ListingsSkeleton() {
 /* ─── MarketplaceCard Component ─── */
 function MarketplaceCard({ asset }: { asset: ListingItem }) {
   const saveMutation = useSaveListingMutation();
-  const token = Cookies.get("access_token") || useAuthStore((state) => state.token);
+  const token =
+    Cookies.get("accessToken") ||
+    Cookies.get("token") ||
+    useAuthStore((state) => state.token);
 
   const { data: savedResponse } = useSavedListingsQuery(
     { page: 1, limit: 100 },
-    { enabled: Boolean(token) }
+    { enabled: Boolean(token) },
   );
 
   const isSavedInListings = useMemo(() => {
@@ -644,7 +651,8 @@ function MarketplaceCard({ asset }: { asset: ListingItem }) {
     return savedResponse.data.some((savedItem) => savedItem.id === asset.id);
   }, [savedResponse, asset.id]);
 
-  const isSaved = asset.isSaved !== undefined ? asset.isSaved : isSavedInListings;
+  const isSaved =
+    asset.isSaved !== undefined ? asset.isSaved : isSavedInListings;
 
   const handleToggleSave = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -712,7 +720,9 @@ function MarketplaceCard({ asset }: { asset: ListingItem }) {
           }`}
           title={isSaved ? "Remove from saved" : "Save listing"}
         >
-          <Heart className={`w-4 h-4 transition-transform duration-200 ${isSaved ? "fill-current scale-110" : ""}`} />
+          <Heart
+            className={`w-4 h-4 transition-transform duration-200 ${isSaved ? "fill-current scale-110" : ""}`}
+          />
         </button>
       </div>
 

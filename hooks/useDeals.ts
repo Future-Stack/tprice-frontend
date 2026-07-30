@@ -6,6 +6,9 @@ import {
   getDealDetailApi,
   getDealMessagesApi,
   sendDealMessageApi,
+  updateDealStageApi,
+  UpdateDealStagePayload,
+  DealStage,
   GetDealsParams,
   GetDealsResponse,
   DealItem,
@@ -154,5 +157,31 @@ export const useSendDealMessageMutation = () => {
     },
   });
 };
+
+/**
+ * React Query mutation hook to update a deal stage
+ */
+export const useUpdateDealStageMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    DealItem,
+    Error,
+    { dealId: string; payload: UpdateDealStagePayload }
+  >({
+    mutationFn: ({ dealId, payload }) => updateDealStageApi(dealId, payload),
+    onSuccess: (data, variables) => {
+      toast.success(`Deal stage updated to ${variables.payload.stage}`);
+      queryClient.invalidateQueries({ queryKey: DEALS_QUERY_KEYS.all });
+      queryClient.invalidateQueries({ queryKey: ["offers"] });
+    },
+    onError: (err: any) => {
+      const errMsg =
+        err?.response?.data?.message || err?.message || "Failed to update deal stage";
+      toast.error(errMsg);
+    },
+  });
+};
+
 
 
