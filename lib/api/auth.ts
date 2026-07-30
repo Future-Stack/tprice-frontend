@@ -48,8 +48,32 @@ export interface UpdateProfilePayload {
 }
 
 export const getMeApi = async (): Promise<User> => {
-  const response = await apiClient.get<User>("/users/me");
-  return response.data;
+  try {
+    const response = await apiClient.get<any>("/users/me");
+    const resData = response.data;
+    if (resData && typeof resData === "object") {
+      if (resData.data && typeof resData.data === "object" && (resData.data.email || resData.data.id)) {
+        return resData.data;
+      }
+      if (resData.user && typeof resData.user === "object" && (resData.user.email || resData.user.id)) {
+        return resData.user;
+      }
+    }
+    return resData;
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      try {
+        const fallback = await apiClient.get<any>("/auth/me");
+        const resData = fallback.data;
+        return resData?.data || resData?.user || resData;
+      } catch {
+        const fallback2 = await apiClient.get<any>("/me");
+        const resData = fallback2.data;
+        return resData?.data || resData?.user || resData;
+      }
+    }
+    throw error;
+  }
 };
 
 export const updateMeApi = async (payload: UpdateProfilePayload): Promise<User> => {

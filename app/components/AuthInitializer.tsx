@@ -49,9 +49,12 @@ export default function AuthInitializer() {
           console.error("Error fetching profile after OAuth redirect:", err);
         });
     } else {
-      // Check if access_token cookie exists but Zustand store is not authenticated
-      const cookieToken = Cookies.get("access_token");
-      if (cookieToken && !useAuthStore.getState().isAuthenticated) {
+      // Check if access_token / accessToken / token cookie exists but Zustand store is not authenticated
+      const cookieToken =
+        Cookies.get("access_token") ||
+        Cookies.get("accessToken") ||
+        Cookies.get("token");
+      if (cookieToken && (!useAuthStore.getState().isAuthenticated || !useAuthStore.getState().user)) {
         getMeApi()
           .then((user) => {
             if (user) {

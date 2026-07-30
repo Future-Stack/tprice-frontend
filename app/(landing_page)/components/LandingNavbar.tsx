@@ -72,7 +72,14 @@ export default function LandingNavbar() {
   }, []);
 
   // Fetch user profile via TanStack Query
-  const hasToken = mounted && !!(Cookies.get("access_token") || storeToken);
+  const hasToken =
+    mounted &&
+    !!(
+      Cookies.get("access_token") ||
+      Cookies.get("accessToken") ||
+      Cookies.get("token") ||
+      storeToken
+    );
   const { data: userProfile, isLoading: isUserLoading } =
     useGetMeQuery(hasToken);
 
