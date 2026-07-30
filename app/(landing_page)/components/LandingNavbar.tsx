@@ -77,7 +77,10 @@ export default function LandingNavbar() {
   const user = userProfile || storeUser;
   const isLoading = isUserLoading && mounted && !user;
   const isLoggedIn =
-    (isAuthenticated || !!userProfile || !!storeUser) && !!user;
+    (isAuthenticated || !!userProfile || !!storeUser) &&
+    !!user &&
+    typeof user === "object" &&
+    Object.keys(user).length > 0;
 
   useEffect(() => {
     const handleScroll = () => {
