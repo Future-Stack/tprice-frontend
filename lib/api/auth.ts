@@ -62,6 +62,57 @@ export const logoutApi = async (): Promise<LogoutResponse> => {
   return response.data;
 };
 
+export interface UserSession {
+  id: string;
+  ipAddress: string | null;
+  userAgent: string | null;
+  createdAt: string;
+  expiresAt: string;
+  isCurrent: boolean;
+}
+
+export interface RevokeSessionResponse {
+  message?: string;
+  id?: string;
+}
+
+export const getUserSessionsApi = async (): Promise<UserSession[]> => {
+  try {
+    const response = await apiClient.get<UserSession[]>("/users/me/sessions");
+    return response.data;
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      try {
+        const fallbackRes = await apiClient.get<UserSession[]>("/auth/sessions");
+        return fallbackRes.data;
+      } catch {
+        const fallbackRes2 = await apiClient.get<UserSession[]>("/sessions");
+        return fallbackRes2.data;
+      }
+    }
+    throw error;
+  }
+};
+
+export const revokeUserSessionApi = async (sessionId: string): Promise<RevokeSessionResponse> => {
+  try {
+    const response = await apiClient.delete<RevokeSessionResponse>(`/users/me/sessions/${sessionId}`);
+    return response.data;
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      try {
+        const fallbackRes = await apiClient.delete<RevokeSessionResponse>(`/auth/sessions/${sessionId}`);
+        return fallbackRes.data;
+      } catch {
+        const fallbackRes2 = await apiClient.delete<RevokeSessionResponse>(`/sessions/${sessionId}`);
+        return fallbackRes2.data;
+      }
+    }
+    throw error;
+  }
+};
+
+
 
 
 

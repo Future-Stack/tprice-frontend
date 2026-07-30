@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import AnimationWrapper from '@/app/components/AnimationWrapper';
 import { ChevronDown, CheckCircle2, ClipboardList, Search, Lock, Monitor, LogOut, Loader2, RefreshCw } from 'lucide-react';
 import { useAdminSettingsQuery, useUpdateAdminSettingsMutation, useUpdateGeneralSettingsMutation, useUpdateModerationSettingsMutation, useUpdateLogsSettingsMutation } from '@/hooks/useAdminSettings';
+import { useUserSessionsQuery, useRevokeSessionMutation } from '@/hooks/useSessions';
 
 const logRetentionToPeriod = (days?: number): string => {
     if (!days) return '30 days';
@@ -31,6 +32,55 @@ const periodToLogRetentionDays = (period: string): number => {
     }
 };
 
+function parseUserAgent(uaString: string | null): { device: string; browser: string } {
+    if (!uaString) return { device: "Unknown Device", browser: "Unknown Browser" };
+
+    let device = "Desktop Device";
+    if (/macintosh|mac os x/i.test(uaString)) {
+        device = "Macbook / Mac";
+    } else if (/iphone/i.test(uaString)) {
+        device = "iPhone";
+    } else if (/ipad/i.test(uaString)) {
+        device = "iPad";
+    } else if (/android/i.test(uaString)) {
+        device = "Android Device";
+    } else if (/windows/i.test(uaString)) {
+        device = "Windows PC";
+    } else if (/linux/i.test(uaString)) {
+        device = "Linux PC";
+    }
+
+    let browser = "Web Browser";
+    if (/firefox/i.test(uaString)) {
+        browser = "Firefox";
+    } else if (/edg/i.test(uaString)) {
+        browser = "Edge";
+    } else if (/chrome/i.test(uaString)) {
+        browser = "Chrome";
+    } else if (/safari/i.test(uaString)) {
+        browser = "Safari";
+    } else if (/opera|opr/i.test(uaString)) {
+        browser = "Opera";
+    }
+
+    return { device, browser };
+}
+
+const formatDate = (dateStr?: string) => {
+    if (!dateStr) return '';
+    try {
+        return new Date(dateStr).toLocaleString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+    } catch {
+        return dateStr;
+    }
+};
+
 export default function AdminSettings() {
     const [activeTab, setActiveTab] = useState('General');
 
@@ -39,6 +89,22 @@ export default function AdminSettings() {
     const updateGeneralSettingsMutation = useUpdateGeneralSettingsMutation();
     const updateModerationSettingsMutation = useUpdateModerationSettingsMutation();
     const updateLogsSettingsMutation = useUpdateLogsSettingsMutation();
+
+    const {
+        data: sessions,
+        isLoading: isSessionsLoading,
+        isError: isSessionsError,
+        refetch: refetchSessions,
+    } = useUserSessionsQuery();
+    const revokeSessionMutation = useRevokeSessionMutation();
+    const [revokingId, setRevokingId] = useState<string | null>(null);
+
+    const handleRevokeSession = (sessionId: string) => {
+        setRevokingId(sessionId);
+        revokeSessionMutation.mutate(sessionId, {
+            onSettled: () => setRevokingId(null),
+        });
+    };
 
     const [notifications, setNotifications] = useState({
         newListing: true,
@@ -413,34 +479,110 @@ export default function AdminSettings() {
 
                             {/* Active Sessions */}
                             <section className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-8 shadow-2xl">
-                                <div className="flex items-center gap-4 mb-10">
-                                    <Monitor className="w-6 h-6 text-[#facc15]" />
-                                    <h2 className="text-xl md:text-2xl font-bold text-white">Active Sessions</h2>
-                                </div>
-                                <div className="space-y-6">
-                                    <div className="flex items-center justify-between group">
-                                        <div className="space-y-1">
-                                            <h4 className="text-white font-medium">Mackbook Pro - Chrome</h4>
-                                            <div className="flex items-center gap-3">
-                                                <span className="text-[#666] text-sm">New York, US</span>
-                                                <div className="w-1.5 h-1.5 rounded-full bg-[#facc15] animate-pulse" />
-                                                <span className="text-[#facc15] text-[13px] font-medium italic">Current device</span>
-                                            </div>
+                                <div className="flex items-center justify-between mb-8">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-xl bg-[#facc15]/10 flex items-center justify-center">
+                                            <Monitor className="w-6 h-6 text-[#facc15]" />
+                                        </div>
+                                        <div>
+                                            <h2 className="text-xl md:text-2xl font-bold text-white">Active Sessions</h2>
+                                            <p className="text-[#666] text-xs md:text-sm">Manage devices currently logged into your account</p>
                                         </div>
                                     </div>
+                                    {isSessionsError && (
+                                        <button
+                                            onClick={() => refetchSessions()}
+                                            className="flex items-center gap-2 text-xs font-semibold px-3 py-2 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg hover:bg-red-500/20 transition-all cursor-pointer"
+                                        >
+                                            <RefreshCw className="w-3.5 h-3.5" />
+                                            Retry
+                                        </button>
+                                    )}
+                                </div>
 
-                                    <div className="h-[1px] bg-white/[0.03]" />
-
-                                    <div className="flex items-center justify-between group">
-                                        <div className="space-y-1">
-                                            <h4 className="text-white font-medium">i phone 16 pro max - safari</h4>
-                                            <span className="text-[#666] text-sm">New York, US</span>
-                                        </div>
-                                        <button className="w-10 h-10 rounded-xl bg-orange-500/5 hover:bg-orange-500/10 flex items-center justify-center transition-all group/btn border border-transparent hover:border-orange-500/20 cursor-pointer">
-                                            <LogOut className="w-5 h-5 text-[#f97316] group-hover/btn:scale-110 transition-all" />
+                                {isSessionsLoading ? (
+                                    <div className="space-y-4">
+                                        {[1, 2, 3].map((i) => (
+                                            <div key={i} className="animate-pulse flex items-center justify-between p-4 bg-[#1A1A1A]/40 rounded-xl border border-white/5">
+                                                <div className="space-y-2 flex-1">
+                                                    <div className="h-4 bg-[#2A2A2A] rounded w-52" />
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="h-3 bg-[#222] rounded w-28" />
+                                                        <div className="h-3 bg-[#222] rounded w-36" />
+                                                    </div>
+                                                </div>
+                                                <div className="w-10 h-10 rounded-xl bg-[#2A2A2A]" />
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : isSessionsError ? (
+                                    <div className="text-center py-8 bg-[#1A1A1A]/30 rounded-xl border border-red-500/10">
+                                        <p className="text-red-400 text-sm mb-3">Failed to load active sessions.</p>
+                                        <button
+                                            onClick={() => refetchSessions()}
+                                            className="inline-flex items-center gap-2 text-xs font-semibold px-4 py-2 bg-[#facc15] text-black rounded-lg hover:bg-[#eab308] transition-all cursor-pointer"
+                                        >
+                                            <RefreshCw className="w-3.5 h-3.5" />
+                                            Reload Sessions
                                         </button>
                                     </div>
-                                </div>
+                                ) : !sessions || sessions.length === 0 ? (
+                                    <div className="text-center py-8 text-[#666] text-sm bg-[#1A1A1A]/20 rounded-xl border border-white/5">
+                                        No active sessions found.
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {sessions.map((session, index) => {
+                                            const { device, browser } = parseUserAgent(session.userAgent);
+                                            const isRevoking = revokingId === session.id;
+
+                                            return (
+                                                <React.Fragment key={session.id}>
+                                                    {index > 0 && <div className="h-[1px] bg-white/[0.03]" />}
+                                                    <div className="flex items-center justify-between group py-2">
+                                                        <div className="space-y-1">
+                                                            <h4 className="text-white font-medium flex items-center gap-2 text-base">
+                                                                <span>{device} - {browser}</span>
+                                                            </h4>
+                                                            <div className="flex flex-wrap items-center gap-3 text-xs md:text-sm">
+                                                                <span className="text-[#888]">
+                                                                    IP: {session.ipAddress || 'Unknown IP'}
+                                                                </span>
+                                                                <span className="text-[#444]">•</span>
+                                                                <span className="text-[#666]">
+                                                                    Logged in: {formatDate(session.createdAt)}
+                                                                </span>
+                                                                {session.isCurrent && (
+                                                                    <>
+                                                                        <span className="text-[#444]">•</span>
+                                                                        <div className="flex items-center gap-1.5">
+                                                                            <div className="w-1.5 h-1.5 rounded-full bg-[#facc15] animate-pulse" />
+                                                                            <span className="text-[#facc15] text-[13px] font-medium italic">Current device</span>
+                                                                        </div>
+                                                                    </>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        {!session.isCurrent && (
+                                                            <button
+                                                                onClick={() => handleRevokeSession(session.id)}
+                                                                disabled={isRevoking || revokeSessionMutation.isPending}
+                                                                title="Revoke session"
+                                                                className="w-10 h-10 rounded-xl bg-orange-500/5 hover:bg-orange-500/10 flex items-center justify-center transition-all group/btn border border-transparent hover:border-orange-500/20 cursor-pointer disabled:opacity-50"
+                                                            >
+                                                                {isRevoking ? (
+                                                                    <Loader2 className="w-4 h-4 animate-spin text-[#f97316]" />
+                                                                ) : (
+                                                                    <LogOut className="w-5 h-5 text-[#f97316] group-hover/btn:scale-110 transition-all" />
+                                                                )}
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </React.Fragment>
+                                            );
+                                        })}
+                                    </div>
+                                )}
                             </section>
                         </div>
                     </AnimationWrapper>
