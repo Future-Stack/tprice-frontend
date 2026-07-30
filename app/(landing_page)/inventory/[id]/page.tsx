@@ -98,7 +98,9 @@ export default function InventoryDetailsPage() {
 
   const saveMutation = useSaveListingMutation();
   const token =
-    Cookies.get("access_token") || useAuthStore((state) => state.token);
+    Cookies.get("accessToken") ||
+    Cookies.get("token") ||
+    useAuthStore((state) => state.token);
 
   const { data: savedResponse } = useSavedListingsQuery(
     { page: 1, limit: 100 },

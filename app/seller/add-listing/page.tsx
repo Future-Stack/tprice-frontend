@@ -202,7 +202,10 @@ export default function AddListing() {
       }
     }
     if (currentStep === 3) {
-      if (saleType === "FIXED_PRICE" && (!askingPrice || Number(askingPrice) <= 0)) {
+      if (
+        saleType === "FIXED_PRICE" &&
+        (!askingPrice || Number(askingPrice) <= 0)
+      ) {
         toast.error("Please enter a valid asking price.");
         return false;
       }
@@ -302,7 +305,9 @@ export default function AddListing() {
 
       if (selectedPlan === "featured") {
         if (!createdListingId) {
-          toast.error("Listing created, but listing ID was not returned for checkout.");
+          toast.error(
+            "Listing created, but listing ID was not returned for checkout.",
+          );
           router.push("/seller/my-listing");
           return;
         }
@@ -327,13 +332,15 @@ export default function AddListing() {
 
           if (checkoutUrl) {
             toast.success(
-              "Listing created! Redirecting to Stripe checkout for VIP Featured promotion..."
+              "Listing created! Redirecting to Stripe checkout for VIP Featured promotion...",
             );
             window.location.assign(checkoutUrl);
             return;
           } else {
             console.error("No checkoutUrl in response:", checkoutRes);
-            toast.error("Checkout session created, but no checkout URL was returned.");
+            toast.error(
+              "Checkout session created, but no checkout URL was returned.",
+            );
           }
         } catch (paymentErr: any) {
           console.error("Checkout session error:", paymentErr);
@@ -739,7 +746,9 @@ export default function AddListing() {
                   {saleType === "FIXED_PRICE" ? (
                     <span className="text-primary2">*</span>
                   ) : (
-                    <span className="text-gray-500 font-normal normal-case text-xs">(Optional for Private Sale)</span>
+                    <span className="text-gray-500 font-normal normal-case text-xs">
+                      (Optional for Private Sale)
+                    </span>
                   )}
                 </label>
                 <div className="relative">

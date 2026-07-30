@@ -17,31 +17,35 @@ export default function AuthInitializer() {
     const accessToken =
       urlParams.get("accessToken") ||
       urlParams.get("token") ||
-      urlParams.get("access_token");
+      Cookies.get("accessToken") ||
+      Cookies.get("token");
     const refreshToken =
-      urlParams.get("refreshToken") || urlParams.get("refresh_token");
+      urlParams.get("refreshToken") ||
+      Cookies.get("refreshToken");
 
     if (accessToken) {
-      // 1. Store token in cookies & Zustand store
+      // 1. Store token in Zustand store
       useAuthStore.getState().setToken(accessToken, refreshToken || undefined);
 
       // 2. Clean URL search parameters without reloading page
       urlParams.delete("accessToken");
       urlParams.delete("token");
-      urlParams.delete("access_token");
       urlParams.delete("refreshToken");
-      urlParams.delete("refresh_token");
 
       const newSearch = urlParams.toString();
       const newUrl =
-        window.location.pathname + (newSearch ? `?${newSearch}` : "") + window.location.hash;
+        window.location.pathname +
+        (newSearch ? `?${newSearch}` : "") +
+        window.location.hash;
       window.history.replaceState({}, document.title, newUrl);
 
       // 3. Fetch user info using getMeApi and update Zustand + Query Cache
       getMeApi()
         .then((user) => {
           if (user) {
-            useAuthStore.getState().setAuth(user, accessToken, refreshToken || undefined);
+            useAuthStore
+              .getState()
+              .setAuth(user, accessToken, refreshToken || undefined);
             queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.user });
           }
         })
@@ -49,20 +53,22 @@ export default function AuthInitializer() {
           console.error("Error fetching profile after OAuth redirect:", err);
         });
     } else {
-      // Check if access_token / accessToken / token cookie exists but Zustand store is not authenticated
-      const cookieToken =
-        Cookies.get("access_token") ||
-        Cookies.get("accessToken") ||
-        Cookies.get("token");
-      if (cookieToken && (!useAuthStore.getState().isAuthenticated || !useAuthStore.getState().user)) {
+      // HttpOnly cookies cannot be read via JavaScript (Cookies.get returns undefined).
+      // If store user is missing, attempt fetching /users/me using HttpOnly cookie via withCredentials.
+      if (
+        !useAuthStore.getState().user ||
+        !useAuthStore.getState().isAuthenticated
+      ) {
         getMeApi()
           .then((user) => {
-            if (user) {
-              useAuthStore.getState().setAuth(user, cookieToken);
+            if (user && (user.id || user.email)) {
+              useAuthStore.getState().setUser(user);
               queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.user });
             }
           })
-          .catch(() => {});
+          .catch(() => {
+            // Unauthenticated, silently ignore
+          });
       }
     }
   }, [queryClient]);

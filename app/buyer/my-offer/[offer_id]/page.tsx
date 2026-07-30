@@ -19,6 +19,9 @@ import {
   DollarSign,
   Loader2,
   MessageSquare,
+  CheckCircle2,
+  XCircle,
+  Flag,
 } from "lucide-react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
 import {
@@ -33,8 +36,9 @@ import {
   useDealDetailQuery,
   useDealMessagesQuery,
   useSendDealMessageMutation,
+  useUpdateDealStageMutation,
 } from "@/hooks/useDeals";
-import { DealMessage } from "@/lib/api/deals";
+import { DealMessage, DealStage } from "@/lib/api/deals";
 import { toast } from "sonner";
 import { OfferDetailItem } from "@/lib/api/offers";
 
@@ -274,6 +278,45 @@ const OfferDetails = () => {
   const withdrawOfferMutation = useWithdrawOfferMutation();
   const counterOfferMutation = useCounterOfferMutation();
   const sendDealMessageMutation = useSendDealMessageMutation();
+  const updateDealStageMutation = useUpdateDealStageMutation();
+
+  const [updatingStage, setUpdatingStage] = useState<DealStage | null>(null);
+
+  const currentStage = (
+    dealDetail?.stage ||
+    offer?.deal?.stage ||
+    matchedDeal?.stage ||
+    ""
+  ).toUpperCase() as DealStage | "";
+
+  const handleUpdateStage = async (stage: DealStage) => {
+    if (!targetDealId) {
+      toast.error("No active deal found associated with this offer yet.");
+      return;
+    }
+
+    setUpdatingStage(stage);
+    try {
+      const adminNotesMap: Record<DealStage, string> = {
+        COMPLETED: "Escrow verification complete. Title transfer confirmed.",
+        CANCELLED: "Deal cancelled by buyer.",
+        FLAGGED: "Deal flagged for review by buyer.",
+      };
+
+      await updateDealStageMutation.mutateAsync({
+        dealId: targetDealId,
+        payload: {
+          stage,
+          adminNotes: adminNotesMap[stage],
+          isFlagged: stage === "FLAGGED",
+        },
+      });
+    } catch {
+      // Handled in mutation onError toast
+    } finally {
+      setUpdatingStage(null);
+    }
+  };
 
   useEffect(() => {
     if (chatScrollRef.current) {
@@ -758,10 +801,106 @@ const OfferDetails = () => {
             )}
           </div>
 
-          {/* Right Column (Order History) */}
+          {/* Right Column (Deal Stage & Order History) */}
           <div className="lg:col-span-4">
             <AnimationWrapper type="fade-left">
               <div className="space-y-6">
+                {/* Deal Stage Card */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-2xl font-semibold font-clash">
+                      Deal Stage
+                    </h2>
+                    {currentStage && (
+                      <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] font-bold uppercase tracking-wider text-white/80">
+                        <span
+                          className={`w-2 h-2 rounded-full ${
+                            currentStage === "COMPLETED"
+                              ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"
+                              : currentStage === "CANCELLED"
+                              ? "bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.5)]"
+                              : currentStage === "FLAGGED"
+                              ? "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)]"
+                              : "bg-[#D4AF37]"
+                          }`}
+                        />
+                        {currentStage}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="bg-[#0A0A0B] rounded-[2.5rem] border border-white/5 p-6 md:p-8 space-y-4">
+                    <div className="grid grid-cols-3 gap-3">
+                      {/* COMPLETED Button */}
+                      <button
+                        onClick={() => handleUpdateStage("COMPLETED")}
+                        disabled={
+                          updateDealStageMutation.isPending ||
+                          currentStage === "COMPLETED"
+                        }
+                        title="Mark deal as COMPLETED"
+                        className={`py-3.5 px-2 rounded-xl text-xs font-bold uppercase tracking-wider flex flex-col items-center justify-center gap-2 transition-all border ${
+                          currentStage === "COMPLETED"
+                            ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]"
+                            : "bg-white/5 hover:bg-emerald-500/10 border-white/10 text-gray-300 hover:text-emerald-400 hover:border-emerald-500/30"
+                        } disabled:opacity-50 cursor-pointer active:scale-95`}
+                      >
+                        {updatingStage === "COMPLETED" ? (
+                          <Loader2 size={18} className="animate-spin text-emerald-400" />
+                        ) : (
+                          <CheckCircle2 size={18} />
+                        )}
+                        <span className="text-[10px]">Completed</span>
+                      </button>
+
+                      {/* CANCELLED Button */}
+                      <button
+                        onClick={() => handleUpdateStage("CANCELLED")}
+                        disabled={
+                          updateDealStageMutation.isPending ||
+                          currentStage === "CANCELLED"
+                        }
+                        title="Mark deal as CANCELLED"
+                        className={`py-3.5 px-2 rounded-xl text-xs font-bold uppercase tracking-wider flex flex-col items-center justify-center gap-2 transition-all border ${
+                          currentStage === "CANCELLED"
+                            ? "bg-red-500/20 border-red-500/50 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.2)]"
+                            : "bg-white/5 hover:bg-red-500/10 border-white/10 text-gray-300 hover:text-red-400 hover:border-red-500/30"
+                        } disabled:opacity-50 cursor-pointer active:scale-95`}
+                      >
+                        {updatingStage === "CANCELLED" ? (
+                          <Loader2 size={18} className="animate-spin text-red-400" />
+                        ) : (
+                          <XCircle size={18} />
+                        )}
+                        <span className="text-[10px]">Cancelled</span>
+                      </button>
+
+                      {/* FLAGGED Button */}
+                      <button
+                        onClick={() => handleUpdateStage("FLAGGED")}
+                        disabled={
+                          updateDealStageMutation.isPending ||
+                          currentStage === "FLAGGED"
+                        }
+                        title="Mark deal as FLAGGED"
+                        className={`py-3.5 px-2 rounded-xl text-xs font-bold uppercase tracking-wider flex flex-col items-center justify-center gap-2 transition-all border ${
+                          currentStage === "FLAGGED"
+                            ? "bg-amber-500/20 border-amber-500/50 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]"
+                            : "bg-white/5 hover:bg-amber-500/10 border-white/10 text-gray-300 hover:text-amber-400 hover:border-amber-500/30"
+                        } disabled:opacity-50 cursor-pointer active:scale-95`}
+                      >
+                        {updatingStage === "FLAGGED" ? (
+                          <Loader2 size={18} className="animate-spin text-amber-400" />
+                        ) : (
+                          <Flag size={18} />
+                        )}
+                        <span className="text-[10px]">Flagged</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Order History */}
                 <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-semibold font-clash">
                     Order History

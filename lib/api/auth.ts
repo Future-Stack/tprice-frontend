@@ -26,6 +26,7 @@ export const loginApi = async (payload: LoginPayload): Promise<LoginResponse> =>
 export const refreshTokenApi = async (payload: RefreshPayload): Promise<RefreshResponse> => {
   const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://tprice.softvenceomegaforce.cloud/api/v1";
   const response = await axios.post<RefreshResponse>(`${baseURL}/auth/refresh`, payload, {
+    withCredentials: true,
     headers: {
       "Content-Type": "application/json",
       accept: "*/*",

@@ -1,13 +1,25 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { Heart, MapPin, CheckCircle2, MoveRight, Gauge, Calendar, Zap, Cog } from "lucide-react";
+import {
+  Heart,
+  MapPin,
+  CheckCircle2,
+  MoveRight,
+  Gauge,
+  Calendar,
+  Zap,
+  Cog,
+} from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
 import { ListingItem } from "@/lib/api/listings";
-import { useSaveListingMutation, useSavedListingsQuery } from "@/hooks/useListings";
+import {
+  useSaveListingMutation,
+  useSavedListingsQuery,
+} from "@/hooks/useListings";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 
 interface ProductCardProps {
@@ -16,12 +28,15 @@ interface ProductCardProps {
 
 export default function ProductCard({ item }: ProductCardProps) {
   const saveMutation = useSaveListingMutation();
-  const token = Cookies.get("access_token") || useAuthStore((state) => state.token);
+  const token =
+    Cookies.get("accessToken") ||
+    Cookies.get("token") ||
+    useAuthStore((state) => state.token);
 
   // Fetch saved listings if authenticated to cross-reference saved status
   const { data: savedResponse } = useSavedListingsQuery(
     { page: 1, limit: 100 },
-    { enabled: Boolean(token) }
+    { enabled: Boolean(token) },
   );
 
   const isSavedInListings = useMemo(() => {
@@ -142,7 +157,9 @@ export default function ProductCard({ item }: ProductCardProps) {
           }`}
           title={isSaved ? "Remove from saved" : "Save listing"}
         >
-          <Heart className={`w-4 h-4 transition-transform duration-200 ${isSaved ? "fill-current scale-110" : ""}`} />
+          <Heart
+            className={`w-4 h-4 transition-transform duration-200 ${isSaved ? "fill-current scale-110" : ""}`}
+          />
         </button>
 
         {/* Category Badge(s) */}
@@ -150,7 +167,7 @@ export default function ProductCard({ item }: ProductCardProps) {
           {item.category && (
             <span
               className={`px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider rounded-full backdrop-blur-md ${getCategoryBadgeStyle(
-                item.category
+                item.category,
               )}`}
             >
               {item.category}
@@ -201,7 +218,9 @@ export default function ProductCard({ item }: ProductCardProps) {
         <div className="flex items-center justify-between pt-5 border-t border-white/5 mt-auto">
           <div className="flex items-center gap-1.5 text-white/70 truncate mr-2">
             <CheckCircle2 className="w-4 h-4 text-[#00D1FF] shrink-0" />
-            <span className="text-[11px] font-medium truncate">{ownerName}</span>
+            <span className="text-[11px] font-medium truncate">
+              {ownerName}
+            </span>
           </div>
 
           <Link

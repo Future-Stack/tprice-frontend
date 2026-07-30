@@ -29,7 +29,7 @@ import { ListingItem } from "@/lib/api/listings";
 /* ─── Helpers ─── */
 const formatPrice = (
   amount: string | number | null | undefined,
-  currency: string = "USD"
+  currency: string = "USD",
 ) => {
   if (!amount) return "Price on Request";
   const num = typeof amount === "string" ? parseFloat(amount) : amount;
@@ -143,8 +143,16 @@ const getSpecItems = (listing: ListingItem) => {
   ]);
 
   Object.entries(specs).forEach(([key, val]) => {
-    if (!knownKeys.has(key) && val !== null && val !== undefined && val !== "") {
-      const formattedLabel = key.replace(/([A-Z])/g, " $1").toUpperCase().trim();
+    if (
+      !knownKeys.has(key) &&
+      val !== null &&
+      val !== undefined &&
+      val !== ""
+    ) {
+      const formattedLabel = key
+        .replace(/([A-Z])/g, " $1")
+        .toUpperCase()
+        .trim();
       items.push({
         label: formattedLabel,
         value: String(val),
@@ -177,15 +185,19 @@ export default function VIPDetailsPage() {
   const [copied, setCopied] = useState(false);
 
   const saveMutation = useSaveListingMutation();
-  const token = Cookies.get("access_token") || useAuthStore((state) => state.token);
+  const token =
+    Cookies.get("accessToken") ||
+    Cookies.get("token") ||
+    useAuthStore((state) => state.token);
 
   const { data: savedResponse } = useSavedListingsQuery(
     { page: 1, limit: 100 },
-    { enabled: Boolean(token) }
+    { enabled: Boolean(token) },
   );
 
   const isSavedInListings =
-    savedResponse?.data?.some((savedItem) => savedItem.id === product?.id) ?? false;
+    savedResponse?.data?.some((savedItem) => savedItem.id === product?.id) ??
+    false;
   const isSaved =
     product?.isSaved !== undefined ? product.isSaved : isSavedInListings;
 
@@ -269,21 +281,24 @@ export default function VIPDetailsPage() {
 
   // Location string
   const locationText =
-    [product.locationCity, product.locationCountry].filter(Boolean).join(", ") ||
-    "Location on Request";
+    [product.locationCity, product.locationCountry]
+      .filter(Boolean)
+      .join(", ") || "Location on Request";
 
   // Badge label
   const badgeLabel = product.isOffMarket
     ? "OFF MARKET VIP"
     : product.saleType === "AUCTION"
-    ? "AUCTION"
-    : product.category || "VIP ASSET";
+      ? "AUCTION"
+      : product.category || "VIP ASSET";
 
   // Price formatting
-  const rawPriceNum = parseFloat(product.askingPrice || product.startingBid || "0");
+  const rawPriceNum = parseFloat(
+    product.askingPrice || product.startingBid || "0",
+  );
   const formattedPrice = formatPrice(
     product.askingPrice || product.startingBid,
-    product.currency
+    product.currency,
   );
   const currentBidLabel =
     product.saleType === "AUCTION" ? "CURRENT BID" : "ASKING PRICE";
@@ -361,7 +376,9 @@ export default function VIPDetailsPage() {
                 <button
                   onClick={handleToggleSave}
                   className={`w-10 h-10 bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center transition-colors border border-white/10 ${
-                    isSaved ? "text-red-500" : "text-white/80 hover:text-red-400"
+                    isSaved
+                      ? "text-red-500"
+                      : "text-white/80 hover:text-red-400"
                   }`}
                   title={isSaved ? "Remove from Saved" : "Save Listing"}
                 >
@@ -493,7 +510,11 @@ export default function VIPDetailsPage() {
                   <div className="grid grid-cols-2 gap-y-5 gap-x-4">
                     {specItems.length > 0 ? (
                       specItems.map((item, idx) => (
-                        <SpecItem key={idx} label={item.label} value={item.value} />
+                        <SpecItem
+                          key={idx}
+                          label={item.label}
+                          value={item.value}
+                        />
                       ))
                     ) : (
                       <>
@@ -692,7 +713,7 @@ export default function VIPDetailsPage() {
                   <button
                     onClick={() => {
                       toast.success(
-                        "Your bid has been submitted successfully to the seller!"
+                        "Your bid has been submitted successfully to the seller!",
                       );
                     }}
                     className="w-full py-4.5 bg-[#E78F23] hover:brightness-110 text-black text-sm font-bold rounded-xl transition-all shadow-[0_10px_30px_rgba(231,143,35,0.2)] active:scale-[0.98]"

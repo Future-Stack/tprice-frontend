@@ -2,10 +2,13 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://tprice.softvenceomegaforce.cloud/api/v1";
+const BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  "https://tprice.softvenceomegaforce.cloud/api/v1";
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
@@ -16,7 +19,6 @@ export const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     const token =
-      Cookies.get("access_token") ||
       Cookies.get("accessToken") ||
       Cookies.get("token") ||
       useAuthStore.getState().token;
@@ -51,7 +53,11 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry
+    ) {
       const requestUrl = originalRequest.url || "";
       if (
         requestUrl.includes("/auth/login") ||
@@ -81,7 +87,9 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const refreshToken = Cookies.get("refresh_token") || useAuthStore.getState().refreshToken;
+      const refreshToken =
+        Cookies.get("refreshToken") ||
+        useAuthStore.getState().refreshToken;
 
       if (!refreshToken) {
         isRefreshing = false;
@@ -94,18 +102,25 @@ apiClient.interceptors.response.use(
           `${BASE_URL}/auth/refresh`,
           { refreshToken },
           {
+            withCredentials: true,
             headers: {
               "Content-Type": "application/json",
               accept: "*/*",
             },
-          }
+          },
         );
 
-        const { accessToken, refreshToken: newRefreshToken, user } = refreshResponse.data;
+        const {
+          accessToken,
+          refreshToken: newRefreshToken,
+          user,
+        } = refreshResponse.data;
 
         if (accessToken) {
           const currentUser = user || useAuthStore.getState().user;
-          useAuthStore.getState().setAuth(currentUser, accessToken, newRefreshToken || refreshToken);
+          useAuthStore
+            .getState()
+            .setAuth(currentUser, accessToken, newRefreshToken || refreshToken);
 
           if (originalRequest.headers) {
             originalRequest.headers.Authorization = `Bearer ${accessToken}`;
@@ -126,8 +141,7 @@ apiClient.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default apiClient;
-

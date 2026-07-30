@@ -142,4 +142,26 @@ export const sendDealMessageApi = async (
   return response.data?.data || response.data?.message || response.data;
 };
 
+export type DealStage = "COMPLETED" | "CANCELLED" | "FLAGGED";
+
+export interface UpdateDealStagePayload {
+  stage: DealStage | string;
+  adminNotes?: string;
+  isFlagged?: boolean;
+}
+
+/**
+ * Update stage of a deal by deal ID
+ */
+export const updateDealStageApi = async (
+  dealId: string,
+  payload: UpdateDealStagePayload
+): Promise<DealItem> => {
+  const response = await apiClient.patch<DealItem>(
+    `/deals/${dealId}/stage`,
+    payload
+  );
+  return response.data;
+};
+
 

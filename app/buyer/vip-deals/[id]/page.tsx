@@ -196,7 +196,9 @@ export default function VIPDetailsPage() {
 
   const saveMutation = useSaveListingMutation();
   const token =
-    Cookies.get("access_token") || useAuthStore((state) => state.token);
+    Cookies.get("accessToken") ||
+    Cookies.get("token") ||
+    useAuthStore((state) => state.token);
 
   const { data: savedResponse } = useSavedListingsQuery(
     { page: 1, limit: 100 },
@@ -205,13 +207,13 @@ export default function VIPDetailsPage() {
 
   const { data: offersResponse } = useOffersQuery(
     { page: 1, limit: 100 },
-    { enabled: Boolean(token) }
+    { enabled: Boolean(token) },
   );
 
   const existingOffer = offersResponse?.data?.find(
     (off) =>
       String(off.listingId) === String(product?.id) ||
-      String(off.listing?.id) === String(product?.id)
+      String(off.listing?.id) === String(product?.id),
   );
 
   const createOfferMutation = useCreateOfferMutation();
@@ -251,11 +253,15 @@ export default function VIPDetailsPage() {
     }
     if (existingOffer) {
       setOfferAmount(
-        String(existingOffer.currentAmount || existingOffer.initialAmount || "")
+        String(
+          existingOffer.currentAmount || existingOffer.initialAmount || "",
+        ),
       );
       setOfferNote((existingOffer as any).note || "");
     } else {
-      const numericPrice = product?.askingPrice ? Number(product.askingPrice) : 0;
+      const numericPrice = product?.askingPrice
+        ? Number(product.askingPrice)
+        : 0;
       setOfferAmount(numericPrice > 0 ? String(numericPrice) : "");
       setOfferNote("");
     }
@@ -281,10 +287,12 @@ export default function VIPDetailsPage() {
         onSuccess: () => {
           setIsOfferModalOpen(false);
           toast.success(
-            existingOffer ? "Offer updated successfully!" : "Offer submitted successfully!"
+            existingOffer
+              ? "Offer updated successfully!"
+              : "Offer submitted successfully!",
           );
         },
-      }
+      },
     );
   };
 
@@ -369,7 +377,8 @@ export default function VIPDetailsPage() {
     locationParts.length > 0 ? locationParts.join(", ") : "Worldwide VIP";
 
   const specItems = getSpecItems(product);
-  const badgeLabel = (product as any).badgeText || product.saleType || "VIP ASSET";
+  const badgeLabel =
+    (product as any).badgeText || product.saleType || "VIP ASSET";
 
   // Seller details
   const sellerName = product.owner
@@ -487,7 +496,12 @@ export default function VIPDetailsPage() {
                     </span>
                     {existingOffer && (
                       <span className="inline-block bg-teal-500/20 text-teal-400 text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider border border-teal-500/30">
-                        Offer Submitted (${Number(existingOffer.currentAmount || existingOffer.initialAmount).toLocaleString()})
+                        Offer Submitted ($
+                        {Number(
+                          existingOffer.currentAmount ||
+                            existingOffer.initialAmount,
+                        ).toLocaleString()}
+                        )
                       </span>
                     )}
                   </div>
@@ -844,9 +858,7 @@ export default function VIPDetailsPage() {
                   <h3 className="text-lg font-clash font-semibold text-white">
                     {existingOffer ? "Update Your Offer" : "Make an Offer"}
                   </h3>
-                  <p className="text-xs text-gray-400">
-                    {product.title}
-                  </p>
+                  <p className="text-xs text-gray-400">{product.title}</p>
                 </div>
               </div>
               <button
@@ -866,7 +878,9 @@ export default function VIPDetailsPage() {
                   </label>
                   {rawPrice > 0 && (
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-500">Asking: {formattedPrice}</span>
+                      <span className="text-xs text-gray-500">
+                        Asking: {formattedPrice}
+                      </span>
                       <button
                         type="button"
                         onClick={() =>
@@ -923,28 +937,35 @@ export default function VIPDetailsPage() {
               </div>
 
               {/* Dynamic VIP Fee estimate summary */}
-              {Boolean(parseFloat(offerAmount)) && parseFloat(offerAmount) > 0 && (
-                <div className="bg-[#111111] border border-white/5 p-3.5 rounded-xl text-xs space-y-1.5">
-                  <div className="flex justify-between text-gray-400">
-                    <span>Offer Amount</span>
-                    <span className="text-white font-medium">
-                      ${parseFloat(offerAmount).toLocaleString()}
-                    </span>
+              {Boolean(parseFloat(offerAmount)) &&
+                parseFloat(offerAmount) > 0 && (
+                  <div className="bg-[#111111] border border-white/5 p-3.5 rounded-xl text-xs space-y-1.5">
+                    <div className="flex justify-between text-gray-400">
+                      <span>Offer Amount</span>
+                      <span className="text-white font-medium">
+                        ${parseFloat(offerAmount).toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-gray-400">
+                      <span>Estimated VIP Fee (1.5%)</span>
+                      <span className="text-white font-medium">
+                        $
+                        {Math.round(
+                          parseFloat(offerAmount) * 0.015,
+                        ).toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="pt-1.5 border-t border-white/5 flex justify-between font-semibold">
+                      <span className="text-gray-300">Total Commitment</span>
+                      <span className="text-primary">
+                        $
+                        {Math.round(
+                          parseFloat(offerAmount) * 1.015,
+                        ).toLocaleString()}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex justify-between text-gray-400">
-                    <span>Estimated VIP Fee (1.5%)</span>
-                    <span className="text-white font-medium">
-                      ${Math.round(parseFloat(offerAmount) * 0.015).toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="pt-1.5 border-t border-white/5 flex justify-between font-semibold">
-                    <span className="text-gray-300">Total Commitment</span>
-                    <span className="text-primary">
-                      ${Math.round(parseFloat(offerAmount) * 1.015).toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-              )}
+                )}
 
               {/* Footer Actions */}
               <div className="flex items-center justify-end gap-3 pt-2">
@@ -967,8 +988,8 @@ export default function VIPDetailsPage() {
                   {createOfferMutation.isPending
                     ? "Submitting..."
                     : existingOffer
-                    ? "Update Offer"
-                    : "Submit Offer"}
+                      ? "Update Offer"
+                      : "Submit Offer"}
                 </button>
               </div>
             </form>

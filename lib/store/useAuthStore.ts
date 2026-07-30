@@ -24,10 +24,18 @@ interface AuthState {
 }
 
 const getCookieToken = () =>
-  Cookies.get("access_token") || Cookies.get("accessToken") || Cookies.get("token") || null;
+  Cookies.get("accessToken") ||
+  Cookies.get("token") ||
+  null;
 
 const getCookieRefreshToken = () =>
-  Cookies.get("refresh_token") || Cookies.get("refreshToken") || null;
+  Cookies.get("refreshToken") || null;
+
+export const clearAuthCookies = () => {
+  Cookies.remove("accessToken");
+  Cookies.remove("token");
+  Cookies.remove("refreshToken");
+};
 
 export const useAuthStore = create<AuthState>()(
   persist(
@@ -38,51 +46,52 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: !!getCookieToken(),
 
       setAuth: (user, token, refreshToken) => {
-        Cookies.set("access_token", token, { expires: 7, secure: true, sameSite: "lax" });
-        if (refreshToken) {
-          Cookies.set("refresh_token", refreshToken, { expires: 7, secure: true, sameSite: "lax" });
-        }
-        set({
+        set((state) => ({
           user,
-          token,
-          refreshToken: refreshToken || getCookieRefreshToken(),
-          isAuthenticated: true,
-        });
+          token: token || state.token || getCookieToken(),
+          refreshToken:
+            refreshToken || state.refreshToken || getCookieRefreshToken(),
+          isAuthenticated: !!user,
+        }));
       },
 
       setUser: (user) =>
         set((state) => ({
           user,
-          isAuthenticated: !!(user && (state.token || getCookieToken())),
+          isAuthenticated: !!user,
         })),
 
       setToken: (token, refreshToken) => {
-        Cookies.set("access_token", token, { expires: 7, secure: true, sameSite: "lax" });
-        if (refreshToken) {
-          Cookies.set("refresh_token", refreshToken, { expires: 7, secure: true, sameSite: "lax" });
-        }
-        set({
-          token,
-          refreshToken: refreshToken || Cookies.get("refresh_token") || null,
-          isAuthenticated: true,
-        });
+        set((state) => ({
+          token: token || state.token || getCookieToken(),
+          refreshToken:
+            refreshToken || state.refreshToken || getCookieRefreshToken(),
+          isAuthenticated: !!state.user || !!token,
+        }));
       },
 
       setRefreshToken: (refreshToken) => {
-        Cookies.set("refresh_token", refreshToken, { expires: 7, secure: true, sameSite: "lax" });
         set({ refreshToken });
       },
 
       logout: () => {
-        Cookies.remove("access_token");
-        Cookies.remove("refresh_token");
-        set({ user: null, token: null, refreshToken: null, isAuthenticated: false });
+        clearAuthCookies();
+        set({
+          user: null,
+          token: null,
+          refreshToken: null,
+          isAuthenticated: false,
+        });
       },
     }),
     {
       name: "auth-storage",
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ user: state.user, token: state.token, refreshToken: state.refreshToken }),
-    }
-  )
+      partialize: (state) => ({
+        user: state.user,
+        token: state.token,
+        refreshToken: state.refreshToken,
+      }),
+    },
+  ),
 );

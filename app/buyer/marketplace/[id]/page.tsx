@@ -27,7 +27,11 @@ import Cookies from "js-cookie";
 import { toast } from "sonner";
 
 import AnimationWrapper from "@/app/components/AnimationWrapper";
-import { useListingByIdQuery, useSaveListingMutation, useSavedListingsQuery } from "@/hooks/useListings";
+import {
+  useListingByIdQuery,
+  useSaveListingMutation,
+  useSavedListingsQuery,
+} from "@/hooks/useListings";
 import { useOffersQuery, useCreateOfferMutation } from "@/hooks/useOffers";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 
@@ -48,7 +52,11 @@ function formatSpecValue(key: string, val: any): string {
   const lowerKey = key.toLowerCase();
   if (typeof val === "number") {
     if (lowerKey.includes("mileage")) return `${val.toLocaleString()} mi`;
-    if (lowerKey.includes("horsepower") || lowerKey.includes("power") || lowerKey === "hp")
+    if (
+      lowerKey.includes("horsepower") ||
+      lowerKey.includes("power") ||
+      lowerKey === "hp"
+    )
       return `${val.toLocaleString()} hp`;
     if (lowerKey.includes("sqft") || lowerKey.includes("squarefeet"))
       return `${val.toLocaleString()} sq ft`;
@@ -58,7 +66,10 @@ function formatSpecValue(key: string, val: any): string {
   const strVal = String(val);
   if (lowerKey.includes("mileage") && !strVal.toLowerCase().includes("mi"))
     return `${strVal} mi`;
-  if ((lowerKey.includes("horsepower") || lowerKey.includes("power")) && !strVal.toLowerCase().includes("hp"))
+  if (
+    (lowerKey.includes("horsepower") || lowerKey.includes("power")) &&
+    !strVal.toLowerCase().includes("hp")
+  )
     return `${strVal} hp`;
 
   return strVal;
@@ -92,25 +103,29 @@ export default function BuyerListingDetailPage() {
 
   const saveMutation = useSaveListingMutation();
   const createOfferMutation = useCreateOfferMutation();
-  const token = Cookies.get("access_token") || useAuthStore((state) => state.token);
+  const token =
+    Cookies.get("accessToken") ||
+    Cookies.get("token") ||
+    useAuthStore((state) => state.token);
 
   const { data: savedResponse } = useSavedListingsQuery(
     { page: 1, limit: 100 },
-    { enabled: Boolean(token) }
+    { enabled: Boolean(token) },
   );
 
-  const { data: userOffersData, isLoading: isUserOffersLoading } = useOffersQuery(
-    { limit: 100 },
-    { enabled: Boolean(token) }
-  );
+  const { data: userOffersData, isLoading: isUserOffersLoading } =
+    useOffersQuery({ limit: 100 }, { enabled: Boolean(token) });
 
   const existingOffer = userOffersData?.data?.find(
     (offer) =>
-      offer.listingId === product?.id || offer.listing?.id === product?.id
+      offer.listingId === product?.id || offer.listing?.id === product?.id,
   );
 
-  const isSavedInListings = savedResponse?.data?.some((savedItem) => savedItem.id === product?.id) ?? false;
-  const isSaved = product?.isSaved !== undefined ? product.isSaved : isSavedInListings;
+  const isSavedInListings =
+    savedResponse?.data?.some((savedItem) => savedItem.id === product?.id) ??
+    false;
+  const isSaved =
+    product?.isSaved !== undefined ? product.isSaved : isSavedInListings;
 
   const handleToggleSave = (e?: React.MouseEvent) => {
     if (e) {
@@ -133,7 +148,7 @@ export default function BuyerListingDetailPage() {
     const initialPrice = product?.askingPrice ? Number(product.askingPrice) : 0;
     setOfferAmount(initialPrice > 0 ? String(initialPrice) : "");
     setOfferNote(
-      "Flexible on delivery timeline and ready to complete escrow verification."
+      "Flexible on delivery timeline and ready to complete escrow verification.",
     );
     setIsOfferModalOpen(true);
   };
@@ -157,7 +172,7 @@ export default function BuyerListingDetailPage() {
         onSuccess: () => {
           setIsOfferModalOpen(false);
         },
-      }
+      },
     );
   };
 
@@ -169,17 +184,17 @@ export default function BuyerListingDetailPage() {
     const currentVal = existingOffer
       ? Number(existingOffer.currentAmount || existingOffer.initialAmount)
       : product?.startingBid
-      ? Number(product.startingBid)
-      : product?.askingPrice
-      ? Number(product.askingPrice)
-      : 0;
+        ? Number(product.startingBid)
+        : product?.askingPrice
+          ? Number(product.askingPrice)
+          : 0;
 
     // Suggested min bid: if existing bid present, suggest +5%, else current starting bid
     const suggested = existingOffer
       ? Math.round(currentVal * 1.05)
       : currentVal > 0
-      ? currentVal
-      : 1000;
+        ? currentVal
+        : 1000;
     setBidAmount(String(suggested));
     setBidNote("Escrow verified bidder ready to complete verification.");
     setIsBidModalOpen(true);
@@ -200,7 +215,7 @@ export default function BuyerListingDetailPage() {
 
     if (existingOffer && numericAmount <= currentVal) {
       toast.error(
-        `Your new bid must be higher than your current bid of $${currentVal.toLocaleString()}`
+        `Your new bid must be higher than your current bid of $${currentVal.toLocaleString()}`,
       );
       return;
     }
@@ -215,10 +230,12 @@ export default function BuyerListingDetailPage() {
         onSuccess: () => {
           setIsBidModalOpen(false);
           toast.success(
-            existingOffer ? "Bid increased successfully!" : "Bid placed successfully!"
+            existingOffer
+              ? "Bid increased successfully!"
+              : "Bid placed successfully!",
           );
         },
-      }
+      },
     );
   };
 
@@ -493,8 +510,8 @@ export default function BuyerListingDetailPage() {
                       {isAuction
                         ? "STARTING BID / CURRENT BID"
                         : isPrivateSale
-                        ? "ESTIMATED VALUE / ASK"
-                        : "CURRENT PRICE / ASK"}
+                          ? "ESTIMATED VALUE / ASK"
+                          : "CURRENT PRICE / ASK"}
                     </p>
                     <p className="text-3xl font-inter font-medium text-primary">
                       {formattedPrice}
@@ -510,14 +527,19 @@ export default function BuyerListingDetailPage() {
                         <div className="w-full h-13 bg-[#1C1C1E] border border-[#2C2C2E] rounded-xl animate-pulse" />
                       ) : existingOffer &&
                         ["PENDING", "COUNTERED", "ACCEPTED"].includes(
-                          (existingOffer.status || "").toUpperCase()
+                          (existingOffer.status || "").toUpperCase(),
                         ) ? (
                         <button
                           onClick={() => setIsViewOfferModalOpen(true)}
                           className="w-full py-4 bg-[#E78F23]/15 border border-[#E78F23]/40 text-primary hover:bg-[#E78F23]/25 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-[0.98]"
                         >
                           <Clock className="w-4.5 h-4.5 text-primary" />
-                          Offer Sent (${Number(existingOffer.currentAmount || existingOffer.initialAmount).toLocaleString()})
+                          Offer Sent ($
+                          {Number(
+                            existingOffer.currentAmount ||
+                              existingOffer.initialAmount,
+                          ).toLocaleString()}
+                          )
                         </button>
                       ) : (
                         <button
@@ -536,15 +558,26 @@ export default function BuyerListingDetailPage() {
                       {isUserOffersLoading ? (
                         <div className="w-full h-13 bg-[#1C1C1E] border border-[#2C2C2E] rounded-xl animate-pulse" />
                       ) : existingOffer &&
-                        ["PENDING", "LEADING", "OUTBID", "COUNTERED", "ACCEPTED"].includes(
-                          (existingOffer.status || "").toUpperCase()
+                        [
+                          "PENDING",
+                          "LEADING",
+                          "OUTBID",
+                          "COUNTERED",
+                          "ACCEPTED",
+                        ].includes(
+                          (existingOffer.status || "").toUpperCase(),
                         ) ? (
                         <button
                           onClick={handleOpenPlaceBidModal}
                           className="w-full py-4 bg-[#E78F23]/15 border border-[#E78F23]/40 text-primary hover:bg-[#E78F23]/25 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-[0.98]"
                         >
                           <Gavel className="w-4.5 h-4.5 text-primary" />
-                          Increase Bid (${Number(existingOffer.currentAmount || existingOffer.initialAmount).toLocaleString()})
+                          Increase Bid ($
+                          {Number(
+                            existingOffer.currentAmount ||
+                              existingOffer.initialAmount,
+                          ).toLocaleString()}
+                          )
                         </button>
                       ) : (
                         <button
@@ -562,7 +595,11 @@ export default function BuyerListingDetailPage() {
                     <div className="w-full py-4 px-4 bg-[#161618] border border-[#E78F23]/30 rounded-xl text-center flex items-center justify-center gap-2.5 shadow-lg">
                       <Lock className="w-4 h-4 text-primary shrink-0" />
                       <p className="text-sm font-medium text-gray-300">
-                        This item is available for <span className="text-primary font-semibold">Private Sale</span> only.
+                        This item is available for{" "}
+                        <span className="text-primary font-semibold">
+                          Private Sale
+                        </span>{" "}
+                        only.
                       </p>
                     </div>
                   )}
@@ -871,7 +908,10 @@ export default function BuyerListingDetailPage() {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
           onClick={(e) => {
-            if (e.target === e.currentTarget && !createOfferMutation.isPending) {
+            if (
+              e.target === e.currentTarget &&
+              !createOfferMutation.isPending
+            ) {
               setIsOfferModalOpen(false);
             }
           }}
@@ -909,7 +949,9 @@ export default function BuyerListingDetailPage() {
                 </h4>
                 <p className="text-xs text-gray-400 mt-0.5">
                   Asking Price:{" "}
-                  <span className="text-primary font-medium">{formattedPrice}</span>
+                  <span className="text-primary font-medium">
+                    {formattedPrice}
+                  </span>
                 </p>
               </div>
             </div>
@@ -919,15 +961,15 @@ export default function BuyerListingDetailPage() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="text-xs font-semibold uppercase tracking-wider text-gray-300">
-                    Your Offer Amount (USD) <span className="text-red-400">*</span>
+                    Your Offer Amount (USD){" "}
+                    <span className="text-red-400">*</span>
                   </label>
                   {/* Quick preset percentage pills */}
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
                       onClick={() =>
-                        numericPrice > 0 &&
-                        setOfferAmount(String(numericPrice))
+                        numericPrice > 0 && setOfferAmount(String(numericPrice))
                       }
                       className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-gray-300 transition-colors"
                     >
@@ -990,28 +1032,35 @@ export default function BuyerListingDetailPage() {
               </div>
 
               {/* Dynamic VIP Fee estimate summary */}
-              {Boolean(parseFloat(offerAmount)) && parseFloat(offerAmount) > 0 && (
-                <div className="bg-[#111111] border border-white/5 p-3.5 rounded-xl text-xs space-y-1.5">
-                  <div className="flex justify-between text-gray-400">
-                    <span>Offer Amount</span>
-                    <span className="text-white font-medium">
-                      ${parseFloat(offerAmount).toLocaleString()}
-                    </span>
+              {Boolean(parseFloat(offerAmount)) &&
+                parseFloat(offerAmount) > 0 && (
+                  <div className="bg-[#111111] border border-white/5 p-3.5 rounded-xl text-xs space-y-1.5">
+                    <div className="flex justify-between text-gray-400">
+                      <span>Offer Amount</span>
+                      <span className="text-white font-medium">
+                        ${parseFloat(offerAmount).toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-gray-400">
+                      <span>Estimated VIP Fee (1.5%)</span>
+                      <span className="text-white font-medium">
+                        $
+                        {Math.round(
+                          parseFloat(offerAmount) * 0.015,
+                        ).toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="pt-1.5 border-t border-white/5 flex justify-between font-semibold">
+                      <span className="text-gray-300">Total Commitment</span>
+                      <span className="text-primary">
+                        $
+                        {Math.round(
+                          parseFloat(offerAmount) * 1.015,
+                        ).toLocaleString()}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex justify-between text-gray-400">
-                    <span>Estimated VIP Fee (1.5%)</span>
-                    <span className="text-white font-medium">
-                      ${Math.round(parseFloat(offerAmount) * 0.015).toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="pt-1.5 border-t border-white/5 flex justify-between font-semibold">
-                    <span className="text-gray-300">Total Commitment</span>
-                    <span className="text-primary">
-                      ${Math.round(parseFloat(offerAmount) * 1.015).toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-              )}
+                )}
 
               {/* Footer Actions */}
               <div className="flex items-center justify-end gap-3 pt-2">
@@ -1088,7 +1137,10 @@ export default function BuyerListingDetailPage() {
               <div className="flex items-center justify-between pt-2 border-t border-white/5">
                 <span className="text-xs text-gray-400">Offered Amount</span>
                 <span className="text-lg font-clash font-bold text-white">
-                  ${Number(existingOffer.currentAmount || existingOffer.initialAmount).toLocaleString()}
+                  $
+                  {Number(
+                    existingOffer.currentAmount || existingOffer.initialAmount,
+                  ).toLocaleString()}
                 </span>
               </div>
 
@@ -1138,7 +1190,10 @@ export default function BuyerListingDetailPage() {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
           onClick={(e) => {
-            if (e.target === e.currentTarget && !createOfferMutation.isPending) {
+            if (
+              e.target === e.currentTarget &&
+              !createOfferMutation.isPending
+            ) {
               setIsBidModalOpen(false);
             }
           }}
@@ -1179,7 +1234,9 @@ export default function BuyerListingDetailPage() {
                 </h4>
                 <div className="flex items-center gap-3 mt-1 text-xs">
                   <span className="text-gray-400">
-                    {existingOffer ? "Your Current Bid:" : "Starting / Current Ask:"}
+                    {existingOffer
+                      ? "Your Current Bid:"
+                      : "Starting / Current Ask:"}
                   </span>
                   <span className="text-primary font-bold">
                     {existingOffer
@@ -1195,7 +1252,9 @@ export default function BuyerListingDetailPage() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="text-xs font-semibold uppercase tracking-wider text-gray-300">
-                    {existingOffer ? "New Higher Bid Amount (USD)" : "Your Bid Amount (USD)"}{" "}
+                    {existingOffer
+                      ? "New Higher Bid Amount (USD)"
+                      : "Your Bid Amount (USD)"}{" "}
                     <span className="text-red-400">*</span>
                   </label>
 
@@ -1206,7 +1265,8 @@ export default function BuyerListingDetailPage() {
                         type="button"
                         onClick={() => {
                           const base = Number(
-                            existingOffer.currentAmount || existingOffer.initialAmount
+                            existingOffer.currentAmount ||
+                              existingOffer.initialAmount,
                           );
                           setBidAmount(String(Math.round(base * 1.05)));
                         }}
@@ -1218,7 +1278,8 @@ export default function BuyerListingDetailPage() {
                         type="button"
                         onClick={() => {
                           const base = Number(
-                            existingOffer.currentAmount || existingOffer.initialAmount
+                            existingOffer.currentAmount ||
+                              existingOffer.initialAmount,
                           );
                           setBidAmount(String(Math.round(base * 1.1)));
                         }}
@@ -1230,7 +1291,8 @@ export default function BuyerListingDetailPage() {
                         type="button"
                         onClick={() => {
                           const base = Number(
-                            existingOffer.currentAmount || existingOffer.initialAmount
+                            existingOffer.currentAmount ||
+                              existingOffer.initialAmount,
                           );
                           setBidAmount(String(Math.round(base * 1.15)));
                         }}
@@ -1288,13 +1350,19 @@ export default function BuyerListingDetailPage() {
                   <div className="flex justify-between text-gray-400">
                     <span>VIP Fee (1.5%)</span>
                     <span className="text-white font-medium">
-                      ${Math.round(parseFloat(bidAmount) * 0.015).toLocaleString()}
+                      $
+                      {Math.round(
+                        parseFloat(bidAmount) * 0.015,
+                      ).toLocaleString()}
                     </span>
                   </div>
                   <div className="pt-1.5 border-t border-white/5 flex justify-between font-semibold">
                     <span className="text-gray-300">Total Payable</span>
                     <span className="text-primary font-bold">
-                      ${Math.round(parseFloat(bidAmount) * 1.015).toLocaleString()}
+                      $
+                      {Math.round(
+                        parseFloat(bidAmount) * 1.015,
+                      ).toLocaleString()}
                     </span>
                   </div>
                 </div>
