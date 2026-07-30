@@ -266,6 +266,42 @@ export default function BuyerListingDetailPage() {
       ? `${currencySymbol}${numericPrice.toLocaleString()}`
       : "Price on Request";
 
+  // Financial & Bidding properties parsing for conditional display
+  const askingPriceVal =
+    product?.askingPrice !== null &&
+    product?.askingPrice !== undefined &&
+    product?.askingPrice !== "" &&
+    !isNaN(Number(product.askingPrice))
+      ? Number(product.askingPrice)
+      : null;
+
+  const startingBidVal =
+    product?.startingBid !== null &&
+    product?.startingBid !== undefined &&
+    product?.startingBid !== "" &&
+    !isNaN(Number(product.startingBid))
+      ? Number(product.startingBid)
+      : null;
+
+  const highestBidVal = (() => {
+    if (product?.highestBid === null || product?.highestBid === undefined) return null;
+    if (typeof product.highestBid === "object") {
+      const num = Number(
+        (product.highestBid as any).amount ?? (product.highestBid as any).price,
+      );
+      return !isNaN(num) && num > 0 ? num : null;
+    }
+    const num = Number(product.highestBid);
+    return !isNaN(num) && num > 0 ? num : null;
+  })();
+
+  const totalBidsCountVal =
+    product?.totalBidsCount !== null &&
+    product?.totalBidsCount !== undefined &&
+    typeof product.totalBidsCount === "number"
+      ? product.totalBidsCount
+      : null;
+
   // Sale type classification
   const normalizedSaleType = (product?.saleType || "").toUpperCase();
   const isAuction =
@@ -505,17 +541,68 @@ export default function BuyerListingDetailPage() {
 
                 {/* Price */}
                 <AnimationWrapper type="fade-left" duration={0.5} delay={0.15}>
-                  <div className="pt-2">
-                    <p className="text-[11px] text-gray-500 uppercase tracking-[0.15em] font-semibold mb-1">
-                      {isAuction
-                        ? "STARTING BID / CURRENT BID"
-                        : isPrivateSale
-                          ? "ESTIMATED VALUE / ASK"
-                          : "CURRENT PRICE / ASK"}
-                    </p>
-                    <p className="text-3xl font-inter font-medium text-primary">
-                      {formattedPrice}
-                    </p>
+                  <div className="pt-2 space-y-3">
+                    <div>
+                      <p className="text-[11px] text-gray-500 uppercase tracking-[0.15em] font-semibold mb-1">
+                        {isAuction
+                          ? "STARTING BID / CURRENT BID"
+                          : isPrivateSale
+                            ? "ESTIMATED VALUE / ASK"
+                            : "CURRENT PRICE / ASK"}
+                      </p>
+                      <p className="text-3xl font-inter font-medium text-primary">
+                        {formattedPrice}
+                      </p>
+                    </div>
+
+                    {/* Conditional Property Details Breakdown */}
+                    {(askingPriceVal !== null ||
+                      startingBidVal !== null ||
+                      highestBidVal !== null ||
+                      totalBidsCountVal !== null) && (
+                      <div className="bg-[#161618] border border-[#2C2C2E] rounded-xl p-4 grid grid-cols-2 gap-3">
+                        {askingPriceVal !== null && (
+                          <div>
+                            <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mb-0.5">
+                              Asking Price
+                            </p>
+                            <p className="text-sm font-medium text-white">
+                              {currencySymbol}{askingPriceVal.toLocaleString()}
+                            </p>
+                          </div>
+                        )}
+                        {startingBidVal !== null && (
+                          <div>
+                            <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mb-0.5">
+                              Starting Bid
+                            </p>
+                            <p className="text-sm font-medium text-white">
+                              {currencySymbol}{startingBidVal.toLocaleString()}
+                            </p>
+                          </div>
+                        )}
+                        {highestBidVal !== null && (
+                          <div>
+                            <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mb-0.5">
+                              Highest Bid
+                            </p>
+                            <p className="text-sm font-medium text-green-400">
+                              {currencySymbol}{highestBidVal.toLocaleString()}
+                            </p>
+                          </div>
+                        )}
+                        {totalBidsCountVal !== null && (
+                          <div>
+                            <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mb-0.5">
+                              Total Bids
+                            </p>
+                            <p className="text-sm font-medium text-white">
+                              {totalBidsCountVal}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </AnimationWrapper>
 

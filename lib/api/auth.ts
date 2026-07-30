@@ -48,16 +48,47 @@ export interface UpdateProfilePayload {
   avatarUrl?: string | null;
 }
 
+export const decodeJwtUser = (token: string): User | null => {
+  try {
+    const base64Url = token.split(".")[1];
+    if (!base64Url) return null;
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
+    const payload = JSON.parse(jsonPayload);
+    if (payload && (payload.sub || payload.id || payload.email)) {
+      return {
+        id: payload.sub || payload.id || "google-user",
+        email: payload.email || "",
+        role: payload.role || "BUYER",
+        firstName: payload.firstName,
+        lastName: payload.lastName,
+        name: payload.name || (payload.email ? payload.email.split("@")[0] : "User"),
+      };
+    }
+  } catch {
+    // Ignore decoding errors
+  }
+  return null;
+};
+
 export const getMeApi = async (): Promise<User> => {
   try {
     const response = await apiClient.get<any>("/users/me");
     const resData = response.data;
     if (resData && typeof resData === "object") {
-      if (resData.data && typeof resData.data === "object" && (resData.data.email || resData.data.id)) {
-        return resData.data;
-      }
-      if (resData.user && typeof resData.user === "object" && (resData.user.email || resData.user.id)) {
-        return resData.user;
+      const extracted =
+        resData.data?.user ||
+        resData.user ||
+        resData.data ||
+        resData.result ||
+        resData;
+      if (extracted && typeof extracted === "object") {
+        return extracted;
       }
     }
     return resData;
@@ -66,11 +97,15 @@ export const getMeApi = async (): Promise<User> => {
       try {
         const fallback = await apiClient.get<any>("/auth/me");
         const resData = fallback.data;
-        return resData?.data || resData?.user || resData;
+        return (
+          resData?.data?.user || resData?.data || resData?.user || resData
+        );
       } catch {
         const fallback2 = await apiClient.get<any>("/me");
         const resData = fallback2.data;
-        return resData?.data || resData?.user || resData;
+        return (
+          resData?.data?.user || resData?.data || resData?.user || resData
+        );
       }
     }
     throw error;

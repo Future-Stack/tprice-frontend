@@ -26,15 +26,45 @@ interface AuthState {
 const getCookieToken = () =>
   Cookies.get("accessToken") ||
   Cookies.get("token") ||
+  Cookies.get("access_token") ||
   null;
 
 const getCookieRefreshToken = () =>
-  Cookies.get("refreshToken") || null;
+  Cookies.get("refreshToken") ||
+  Cookies.get("refresh_token") ||
+  null;
+
+const setTokenCookies = (token?: string) => {
+  if (token && token.trim() !== "") {
+    Cookies.set("accessToken", token, {
+      expires: 7,
+      sameSite: "lax",
+      path: "/",
+    });
+  }
+};
+
+const setRefreshTokenCookies = (refreshToken?: string) => {
+  if (refreshToken && refreshToken.trim() !== "") {
+    Cookies.set("refreshToken", refreshToken, {
+      expires: 7,
+      sameSite: "lax",
+      path: "/",
+    });
+  }
+};
 
 export const clearAuthCookies = () => {
+  Cookies.remove("accessToken", { path: "/" });
+  Cookies.remove("token", { path: "/" });
+  Cookies.remove("access_token", { path: "/" });
+  Cookies.remove("refreshToken", { path: "/" });
+  Cookies.remove("refresh_token", { path: "/" });
   Cookies.remove("accessToken");
   Cookies.remove("token");
+  Cookies.remove("access_token");
   Cookies.remove("refreshToken");
+  Cookies.remove("refresh_token");
 };
 
 export const useAuthStore = create<AuthState>()(
@@ -46,6 +76,8 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: !!getCookieToken(),
 
       setAuth: (user, token, refreshToken) => {
+        setTokenCookies(token);
+        setRefreshTokenCookies(refreshToken);
         set((state) => ({
           user,
           token: token || state.token || getCookieToken(),
@@ -62,6 +94,8 @@ export const useAuthStore = create<AuthState>()(
         })),
 
       setToken: (token, refreshToken) => {
+        setTokenCookies(token);
+        setRefreshTokenCookies(refreshToken);
         set((state) => ({
           token: token || state.token || getCookieToken(),
           refreshToken:
@@ -71,6 +105,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       setRefreshToken: (refreshToken) => {
+        setRefreshTokenCookies(refreshToken);
         set({ refreshToken });
       },
 

@@ -54,6 +54,8 @@ export interface ListingItem {
   allowCounterOffers?: boolean;
   askingPrice: string;
   startingBid?: string | null;
+  highestBid?: string | number | null;
+  totalBidsCount?: number | null;
   auctionEndsAt?: string | null;
   currency: string;
   isOffMarket: boolean;

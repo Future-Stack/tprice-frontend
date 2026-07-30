@@ -7,6 +7,7 @@ import {
   registerApi,
   logoutApi,
   getMeApi,
+  decodeJwtUser,
   updateMeApi,
   changePasswordApi,
   LoginPayload,
@@ -104,20 +105,29 @@ export const useGetMeQuery = (enabled: boolean = true) => {
     queryKey: AUTH_QUERY_KEYS.user,
     queryFn: async () => {
       const data = await getMeApi();
-      if (data) {
+      if (data && typeof data === "object" && Object.keys(data).length > 0) {
         const token =
-          useAuthStore.getState().token || Cookies.get("accessToken");
+          useAuthStore.getState().token ||
+          Cookies.get("accessToken") ||
+          Cookies.get("token") ||
+          Cookies.get("access_token");
         if (token) {
           setAuth(data, token);
         } else {
           setUser(data);
+        }
+      } else {
+        const token = useAuthStore.getState().token;
+        if (token) {
+          const decoded = decodeJwtUser(token);
+          if (decoded) setUser(decoded);
         }
       }
       return data;
     },
     enabled: enabled,
     staleTime: 5 * 60 * 1000,
-    retry: false,
+    retry: 1,
   });
 };
 
