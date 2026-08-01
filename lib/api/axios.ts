@@ -2,9 +2,10 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ||
-  "https://tprice.softvenceomegaforce.cloud/api/v1";
+const BASE_URL = "https://api.exoticworldinc.com/api/v1";
+// const BASE_URL =
+//   process.env.NEXT_PUBLIC_API_BASE_URL ||
+//   "https://api.exoticworldinc.com/api/v1";
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,

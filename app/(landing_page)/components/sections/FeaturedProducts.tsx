@@ -22,7 +22,10 @@ export default function FeaturedProducts() {
   // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsDropdownOpen(false);
       }
     };
@@ -110,7 +113,9 @@ export default function FeaturedProducts() {
               className="cursor-pointer w-full bg-white/5 border border-white/10 px-6 py-4 rounded-lg flex items-center justify-between text-white hover:border-primary/50 transition-all text-sm font-medium"
             >
               <span className="truncate">
-                {selectedCategory === "ALL" ? "All Categories" : selectedCategory}
+                {selectedCategory === "ALL"
+                  ? "All Categories"
+                  : selectedCategory}
               </span>
               <ChevronDown
                 className={`w-4 h-4 text-white/60 transition-transform ${
@@ -132,7 +137,9 @@ export default function FeaturedProducts() {
                       setIsDropdownOpen(false);
                     }}
                     className={`cursor-pointer w-full text-left px-6 py-3.5 hover:bg-primary/10 transition-colors text-sm ${
-                      selectedCategory === "ALL" ? "text-primary font-bold" : "text-white/70"
+                      selectedCategory === "ALL"
+                        ? "text-primary font-bold"
+                        : "text-white/70"
                     }`}
                   >
                     All Categories
@@ -145,7 +152,9 @@ export default function FeaturedProducts() {
                         setIsDropdownOpen(false);
                       }}
                       className={`cursor-pointer w-full text-left px-6 py-3.5 hover:bg-primary/10 transition-colors text-sm truncate ${
-                        selectedCategory === cat.name ? "text-primary font-bold" : "text-white/70"
+                        selectedCategory === cat.name
+                          ? "text-primary font-bold"
+                          : "text-white/70"
                       }`}
                     >
                       {cat.name}
@@ -195,7 +204,8 @@ export default function FeaturedProducts() {
               No featured listings available
             </h3>
             <p className="text-white/40 text-sm max-w-md mx-auto mb-6 font-light">
-              There are currently no featured listings found for this selection. Try selecting another category.
+              There are currently no featured listings found for this selection.
+              Try selecting another category.
             </p>
             {selectedCategory !== "ALL" && (
               <button
@@ -217,11 +227,13 @@ export default function FeaturedProducts() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5 }}
-                className={sideProducts.length > 0 ? "lg:col-span-4" : "lg:col-span-12"}
+                className={
+                  sideProducts.length > 0 ? "lg:col-span-4" : "lg:col-span-12"
+                }
               >
                 <Link
                   href={`/inventory/${mainProduct.slug || mainProduct.id}`}
-                  className="group relative h-[600px] block overflow-hidden rounded-xl border border-white/5 hover:border-primary/40 transition-all shadow-2xl"
+                  className="group relative h-150 block overflow-hidden rounded-xl border border-white/5 hover:border-primary/40 transition-all shadow-2xl"
                 >
                   <img
                     src={getProductImage(mainProduct)}
@@ -232,7 +244,7 @@ export default function FeaturedProducts() {
                         "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=1200&q=80";
                     }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black via-black/30 to-transparent" />
 
                   {/* Badge */}
                   <div className="absolute top-6 left-6 px-4 py-1.5 bg-primary/20 backdrop-blur-md border border-primary/30 rounded-full text-primary text-xs font-bold uppercase tracking-widest">
@@ -252,7 +264,9 @@ export default function FeaturedProducts() {
                     </p>
                     <div className="flex items-center gap-2 text-white/70 text-sm font-light">
                       <MapPin className="w-4 h-4 text-primary shrink-0" />
-                      <span className="truncate">{getLocationString(mainProduct)}</span>
+                      <span className="truncate">
+                        {getLocationString(mainProduct)}
+                      </span>
                     </div>
                   </div>
                 </Link>
@@ -284,7 +298,7 @@ export default function FeaturedProducts() {
                               "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=1200&q=80";
                           }}
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                        <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-transparent" />
                         <div className="absolute top-4 left-4 px-3 py-1 bg-white/10 backdrop-blur-md border border-white/10 rounded-full text-white/90 text-[10px] font-bold uppercase">
                           {getBadgeTag(product)}
                         </div>
@@ -295,7 +309,9 @@ export default function FeaturedProducts() {
                           <h4 className="text-lg font-semibold text-white mb-1 group-hover:text-primary transition-colors truncate">
                             {product.title}
                           </h4>
-                          <p className="text-primary font-bold">{getFormattedPrice(product)}</p>
+                          <p className="text-primary font-bold">
+                            {getFormattedPrice(product)}
+                          </p>
                         </div>
                       </Link>
                     </motion.div>
@@ -325,7 +341,7 @@ function FeaturedProductsSkeleton() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-pulse">
       {/* Main Card Skeleton */}
-      <div className="lg:col-span-4 h-[600px] bg-[#0E0E0E] border border-white/5 rounded-xl p-8 flex flex-col justify-between relative overflow-hidden">
+      <div className="lg:col-span-4 h-150 bg-[#0E0E0E] border border-white/5 rounded-xl p-8 flex flex-col justify-between relative overflow-hidden">
         <div className="w-16 h-7 bg-white/10 rounded-full" />
         <div className="space-y-4">
           <div className="w-24 h-4 bg-white/10 rounded" />
@@ -340,7 +356,7 @@ function FeaturedProductsSkeleton() {
         {[1, 2, 3, 4].map((n) => (
           <div
             key={n}
-            className="h-[290px] bg-[#0E0E0E] border border-white/5 rounded-xl p-6 flex flex-col justify-between relative overflow-hidden"
+            className="h-72.5 bg-[#0E0E0E] border border-white/5 rounded-xl p-6 flex flex-col justify-between relative overflow-hidden"
           >
             <div className="w-14 h-5 bg-white/10 rounded-full" />
             <div className="space-y-2">
@@ -354,4 +370,3 @@ function FeaturedProductsSkeleton() {
     </div>
   );
 }
-

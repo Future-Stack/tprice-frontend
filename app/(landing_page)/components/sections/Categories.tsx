@@ -6,63 +6,13 @@ import { motion } from "framer-motion";
 import { Car, Anchor, Plane, Home, Watch, Sparkles } from "lucide-react";
 import { useGetCategoriesQuery } from "@/hooks/useCategories";
 import { Category } from "@/lib/api/categories";
+import Image from "next/image";
 
 const DEFAULT_IMAGES = [
   "/images/landing/hero-car.png",
   "/images/landing/hero-yacht.png",
   "/images/landing/hero-jet.png",
   "/images/landing/hero-villa.png",
-];
-
-const FALLBACK_CATEGORIES: Category[] = [
-  {
-    id: "fb-1",
-    name: "Automotive",
-    description: "Exotic and luxury sports cars",
-    imageUrl: "/images/landing/hero-car.png",
-    iconName: "car",
-    displayOrder: 1,
-    isActive: true,
-    createdAt: "",
-    updatedAt: "",
-    _count: { brands: 0, listings: 300 },
-  },
-  {
-    id: "fb-2",
-    name: "Yachts",
-    description: "Luxury motor yachts and superyachts",
-    imageUrl: "/images/landing/hero-yacht.png",
-    iconName: "boat",
-    displayOrder: 2,
-    isActive: true,
-    createdAt: "",
-    updatedAt: "",
-    _count: { brands: 0, listings: 524 },
-  },
-  {
-    id: "fb-3",
-    name: "Aviation",
-    description: "Ultra long range executive aircraft",
-    imageUrl: "/images/landing/hero-jet.png",
-    iconName: "plane",
-    displayOrder: 3,
-    isActive: true,
-    createdAt: "",
-    updatedAt: "",
-    _count: { brands: 0, listings: 150 },
-  },
-  {
-    id: "fb-4",
-    name: "Real Estate",
-    description: "Exclusive properties and villas",
-    imageUrl: "/images/landing/hero-villa.png",
-    iconName: "home",
-    displayOrder: 4,
-    isActive: true,
-    createdAt: "",
-    updatedAt: "",
-    _count: { brands: 0, listings: 280 },
-  },
 ];
 
 const getCategoryIcon = (iconName?: string | null, name?: string) => {
@@ -118,13 +68,8 @@ export default function Categories() {
       ? categoriesResponse.data
       : [];
 
-  const displayCategories =
-    !isLoading && apiCategories.length === 0
-      ? FALLBACK_CATEGORIES
-      : apiCategories;
-
   // Limit to 4 items max
-  const categoriesToShow = displayCategories.slice(0, 4);
+  const categoriesToShow = apiCategories.slice(0, 4);
 
   return (
     <section className="py-32 bg-black px-6">
@@ -150,6 +95,26 @@ export default function Categories() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {categoriesToShow.length === 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="py-24 text-center max-w-112.5 mx-auto  rounded-xl px-6"
+            >
+              <div>
+                <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4 border border-white/10">
+                  <Sparkles className="w-8 h-8 text-primary/60" />
+                </div>
+                <h3 className="text-xl font-serif text-white mb-2">
+                  No Category available
+                </h3>
+                <p className="text-white/40 text-sm max-w-md mx-auto mb-6 font-light">
+                  There are currently no featured listings found for this
+                  selection. Try selecting another category.
+                </p>
+              </div>
+            </motion.div>
+          )}
           {isLoading
             ? Array.from({ length: 4 }).map((_, i) => (
                 <div
@@ -191,12 +156,17 @@ export default function Categories() {
                       className="group relative h-112.5 overflow-hidden rounded-xl cursor-pointer"
                     >
                       {/* Background Image */}
-                      <img
+                      {/* <img
                         src={imageSrc}
                         alt={cat.name}
                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      /> */}
+                      <Image
+                        src={imageSrc}
+                        alt={cat.name}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
                       />
-
                       {/* Gradient Overlay */}
                       <div className="absolute inset-0 bg-linear-to-t from-black via-black/20 to-transparent group-hover:via-black/40 transition-all duration-300" />
 
