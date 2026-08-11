@@ -187,7 +187,7 @@ export default function AdminInquiriesPage() {
 
   const handleUpdateInquiry = async (
     id: string,
-    payload: UpdateContactInquiryPayload
+    payload: UpdateContactInquiryPayload,
   ) => {
     try {
       await updateMutation.mutateAsync({ id, payload });
@@ -198,13 +198,13 @@ export default function AdminInquiriesPage() {
       toast.error(
         err?.response?.data?.message ||
           err?.message ||
-          "Failed to update inquiry"
+          "Failed to update inquiry",
       );
     }
   };
 
   const newCount = rawInquiries.filter(
-    (i) => i.status?.toUpperCase() === "NEW"
+    (i) => i.status?.toUpperCase() === "NEW",
   ).length;
 
   return (
@@ -213,44 +213,12 @@ export default function AdminInquiriesPage() {
       <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <AnimationWrapper type="fade-down" duration={0.5}>
           <div>
-            <h1 className="text-3xl font-bold font-montserrat flex items-center gap-3">
-              <MessageSquare className="w-8 h-8 text-primary" />
+            <h1 className="text-3xl font-bold font-montserrat  ">
               Inquiries Management
             </h1>
             <p className="text-gray-400 text-sm mt-1">
               View and manage customer contact messages and inquiries
             </p>
-          </div>
-        </AnimationWrapper>
-
-        {/* Stats Summary Badge */}
-        <AnimationWrapper type="fade-down" duration={0.5} delay={0.1}>
-          <div className="flex items-center gap-3">
-            <div className="bg-[#141416] border border-[#262626] rounded-xl px-4 py-2 flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                <Inbox className="w-4 h-4" />
-              </div>
-              <div>
-                <p className="text-[10px] text-gray-400 uppercase font-semibold">
-                  Total Inquiries
-                </p>
-                <p className="text-sm font-bold text-white">{meta.total}</p>
-              </div>
-            </div>
-
-            <div className="bg-[#141416] border border-[#262626] rounded-xl px-4 py-2 flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 block animate-pulse" />
-              </div>
-              <div>
-                <p className="text-[10px] text-gray-400 uppercase font-semibold">
-                  New Status
-                </p>
-                <p className="text-sm font-bold text-emerald-400">
-                  {newCount}
-                </p>
-              </div>
-            </div>
           </div>
         </AnimationWrapper>
       </div>
@@ -272,35 +240,6 @@ export default function AdminInquiriesPage() {
                 }}
                 className="w-full bg-[#141416] border border-[#262626] rounded-xl pl-10 pr-4 py-2.5 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-primary/60 transition-colors"
               />
-            </div>
-
-            {/* Status Filter Dropdown */}
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <Filter className="w-4 h-4 text-gray-400 hidden sm:block" />
-              <select
-                value={statusFilter}
-                onChange={(e) => {
-                  setStatusFilter(e.target.value);
-                  setPage(1);
-                }}
-                className="w-full sm:w-auto bg-[#141416] border border-[#262626] rounded-xl px-3 py-2.5 text-xs text-gray-300 focus:outline-none focus:border-primary/60 cursor-pointer"
-              >
-                <option value="ALL" className="bg-[#141416]">
-                  All Statuses
-                </option>
-                <option value="NEW" className="bg-[#141416]">
-                  New
-                </option>
-                <option value="READ" className="bg-[#141416]">
-                  Read
-                </option>
-                <option value="RESPONDED" className="bg-[#141416]">
-                  Responded
-                </option>
-                <option value="RESOLVED" className="bg-[#141416]">
-                  Resolved
-                </option>
-              </select>
             </div>
           </div>
         </AnimationWrapper>
@@ -541,7 +480,7 @@ export default function AdminInquiriesPage() {
                     >
                       {pageNum}
                     </button>
-                  )
+                  ),
                 )}
 
                 <button

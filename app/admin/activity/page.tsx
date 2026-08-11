@@ -173,7 +173,10 @@ const formatActionDescription = (activity: AuditLogItem) => {
       const keys = Object.keys(changes);
       if (keys.length > 0) {
         details = keys
-          .map((k) => `${k}: ${typeof changes[k] === "object" ? JSON.stringify(changes[k]) : changes[k]}`)
+          .map(
+            (k) =>
+              `${k}: ${typeof changes[k] === "object" ? JSON.stringify(changes[k]) : changes[k]}`,
+          )
           .join(", ");
       }
     }
@@ -275,19 +278,6 @@ function AdminActivity() {
             Track all system actions, audit logs, and administrative events
           </p>
         </AnimationWrapper>
-
-        <div className="flex items-center gap-3 shrink-0">
-          <button
-            onClick={() => refetch()}
-            className="p-2.5 bg-[#141416] border border-[#262626] rounded-xl text-gray-400 hover:text-white hover:border-primary/40 transition-colors cursor-pointer flex items-center gap-2 text-xs font-medium"
-            title="Refresh logs"
-          >
-            <RefreshCw
-              className={`w-4 h-4 ${isFetching ? "animate-spin text-primary" : ""}`}
-            />
-            <span className="hidden sm:inline">Refresh</span>
-          </button>
-        </div>
       </div>
 
       {/* Filter and Search Controls */}
@@ -312,41 +302,6 @@ function AdminActivity() {
               );
             })}
           </div>
-
-          {/* Search and Limit Controls */}
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <div className="relative flex-1 sm:w-60">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setPage(1);
-                }}
-                placeholder="Search audit logs..."
-                className="w-full bg-[#141416] border border-[#262626] rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-primary/60 transition-colors"
-              />
-            </div>
-
-            <div className="flex items-center gap-2 text-xs text-gray-400 shrink-0">
-              <span className="hidden md:inline">Per page:</span>
-              <select
-                value={limit}
-                onChange={(e) => {
-                  setLimit(Number(e.target.value));
-                  setPage(1);
-                }}
-                className="bg-[#141416] border border-[#262626] rounded-xl px-3 py-2 text-xs text-gray-300 focus:outline-none focus:border-primary/60 cursor-pointer"
-              >
-                {LIMIT_OPTIONS.map((opt) => (
-                  <option key={opt} value={opt} className="bg-[#141416]">
-                    {opt}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
         </div>
       </AnimationWrapper>
 
@@ -354,7 +309,7 @@ function AdminActivity() {
       <AnimationWrapper type="fade-up" duration={0.6} delay={0.2}>
         <div className="bg-[#111111] border border-[#232323] rounded-3xl p-6 md:p-10 max-w-4xl relative overflow-hidden shadow-2xl">
           {/* Vertical Line Container */}
-          <div className="absolute right-[43px] md:right-[48px] top-10 bottom-24 w-px bg-[#232323] hidden md:block" />
+          <div className="absolute right-10.75 md:right-12 top-10 bottom-24 w-px bg-[#232323] hidden md:block" />
 
           {isLoading ? (
             <ActivitySkeleton />
@@ -366,7 +321,8 @@ function AdminActivity() {
                   Failed to load activity logs
                 </p>
                 <p className="text-xs text-gray-500 max-w-sm">
-                  There was an error communicating with the server. Please check your connection and try again.
+                  There was an error communicating with the server. Please check
+                  your connection and try again.
                 </p>
                 <button
                   onClick={() => refetch()}
@@ -460,7 +416,9 @@ function AdminActivity() {
                 <span className="font-semibold text-white">
                   {Math.min(meta.page * meta.limit, meta.total)}
                 </span>{" "}
-                of <span className="font-semibold text-white">{meta.total}</span> logs
+                of{" "}
+                <span className="font-semibold text-white">{meta.total}</span>{" "}
+                logs
               </div>
 
               {/* Page Buttons */}
@@ -474,32 +432,35 @@ function AdminActivity() {
                   <span className="hidden sm:inline">Previous</span>
                 </button>
 
-                {Array.from({ length: Math.min(5, meta.totalPages) }, (_, i) => {
-                  let pageNum = meta.page;
-                  if (meta.totalPages <= 5) {
-                    pageNum = i + 1;
-                  } else if (meta.page <= 3) {
-                    pageNum = i + 1;
-                  } else if (meta.page >= meta.totalPages - 2) {
-                    pageNum = meta.totalPages - 4 + i;
-                  } else {
-                    pageNum = meta.page - 2 + i;
-                  }
+                {Array.from(
+                  { length: Math.min(5, meta.totalPages) },
+                  (_, i) => {
+                    let pageNum = meta.page;
+                    if (meta.totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (meta.page <= 3) {
+                      pageNum = i + 1;
+                    } else if (meta.page >= meta.totalPages - 2) {
+                      pageNum = meta.totalPages - 4 + i;
+                    } else {
+                      pageNum = meta.page - 2 + i;
+                    }
 
-                  return (
-                    <button
-                      key={pageNum}
-                      onClick={() => handlePageChange(pageNum)}
-                      className={`w-8 h-8 rounded-lg border font-semibold text-xs transition-all cursor-pointer ${
-                        pageNum === meta.page
-                          ? "bg-primary text-black border-primary font-bold shadow-[0_2px_10px_rgba(234,179,8,0.3)]"
-                          : "bg-[#1A1A1C] border-[#262626] text-gray-300 hover:text-white hover:border-primary/40"
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  );
-                })}
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`w-8 h-8 rounded-lg border font-semibold text-xs transition-all cursor-pointer ${
+                          pageNum === meta.page
+                            ? "bg-primary text-black border-primary font-bold shadow-[0_2px_10px_rgba(234,179,8,0.3)]"
+                            : "bg-[#1A1A1C] border-[#262626] text-gray-300 hover:text-white hover:border-primary/40"
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  },
+                )}
 
                 <button
                   onClick={() => handlePageChange(meta.page + 1)}

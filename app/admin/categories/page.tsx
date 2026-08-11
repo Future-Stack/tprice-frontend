@@ -25,6 +25,7 @@ import {
 import { Category } from "@/lib/api/categories";
 import CreateCategoryModal from "./CreateCategoryModal";
 import EditCategoryModal from "./EditCategoryModal";
+import DeleteCategoryModal from "./DeleteCategoryModal";
 import { useDebounce } from "@/hooks/useDebounce";
 import { toast } from "sonner";
 
@@ -99,6 +100,7 @@ export default function AdminCategoriesPage() {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
 
   const debouncedSearch = useDebounce(searchQuery, 400);
 
@@ -124,12 +126,15 @@ export default function AdminCategoriesPage() {
     totalPages: 1,
   };
 
-  const handleDelete = async (id: string, name: string) => {
+  const handleDeleteConfirm = async () => {
+    if (!categoryToDelete) return;
     try {
-      await deleteCategoryMutation.mutateAsync(id);
-      toast.success(`Category "${name}" deleted successfully`);
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to delete category");
+      await deleteCategoryMutation.mutateAsync(categoryToDelete.id);
+      toast.success(`Category "${categoryToDelete.name}" deleted successfully`);
+      setCategoryToDelete(null);
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } } };
+      toast.error(error?.response?.data?.message || "Failed to delete category");
     }
   };
 
@@ -185,7 +190,7 @@ export default function AdminCategoriesPage() {
             </div>
 
             {/* Status Dropdown */}
-            <div className="relative min-w-[150px]">
+            <div className="relative min-w-37.5">
               <select
                 value={statusFilter}
                 onChange={(e) => {
@@ -395,11 +400,8 @@ export default function AdminCategoriesPage() {
                             <Pencil className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() =>
-                              handleDelete(category.id, category.name)
-                            }
-                            disabled={deleteCategoryMutation.isPending}
-                            className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg border border-red-500/20 transition-all cursor-pointer active:scale-95 disabled:opacity-50"
+                            onClick={() => setCategoryToDelete(category)}
+                            className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg border border-red-500/20 transition-all cursor-pointer active:scale-95"
                             title="Delete category"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -483,6 +485,15 @@ export default function AdminCategoriesPage() {
         isOpen={!!editingCategory}
         onClose={() => setEditingCategory(null)}
         category={editingCategory}
+      />
+
+      {/* Delete Category Modal */}
+      <DeleteCategoryModal
+        isOpen={!!categoryToDelete}
+        onClose={() => setCategoryToDelete(null)}
+        onConfirm={handleDeleteConfirm}
+        category={categoryToDelete}
+        isDeleting={deleteCategoryMutation.isPending}
       />
     </div>
   );

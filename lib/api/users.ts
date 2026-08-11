@@ -95,12 +95,12 @@ export const updateAdminUserStatusApi = async (
   payload: UpdateUserStatusPayload
 ): Promise<AdminUserItem> => {
   try {
-    const response = await apiClient.patch<AdminUserItem>(`/admin/users/${id}/status`, payload);
+    const response = await apiClient.patch<AdminUserItem>(`/admin/users/${id}`, payload);
     return response.data;
   } catch (error: any) {
-    // If status endpoint fallback is /admin/users/:id
+    // Fallback if status endpoint is /admin/users/:id/status
     if (error.response?.status === 404) {
-      const fallbackResponse = await apiClient.patch<AdminUserItem>(`/admin/users/${id}`, payload);
+      const fallbackResponse = await apiClient.patch<AdminUserItem>(`/admin/users/${id}/status`, payload);
       return fallbackResponse.data;
     }
     throw error;

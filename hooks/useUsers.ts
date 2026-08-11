@@ -5,7 +5,6 @@ import {
   deleteAdminUserApi,
   GetAdminUsersParams,
   AdminUsersResponse,
-  AdminUserItem,
   UpdateUserStatusPayload,
   DeleteUserResponse,
 } from "@/lib/api/users";

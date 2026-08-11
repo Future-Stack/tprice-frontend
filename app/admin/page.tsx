@@ -282,7 +282,9 @@ export default function AdminDashboard() {
       });
       setRejectModalListing(null);
     } catch (error) {
-      toast.error((error as Error)?.message || "Failed to update listing status");
+      toast.error(
+        (error as Error)?.message || "Failed to update listing status",
+      );
     } finally {
       setProcessingId(null);
     }
@@ -298,8 +300,8 @@ export default function AdminDashboard() {
       title: "Active Dealers",
       value: data?.metrics?.activeDealersCount ?? 0,
       trend: "+2 this week",
-      trendColor: "text-[#4ADE80]",
-      icon: <Users className="w-5 h-5 text-primary" />,
+      trendColor: "text-green-400",
+      icon: <Users className="w-5 h-5 text-white" />,
       glow: "shadow-[0_0_20px_-5px_rgba(231,143,35,0.15)]",
       hoverGlow: "group-hover:shadow-[0_0_30px_-5px_rgba(231,143,35,0.3)]",
     },
@@ -307,8 +309,8 @@ export default function AdminDashboard() {
       title: "Pending listings",
       value: data?.metrics?.pendingListingsCount ?? 0,
       trend: `${data?.metrics?.pendingListingsCount ?? 0} listings require approval`,
-      trendColor: "text-[#EF4444]",
-      icon: <FileText className="w-5 h-5 text-primary" />,
+      trendColor: "text-white",
+      icon: <FileText className="w-5 h-5 text-white" />,
       glow: "shadow-[0_0_20px_-5px_rgba(239,68,68,0.15)]",
       hoverGlow: "group-hover:shadow-[0_0_30px_-5px_rgba(239,68,68,0.3)]",
     },
@@ -317,7 +319,7 @@ export default function AdminDashboard() {
       value: data?.metrics?.activeDealsCount ?? 0,
       trend: `${data?.metrics?.activeDealsCount ?? 0} response required`,
       trendColor: "text-[#60A5FA]",
-      icon: <Handshake className="w-5 h-5 text-primary" />,
+      icon: <Handshake className="w-5 h-5 text-white" />,
       glow: "shadow-[0_0_20px_-5px_rgba(96,165,250,0.15)]",
       hoverGlow: "group-hover:shadow-[0_0_30px_-5px_rgba(96,165,250,0.3)]",
     },
@@ -325,8 +327,8 @@ export default function AdminDashboard() {
       title: "Total Listing",
       value: data?.metrics?.totalListingsCount ?? 0,
       trend: `${data?.metrics?.totalListingsCount ?? 0} total listings`,
-      trendColor: "text-[#F59E0B]",
-      icon: <ListOrdered className="w-5 h-5 text-primary" />,
+      trendColor: "text-red-500",
+      icon: <ListOrdered className="w-5 h-5 text-white" />,
       glow: "shadow-[0_0_20px_-5px_rgba(245,158,11,0.15)]",
       hoverGlow: "group-hover:shadow-[0_0_30px_-5px_rgba(245,158,11,0.3)]",
     },
@@ -378,10 +380,10 @@ export default function AdminDashboard() {
               className={`group relative bg-[#111113] border border-white/5 rounded-2xl p-6 transition-all duration-500 ${stat.glow} ${stat.hoverGlow} border-white/5 hover:border-[#E78F23]/40`}
             >
               <div className="flex items-center gap-3 mb-6">
-                <div className="p-2.5 bg-[#E78F23]/10 rounded-xl border border-[#E78F23]/10 group-hover:scale-110 transition-transform duration-500">
+                <div className="p-2.5 bg-primary text-white rounded-xl border border-[#E78F23]/10 group-hover:scale-110 transition-transform duration-500">
                   {stat.icon}
                 </div>
-                <span className="text-sm text-gray-400 font-medium">
+                <span className="text-sm text-primary font-medium">
                   {stat.title}
                 </span>
               </div>
@@ -412,16 +414,16 @@ export default function AdminDashboard() {
           {isLoading ? (
             <PendingApprovalsSkeleton />
           ) : !data?.pendingApprovals || data.pendingApprovals.length === 0 ? (
-            <div className="p-8 bg-[#111113] border border-white/5 rounded-2xl text-center text-gray-400 text-sm">
+            <div className="p-8 bg-[#111113] min-h-36.25 flex justify-center items-center border border-white/5 rounded-2xl text-center text-gray-400 text-sm">
               No pending approvals at the moment.
             </div>
           ) : (
-            <div className="grid gap-4">
+            <div className="grid gap-4  ">
               <AnimatePresence mode="popLayout">
                 {data.pendingApprovals.map((item, i) => {
                   const imageUrl =
                     item.media?.[0]?.url ||
-                    "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?q=80&w=800&auto=format&fit=crop";
+                    "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
                   const ownerName = item.owner
                     ? `${item.owner.firstName} ${item.owner.lastName}`.trim()
                     : "Seller";
@@ -436,7 +438,7 @@ export default function AdminDashboard() {
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, scale: 0.95, y: -10 }}
                       transition={{ duration: 0.2 }}
-                      className="flex flex-col md:flex-row items-center gap-6 p-4 bg-[#111113] border border-white/5 rounded-2xl hover:border-white/10 hover:bg-white/2 transition-all group"
+                      className="flex flex-col md:flex-row items-center  gap-6 p-4 bg-[#111113] border border-white/5  rounded-2xl hover:border-white/10 hover:bg-white/2 transition-all group"
                     >
                       <div className="relative w-full md:w-44 h-28 rounded-xl overflow-hidden shrink-0">
                         <Image
@@ -518,7 +520,7 @@ export default function AdminDashboard() {
               Dealers
             </h2>
             <Link
-              href="/admin/dealers"
+              href="/admin/users"
               className="text-[10px] font-bold text-primary flex items-center gap-1.5 group bg-primary/10 px-4 py-2 rounded-full hover:bg-primary/20 transition-all uppercase tracking-widest"
             >
               Manage{" "}
@@ -562,7 +564,7 @@ export default function AdminDashboard() {
                             <CheckCircle2 className="w-3 h-3 text-blue-500 fill-blue-500/10 text-xs shrink-0" />
                           )}
                         </span>
-                        <span className="text-[11px] text-gray-500 truncate max-w-[140px] font-medium">
+                        <span className="text-[11px] text-gray-500 truncate max-w-35 font-medium">
                           {dealer.email}
                         </span>
                       </div>

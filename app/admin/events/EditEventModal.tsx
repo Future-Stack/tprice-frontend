@@ -1,8 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import {
   X,
+  Calendar,
+  MapPin,
+  Image as ImageIcon,
   Tag,
   FileText,
   Edit3,
@@ -10,70 +15,97 @@ import {
   Loader2,
   CheckCircle2,
   Trash2,
-  Image as ImageIcon,
-  Hash,
   Activity,
 } from "lucide-react";
-import { useUpdateCategoryMutation } from "@/hooks/useCategories";
+import { useUpdateEventMutation } from "@/hooks/useEvents";
 import { useUploadMediaMutation } from "@/hooks/useMedia";
-import { Category } from "@/lib/api/categories";
+import { useGetCategoriesQuery } from "@/hooks/useCategories";
+import { EventItem } from "@/lib/api/events";
 import { toast } from "sonner";
 
-interface EditCategoryModalProps {
+interface EditEventModalProps {
   isOpen: boolean;
   onClose: () => void;
-  category: Category | null;
+  event: EventItem | null;
 }
 
-export default function EditCategoryModal({
-  isOpen,
-  onClose,
-  category,
-}: EditCategoryModalProps) {
-  const updateCategoryMutation = useUpdateCategoryMutation();
+const CATEGORIES = [
+  { label: "Yacht", value: "YACHT" },
+  { label: "Automotive", value: "AUTOMOTIVE" },
+  { label: "Aviation", value: "AVIATION" },
+  { label: "Real Estate", value: "REAL_ESTATE" },
+  { label: "Watches", value: "WATCH" },
+  { label: "Other", value: "OTHER" },
+];
+
+const STATUSES = [
+  { label: "Upcoming", value: "UPCOMING" },
+  { label: "Ongoing", value: "ONGOING" },
+  { label: "Completed", value: "COMPLETED" },
+  { label: "Cancelled", value: "CANCELLED" },
+];
+
+export default function EditEventModal({ isOpen, onClose, event }: EditEventModalProps) {
+  const updateEventMutation = useUpdateEventMutation();
   const uploadMediaMutation = useUploadMediaMutation();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const { data: categoriesResponse } = useGetCategoriesQuery();
+  const categoriesList = categoriesResponse?.data || [];
+
+  const displayCategories = React.useMemo(() => {
+    if (!categoriesList || categoriesList.length === 0) {
+      return CATEGORIES;
+    }
+
+    return categoriesList.map((cat) => {
+      let val = cat.slug ? cat.slug.toUpperCase().replace(/-/g, "_") : cat.name.toUpperCase();
+      if (val === "SUPERCARS") val = "AUTOMOTIVE";
+      if (val === "PRIVATE_JETS") val = "AVIATION";
+      if (val === "YACHTS") val = "YACHT";
+      if (val === "WATCHES") val = "WATCH";
+
+      return {
+        label: cat.name,
+        value: val,
+      };
+    });
+  }, [categoriesList]);
+
   const [formData, setFormData] = useState({
-    name: "",
+    title: "",
+    category: "YACHT",
     description: "",
-    imageUrl: "",
-    displayOrder: 1,
-    isActive: true,
+    location: "",
+    coverImageUrl: "",
+    status: "UPCOMING",
   });
 
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [inputMode, setInputMode] = useState<"upload" | "url">("upload");
   const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
-    if (category) {
+    if (event) {
       setFormData({
-        name: category.name || "",
-        description: category.description || "",
-        imageUrl: category.imageUrl || "",
-        displayOrder: category.displayOrder ?? 1,
-        isActive: category.isActive ?? true,
+        title: event.title || "",
+        category: event.category || "YACHT",
+        description: event.description || "",
+        location: event.location || "",
+        coverImageUrl: event.coverImageUrl || "",
+        status: event.status || "UPCOMING",
       });
+      setSelectedDate(event.eventDate ? new Date(event.eventDate) : null);
     }
-  }, [category]);
+  }, [event]);
 
-  if (!isOpen || !category) return null;
+  if (!isOpen || !event) return null;
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    const { name, value, type } = e.target;
-    if (type === "checkbox") {
-      const checked = (e.target as HTMLInputElement).checked;
-      setFormData((prev) => ({ ...prev, [name]: checked }));
-    } else if (name === "displayOrder") {
-      setFormData((prev) => ({
-        ...prev,
-        displayOrder: parseInt(value, 10) || 1,
-      }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleFileUpload = async (file: File) => {
@@ -90,18 +122,16 @@ export default function EditCategoryModal({
     try {
       const res = await uploadMediaMutation.mutateAsync({
         file,
-        folder: "exoticworld/categories",
+        folder: "exoticworld/listings",
       });
 
       if (res?.url) {
-        setFormData((prev) => ({ ...prev, imageUrl: res.url }));
-        toast.success("Category image uploaded successfully!");
+        setFormData((prev) => ({ ...prev, coverImageUrl: res.url }));
+        toast.success("Image uploaded successfully!");
       }
     } catch (err: any) {
       const errMsg =
-        err?.response?.data?.message ||
-        err?.message ||
-        "Failed to upload image";
+        err?.response?.data?.message || err?.message || "Failed to upload image";
       toast.error(errMsg);
     }
   };
@@ -136,14 +166,14 @@ export default function EditCategoryModal({
   };
 
   const handleRemoveImage = () => {
-    setFormData((prev) => ({ ...prev, imageUrl: "" }));
+    setFormData((prev) => ({ ...prev, coverImageUrl: "" }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name.trim()) {
-      toast.error("Category name is required.");
+    if (!formData.title.trim() || !formData.description.trim() || !selectedDate || !formData.location.trim()) {
+      toast.error("Please fill in all required fields.");
       return;
     }
 
@@ -153,30 +183,32 @@ export default function EditCategoryModal({
     }
 
     try {
-      await updateCategoryMutation.mutateAsync({
-        id: category.id,
+      const isoDate = selectedDate.toISOString();
+
+      await updateEventMutation.mutateAsync({
+        id: event.id,
         data: {
-          name: formData.name.trim(),
-          description: formData.description.trim() || undefined,
-          imageUrl: formData.imageUrl.trim() || undefined,
-          displayOrder: Number(formData.displayOrder) || 1,
-          isActive: formData.isActive,
+          title: formData.title.trim(),
+          category: formData.category,
+          description: formData.description.trim(),
+          eventDate: isoDate,
+          location: formData.location.trim(),
+          coverImageUrl: formData.coverImageUrl.trim() || undefined,
+          status: formData.status,
         },
       });
 
-      toast.success("Category updated successfully!");
+      toast.success("Event updated successfully!");
       onClose();
     } catch (err: any) {
       const errMsg =
-        err?.response?.data?.message ||
-        err?.message ||
-        "Failed to update category";
+        err?.response?.data?.message || err?.message || "Failed to update event";
       toast.error(errMsg);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md overflow-y-auto">
       <div className="relative w-full max-w-2xl bg-[#141416] border border-[#262626] rounded-2xl shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-[#262626] bg-[#18181A]">
@@ -185,12 +217,8 @@ export default function EditCategoryModal({
               <Edit3 className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white font-clash">
-                Edit Category
-              </h2>
-              <p className="text-xs text-gray-400">
-                Update category information and settings
-              </p>
+              <h2 className="text-xl font-bold text-white font-clash">Edit Event</h2>
+              <p className="text-xs text-gray-400">Update the details of this platform event</p>
             </div>
           </div>
           <button
@@ -203,59 +231,103 @@ export default function EditCategoryModal({
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          {/* Category Name */}
+          {/* Title */}
           <div>
-            <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <Tag className="w-3.5 h-3.5 text-primary" /> Name{" "}
-              <span className="text-primary">*</span>
+            <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
+              Event Title <span className="text-primary">*</span>
             </label>
             <input
               type="text"
-              name="name"
-              value={formData.name}
+              name="title"
+              value={formData.title}
               onChange={handleChange}
-              placeholder="e.g. Supercars"
+              placeholder="e.g. Monaco Yacht Show 2026 VIP Preview"
               className="w-full bg-[#0E0E10] border border-[#262626] rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary/60 transition-colors"
               required
             />
           </div>
 
-          {/* Description */}
-          <div>
-            <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <FileText className="w-3.5 h-3.5 text-primary" /> Description
-            </label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              rows={3}
-              placeholder="Exotic high-performance supercars and hypercars"
-              className="w-full bg-[#0E0E10] border border-[#262626] rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary/60 transition-colors resize-none"
-            />
+          {/* Category & Status */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <Tag className="w-3.5 h-3.5 text-primary" /> Category <span className="text-primary">*</span>
+              </label>
+              <select
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                className="w-full bg-[#0E0E10] border border-[#262626] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary/60 transition-colors cursor-pointer"
+              >
+                {displayCategories.map((cat) => (
+                  <option key={cat.value} value={cat.value} className="bg-[#141416] text-white">
+                    {cat.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <Activity className="w-3.5 h-3.5 text-primary" /> Status <span className="text-primary">*</span>
+              </label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className="w-full bg-[#0E0E10] border border-[#262626] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary/60 transition-colors cursor-pointer"
+              >
+                {STATUSES.map((st) => (
+                  <option key={st.value} value={st.value} className="bg-[#141416] text-white">
+                    {st.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          {/* Display Order */}
-          <div>
-            <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <Hash className="w-3.5 h-3.5 text-primary" /> Display Order
-            </label>
-            <input
-              type="text"
-              name="displayOrder"
-              min={1}
-              value={formData.displayOrder}
-              onChange={handleChange}
-              className="w-full bg-[#0E0E10] border border-[#262626] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary/60 transition-colors"
-            />
+          {/* Date & Location */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-primary" /> Event Date & Time <span className="text-primary">*</span>
+              </label>
+              <DatePicker
+                selected={selectedDate}
+                onChange={(date: Date | null) => setSelectedDate(date)}
+                showTimeSelect
+                timeFormat="HH:mm"
+                timeIntervals={15}
+                timeCaption="Time"
+                dateFormat="MMMM d, yyyy h:mm aa"
+                placeholderText="Select date and time"
+                className="w-full bg-[#0E0E10] border border-[#262626] rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary/60 transition-colors cursor-pointer"
+                wrapperClassName="w-full"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-primary" /> Location <span className="text-primary">*</span>
+              </label>
+              <input
+                type="text"
+                name="location"
+                value={formData.location}
+                onChange={handleChange}
+                placeholder="e.g. Port Hercules, Monaco"
+                className="w-full bg-[#0E0E10] border border-[#262626] rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary/60 transition-colors"
+                required
+              />
+            </div>
           </div>
 
-          {/* Image Upload Section */}
+          {/* Cover Image Upload Section */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
-                <ImageIcon className="w-3.5 h-3.5 text-primary" /> Category
-                Image
+                <ImageIcon className="w-3.5 h-3.5 text-primary" /> Cover Image
               </label>
 
               <div className="flex items-center gap-1 bg-[#0E0E10] border border-[#262626] p-0.5 rounded-lg text-[10px]">
@@ -270,7 +342,7 @@ export default function EditCategoryModal({
                 >
                   Upload File
                 </button>
-                {/* <button
+                <button
                   type="button"
                   onClick={() => setInputMode("url")}
                   className={`px-2.5 py-1 rounded-md transition-colors font-medium cursor-pointer ${
@@ -280,40 +352,39 @@ export default function EditCategoryModal({
                   }`}
                 >
                   Image URL
-                </button> */}
+                </button>
               </div>
             </div>
 
             {inputMode === "upload" ? (
               <div className="space-y-3">
-                {formData.imageUrl ? (
+                {formData.coverImageUrl ? (
                   /* Preview uploaded image */
                   <div className="relative group rounded-xl border border-primary/30 overflow-hidden bg-[#0E0E10] p-2 flex items-center gap-4">
                     <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-[#262626] shrink-0 bg-[#1A1A1A]">
                       <img
-                        src={formData.imageUrl}
-                        alt="Category Preview"
+                        src={formData.coverImageUrl}
+                        alt="Cover Preview"
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            "https://images.unsplash.com/photo-1583121274602-3e2820c69888";
+                          (e.target as HTMLImageElement).src = "/images/landing/hero-car.png";
                         }}
                       />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 text-green-400 text-xs font-semibold mb-1">
                         <CheckCircle2 className="w-4 h-4" />
-                        Selected Image
+                        Uploaded & Saved
                       </div>
                       <p className="text-[11px] text-gray-400 truncate max-w-full font-mono">
-                        {formData.imageUrl}
+                        {formData.coverImageUrl}
                       </p>
                     </div>
                     <button
                       type="button"
                       onClick={handleRemoveImage}
                       className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer mr-2 shrink-0"
-                      title="Remove category image"
+                      title="Remove cover image"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -342,12 +413,8 @@ export default function EditCategoryModal({
                     {uploadMediaMutation.isPending ? (
                       <div className="flex flex-col items-center justify-center py-3 space-y-2">
                         <Loader2 className="w-8 h-8 text-primary animate-spin" />
-                        <p className="text-xs font-medium text-primary">
-                          Uploading image to cloud...
-                        </p>
-                        <p className="text-[10px] text-gray-500">
-                          Please wait a moment
-                        </p>
+                        <p className="text-xs font-medium text-primary">Uploading image to cloud...</p>
+                        <p className="text-[10px] text-gray-500">Please wait a moment</p>
                       </div>
                     ) : (
                       <div className="flex flex-col items-center justify-center space-y-2">
@@ -356,7 +423,7 @@ export default function EditCategoryModal({
                         </div>
                         <div>
                           <p className="text-xs font-semibold text-white">
-                            Click to upload or drag & drop new category image
+                            Click to upload or drag & drop cover image
                           </p>
                           <p className="text-[11px] text-gray-400 mt-0.5">
                             PNG, JPG, WEBP or GIF (Max 10MB)
@@ -372,21 +439,20 @@ export default function EditCategoryModal({
               <div className="relative">
                 <input
                   type="url"
-                  name="imageUrl"
-                  value={formData.imageUrl}
+                  name="coverImageUrl"
+                  value={formData.coverImageUrl}
                   onChange={handleChange}
-                  placeholder="https://images.unsplash.com/photo-..."
+                  placeholder="https://res.cloudinary.com/... or https://..."
                   className="w-full bg-[#0E0E10] border border-[#262626] rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary/60 transition-colors"
                 />
-                {formData.imageUrl && (
+                {formData.coverImageUrl && (
                   <div className="mt-2 relative w-full h-32 rounded-xl overflow-hidden border border-[#262626] bg-[#0E0E10]">
                     <img
-                      src={formData.imageUrl}
+                      src={formData.coverImageUrl}
                       alt="URL Preview"
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src =
-                          "https://images.unsplash.com/photo-1583121274602-3e2820c69888";
+                        (e.target as HTMLImageElement).src = "/images/landing/hero-car.png";
                       }}
                     />
                   </div>
@@ -395,23 +461,20 @@ export default function EditCategoryModal({
             )}
           </div>
 
-          {/* Active Status Checkbox */}
-          <div className="flex items-center gap-3 bg-[#0E0E10] border border-[#262626] p-4 rounded-xl">
-            <input
-              type="checkbox"
-              id="editIsActive"
-              name="isActive"
-              checked={formData.isActive}
-              onChange={handleChange}
-              className="w-4 h-4 rounded border-[#262626] text-primary focus:ring-primary accent-[#E78F23] cursor-pointer"
-            />
-            <label
-              htmlFor="editIsActive"
-              className="text-xs font-semibold text-gray-200 cursor-pointer flex items-center gap-2"
-            >
-              <Activity className="w-4 h-4 text-green-400" /> Mark Category as
-              Active
+          {/* Description */}
+          <div>
+            <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+              <FileText className="w-3.5 h-3.5 text-primary" /> Description <span className="text-primary">*</span>
             </label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              rows={3}
+              placeholder="Provide event overview and details..."
+              className="w-full bg-[#0E0E10] border border-[#262626] rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary/60 transition-colors resize-none"
+              required
+            />
           </div>
 
           {/* Footer Actions */}
@@ -425,13 +488,10 @@ export default function EditCategoryModal({
             </button>
             <button
               type="submit"
-              disabled={
-                updateCategoryMutation.isPending ||
-                uploadMediaMutation.isPending
-              }
+              disabled={updateEventMutation.isPending || uploadMediaMutation.isPending}
               className="px-6 py-2.5 rounded-xl bg-primary hover:bg-yellow-400 text-black text-xs font-bold transition-all shadow-[0_4px_20px_rgba(231,143,35,0.3)] active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
-              {updateCategoryMutation.isPending ? (
+              {updateEventMutation.isPending ? (
                 <>
                   <Loader2 className="w-4 h-4 text-black animate-spin" />
                   Updating...
@@ -442,7 +502,7 @@ export default function EditCategoryModal({
                   Uploading Image...
                 </>
               ) : (
-                "Update Category"
+                "Update Event"
               )}
             </button>
           </div>

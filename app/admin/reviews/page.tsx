@@ -23,6 +23,7 @@ import {
 } from "@/hooks/useReviews";
 import { ReviewItem } from "@/lib/api/reviews";
 import ReviewDetailModal from "./ReviewDetailModal";
+import DeleteReviewModal from "./DeleteReviewModal";
 import Image from "next/image";
 import { toast } from "sonner";
 
@@ -84,6 +85,7 @@ export default function AdminReviewsPage() {
   const [limit, setLimit] = useState(10);
   const [selectedReview, setSelectedReview] = useState<ReviewItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [reviewToDelete, setReviewToDelete] = useState<ReviewItem | null>(null);
 
   const deleteReviewMutation = useDeleteAdminReviewMutation();
 
@@ -118,14 +120,16 @@ export default function AdminReviewsPage() {
     setIsModalOpen(true);
   };
 
-  const handleDeleteReview = async (id: string, reviewerName: string) => {
+  const handleDeleteConfirm = async () => {
+    if (!reviewToDelete) return;
     try {
-      await deleteReviewMutation.mutateAsync(id);
-      toast.success(`Review by "${reviewerName}" deleted successfully`);
-      if (selectedReview?.id === id) {
+      await deleteReviewMutation.mutateAsync(reviewToDelete.id);
+      toast.success(`Review by "${reviewToDelete.reviewerName}" deleted successfully`);
+      if (selectedReview?.id === reviewToDelete.id) {
         setIsModalOpen(false);
         setSelectedReview(null);
       }
+      setReviewToDelete(null);
     } catch (err: any) {
       toast.error(
         err?.response?.data?.message ||
@@ -382,9 +386,7 @@ export default function AdminReviewsPage() {
                             View
                           </button>
                           <button
-                            onClick={() =>
-                              handleDeleteReview(review.id, review.reviewerName)
-                            }
+                            onClick={() => setReviewToDelete(review)}
                             disabled={
                               deleteReviewMutation.isPending &&
                               deleteReviewMutation.variables === review.id
@@ -473,7 +475,22 @@ export default function AdminReviewsPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         review={selectedReview}
-        onDelete={handleDeleteReview}
+        onDelete={(id, name) => {
+          const review = reviews.find((r) => r.id === id) || selectedReview;
+          if (review) {
+            setReviewToDelete(review);
+            setIsModalOpen(false);
+          }
+        }}
+        isDeleting={deleteReviewMutation.isPending && deleteReviewMutation.variables === selectedReview?.id}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <DeleteReviewModal
+        isOpen={reviewToDelete !== null}
+        onClose={() => setReviewToDelete(null)}
+        onConfirm={handleDeleteConfirm}
+        review={reviewToDelete}
         isDeleting={deleteReviewMutation.isPending}
       />
     </div>
