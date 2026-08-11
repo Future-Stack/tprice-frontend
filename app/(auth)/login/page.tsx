@@ -80,7 +80,19 @@ export default function LoginPage() {
       }
 
       toast.success("Welcome back! Login successful.");
-      router.push("/");
+
+      // Check for redirect param or admin dashboard path
+      const searchParams = new URLSearchParams(window.location.search);
+      const fromPath = searchParams.get("from");
+      const isValidLocalPath = fromPath && fromPath.startsWith("/") && !fromPath.startsWith("//");
+
+      if (isValidLocalPath) {
+        router.push(fromPath);
+      } else if (res?.user?.role?.toUpperCase() === "ADMIN") {
+        router.push("/admin");
+      } else {
+        router.push("/");
+      }
     } catch (error: any) {
       console.error("Login failed:", error);
 

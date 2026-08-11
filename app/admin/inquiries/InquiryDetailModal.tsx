@@ -253,7 +253,7 @@ export default function InquiryDetailModal({
         </div>
 
         {/* Footer Actions */}
-        <div className="px-6 py-4 bg-[#18181A] border-t border-[#262626] flex items-center justify-between gap-4">
+        {/* <div className="px-6 py-4 bg-[#18181A] border-t border-[#262626] flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             {onOpenUpdateModal && (
               <button
@@ -284,9 +284,8 @@ export default function InquiryDetailModal({
           >
             Close
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );
 }
-

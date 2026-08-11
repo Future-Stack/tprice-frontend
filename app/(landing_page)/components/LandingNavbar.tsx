@@ -142,11 +142,11 @@ export default function LandingNavbar() {
         scrolled ? "bg-black/80 backdrop-blur-lg py-4" : "bg-black py-6"
       }`}
     >
-      <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
+      <div className="container mx-auto px-6 md:px-0 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <Image
-            src="./logo.svg"
+            src="/logo.svg"
             alt="Logo"
             className="w-full"
             width={40}

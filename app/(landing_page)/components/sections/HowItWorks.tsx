@@ -36,7 +36,7 @@ export default function HowItWorks() {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-primary text-xs font-bold tracking-[0.3em] uppercase mb-4 block"
+            className="text-primary text-[16px] font-montserrat font-normal   uppercase mb-4 block"
           >
             SIMPLE & SEAMLESS
           </motion.span>
@@ -45,13 +45,13 @@ export default function HowItWorks() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-white text-4xl md:text-5xl font-serif"
+            className="text-white text-4xl md:text-5xl font-cormorant font-normal"
           >
             How It Works
           </motion.h2>
         </div>
 
-        <div className="relative max-w-7xl mx-auto">
+        <div className="relative ">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-6">
             {STEPS.map((step, i) => (
               <motion.div
@@ -74,17 +74,17 @@ export default function HowItWorks() {
                 {/* Circle Container */}
                 <div className="relative mb-10">
                   {/* Dashed Border */}
-                  <div className="absolute -inset-2.5 rounded-full border border-dashed border-primary/20 group-hover:border-primary/40 transition-colors duration-500" />
+                  <div className="absolute -inset-2 rounded-full border border-dashed border-primary  transition-colors duration-500" />
 
                   {/* Icon Circle with Gradient */}
                   <div
-                    className="relative w-32 h-32 rounded-full flex items-center justify-center overflow-hidden shadow-2xl transition-transform duration-500 group-hover:scale-105 border border-white/5"
+                    className="relative w-31 h-31 rounded-full flex items-center justify-center overflow-hidden shadow-2xl transition-transform duration-500 group-hover:scale-105 border border-white/5"
                     style={{
+                      borderRadius: "50%",
                       background:
                         "linear-gradient(180deg, #8D815E 0%, #2F260D 100%)",
                     }}
                   >
-                    <div className="absolute inset-0 bg-linear-to-b from-[#2A241A] to-[#0A0A0A] opacity-90" />
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.15)_0%,transparent_70%)]" />
                     <step.icon className="w-8 h-8 text-primary relative z-10 stroke-[1.2]" />
                   </div>
@@ -94,7 +94,7 @@ export default function HowItWorks() {
                 <h3 className="text-xl font-serif text-white mb-4 transition-colors group-hover:text-primary">
                   {step.title}
                 </h3>
-                <p className="text-white/40 text-[13px] leading-relaxed font-light max-w-60">
+                <p className="text-[#9C9C9C] text-[12px] leading-relaxed font-light max-w-60">
                   {step.desc}
                 </p>
               </motion.div>

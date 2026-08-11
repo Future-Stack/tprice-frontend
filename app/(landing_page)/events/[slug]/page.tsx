@@ -32,18 +32,17 @@ export default function EventDetailsPage() {
 
   const { data: apiEvent, isLoading } = useGetEventByIdQuery(slug);
 
-
   const event = apiEvent
     ? {
-      title: apiEvent.title,
-      category: apiEvent.category,
-      status: apiEvent.status,
-      date: formatDate(apiEvent.eventDate),
-      time: "9:00 AM",
-      location: apiEvent.location,
-      image: apiEvent.coverImageUrl || "/images/landing/hero-car.png",
-      description: apiEvent.description,
-    }
+        title: apiEvent.title,
+        category: apiEvent.category,
+        status: apiEvent.status,
+        date: formatDate(apiEvent.eventDate),
+        time: "9:00 AM",
+        location: apiEvent.location,
+        image: apiEvent.coverImageUrl || "/images/landing/hero-car.png",
+        description: apiEvent.description,
+      }
     : null;
 
   if (isLoading) {
@@ -69,7 +68,7 @@ export default function EventDetailsPage() {
   return (
     <main className="bg-black min-h-screen text-white">
       {/* Event Hero */}
-      <section className="relative h-screen min-h-[500px] w-full flex flex-col justify-end">
+      <section className="relative h-screen min-h-125 w-full flex flex-col justify-end">
         <div className="absolute inset-0 z-0">
           <Image
             src={event.image}
@@ -79,35 +78,39 @@ export default function EventDetailsPage() {
             priority
             unoptimized
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-[1]" />
+          <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-transparent z-1" />
         </div>
 
-        <div className="relative z-10 container mx-auto px-6 md:px-12 pb-16">
+        <div className="relative z-10 container mx-auto px-6 md:px-0 pb-16">
           <div className="max-w-5xl space-y-8">
             <div className="flex gap-4">
-              <span className="px-4 py-1.5 rounded-full border border-primary/40 bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-widest">
+              <span className="px-4 py-1.5 rounded-full border border-primary/40 bg-primary/10 text-primary text-[10px] font-bold uppercase">
                 {event.category}
               </span>
-              <span className="px-4 py-1.5 rounded-full border border-[#4ADE80]/40 bg-[#4ADE80]/10 text-[#4ADE80] text-[10px] font-bold uppercase tracking-widest">
+              <span className="px-4 py-1.5 rounded-full border border-[#4ADE80]/40 bg-[#4ADE80]/10 text-[#4ADE80] text-[10px] font-bold ">
                 {event.status}
               </span>
             </div>
 
-            <div className="space-y-4">
-              <h1 className="text-4xl md:text-7xl font-serif leading-tight">{event.title}</h1>
-              <p className="text-white/60 text-lg max-w-2xl italic">The World&apos;s Premier Event</p>
+            <div className="mb-8.25">
+              <h1 className="text-4xl md:text-[48px] font-cormorant font-medium mb-4">
+                {event.title}
+              </h1>
+              <p className="text-white/60 text-lg max-w-2xl  ">
+                The World&apos;s Premier Event
+              </p>
             </div>
 
             <div className="flex flex-wrap gap-8 py-6 border-y border-white/10 mt-8">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 font-montserrat text[24px text-[#E0E0E0]">
                 <Calendar className="w-5 h-5 text-primary" />
                 <span className="text-sm font-medium">{event.date}</span>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 font-montserrat text[24px text-[#E0E0E0]">
                 <Clock className="w-5 h-5 text-primary" />
                 <span className="text-sm font-medium">{event.time}</span>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 font-montserrat text[24px text-[#E0E0E0]">
                 <MapPin className="w-5 h-5 text-primary" />
                 <span className="text-sm font-medium">{event.location}</span>
               </div>
@@ -115,7 +118,7 @@ export default function EventDetailsPage() {
 
             <button
               onClick={() => setIsModalOpen(true)}
-              className="cursor-pointer px-10 py-4 bg-primary text-black font-bold uppercase tracking-[0.2em] rounded-sm hover:scale-105 transition-all shadow-2xl"
+              className="cursor-pointer px-10 py-4 bg-primary text-black font-medium text-[28px]   rounded-sm hover:scale-105 transition-all shadow-2xl"
             >
               Register Now
             </button>
@@ -124,23 +127,29 @@ export default function EventDetailsPage() {
       </section>
 
       {/* Content Section */}
-      <section className="py-24 px-6 md:px-12">
-        <div className="container mx-auto max-w-7xl">
+      <section className="py-24 px-6 md:px-0">
+        <div className="container mx-auto  ">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 items-start">
             {/* Left: About Text */}
             <div className="lg:col-span-2 space-y-12">
               <div className="space-y-6">
-                <p className="text-primary text-xs font-bold tracking-[0.4em] uppercase">ABOUT THE EVENT</p>
-                <h2 className="text-3xl md:text-4xl font-serif italic">{event.title}</h2>
+                <p className="text-primary text-[16px] font-montserrat font-normal mb-6">
+                  ABOUT THE EVENT
+                </p>
+                <h2 className="text-3xl md:text-[40px] font-medium font-cormorant ">
+                  {event.title}
+                </h2>
                 <div className="prose prose-invert prose-p:text-white/60 prose-p:leading-relaxed max-w-none">
-                  <p>{event.description}</p>
+                  <p className="text-[24px] font-normal text-[#9C9C9C]">
+                    {event.description}
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* Right: Info Card */}
             <div className="lg:col-span-1 sticky top-32">
-              <div className="bg-[#0A0A0A] border border-white/5 rounded-sm p-8 space-y-8 shadow-2xl">
+              <div className="bg-[#181818] border border-white/5 rounded-sm p-8 space-y-8 shadow-2xl">
                 <h3 className="text-xl font-serif text-white">Event Details</h3>
 
                 <div className="space-y-6">
@@ -149,7 +158,9 @@ export default function EventDetailsPage() {
                       <Calendar className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest mb-1">Date</p>
+                      <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest mb-1">
+                        Date
+                      </p>
                       <p className="text-sm text-white/80">{event.date}</p>
                     </div>
                   </div>
@@ -159,7 +170,9 @@ export default function EventDetailsPage() {
                       <Clock className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest mb-1">Time</p>
+                      <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest mb-1">
+                        Time
+                      </p>
                       <p className="text-sm text-white/80">{event.time}</p>
                     </div>
                   </div>
@@ -169,8 +182,12 @@ export default function EventDetailsPage() {
                       <MapPin className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest mb-1">Location</p>
-                      <p className="text-sm text-white/80 italic">{event.location}</p>
+                      <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest mb-1">
+                        Location
+                      </p>
+                      <p className="text-sm text-white/80 italic">
+                        {event.location}
+                      </p>
                     </div>
                   </div>
 
@@ -179,8 +196,12 @@ export default function EventDetailsPage() {
                       <ShieldCheck className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest mb-1">Access</p>
-                      <p className="text-sm text-[#4ADE80] font-bold">{event.status}</p>
+                      <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest mb-1">
+                        Access
+                      </p>
+                      <p className="text-sm text-[#4ADE80] font-bold">
+                        {event.status}
+                      </p>
                     </div>
                   </div>
                 </div>

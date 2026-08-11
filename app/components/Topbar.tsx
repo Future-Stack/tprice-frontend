@@ -7,13 +7,11 @@ import {
   Bell,
   ChevronDown,
   Menu,
-  Settings,
   LogOut,
   Loader2,
   DollarSign,
   FileText,
   Sparkles,
-  CheckCircle2,
   Inbox,
   Check,
 } from "lucide-react";
@@ -111,8 +109,6 @@ export default function Topbar({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  const menuItems = [{ icon: Settings, label: "Settings", desc: "/settings" }];
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -212,7 +208,7 @@ export default function Topbar({
                         className={`group relative p-3 rounded-xl transition-all cursor-pointer border flex items-start gap-3 ${
                           !item.isRead
                             ? "bg-[#E78F23]/10 border-[#E78F23]/30 hover:bg-[#E78F23]/15 hover:border-[#E78F23]/50"
-                            : "bg-white/[0.02] border-white/5 hover:bg-white/[0.06] hover:border-white/10"
+                            : "bg-white/2 border-white/5 hover:bg-white/6 hover:border-white/10"
                         }`}
                       >
                         {/* Icon Badge */}
@@ -351,7 +347,7 @@ export default function Topbar({
                   </p>
                 </div>
 
-                <div className="space-y-0.5">
+                {/* <div className="space-y-0.5">
                   {menuItems.map((item, index) => (
                     <button
                       key={index}
@@ -370,7 +366,7 @@ export default function Topbar({
                       </div>
                     </button>
                   ))}
-                </div>
+                </div> */}
 
                 <div className="mt-1 pt-1 border-t border-white/5">
                   <button

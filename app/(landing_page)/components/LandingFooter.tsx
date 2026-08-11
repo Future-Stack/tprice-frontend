@@ -2,7 +2,6 @@
 
 import React from "react";
 import Link from "next/link";
-import { Play } from "lucide-react";
 
 const COMPANY_LINKS = [
   { name: "About Us", href: "/aboutus" },
@@ -13,10 +12,9 @@ const COMPANY_LINKS = [
 ];
 
 const QUICK_LINKS = [
-  { name: "Categories", href: "#" },
-  { name: "Help Center", href: "#" },
-  { name: "Live chat", href: "#" },
-  { name: "How it works", href: "#" },
+  { name: "Events", href: "/events" },
+  { name: "Marketplace", href: "/marketplace" },
+  { name: "Contacts", href: "/contact" },
 ];
 
 const SOCIAL_SVGS = [

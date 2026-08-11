@@ -5,9 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight, Quote, Star, Crown } from "lucide-react";
 import { useGetReviewsQuery } from "@/hooks/useReviews";
 import { ReviewItem } from "@/lib/api/reviews";
+import Image from "next/image";
 
 const DEFAULT_AVATAR =
-  "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=128&h=128&q=80";
+  "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
 
 export default function Reviews() {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -19,19 +20,15 @@ export default function Reviews() {
 
   const reviews: ReviewItem[] = reviewsResponse?.data || [];
 
-  const currentActiveIndex =
-    activeIndex >= reviews.length ? 0 : activeIndex;
+  const currentActiveIndex = activeIndex >= reviews.length ? 0 : activeIndex;
   const currentReview = reviews[currentActiveIndex];
 
-  const next = () =>
-    setActiveIndex((prev) => (prev + 1) % reviews.length);
+  const next = () => setActiveIndex((prev) => (prev + 1) % reviews.length);
   const prev = () =>
-    setActiveIndex(
-      (prev) => (prev - 1 + reviews.length) % reviews.length
-    );
+    setActiveIndex((prev) => (prev - 1 + reviews.length) % reviews.length);
 
   const handleImageError = (
-    e: React.SyntheticEvent<HTMLImageElement, Event>
+    e: React.SyntheticEvent<HTMLImageElement, Event>,
   ) => {
     e.currentTarget.src = DEFAULT_AVATAR;
   };
@@ -41,7 +38,7 @@ export default function Reviews() {
       return review.highlightTags.join(" • ");
     }
     const parts = [review.reviewerTitle, review.reviewerLocation].filter(
-      Boolean
+      Boolean,
     );
     if (parts.length > 0) {
       return parts.join(" • ").toUpperCase();
@@ -51,7 +48,7 @@ export default function Reviews() {
 
   const getRoleText = (review: ReviewItem) => {
     const parts = [review.reviewerTitle, review.reviewerLocation].filter(
-      Boolean
+      Boolean,
     );
     return parts.length > 0 ? parts.join(", ") : "VIP Member";
   };
@@ -64,7 +61,7 @@ export default function Reviews() {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-primary text-xs font-bold tracking-[0.3em] uppercase mb-4 block"
+            className="text-primary text-[16px] font-normal font-montserrat uppercase mb-4 block"
           >
             CLIENT VOICES
           </motion.span>
@@ -73,7 +70,7 @@ export default function Reviews() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-white text-4xl md:text-5xl font-serif"
+            className="text-white text-4xl font-normal md:text-5xl font-cormorant"
           >
             VIP Member Reviews
           </motion.h2>
@@ -82,9 +79,14 @@ export default function Reviews() {
         {isLoading ? (
           <ReviewsSkeleton />
         ) : reviews.length === 0 ? (
-          <div className="max-w-xl mx-auto text-center py-12 px-6 bg-[#1A1A1A] rounded-2xl border border-white/10">
-            <Quote className="w-12 h-12 text-primary/30 mx-auto mb-4" strokeWidth={1} />
-            <h3 className="text-white text-lg font-serif mb-2">No VIP Reviews Yet</h3>
+          <div className=" text-center py-12 px-6 bg-[#1A1A1A] rounded-2xl border border-white/10">
+            <Quote
+              className="w-12 h-12 text-primary/30 mx-auto mb-4"
+              strokeWidth={1}
+            />
+            <h3 className="text-white text-lg font-serif mb-2">
+              No VIP Reviews Yet
+            </h3>
             <p className="text-white/40 text-xs">
               Check back soon for verified reviews from our VIP global network.
             </p>
@@ -102,20 +104,23 @@ export default function Reviews() {
               <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none" />
 
               <div className="flex flex-col items-center text-center relative z-10 px-12 md:px-24">
-                <Quote
-                  className="w-16 h-16 text-primary/30 mb-8"
-                  strokeWidth={1}
+                <Image
+                  src="/quote.svg"
+                  alt="quote"
+                  width={64}
+                  height={64}
+                  className="mb-4"
                 />
-
                 {/* Rating Stars */}
                 <div className="flex gap-1 mb-10">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`w-5 h-5 ${i < (currentReview.rating || 5)
-                        ? "fill-primary text-primary"
-                        : "text-white/20 fill-transparent"
-                        }`}
+                      className={`w-5 h-5 ${
+                        i < (currentReview.rating || 5)
+                          ? "fill-primary text-primary"
+                          : "text-white/20 fill-transparent"
+                      }`}
                     />
                   ))}
                 </div>
@@ -129,30 +134,36 @@ export default function Reviews() {
                     transition={{ duration: 0.4 }}
                     className="flex flex-col items-center"
                   >
-                    <p className="text-xl md:text-2xl text-white/80 font-serif leading-relaxed mb-12 max-w-2xl">
+                    <p className="text-xl md:text-2xl text-white/80 font-montserrat mb-12 max-w-258.25">
                       “{currentReview.content}”
                     </p>
 
                     <div className="inline-flex items-center gap-2 border border-primary/30 rounded-full py-1.5 px-6 mb-10 bg-primary/5">
                       <Crown className="w-4 h-4 text-primary" />
-                      <span className="text-[10px] md:text-[11px] font-bold text-primary tracking-[0.15em] uppercase">
+                      <span className="text-[10px] md:text-[16px] font-montserrat font-normal text-white  uppercase">
                         {getHighlightText(currentReview)}
                       </span>
                     </div>
 
-                    <div className="flex flex-col items-center">
-                      <img
-                        src={currentReview.avatarUrl || DEFAULT_AVATAR}
-                        alt={currentReview.reviewerName || "Reviewer"}
-                        onError={handleImageError}
-                        className="w-14 h-14 rounded-full object-cover border-2 border-primary/20 mb-4"
-                      />
-                      <h4 className="text-xl font-serif text-white mb-1">
-                        {currentReview.reviewerName || "Anonymous Member"}
-                      </h4>
-                      <p className="text-white/40 text-xs tracking-wider">
-                        {getRoleText(currentReview)}
-                      </p>
+                    <div className="flex items-center gap-4">
+                      <div>
+                        <Image
+                          src={currentReview.avatarUrl || DEFAULT_AVATAR}
+                          alt={currentReview.reviewerName || "Reviewer"}
+                          onError={handleImageError}
+                          className="w-14 h-14 rounded-full object-cover border-2 border-primary/20  "
+                          width={56}
+                          height={56}
+                        />
+                      </div>
+                      <div className=" ">
+                        <h4 className="text-[24px] text-left font-montserrat text-[#E0E0E0] mb-1">
+                          {currentReview.reviewerName || "Anonymous Member"}
+                        </h4>
+                        <p className="text-[#9C9C9C] text-left text-[16px]  font-montserrat">
+                          {getRoleText(currentReview)}
+                        </p>
+                      </div>
                     </div>
                   </motion.div>
                 </AnimatePresence>
@@ -190,20 +201,22 @@ export default function Reviews() {
                   <button
                     key={review.id || i}
                     onClick={() => setActiveIndex(i)}
-                    className={`relative group transition-all duration-300 ${currentActiveIndex === i
-                      ? "scale-115"
-                      : "scale-90 opacity-40 grayscale hover:opacity-100 hover:grayscale-0 hover:scale-100"
-                      }`}
+                    className={`relative group transition-all duration-300 ${
+                      currentActiveIndex === i
+                        ? "scale-115"
+                        : "scale-90 opacity-40 grayscale hover:opacity-100 hover:grayscale-0 hover:scale-100"
+                    }`}
                     aria-label={`Go to review by ${review.reviewerName}`}
                   >
                     <img
                       src={review.avatarUrl || DEFAULT_AVATAR}
                       alt={review.reviewerName || "Reviewer"}
                       onError={handleImageError}
-                      className={`w-10 h-10 rounded-full object-cover ${currentActiveIndex === i
-                        ? "border-2 border-primary"
-                        : "border border-white/10"
-                        }`}
+                      className={`w-10 h-10 rounded-full object-cover ${
+                        currentActiveIndex === i
+                          ? "border-2 border-primary"
+                          : "border border-white/10"
+                      }`}
                     />
                   </button>
                 ))}
@@ -267,5 +280,3 @@ function ReviewsSkeleton() {
     </div>
   );
 }
-
-

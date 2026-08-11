@@ -80,7 +80,7 @@ export default function ProductCard({ item }: ProductCardProps) {
 
   const imageUrl =
     item.media?.[0]?.url ||
-    "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=1200&q=80";
+    "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
 
   const locationStr =
     [item.locationCity, item.locationCountry].filter(Boolean).join(", ") ||
@@ -123,7 +123,7 @@ export default function ProductCard({ item }: ProductCardProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="group bg-[#0A0A0A] border border-white/[0.03] rounded-sm overflow-hidden flex flex-col hover:border-primary/20 transition-all duration-300 shadow-2xl"
+      className="group bg-[#0A0A0A] border border-white/3 rounded-sm overflow-hidden flex flex-col hover:border-primary/20 transition-all duration-300 shadow-2xl"
     >
       {/* Image Container */}
       <div className="relative h-56 overflow-hidden shrink-0 bg-black/40">
@@ -133,7 +133,7 @@ export default function ProductCard({ item }: ProductCardProps) {
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           onError={(e) => {
             (e.target as HTMLImageElement).src =
-              "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=1200&q=80";
+              "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
           }}
         />
 
@@ -182,7 +182,7 @@ export default function ProductCard({ item }: ProductCardProps) {
       </div>
 
       {/* Content */}
-      <div className="p-6 flex flex-col flex-1">
+      <div className="p-6 flex flex-col flex-1 bg-[#181818]">
         <div className="flex justify-between items-start mb-1 gap-2">
           <h3 className="text-lg font-serif text-white truncate flex-1">
             {item.title}
@@ -195,18 +195,20 @@ export default function ProductCard({ item }: ProductCardProps) {
 
         <div className="flex items-center gap-2 text-white/40 text-[12px] mb-5 font-light">
           <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
-          <span className="truncate">{locationStr}</span>
+          <span className="truncate text-white/80">{locationStr}</span>
         </div>
 
         {/* Specs Grid */}
         {displaySpecs.length > 0 && (
           <div className="grid grid-cols-2 gap-y-3 gap-x-2 mb-6">
             {displaySpecs.map((spec, i) => (
-              <div key={i} className="flex items-center gap-2 text-white/50">
+              <div key={i} className="flex items-center gap-2 text-white/80">
                 <div className="text-primary/70">
                   <spec.icon size={15} strokeWidth={1.5} />
                 </div>
-                <p className="text-[12px] font-light truncate">{spec.value}</p>
+                <p className="text-[12px] font-light font-montserrat truncate">
+                  {spec.value}
+                </p>
               </div>
             ))}
           </div>
