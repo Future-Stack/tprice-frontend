@@ -261,7 +261,7 @@ export default function InventoryDetailsPage() {
       : [
           {
             type: "image" as const,
-            url: "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=1200&q=80",
+            url: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
           },
         ];
 
@@ -272,13 +272,13 @@ export default function InventoryDetailsPage() {
         <ProductGallery media={mediaList} />
       </section>
 
-      <div className="container mx-auto px-6 py-12">
+      <div className="container mx-auto px-6 md:px-0 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           {/* Main Content Area */}
           <div className="lg:col-span-8 space-y-8">
             {/* Header Card */}
             <AnimationWrapper type="fade-up">
-              <div className="bg-[#0A0A0A] border border-white/5 p-8 rounded-sm space-y-4">
+              <div className="bg-[#101216] border border-white/5 p-8 rounded-sm space-y-4">
                 <div className="flex flex-wrap items-center gap-2">
                   {item.category && (
                     <span className="px-2.5 py-0.5 bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/20 text-[10px] uppercase font-bold tracking-widest rounded-sm flex items-center gap-1">
@@ -321,7 +321,7 @@ export default function InventoryDetailsPage() {
                       )}
                     </div>
 
-                    <div className="text-[#D4AF37] text-4xl md:text-[36px] font-semibold font-serif pt-1">
+                    <div className="text-[#D4AF37] text-4xl md:text-[36px] font-semibold font-montserrat pt-1">
                       {formattedPrice}
                     </div>
                   </div>
@@ -344,11 +344,11 @@ export default function InventoryDetailsPage() {
 
             {/* Description */}
             <AnimationWrapper type="fade-up" delay={0.2}>
-              <div className="bg-[#0A0A0A] border border-white/5 p-8 rounded-sm space-y-4">
-                <h3 className="text-xl font-serif text-white border-b border-white/5 pb-4">
+              <div className="bg-[#101216] border border-white/5 p-8 rounded-sm space-y-4">
+                <h3 className="text-[24px] font-cormorant font-medium text-white border-b border-white/5 pb-4">
                   Description
                 </h3>
-                <p className="text-white/70 leading-relaxed font-light text-sm md:text-base italic">
+                <p className="text-white/70   font-normal font-montserrat text-sm md:text-base">
                   {(item as any).description ||
                     `${item.buildYear ? `${item.buildYear} ` : ""}${item.title} — An exceptional masterpiece of engineering and craftsmanship, meticulously maintained and available for immediate acquisition.`}
                 </p>
@@ -357,8 +357,8 @@ export default function InventoryDetailsPage() {
 
             {/* Specifications */}
             <AnimationWrapper type="fade-up" delay={0.3}>
-              <div className="bg-[#0A0A0A] border border-white/5 p-8 rounded-sm space-y-6">
-                <h3 className="text-xl font-serif text-white border-b border-white/5 pb-4">
+              <div className="bg-[#101216] border border-white/5 p-8 rounded-sm space-y-6">
+                <h3 className="text-[24px] font-cormorant text-white border-b border-white/5 pb-4">
                   Specifications
                 </h3>
                 <ProductSpecsGrid specs={displaySpecs} />
@@ -369,7 +369,7 @@ export default function InventoryDetailsPage() {
           {/* Sidebar */}
           <div className="lg:col-span-4 space-y-6">
             <AnimationWrapper type="fade-left" delay={0.2}>
-              <div className="bg-[#0A0A0A] border border-white/5 p-8 rounded-sm sticky top-12 space-y-8">
+              <div className="bg-[#101216] border border-white/5 p-8 rounded-sm sticky top-12 space-y-8">
                 {/* Dealer / Owner Info */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 mb-2">

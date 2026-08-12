@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, ShieldCheck, Crown, UserCheck, Loader2, Sparkles, Check } from "lucide-react";
+import { X, Crown, UserCheck, Loader2, Sparkles, Check } from "lucide-react";
 import { AdminUserItem, UpdateUserStatusPayload } from "@/lib/api/users";
 
 interface UpdateUserStatusModalProps {
@@ -27,14 +27,11 @@ export default function UpdateUserStatusModal({
   isSubmitting,
 }: UpdateUserStatusModalProps) {
   const [role, setRole] = useState<string>("BUYER");
-  const [isVerified, setIsVerified] = useState<boolean>(false);
-  const [vipStatus, setVipStatus] = useState<boolean>(false);
 
   useEffect(() => {
     if (user && isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRole(user.role || "BUYER");
-      setIsVerified(user.isVerified || false);
-      setVipStatus(user.vipStatus || false);
     }
   }, [user, isOpen]);
 
@@ -44,8 +41,6 @@ export default function UpdateUserStatusModal({
     e.preventDefault();
     onConfirm({
       role,
-      isVerified,
-      vipStatus,
     });
   };
 
@@ -71,8 +66,8 @@ export default function UpdateUserStatusModal({
               <UserCheck className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">Update User Status</h3>
-              <p className="text-xs text-gray-400">Modify verification, role, and VIP level</p>
+              <h3 className="text-lg font-bold text-white">Update User Role</h3>
+              <p className="text-xs text-gray-400">Modify user role on the platform</p>
             </div>
           </div>
           <button
@@ -139,62 +134,6 @@ export default function UpdateUserStatusModal({
                 );
               })}
             </div>
-          </div>
-
-          {/* Verification Status Toggle */}
-          <div className="p-4 bg-[#1A1A1C] border border-[#262626] rounded-xl flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${isVerified ? "bg-green-500/10 text-green-500" : "bg-gray-800 text-gray-400"}`}>
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-white">Identity Verification</p>
-                <p className="text-[11px] text-gray-400">
-                  {isVerified ? "User is marked as verified" : "User identity is unverified"}
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => setIsVerified(!isVerified)}
-              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                isVerified ? "bg-green-500" : "bg-gray-700"
-              }`}
-            >
-              <span
-                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
-                  isVerified ? "translate-x-5" : "translate-x-0"
-                }`}
-              />
-            </button>
-          </div>
-
-          {/* VIP Status Toggle */}
-          <div className="p-4 bg-[#1A1A1C] border border-[#262626] rounded-xl flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${vipStatus ? "bg-amber-500/10 text-amber-400" : "bg-gray-800 text-gray-400"}`}>
-                <Crown className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-white">VIP Status</p>
-                <p className="text-[11px] text-gray-400">
-                  {vipStatus ? "Grants priority access & VIP badge" : "Standard membership level"}
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => setVipStatus(!vipStatus)}
-              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                vipStatus ? "bg-amber-500" : "bg-gray-700"
-              }`}
-            >
-              <span
-                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
-                  vipStatus ? "translate-x-5" : "translate-x-0"
-                }`}
-              />
-            </button>
           </div>
 
           {/* Actions */}

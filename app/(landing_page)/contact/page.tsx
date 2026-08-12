@@ -10,9 +10,9 @@ export default function ContactPage() {
       <ContactHero />
 
       {/* Form & Info Section */}
-      <section className="py-24 px-6 md:px-12 bg-linear-to-b from-black to-[#0A0A0A]">
+      <section className="py-24 px-6 md:px-0 bg-linear-to-b from-black to-[#0A0A0A]">
         <div className="container mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-stretch max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-stretch ">
             <div className="flex flex-col h-full">
               <ContactForm />
             </div>

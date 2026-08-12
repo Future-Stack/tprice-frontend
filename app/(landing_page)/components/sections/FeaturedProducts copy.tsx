@@ -9,120 +9,6 @@ import { useListingsQuery } from "@/hooks/useListings";
 import { useGetCategoriesQuery } from "@/hooks/useCategories";
 import { ListingItem } from "@/lib/api/listings";
 
-const getProductImage = (item: ListingItem) => {
-  return (
-    item.media?.[0]?.url ||
-    "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
-  );
-};
-
-const getFormattedPrice = (item: ListingItem) => {
-  if (item.askingPrice) {
-    return `$${Number(item.askingPrice).toLocaleString()}`;
-  }
-  if (item.startingBid) {
-    return `Bid: $${Number(item.startingBid).toLocaleString()}`;
-  }
-  return "Price on Request";
-};
-
-const getLocationString = (item: ListingItem) => {
-  return (
-    [item.locationCity, item.locationCountry].filter(Boolean).join(", ") ||
-    "Worldwide"
-  );
-};
-
-const getBadgeTag = (item: ListingItem) => {
-  if (item.owner?.role === "DEALER") return "Dealer";
-  if (item.isFeatured) return "VIP";
-  return "Private";
-};
-
-interface ProductCardProps {
-  product: ListingItem;
-  variant: "large" | "small";
-  heightClass: string;
-}
-
-const ProductCard = React.memo(
-  ({ product, variant, heightClass }: ProductCardProps) => {
-    if (variant === "large") {
-      return (
-        <Link
-          href={`/inventory/${product.slug || product.id}`}
-          className={`group relative ${heightClass} block overflow-hidden rounded-xl border border-white/5 hover:border-primary/40 transition-all shadow-2xl`}
-        >
-          <img
-            src={getProductImage(product)}
-            alt={product.title}
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src =
-                "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
-            }}
-          />
-          <div className="absolute inset-0 bg-linear-to-t from-black via-black/30 to-transparent" />
-
-          {/* Badge */}
-          <div className="absolute top-6 left-6 px-4 py-1.5 bg-primary/20 backdrop-blur-md border border-primary/30 rounded-full text-primary text-xs font-bold uppercase tracking-widest">
-            {getBadgeTag(product)}
-          </div>
-
-          {/* Content Overlay */}
-          <div className="absolute bottom-0 left-6 right-6 pb-8">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">
-              {product.category}
-            </p>
-            <h3 className="text-2xl md:text-3xl font-bold text-white mb-2 line-clamp-2">
-              {product.title}
-            </h3>
-            <p className="text-2xl font-bold text-primary mb-3 font-serif">
-              {getFormattedPrice(product)}
-            </p>
-            <div className="flex items-center gap-2 text-white/70 text-sm font-light">
-              <MapPin className="w-4 h-4 text-primary shrink-0" />
-              <span className="truncate">{getLocationString(product)}</span>
-            </div>
-          </div>
-        </Link>
-      );
-    }
-
-    return (
-      <Link
-        href={`/inventory/${product.slug || product.id}`}
-        className={`group relative ${heightClass} block overflow-hidden rounded-xl border border-white/5 hover:border-primary/40 transition-all shadow-xl`}
-      >
-        <img
-          src={getProductImage(product)}
-          alt={product.title}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src =
-              "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
-          }}
-        />
-        <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-transparent" />
-        <div className="absolute top-4 left-4 px-3 py-1 bg-white/10 backdrop-blur-md border border-white/10 rounded-full text-white/90 text-[10px] font-bold uppercase">
-          {getBadgeTag(product)}
-        </div>
-        <div className="absolute bottom-6 left-6 right-6">
-          <p className="text-white/40 text-[10px] uppercase tracking-widest mb-1">
-            {product.category}
-          </p>
-          <h4 className="text-lg font-semibold text-white mb-1 group-hover:text-primary transition-colors truncate">
-            {product.title}
-          </h4>
-          <p className="text-primary font-bold">{getFormattedPrice(product)}</p>
-        </div>
-      </Link>
-    );
-  },
-);
-
-ProductCard.displayName = "ProductCard";
-
 export default function FeaturedProducts() {
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -162,153 +48,37 @@ export default function FeaturedProducts() {
   });
 
   const featuredListings = listingsData?.data || [];
+  const mainProduct = featuredListings[0];
+  const sideProducts = featuredListings.slice(1, 5);
 
-  const renderGrid = () => {
-    const totalListings = featuredListings.length;
-
-    if (totalListings === 1) {
-      return (
-        <div className="grid grid-cols-1 gap-6">
-          <motion.div
-            layout
-            key={featuredListings[0].id}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            <ProductCard
-              product={featuredListings[0]}
-              variant="large"
-              heightClass="h-96 md:h-120"
-            />
-          </motion.div>
-        </div>
-      );
-    }
-
-    if (totalListings === 2) {
-      return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <AnimatePresence mode="popLayout">
-            {featuredListings.map((product, i) => (
-              <motion.div
-                layout
-                key={product.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
-              >
-                <ProductCard
-                  product={product}
-                  variant="large"
-                  heightClass="h-96 md:h-110"
-                />
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-      );
-    }
-
-    if (totalListings === 3) {
-      return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <AnimatePresence mode="popLayout">
-            {featuredListings.map((product, i) => (
-              <motion.div
-                layout
-                key={product.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
-              >
-                <ProductCard
-                  product={product}
-                  variant="large"
-                  heightClass="h-96"
-                />
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-      );
-    }
-
-    if (totalListings === 4) {
-      return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <AnimatePresence mode="popLayout">
-            {featuredListings.map((product, i) => (
-              <motion.div
-                layout
-                key={product.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
-              >
-                <ProductCard
-                  product={product}
-                  variant="small"
-                  heightClass="h-80"
-                />
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-      );
-    }
-
-    // Default: 5 products (or fallback for larger quantities)
-    // 1 large on left, 4 small on right
-    const mainProduct = featuredListings[0];
-    const sideProducts = featuredListings.slice(1, 5);
-
+  const getProductImage = (item: ListingItem) => {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {mainProduct && (
-          <motion.div
-            layout
-            key={mainProduct.id}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="lg:col-span-4"
-          >
-            <ProductCard
-              product={mainProduct}
-              variant="large"
-              heightClass="h-150"
-            />
-          </motion.div>
-        )}
-
-        {sideProducts.length > 0 && (
-          <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <AnimatePresence mode="popLayout">
-              {sideProducts.map((product, i) => (
-                <motion.div
-                  layout
-                  key={product.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.4, delay: i * 0.1 }}
-                >
-                  <ProductCard
-                    product={product}
-                    variant="small"
-                    heightClass="h-72.5"
-                  />
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-        )}
-      </div>
+      item.media?.[0]?.url ||
+      "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=1200&q=80"
     );
+  };
+
+  const getFormattedPrice = (item: ListingItem) => {
+    if (item.askingPrice) {
+      return `$${Number(item.askingPrice).toLocaleString()}`;
+    }
+    if (item.startingBid) {
+      return `Bid: $${Number(item.startingBid).toLocaleString()}`;
+    }
+    return "Price on Request";
+  };
+
+  const getLocationString = (item: ListingItem) => {
+    return (
+      [item.locationCity, item.locationCountry].filter(Boolean).join(", ") ||
+      "Worldwide"
+    );
+  };
+
+  const getBadgeTag = (item: ListingItem) => {
+    if (item.owner?.role === "DEALER") return "Dealer";
+    if (item.isFeatured) return "VIP";
+    return "Private";
   };
 
   return (
@@ -448,7 +218,108 @@ export default function FeaturedProducts() {
           </motion.div>
         ) : (
           /* Listings Cards Grid */
-          renderGrid()
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Main Featured Card */}
+            {mainProduct && (
+              <motion.div
+                layout
+                key={mainProduct.id}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                className={
+                  sideProducts.length > 0 ? "lg:col-span-4" : "lg:col-span-12"
+                }
+              >
+                <Link
+                  href={`/inventory/${mainProduct.slug || mainProduct.id}`}
+                  className="group relative h-150 block overflow-hidden rounded-xl border border-white/5 hover:border-primary/40 transition-all shadow-2xl"
+                >
+                  <img
+                    src={getProductImage(mainProduct)}
+                    alt={mainProduct.title}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src =
+                        "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-linear-to-t from-black via-black/30 to-transparent" />
+
+                  {/* Badge */}
+                  <div className="absolute top-6 left-6 px-4 py-1.5 bg-primary/20 backdrop-blur-md border border-primary/30 rounded-full text-primary text-xs font-bold uppercase tracking-widest">
+                    {getBadgeTag(mainProduct)}
+                  </div>
+
+                  {/* Content Overlay */}
+                  <div className="absolute bottom-0 left-6 right-6 pb-8">
+                    <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">
+                      {mainProduct.category}
+                    </p>
+                    <h3 className="text-2xl md:text-3xl font-bold text-white mb-2 line-clamp-2">
+                      {mainProduct.title}
+                    </h3>
+                    <p className="text-2xl font-bold text-primary mb-3 font-serif">
+                      {getFormattedPrice(mainProduct)}
+                    </p>
+                    <div className="flex items-center gap-2 text-white/70 text-sm font-light">
+                      <MapPin className="w-4 h-4 text-primary shrink-0" />
+                      <span className="truncate">
+                        {getLocationString(mainProduct)}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
+            )}
+
+            {/* Side 4 Cards Grid */}
+            {sideProducts.length > 0 && (
+              <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <AnimatePresence mode="popLayout">
+                  {sideProducts.map((product, i) => (
+                    <motion.div
+                      key={product.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.4, delay: i * 0.1 }}
+                    >
+                      <Link
+                        href={`/inventory/${product.slug || product.id}`}
+                        className="group relative h-72.5 block overflow-hidden rounded-xl border border-white/5 hover:border-primary/40 transition-all shadow-xl"
+                      >
+                        <img
+                          src={getProductImage(product)}
+                          alt={product.title}
+                          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src =
+                              "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-transparent" />
+                        <div className="absolute top-4 left-4 px-3 py-1 bg-white/10 backdrop-blur-md border border-white/10 rounded-full text-white/90 text-[10px] font-bold uppercase">
+                          {getBadgeTag(product)}
+                        </div>
+                        <div className="absolute bottom-6 left-6 right-6">
+                          <p className="text-white/40 text-[10px] uppercase tracking-widest mb-1">
+                            {product.category}
+                          </p>
+                          <h4 className="text-lg font-semibold text-white mb-1 group-hover:text-primary transition-colors truncate">
+                            {product.title}
+                          </h4>
+                          <p className="text-primary font-bold">
+                            {getFormattedPrice(product)}
+                          </p>
+                        </div>
+                      </Link>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            )}
+          </div>
         )}
 
         {/* View All Button */}

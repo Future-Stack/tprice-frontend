@@ -45,6 +45,16 @@ export interface CreateEventInput {
   coverImageUrl?: string;
 }
 
+export interface UpdateEventInput {
+  title?: string;
+  category?: string;
+  description?: string;
+  eventDate?: string;
+  location?: string;
+  coverImageUrl?: string;
+  status?: string;
+}
+
 export const getEventsApi = async (
   params?: GetEventsParams,
 ): Promise<EventsResponse> => {
@@ -73,6 +83,14 @@ export const createEventApi = async (
   data: CreateEventInput,
 ): Promise<EventItem> => {
   const response = await apiClient.post<EventItem>("/events", data);
+  return response.data;
+};
+
+export const updateEventApi = async (
+  id: string,
+  data: UpdateEventInput,
+): Promise<EventItem> => {
+  const response = await apiClient.patch<EventItem>(`/events/${id}`, data);
   return response.data;
 };
 

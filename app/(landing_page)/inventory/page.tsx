@@ -95,7 +95,7 @@ export default function MarketplacePage() {
       <MarketplaceHero />
 
       <section className="py-20">
-        <div className="container mx-auto px-6 md:px-12 lg:flex gap-16">
+        <div className="container mx-auto px-6 md:px-0 lg:flex gap-16">
           {/* Sidebar */}
           <FilterSidebar
             sortBy={sortBy}

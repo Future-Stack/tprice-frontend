@@ -36,7 +36,7 @@ export default function Trust() {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-primary text-xs font-bold tracking-[0.3em] uppercase mb-4 block"
+            className="text-primary text-[16px] font-montserrat font-normal uppercase mb-4 block"
           >
             BUILT ON TRUST
           </motion.span>
@@ -51,7 +51,7 @@ export default function Trust() {
           </motion.h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6  ">
           {TRUST_PILLARS.map((pillar, i) => (
             <motion.div
               key={pillar.title}
@@ -77,4 +77,3 @@ export default function Trust() {
     </section>
   );
 }
-

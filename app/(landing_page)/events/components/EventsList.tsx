@@ -148,30 +148,30 @@ export default function EventsList() {
                         <img
                           src={
                             event.coverImageUrl ||
-                            "/images/landing/hero-car.png"
+                            "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
                           }
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                           alt={event.title}
                           onError={(e) => {
                             (e.target as HTMLImageElement).src =
-                              "/images/landing/hero-car.png";
+                              "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
                           }}
                         />
                         <div className="absolute top-6 left-6">
-                          <span className="px-4 py-1.5 bg-[#4ADE80]/20 backdrop-blur-md border border-[#4ADE80]/30 text-[#4ADE80] text-[10px] font-bold uppercase tracking-[0.2em] rounded-full">
-                            {event.status || "UPCOMING"}
+                          <span className="px-4 py-1.5 bg-[#31473B] backdrop-blur-md border border-[#4ADE80]/30 text-[#4ADE80] text-[10px] font-bold uppercase tracking-[0.2em] rounded-full">
+                            {event.status}
                           </span>
                         </div>
                       </div>
 
                       {/* Content Section */}
-                      <div className="p-8 space-y-6 flex-1 flex flex-col">
+                      <div className="p-8  flex-1 flex flex-col">
                         <div className="flex justify-between items-start gap-4">
-                          <div className="space-y-4 flex-1">
-                            <div className="inline-block px-4 py-1.5 rounded-full border border-primary/40 text-primary text-[10px] font-bold uppercase tracking-widest mb-2">
+                          <div className="flex-1">
+                            <div className="inline-block px-5 py-1 rounded-full border border-primary/40 text-primary text-[24px] font-montserrat font-medium  mb-2">
                               {event.category}
                             </div>
-                            <h3 className="text-2xl md:text-3xl font-serif text-white leading-tight">
+                            <h3 className="text-2xl md:text-[32px] font-cormorant font-medium text-white mb-4.5">
                               {event.title}
                             </h3>
                           </div>
@@ -181,11 +181,11 @@ export default function EventsList() {
                           </div>
                         </div>
                         <div className="pt-6 border-t border-white/5 flex flex-wrap gap-x-8 gap-y-4 mt-auto">
-                          <div className="flex items-center gap-2 text-[#E0E0E0] text-[16px] font-medium tracking-wide">
+                          <div className="flex items-center gap-2 font-montserrat text-[#E0E0E0] text-[16px] font-normal">
                             <Calendar className="w-4 h-4 text-primary/60" />
                             {formatDate(event.eventDate)}
                           </div>
-                          <div className="flex items-center gap-2 text-[#E0E0E0] text-[16px] font-medium tracking-wide italic">
+                          <div className="flex items-center gap-2 font-montserrat text-[#E0E0E0] text-[16px] font-normal  ">
                             <MapPin className="w-4 h-4 text-primary/60" />
                             {event.location}
                           </div>

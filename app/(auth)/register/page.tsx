@@ -184,7 +184,7 @@ export default function RegisterPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
             {/* First Name & Last Name */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
@@ -198,6 +198,7 @@ export default function RegisterPage() {
                   onChange={handleChange}
                   placeholder="Sophia"
                   disabled={isLoading}
+                  autoComplete="off"
                   className={`w-full bg-[#1A1A1A] border rounded-lg px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none transition-all ${
                     errors.firstName
                       ? "border-red-500/80 focus:border-red-500"
@@ -222,6 +223,7 @@ export default function RegisterPage() {
                   onChange={handleChange}
                   placeholder="Vance"
                   disabled={isLoading}
+                  autoComplete="off"
                   className={`w-full bg-[#1A1A1A] border rounded-lg px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none transition-all ${
                     errors.lastName
                       ? "border-red-500/80 focus:border-red-500"
@@ -248,6 +250,7 @@ export default function RegisterPage() {
                 onChange={handleChange}
                 placeholder="buyer@gmail.com"
                 disabled={isLoading}
+                autoComplete="off"
                 className={`w-full bg-[#1A1A1A] border rounded-lg px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none transition-all ${
                   errors.email
                     ? "border-red-500/80 focus:border-red-500"
@@ -274,6 +277,7 @@ export default function RegisterPage() {
                   onChange={handleChange}
                   placeholder="••••••••"
                   disabled={isLoading}
+                  autoComplete="new-password"
                   className={`w-full bg-[#1A1A1A] border rounded-lg px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none transition-all font-mono ${
                     errors.password
                       ? "border-red-500/80 focus:border-red-500"
@@ -308,6 +312,7 @@ export default function RegisterPage() {
                   onChange={handleChange}
                   placeholder="••••••••"
                   disabled={isLoading}
+                  autoComplete="new-password"
                   className={`w-full bg-[#1A1A1A] border rounded-lg px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none transition-all font-mono ${
                     errors.confirmPassword
                       ? "border-red-500/80 focus:border-red-500"
