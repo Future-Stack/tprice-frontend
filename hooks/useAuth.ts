@@ -10,10 +10,14 @@ import {
   decodeJwtUser,
   updateMeApi,
   changePasswordApi,
+  forgotPasswordApi,
+  resetPasswordApi,
   LoginPayload,
   RegisterPayload,
   UpdateProfilePayload,
   ChangePasswordPayload,
+  ForgotPasswordPayload,
+  ResetPasswordPayload,
   User,
   LogoutResponse,
 } from "@/lib/api/auth";
@@ -169,3 +173,22 @@ export const useChangePasswordMutation = () => {
     },
   });
 };
+
+/**
+ * Mutation Hook for Forgot Password
+ */
+export const useForgotPasswordMutation = () => {
+  return useMutation({
+    mutationFn: (payload: ForgotPasswordPayload) => forgotPasswordApi(payload),
+  });
+};
+
+/**
+ * Mutation Hook for Reset Password
+ */
+export const useResetPasswordMutation = () => {
+  return useMutation({
+    mutationFn: (payload: ResetPasswordPayload) => resetPasswordApi(payload),
+  });
+};
+

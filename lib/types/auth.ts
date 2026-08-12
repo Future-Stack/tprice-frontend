@@ -64,4 +64,22 @@ export interface LogoutResponse {
   [key: string]: any;
 }
 
+export interface ForgotPasswordPayload {
+  email: string;
+}
+
+export interface ForgotPasswordResponse {
+  message?: string;
+  [key: string]: unknown;
+}
+
+export interface ResetPasswordPayload {
+  token: string;
+  newPassword: string;
+}
+
+export interface ResetPasswordResponse {
+  message?: string;
+  [key: string]: unknown;
+}
 

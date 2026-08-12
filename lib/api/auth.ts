@@ -9,6 +9,10 @@ import {
   RefreshResponse,
   LogoutResponse,
   User,
+  ForgotPasswordPayload,
+  ForgotPasswordResponse,
+  ResetPasswordPayload,
+  ResetPasswordResponse,
 } from "@/lib/types/auth";
 
 export * from "@/lib/types/auth";
@@ -210,4 +214,24 @@ export const revokeUserSessionApi = async (
     }
     throw error;
   }
+};
+
+export const forgotPasswordApi = async (
+  payload: ForgotPasswordPayload,
+): Promise<ForgotPasswordResponse> => {
+  const response = await apiClient.post<ForgotPasswordResponse>(
+    "/auth/forgot-password",
+    payload,
+  );
+  return response.data;
+};
+
+export const resetPasswordApi = async (
+  payload: ResetPasswordPayload,
+): Promise<ResetPasswordResponse> => {
+  const response = await apiClient.post<ResetPasswordResponse>(
+    "/auth/reset-password",
+    payload,
+  );
+  return response.data;
 };
