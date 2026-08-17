@@ -986,7 +986,7 @@ export default function UpdateListingModal({
                                 )}
                                 {isCover && (
                                   <span className="text-[11px] font-medium text-emerald-400">
-                                    Primary Display
+                                    primary Display
                                   </span>
                                 )}
 

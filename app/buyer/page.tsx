@@ -187,7 +187,7 @@ export default function Home() {
         {/* Active Bids */}
         <AnimationWrapper type="fade-right" duration={0.6} delay={0.1}>
           <div
-            className="bg-foreground p-7 rounded-2xl border border-primary2/30 shadow-xl hover:border-[#E78F23]/20 transition-colors h-full flex flex-col justify-between"
+            className="bg-foreground p-7 rounded-2xl border border-primary/30 shadow-xl hover:border-[#E78F23]/20 transition-colors h-full flex flex-col justify-between"
             style={{
               boxShadow:
                 "0 66px 19px 0 rgba(178, 114, 31, 0.00), 0 42px 17px 0 rgba(178, 114, 31, 0.01), 0 24px 14px 0 rgba(178, 114, 31, 0.05), 0 11px 11px 0 rgba(178, 114, 31, 0.09), 0 3px 6px 0 rgba(178, 114, 31, 0.10)",
@@ -258,7 +258,7 @@ export default function Home() {
         {/* Recent Activity */}
         <AnimationWrapper type="fade-left" duration={0.6} delay={0.15}>
           <div
-            className="bg-foreground p-7 rounded-2xl border border-primary2/30 shadow-xl hover:border-[#E78F23]/20 transition-colors h-full flex flex-col justify-between"
+            className="bg-foreground p-7 rounded-2xl border border-primary/30 shadow-xl hover:border-[#E78F23]/20 transition-colors h-full flex flex-col justify-between"
             style={{
               boxShadow:
                 "0 66px 19px 0 rgba(178, 114, 31, 0.00), 0 42px 17px 0 rgba(178, 114, 31, 0.01), 0 24px 14px 0 rgba(178, 114, 31, 0.05), 0 11px 11px 0 rgba(178, 114, 31, 0.09), 0 3px 6px 0 rgba(178, 114, 31, 0.10)",
@@ -401,7 +401,7 @@ function StatCard({
   return (
     <Link
       href={href}
-      className="bg-foreground border border-primary2/30 p-5 rounded-2xl flex items-center gap-5 transition-all hover:border-primary/50 shadow-card h-[120px] group"
+      className="bg-foreground border border-primary/30 p-5 rounded-2xl flex items-center gap-5 transition-all hover:border-primary/50 shadow-card h-[120px] group"
       style={{
         boxShadow:
           "0 66px 19px 0 rgba(178, 114, 31, 0.00), 0 42px 17px 0 rgba(178, 114, 31, 0.01), 0 24px 14px 0 rgba(178, 114, 31, 0.05), 0 11px 11px 0 rgba(178, 114, 31, 0.09), 0 3px 6px 0 rgba(178, 114, 31, 0.10)",
@@ -438,7 +438,7 @@ function ListingCard({
   status: string;
 }) {
   return (
-    <div className="bg-foreground rounded-[8px] border border-primary2/30 overflow-hidden group hover:border-[#E78F23]/40 transition-all shadow-xl hover:shadow-[#E78F23]/10 flex flex-col justify-between h-full">
+    <div className="bg-foreground rounded-[8px] border border-primary/30 overflow-hidden group hover:border-[#E78F23]/40 transition-all shadow-xl hover:shadow-[#E78F23]/10 flex flex-col justify-between h-full">
       <div>
         <div className="relative h-[200px] overflow-hidden bg-black">
           <img

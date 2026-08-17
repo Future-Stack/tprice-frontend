@@ -174,7 +174,7 @@ export default function Home() {
         {/* Quick View Listings */}
         <AnimationWrapper type="fade-right" duration={0.6} delay={0.1}>
           <div
-            className="bg-foreground p-7 rounded-2xl border border-primary2/30 shadow-xl hover:border-[#E78F23]/20 transition-colors h-full flex flex-col"
+            className="bg-foreground p-7 rounded-2xl border border-primary/30 shadow-xl hover:border-[#E78F23]/20 transition-colors h-full flex flex-col"
             style={{
               boxShadow:
                 "0 66px 19px 0 rgba(178, 114, 31, 0.00), 0 42px 17px 0 rgba(178, 114, 31, 0.01), 0 24px 14px 0 rgba(178, 114, 31, 0.05), 0 11px 11px 0 rgba(178, 114, 31, 0.09), 0 3px 6px 0 rgba(178, 114, 31, 0.10)",
@@ -240,7 +240,7 @@ export default function Home() {
         {/* Recent Activity */}
         <AnimationWrapper type="fade-left" duration={0.6} delay={0.15}>
           <div
-            className="bg-foreground p-7 rounded-2xl border border-primary2/30 shadow-xl hover:border-[#E78F23]/20 transition-colors h-full flex flex-col"
+            className="bg-foreground p-7 rounded-2xl border border-primary/30 shadow-xl hover:border-[#E78F23]/20 transition-colors h-full flex flex-col"
             style={{
               boxShadow:
                 "0 66px 19px 0 rgba(178, 114, 31, 0.00), 0 42px 17px 0 rgba(178, 114, 31, 0.01), 0 24px 14px 0 rgba(178, 114, 31, 0.05), 0 11px 11px 0 rgba(178, 114, 31, 0.09), 0 3px 6px 0 rgba(178, 114, 31, 0.10)",
@@ -372,7 +372,7 @@ function StatCard({
 }) {
   return (
     <div
-      className="bg-foreground border border-primary2/30 p-5 rounded-2xl flex items-center gap-5 transition-all cursor-default shadow-card h-50.75"
+      className="bg-foreground border border-primary/30 p-5 rounded-2xl flex items-center gap-5 transition-all cursor-default shadow-card h-50.75"
       style={{
         boxShadow:
           "0 66px 19px 0 rgba(178, 114, 31, 0.00), 0 42px 17px 0 rgba(178, 114, 31, 0.01), 0 24px 14px 0 rgba(178, 114, 31, 0.05), 0 11px 11px 0 rgba(178, 114, 31, 0.09), 0 3px 6px 0 rgba(178, 114, 31, 0.10)",
@@ -409,7 +409,7 @@ function ListingCard({
   slug?: string;
 }) {
   return (
-    <div className="bg-foreground rounded-[8px] border border-primary2/30 overflow-hidden group hover:border-[#E78F23]/20 transition-all shadow-xl hover:shadow-[#E78F23]/5 flex flex-col h-full">
+    <div className="bg-foreground rounded-[8px] border border-primary/30 overflow-hidden group hover:border-[#E78F23]/20 transition-all shadow-xl hover:shadow-[#E78F23]/5 flex flex-col h-full">
       <div className="relative h-54.25 overflow-hidden bg-black shrink-0">
         <img
           src={image}
@@ -457,7 +457,7 @@ function ListingCard({
 function StatCardSkeleton() {
   return (
     <div
-      className="bg-foreground border border-primary2/30 p-5 rounded-2xl flex items-center gap-5 shadow-card h-50.75 animate-pulse"
+      className="bg-foreground border border-primary/30 p-5 rounded-2xl flex items-center gap-5 shadow-card h-50.75 animate-pulse"
       style={{
         boxShadow:
           "0 66px 19px 0 rgba(178, 114, 31, 0.00), 0 42px 17px 0 rgba(178, 114, 31, 0.01), 0 24px 14px 0 rgba(178, 114, 31, 0.05), 0 11px 11px 0 rgba(178, 114, 31, 0.09), 0 3px 6px 0 rgba(178, 114, 31, 0.10)",
@@ -513,7 +513,7 @@ function RecentActivitySkeleton() {
 
 function ListingCardSkeleton() {
   return (
-    <div className="bg-foreground rounded-[8px] border border-primary2/30 overflow-hidden shadow-xl animate-pulse flex flex-col h-full">
+    <div className="bg-foreground rounded-[8px] border border-primary/30 overflow-hidden shadow-xl animate-pulse flex flex-col h-full">
       <div className="h-54.25 bg-white/10 w-full shrink-0" />
       <div className="p-5 mt-6 space-y-4 flex-1 flex flex-col justify-between">
         <div className="space-y-3">

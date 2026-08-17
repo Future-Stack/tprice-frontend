@@ -397,7 +397,7 @@ export default function AddListing() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Ferrari 488 Spider"
-                className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50 transition-colors shadow-inner"
+                className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 transition-colors shadow-inner"
                 required
               />
             </div>
@@ -410,7 +410,7 @@ export default function AddListing() {
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white focus:outline-none focus:border-primary2/50 transition-colors appearance-none cursor-pointer"
+                    className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white focus:outline-none focus:border-primary/50 transition-colors appearance-none cursor-pointer"
                   >
                     <option value="">
                       {isLoadingCategories ? "Loading categories..." : "Select Category"}
@@ -432,7 +432,7 @@ export default function AddListing() {
                   <select
                     value={brand}
                     onChange={(e) => setBrand(e.target.value)}
-                    className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white focus:outline-none focus:border-primary2/50 transition-colors appearance-none cursor-pointer"
+                    className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white focus:outline-none focus:border-primary/50 transition-colors appearance-none cursor-pointer"
                   >
                     <option value="">
                       {isLoadingBrands ? "Loading brands..." : "Select Brand"}
@@ -458,7 +458,7 @@ export default function AddListing() {
                 value={itemLocation}
                 onChange={(e) => setItemLocation(e.target.value)}
                 placeholder="City, Country"
-                className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50 transition-colors shadow-inner"
+                className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 transition-colors shadow-inner"
               />
             </div>
 
@@ -470,7 +470,7 @@ export default function AddListing() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Provide a detailed description of the item..."
-                className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50 transition-colors resize-none shadow-inner"
+                className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 transition-colors resize-none shadow-inner"
               />
             </div>
           </div>
@@ -489,7 +489,7 @@ export default function AddListing() {
                   value={yearOfManufacture}
                   onChange={(e) => setYearOfManufacture(e.target.value)}
                   placeholder="YYYY"
-                  className="w-full bg-[#0D0D0F] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50 transition-colors"
+                  className="w-full bg-[#0D0D0F] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 transition-colors"
                 />
               </div>
               <div className="space-y-2.5">
@@ -498,7 +498,7 @@ export default function AddListing() {
                   <select
                     value={condition}
                     onChange={(e) => setCondition(e.target.value)}
-                    className="w-full bg-[#0D0D0F] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white focus:outline-none focus:border-primary2/50 transition-colors appearance-none cursor-pointer"
+                    className="w-full bg-[#0D0D0F] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white focus:outline-none focus:border-primary/50 transition-colors appearance-none cursor-pointer"
                   >
                     <option value="new">New</option>
                     <option value="excellent">Excellent</option>
@@ -521,7 +521,7 @@ export default function AddListing() {
                   value={usageMileage}
                   onChange={(e) => setUsageMileage(e.target.value)}
                   placeholder="e.g. 12,000 miles or 450 flight hours"
-                  className="w-full bg-[#0D0D0F] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50 transition-colors"
+                  className="w-full bg-[#0D0D0F] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 transition-colors"
                 />
               </div>
               <div className="space-y-2.5">
@@ -531,7 +531,7 @@ export default function AddListing() {
                   value={exteriorColor}
                   onChange={(e) => setExteriorColor(e.target.value)}
                   placeholder="e.g. Rosso Corsa"
-                  className="w-full bg-[#0D0D0F] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50 transition-colors"
+                  className="w-full bg-[#0D0D0F] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 transition-colors"
                 />
               </div>
             </div>
@@ -546,7 +546,7 @@ export default function AddListing() {
                 <button
                   type="button"
                   onClick={handleAddSpecRow}
-                  className="px-3.5 py-1.5 bg-primary2/10 border border-primary2/30 hover:bg-primary2/20 text-primary2 rounded-lg text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5"
+                  className="px-3.5 py-1.5 bg-primary/10 border border-primary/30 hover:bg-primary/20 text-primary rounded-lg text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5"
                 >
                   <Plus className="w-3.5 h-3.5" /> Add Spec Field
                 </button>
@@ -559,7 +559,7 @@ export default function AddListing() {
                     key={preset}
                     type="button"
                     onClick={() => handleAddSuggestion(preset)}
-                    className="px-2.5 py-1 bg-[#1c1c1e] border border-[#2C2C2E] hover:border-primary2/50 text-gray-400 hover:text-primary2 rounded-md text-xs transition-colors cursor-pointer flex items-center gap-1 font-mono"
+                    className="px-2.5 py-1 bg-[#1c1c1e] border border-[#2C2C2E] hover:border-primary/50 text-gray-400 hover:text-primary rounded-md text-xs transition-colors cursor-pointer flex items-center gap-1 font-mono"
                   >
                     <Plus className="w-3 h-3" /> {preset}
                   </button>
@@ -579,14 +579,14 @@ export default function AddListing() {
                         value={item.key}
                         onChange={(e) => handleSpecChange(item.id, "key", e.target.value)}
                         placeholder="Key (e.g. transmission)"
-                        className="flex-1 bg-[#0D0D0F] border border-[#2C2C2E] rounded-lg px-3 py-2 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50 font-mono"
+                        className="flex-1 bg-[#0D0D0F] border border-[#2C2C2E] rounded-lg px-3 py-2 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 font-mono"
                       />
                       <input
                         type="text"
                         value={item.value}
                         onChange={(e) => handleSpecChange(item.id, "value", e.target.value)}
                         placeholder="Value (e.g. Automatic)"
-                        className="flex-1 bg-[#0D0D0F] border border-[#2C2C2E] rounded-lg px-3 py-2 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50"
+                        className="flex-1 bg-[#0D0D0F] border border-[#2C2C2E] rounded-lg px-3 py-2 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50"
                       />
                       <button
                         type="button"
@@ -625,18 +625,18 @@ export default function AddListing() {
               onDrop={handleDropMedia}
               onClick={() => fileInputRef.current?.click()}
               className={`relative border-2 border-dashed aspect-[16/7] rounded-2xl flex flex-col items-center justify-center gap-4 transition-all duration-300 cursor-pointer ${isDragging
-                ? "border-primary2 bg-primary2/10"
-                : "border-[#2C2C2E] bg-[#1c1c1e] hover:border-primary2/50 hover:bg-[#252528]"
+                ? "border-primary bg-primary/10"
+                : "border-[#2C2C2E] bg-[#1c1c1e] hover:border-primary/50 hover:bg-[#252528]"
                 }`}
             >
               {uploadMediaMutation.isPending ? (
                 <div className="flex flex-col items-center justify-center space-y-2 py-4">
-                  <Loader2 className="w-10 h-10 text-primary2 animate-spin" />
-                  <p className="text-sm font-medium text-primary2">Uploading image to cloud media service...</p>
+                  <Loader2 className="w-10 h-10 text-primary animate-spin" />
+                  <p className="text-sm font-medium text-primary">Uploading image to cloud media service...</p>
                 </div>
               ) : (
                 <>
-                  <div className="w-16 h-16 bg-[#111113] rounded-full flex items-center justify-center text-gray-400 group-hover:text-primary2 transition-colors">
+                  <div className="w-16 h-16 bg-[#111113] rounded-full flex items-center justify-center text-gray-400 group-hover:text-primary transition-colors">
                     <UploadCloud className="w-8 h-8" />
                   </div>
                   <div className="text-center">
@@ -696,11 +696,11 @@ export default function AddListing() {
                   type="button"
                   onClick={() => setSaleType(type.id as any)}
                   className={`flex flex-col items-start p-6 rounded-xl border transition-all duration-300 text-left cursor-pointer ${saleType === type.id
-                    ? "border-primary2 bg-primary2/5 ring-1 ring-primary2"
+                    ? "border-primary bg-primary/5 ring-1 ring-primary"
                     : "border-[#2C2C2E] bg-[#1c1c1e] hover:border-gray-600"
                     }`}
                 >
-                  <span className={`font-semibold text-base mb-1 ${saleType === type.id ? "text-primary2" : "text-white"}`}>
+                  <span className={`font-semibold text-base mb-1 ${saleType === type.id ? "text-primary" : "text-white"}`}>
                     {type.title}
                   </span>
                   <span className="text-gray-500 text-xs">
@@ -724,7 +724,7 @@ export default function AddListing() {
                       value={askingPrice}
                       onChange={(e) => setAskingPrice(e.target.value)}
                       placeholder="0.00"
-                      className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl pl-8 pr-4 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50 transition-colors shadow-inner"
+                      className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl pl-8 pr-4 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 transition-colors shadow-inner"
                     />
                   </div>
                 </div>
@@ -739,7 +739,7 @@ export default function AddListing() {
                         value={startingBid}
                         onChange={(e) => setStartingBid(e.target.value)}
                         placeholder="0.00"
-                        className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl pl-8 pr-4 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50 transition-colors shadow-inner"
+                        className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl pl-8 pr-4 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 transition-colors shadow-inner"
                       />
                     </div>
                   </div>
@@ -761,7 +761,7 @@ export default function AddListing() {
                       dateFormat="MMMM d, yyyy h:mm aa"
                       placeholderText="Select date and time"
                       minDate={new Date()}
-                      className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white focus:outline-none focus:border-primary2/50 transition-colors shadow-inner cursor-pointer"
+                      className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-4 text-white focus:outline-none focus:border-primary/50 transition-colors shadow-inner cursor-pointer"
                       wrapperClassName="w-full"
                     />
                   </div>
@@ -776,7 +776,7 @@ export default function AddListing() {
                       type="checkbox"
                       checked={allowCounterOffers}
                       onChange={(e) => setAllowCounterOffers(e.target.checked)}
-                      className="peer appearance-none w-5 h-5 border border-[#2C2C2E] rounded bg-[#1c1c1e] checked:bg-primary2 checked:border-primary2 transition-all cursor-pointer"
+                      className="peer appearance-none w-5 h-5 border border-[#2C2C2E] rounded bg-[#1c1c1e] checked:bg-primary checked:border-primary transition-all cursor-pointer"
                     />
                     <Check className={`absolute w-3.5 h-3.5 text-[#111113] transition-opacity duration-200 pointer-events-none ${allowCounterOffers ? "opacity-100" : "opacity-0"}`} />
                   </div>
@@ -795,8 +795,8 @@ export default function AddListing() {
           <div className="flex flex-col items-center">
             {/* Header Icon & Text */}
             <div className="text-center mb-10">
-              <div className="w-16 h-16 bg-primary2/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-primary2/20">
-                <CheckCircle2 className="w-8 h-8 text-primary2" />
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-primary/20">
+                <CheckCircle2 className="w-8 h-8 text-primary" />
               </div>
               <h3 className="text-2xl font-clash font-medium text-white mb-2">Ready to Submit</h3>
               <p className="text-gray-500 max-w-md mx-auto text-sm leading-relaxed">
@@ -807,7 +807,7 @@ export default function AddListing() {
 
             {/* Review Summary Card */}
             <div className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-2xl p-6 mb-8 text-left space-y-4">
-              <h4 className="text-sm font-semibold text-primary2 uppercase tracking-wider">Listing Preview Summary</h4>
+              <h4 className="text-sm font-semibold text-primary uppercase tracking-wider">Listing Preview Summary</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="text-gray-500">Title:</span> <span className="text-white font-medium">{title || "N/A"}</span>
@@ -836,7 +836,7 @@ export default function AddListing() {
               <div
                 onClick={() => setSelectedPlan("standard")}
                 className={`relative group cursor-pointer p-8 rounded-2xl border transition-all duration-300 ${selectedPlan === "standard"
-                  ? "bg-[#1c1c1e] border-primary2/50 ring-1 ring-primary2/20"
+                  ? "bg-[#1c1c1e] border-primary/50 ring-1 ring-primary/20"
                   : "bg-[#1c1c1e] border-[#2C2C2E] hover:border-gray-600"
                   }`}
               >
@@ -869,7 +869,7 @@ export default function AddListing() {
               <div
                 onClick={() => setSelectedPlan("featured")}
                 className={`relative group cursor-pointer p-8 rounded-2xl border transition-all duration-300 ${selectedPlan === "featured"
-                  ? "bg-[#1c1c1e] border-primary2/50 ring-1 ring-primary2/20"
+                  ? "bg-[#1c1c1e] border-primary/50 ring-1 ring-primary/20"
                   : "bg-[#1c1c1e] border-[#2C2C2E] hover:border-gray-600"
                   }`}
               >
@@ -924,7 +924,7 @@ export default function AddListing() {
           <div className="mb-12">
             <div className="w-full bg-[#111113] h-1.5 rounded-full overflow-hidden mb-6">
               <div
-                className="bg-primary2 h-full transition-all duration-500 ease-out"
+                className="bg-primary h-full transition-all duration-500 ease-out"
                 style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
               />
             </div>
@@ -933,7 +933,7 @@ export default function AddListing() {
               {steps.map((step, index) => (
                 <span
                   key={step}
-                  className={`transition-colors duration-300 cursor-default ${index <= currentStep ? "text-primary2" : "text-gray-500"
+                  className={`transition-colors duration-300 cursor-default ${index <= currentStep ? "text-primary" : "text-gray-500"
                     }`}
                 >
                   {step}
@@ -941,7 +941,7 @@ export default function AddListing() {
               ))}
             </div>
             {/* Mobile step indicator */}
-            <div className="md:hidden text-center text-primary2 font-medium text-sm">
+            <div className="md:hidden text-center text-primary font-medium text-sm">
               Step {currentStep + 1}: {steps[currentStep]}
             </div>
           </div>
@@ -977,7 +977,7 @@ export default function AddListing() {
                 createCheckoutMutation.isPending ||
                 uploadMediaMutation.isPending
               }
-              className="flex items-center gap-2 px-8 py-3 bg-primary2 text-[#111113] rounded-xl text-sm font-bold hover:bg-primary transition-all duration-300 shadow-lg shadow-primary2/10 group cursor-pointer ml-auto disabled:opacity-50"
+              className="flex items-center gap-2 px-8 py-3 bg-primary text-[#111113] rounded-xl text-sm font-bold hover:bg-primary transition-all duration-300 shadow-lg shadow-primary/10 group cursor-pointer ml-auto disabled:opacity-50"
             >
               {createListingMutation.isPending ||
               createCheckoutMutation.isPending ? (

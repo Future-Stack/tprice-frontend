@@ -374,20 +374,20 @@ export default function AddListing() {
         return (
           <div className="space-y-6">
             <h3 className="text-xl font-clash font-medium mb-6 text-white flex items-center gap-2">
-              <Tag className="w-5 h-5 text-primary2" /> Basic Information
+              <Tag className="w-5 h-5 text-primary" /> Basic Information
             </h3>
 
             {/* Listing Title */}
             <div className="space-y-2">
               <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
-                Listing Title <span className="text-primary2">*</span>
+                Listing Title <span className="text-primary">*</span>
               </label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. 2024 Ferrari SF90 Stradale Assetto Fiorano"
-                className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors shadow-inner"
+                className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/60 transition-colors shadow-inner"
                 required
               />
             </div>
@@ -396,14 +396,14 @@ export default function AddListing() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <Layers className="w-3.5 h-3.5 text-primary2" /> Category{" "}
-                  <span className="text-primary2">*</span>
+                  <Layers className="w-3.5 h-3.5 text-primary" /> Category{" "}
+                  <span className="text-primary">*</span>
                 </label>
                 <div className="relative">
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-primary2/60 transition-colors appearance-none cursor-pointer"
+                    className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-primary/60 transition-colors appearance-none cursor-pointer"
                   >
                     <option value="">
                       {isLoadingCategories
@@ -424,14 +424,14 @@ export default function AddListing() {
 
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <Briefcase className="w-3.5 h-3.5 text-primary2" /> Brand /
+                  <Briefcase className="w-3.5 h-3.5 text-primary" /> Brand /
                   Manufacturer
                 </label>
                 <div className="relative">
                   <select
                     value={brand}
                     onChange={(e) => setBrand(e.target.value)}
-                    className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-primary2/60 transition-colors appearance-none cursor-pointer"
+                    className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-primary/60 transition-colors appearance-none cursor-pointer"
                   >
                     <option value="">
                       {isLoadingBrands ? "Loading brands..." : "Select Brand"}
@@ -452,7 +452,7 @@ export default function AddListing() {
             {/* Build Year */}
             <div className="space-y-2">
               <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-primary2" /> Build Year
+                <Calendar className="w-3.5 h-3.5 text-primary" /> Build Year
               </label>
               <input
                 type="number"
@@ -463,7 +463,7 @@ export default function AddListing() {
                   )
                 }
                 placeholder="e.g. 2024"
-                className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors shadow-inner"
+                className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/60 transition-colors shadow-inner"
               />
             </div>
 
@@ -471,14 +471,14 @@ export default function AddListing() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-primary2" /> Location City
+                  <MapPin className="w-3.5 h-3.5 text-primary" /> Location City
                 </label>
                 <input
                   type="text"
                   value={locationCity}
                   onChange={(e) => setLocationCity(e.target.value)}
                   placeholder="e.g. Miami"
-                  className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors shadow-inner"
+                  className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/60 transition-colors shadow-inner"
                 />
               </div>
 
@@ -491,7 +491,7 @@ export default function AddListing() {
                   value={locationCountry}
                   onChange={(e) => setLocationCountry(e.target.value)}
                   placeholder="e.g. United States"
-                  className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors shadow-inner"
+                  className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/60 transition-colors shadow-inner"
                 />
               </div>
             </div>
@@ -510,7 +510,7 @@ export default function AddListing() {
                 type="checkbox"
                 checked={isOffMarket}
                 onChange={(e) => setIsOffMarket(e.target.checked)}
-                className="w-5 h-5 rounded border-[#2C2C2E] text-primary2 focus:ring-primary2 accent-[#E78F23] cursor-pointer"
+                className="w-5 h-5 rounded border-[#2C2C2E] text-primary focus:ring-primary accent-[#E78F23] cursor-pointer"
               />
             </div>
           </div>
@@ -522,7 +522,7 @@ export default function AddListing() {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-clash font-medium text-white flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-primary2" /> Specifications
+                  <Sparkles className="w-5 h-5 text-primary" /> Specifications
                   System
                 </h3>
                 <p className="text-xs text-gray-400 mt-1">
@@ -533,7 +533,7 @@ export default function AddListing() {
               <button
                 type="button"
                 onClick={handleAddSpecRow}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary2/10 border border-primary2/30 text-primary2 hover:bg-primary2 hover:text-black font-semibold text-xs transition-all cursor-pointer"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary/10 border border-primary/30 text-primary hover:bg-primary hover:text-black font-semibold text-xs transition-all cursor-pointer"
               >
                 <Plus className="w-4 h-4" /> Add Field
               </button>
@@ -565,7 +565,7 @@ export default function AddListing() {
                           handleSpecChange(item.id, "key", e.target.value)
                         }
                         placeholder="Key (e.g. horsepower)"
-                        className="w-full bg-[#111113] border border-[#2C2C2E] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors font-mono"
+                        className="w-full bg-[#111113] border border-[#2C2C2E] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/60 transition-colors font-mono"
                       />
                     </div>
                     <div className="flex-1">
@@ -576,7 +576,7 @@ export default function AddListing() {
                           handleSpecChange(item.id, "value", e.target.value)
                         }
                         placeholder="Value (e.g. 986)"
-                        className="w-full bg-[#111113] border border-[#2C2C2E] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors"
+                        className="w-full bg-[#111113] border border-[#2C2C2E] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/60 transition-colors"
                       />
                     </div>
                     <button
@@ -598,7 +598,7 @@ export default function AddListing() {
         return (
           <div className="space-y-6">
             <h3 className="text-xl font-clash font-medium text-white flex items-center gap-2 mb-2">
-              <ImageIcon className="w-5 h-5 text-primary2" /> Media Gallery
+              <ImageIcon className="w-5 h-5 text-primary" /> Media Gallery
             </h3>
 
             {/* Dropzone & Upload Area */}
@@ -609,8 +609,8 @@ export default function AddListing() {
               onClick={() => fileInputRef.current?.click()}
               className={`relative border-2 border-dashed rounded-2xl aspect-16/6 flex flex-col items-center justify-center p-6 text-center cursor-pointer transition-all duration-300 ${
                 isDragging
-                  ? "border-primary2 bg-primary2/10"
-                  : "border-[#2C2C2E] bg-[#1c1c1e] hover:border-primary2/50 hover:bg-[#252528]"
+                  ? "border-primary bg-primary/10"
+                  : "border-[#2C2C2E] bg-[#1c1c1e] hover:border-primary/50 hover:bg-[#252528]"
               }`}
             >
               <input
@@ -624,15 +624,15 @@ export default function AddListing() {
 
               {uploadMediaMutation.isPending ? (
                 <div className="flex flex-col items-center justify-center space-y-2 py-4">
-                  <Loader2 className="w-8 h-8 text-primary2 animate-spin" />
-                  <p className="text-sm font-medium text-primary2">
+                  <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                  <p className="text-sm font-medium text-primary">
                     Uploading image to cloud media service...
                   </p>
                   <p className="text-xs text-gray-500">Please wait</p>
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center space-y-3">
-                  <div className="w-14 h-14 bg-[#111113] border border-[#2C2C2E] rounded-full flex items-center justify-center text-primary2 shadow-md">
+                  <div className="w-14 h-14 bg-[#111113] border border-[#2C2C2E] rounded-full flex items-center justify-center text-primary shadow-md">
                     <UploadCloud className="w-7 h-7" />
                   </div>
                   <div>
@@ -669,7 +669,7 @@ export default function AddListing() {
                         alt={`Upload ${idx + 1}`}
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                       />
-                      <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/70 backdrop-blur-md rounded-md text-[10px] text-primary2 font-mono font-bold">
+                      <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/70 backdrop-blur-md rounded-md text-[10px] text-primary font-mono font-bold">
                         #{item.displayOrder}
                       </div>
                       <button
@@ -692,7 +692,7 @@ export default function AddListing() {
         return (
           <div className="space-y-8">
             <h3 className="text-xl font-clash font-medium text-white flex items-center gap-2 mb-4">
-              <DollarSign className="w-5 h-5 text-primary2" /> Pricing & Sale
+              <DollarSign className="w-5 h-5 text-primary" /> Pricing & Sale
               Type
             </h3>
 
@@ -721,13 +721,13 @@ export default function AddListing() {
                   onClick={() => setSaleType(type.id as any)}
                   className={`flex flex-col items-start p-5 rounded-xl border transition-all duration-300 text-left cursor-pointer ${
                     saleType === type.id
-                      ? "border-primary2 bg-primary2/10 ring-1 ring-primary2"
+                      ? "border-primary bg-primary/10 ring-1 ring-primary"
                       : "border-[#2C2C2E] bg-[#1c1c1e] hover:border-gray-600"
                   }`}
                 >
                   <span
                     className={`font-semibold text-sm mb-1 ${
-                      saleType === type.id ? "text-primary2" : "text-white"
+                      saleType === type.id ? "text-primary" : "text-white"
                     }`}
                   >
                     {type.title}
@@ -744,7 +744,7 @@ export default function AddListing() {
                 <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider">
                   Asking Price ({currency}){" "}
                   {saleType === "FIXED_PRICE" ? (
-                    <span className="text-primary2">*</span>
+                    <span className="text-primary">*</span>
                   ) : (
                     <span className="text-gray-500 font-normal normal-case text-xs">
                       (Optional for Private Sale)
@@ -760,7 +760,7 @@ export default function AddListing() {
                     value={askingPrice}
                     onChange={(e) => setAskingPrice(e.target.value)}
                     placeholder="625000"
-                    className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl pl-8 pr-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors shadow-inner"
+                    className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl pl-8 pr-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/60 transition-colors shadow-inner"
                   />
                 </div>
               </div>
@@ -771,7 +771,7 @@ export default function AddListing() {
                   <div className="space-y-2">
                     <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider">
                       Starting Bid ({currency}){" "}
-                      <span className="text-primary2">*</span>
+                      <span className="text-primary">*</span>
                     </label>
                     <div className="relative">
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-sm">
@@ -782,14 +782,14 @@ export default function AddListing() {
                         value={startingBid}
                         onChange={(e) => setStartingBid(e.target.value)}
                         placeholder="500000"
-                        className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl pl-8 pr-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors shadow-inner"
+                        className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl pl-8 pr-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/60 transition-colors shadow-inner"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5 text-primary2" /> Auction
+                      <Clock className="w-3.5 h-3.5 text-primary" /> Auction
                       Ends At
                     </label>
                     <DatePicker
@@ -808,7 +808,7 @@ export default function AddListing() {
                       dateFormat="MMMM d, yyyy h:mm aa"
                       placeholderText="Select date and time"
                       minDate={new Date()}
-                      className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/60 transition-colors shadow-inner cursor-pointer"
+                      className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/60 transition-colors shadow-inner cursor-pointer"
                       wrapperClassName="w-full"
                     />
                   </div>
@@ -824,7 +824,7 @@ export default function AddListing() {
                   id="allowCounterOffers"
                   checked={allowCounterOffers}
                   onChange={(e) => setAllowCounterOffers(e.target.checked)}
-                  className="w-4 h-4 rounded border-[#2C2C2E] text-primary2 focus:ring-primary2 accent-[#E78F23] cursor-pointer"
+                  className="w-4 h-4 rounded border-[#2C2C2E] text-primary focus:ring-primary accent-[#E78F23] cursor-pointer"
                 />
                 <label
                   htmlFor="allowCounterOffers"
@@ -841,7 +841,7 @@ export default function AddListing() {
         return (
           <div className="space-y-8">
             <div className="text-center">
-              <div className="w-14 h-14 bg-primary2/10 rounded-full flex items-center justify-center mx-auto mb-3 border border-primary2/20 text-primary2">
+              <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3 border border-primary/20 text-primary">
                 <CheckCircle2 className="w-7 h-7" />
               </div>
               <h3 className="text-2xl font-clash font-medium text-white mb-1">
@@ -862,13 +862,13 @@ export default function AddListing() {
                   </h4>
                   <p className="text-xs text-gray-400">
                     Category:{" "}
-                    <span className="text-primary2 font-semibold">
+                    <span className="text-primary font-semibold">
                       {category || "Unassigned"}
                     </span>{" "}
                     {brand && `• Brand: ${brand}`}
                   </p>
                 </div>
-                <span className="px-3 py-1 bg-primary2/10 border border-primary2/20 text-primary2 text-xs font-bold rounded-lg">
+                <span className="px-3 py-1 bg-primary/10 border border-primary/20 text-primary text-xs font-bold rounded-lg">
                   {currency}{" "}
                   {askingPrice ? Number(askingPrice).toLocaleString() : "0"}
                 </span>
@@ -907,7 +907,7 @@ export default function AddListing() {
                 onClick={() => setSelectedPlan("standard")}
                 className={`relative cursor-pointer p-6 rounded-2xl border transition-all duration-300 ${
                   selectedPlan === "standard"
-                    ? "bg-[#1c1c1e] border-primary2 ring-1 ring-primary2/30"
+                    ? "bg-[#1c1c1e] border-primary ring-1 ring-primary/30"
                     : "bg-[#1c1c1e] border-[#2C2C2E] hover:border-gray-600"
                 }`}
               >
@@ -915,7 +915,7 @@ export default function AddListing() {
                   <div
                     className={`mt-1 transition-colors ${
                       selectedPlan === "standard"
-                        ? "text-primary2"
+                        ? "text-primary"
                         : "text-gray-600"
                     }`}
                   >
@@ -941,7 +941,7 @@ export default function AddListing() {
                 onClick={() => setSelectedPlan("featured")}
                 className={`relative cursor-pointer p-6 rounded-2xl border transition-all duration-300 ${
                   selectedPlan === "featured"
-                    ? "bg-[#1c1c1e] border-primary2 ring-1 ring-primary2/30"
+                    ? "bg-[#1c1c1e] border-primary ring-1 ring-primary/30"
                     : "bg-[#1c1c1e] border-[#2C2C2E] hover:border-gray-600"
                 }`}
               >
@@ -949,7 +949,7 @@ export default function AddListing() {
                   <div
                     className={`mt-1 transition-colors ${
                       selectedPlan === "featured"
-                        ? "text-primary2"
+                        ? "text-primary"
                         : "text-gray-600"
                     }`}
                   >
@@ -1000,7 +1000,7 @@ export default function AddListing() {
           <div className="mb-8">
             <div className="w-full bg-[#111113] h-1.5 rounded-full overflow-hidden mb-6">
               <div
-                className="bg-primary2 h-full transition-all duration-500 ease-out"
+                className="bg-primary h-full transition-all duration-500 ease-out"
                 style={{
                   width: `${((currentStep + 1) / steps.length) * 100}%`,
                 }}
@@ -1013,7 +1013,7 @@ export default function AddListing() {
                   key={step}
                   className={`transition-colors duration-300 cursor-default ${
                     index <= currentStep
-                      ? "text-primary2 font-semibold"
+                      ? "text-primary font-semibold"
                       : "text-gray-500"
                   }`}
                 >
@@ -1023,7 +1023,7 @@ export default function AddListing() {
             </div>
 
             {/* Mobile step indicator */}
-            <div className="md:hidden text-center text-primary2 font-medium text-sm">
+            <div className="md:hidden text-center text-primary font-medium text-sm">
               Step {currentStep + 1}: {steps[currentStep]}
             </div>
           </div>
@@ -1059,7 +1059,7 @@ export default function AddListing() {
                   createCheckoutMutation.isPending ||
                   uploadMediaMutation.isPending
                 }
-                className="flex items-center gap-2 px-8 py-3 bg-primary2 text-[#111113] rounded-xl text-sm font-bold hover:bg-yellow-400 transition-all duration-300 shadow-lg shadow-primary2/20 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer active:scale-95 ml-auto"
+                className="flex items-center gap-2 px-8 py-3 bg-primary text-[#111113] rounded-xl text-sm font-bold hover:bg-yellow-400 transition-all duration-300 shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer active:scale-95 ml-auto"
               >
                 {createListingMutation.isPending ||
                 createCheckoutMutation.isPending ? (
@@ -1081,7 +1081,7 @@ export default function AddListing() {
                 type="button"
                 onClick={handleNext}
                 disabled={uploadMediaMutation.isPending}
-                className="flex items-center gap-2 px-8 py-3 bg-primary2 text-[#111113] rounded-xl text-sm font-bold hover:bg-yellow-400 transition-all duration-300 shadow-lg shadow-primary2/20 group cursor-pointer ml-auto disabled:opacity-50"
+                className="flex items-center gap-2 px-8 py-3 bg-primary text-[#111113] rounded-xl text-sm font-bold hover:bg-yellow-400 transition-all duration-300 shadow-lg shadow-primary/20 group cursor-pointer ml-auto disabled:opacity-50"
               >
                 Next Step
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
