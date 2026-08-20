@@ -72,7 +72,7 @@ export default function LandingNavbar() {
 
   // Fetch user profile via TanStack Query
   const { data: userProfile, isLoading: isUserLoading } =
-    useGetMeQuery(mounted);
+    useGetMeQuery(mounted && (isAuthenticated || !!storeToken));
 
   const user = userProfile || storeUser;
   const isLoading = isUserLoading && mounted && !user;

@@ -122,3 +122,65 @@ export const deleteAdminUserApi = async (id: string): Promise<DeleteUserResponse
 
 export const deleteUserApi = deleteAdminUserApi;
 
+export interface ActiveVipSubscription {
+  id: string;
+  plan: string;
+  amount: number;
+  status: string;
+  startsAt: string;
+  expiresAt: string;
+  vipExpiresAt?: string;
+}
+
+export interface VipPricing {
+  freeTrialMonths: number;
+  freeTrialDays: number;
+  monthlyPriceAfterTrial: number;
+  currency: string;
+}
+
+export interface VipStatusResponse {
+  isVip: boolean;
+  trialEligible: boolean;
+  vipExpiresAt?: string | null;
+  daysRemaining?: number | null;
+  activeSubscription?: ActiveVipSubscription | null;
+  pricing?: VipPricing;
+}
+
+export interface ClaimVipTrialResponse {
+  message?: string;
+  success?: boolean;
+  [key: string]: any;
+}
+
+/**
+ * Fetch current user's VIP status & subscription info via GET /users/me/vip-status
+ */
+export const getVipStatusApi = async (): Promise<VipStatusResponse> => {
+  const response = await apiClient.get<VipStatusResponse | { data: VipStatusResponse }>(
+    "/users/me/vip-status"
+  );
+
+  const resData = response.data as any;
+  if (resData?.data && resData?.data?.isVip !== undefined) {
+    return resData.data;
+  }
+  return resData;
+};
+
+/**
+ * Claim 3-Month Free VIP Trial via POST /users/me/claim-vip-trial
+ */
+export const claimVipTrialApi = async (): Promise<ClaimVipTrialResponse> => {
+  const response = await apiClient.post<
+    ClaimVipTrialResponse | { data: ClaimVipTrialResponse }
+  >("/users/me/claim-vip-trial", {});
+
+  const resData = response.data as any;
+  if (resData?.data) {
+    return resData.data;
+  }
+  return resData;
+};
+

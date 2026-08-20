@@ -104,6 +104,16 @@ export const useRegisterMutation = () => {
 export const useGetMeQuery = (enabled: boolean = true) => {
   const setAuth = useAuthStore((state) => state.setAuth);
   const setUser = useAuthStore((state) => state.setUser);
+  const storeToken = useAuthStore((state) => state.token);
+
+  const hasToken =
+    !!storeToken ||
+    (typeof window !== "undefined" &&
+      !!(
+        Cookies.get("accessToken") ||
+        Cookies.get("token") ||
+        Cookies.get("access_token")
+      ));
 
   return useQuery<User>({
     queryKey: AUTH_QUERY_KEYS.user,
@@ -129,9 +139,18 @@ export const useGetMeQuery = (enabled: boolean = true) => {
       }
       return data;
     },
-    enabled: enabled,
+    enabled: enabled && hasToken,
     staleTime: 5 * 60 * 1000,
-    retry: 1,
+    retry: (failureCount, error: any) => {
+      if (
+        error?.response?.status === 401 ||
+        error?.response?.status === 403 ||
+        error?.response?.status === 404
+      ) {
+        return false;
+      }
+      return failureCount < 1;
+    },
   });
 };
 

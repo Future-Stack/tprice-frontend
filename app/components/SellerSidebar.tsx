@@ -3,15 +3,20 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Building2,
   Gavel,
   BadgePercent,
+  CreditCard,
   List as ListIcon,
   X,
+  Crown,
 } from "lucide-react";
+import { useAuthStore } from "@/lib/store/useAuthStore";
+import { useGetMeQuery } from "@/hooks/useAuth";
+import { useFeaturedStatusQuery } from "@/hooks/useListings";
 
 const navItems = [
   { href: "/seller", icon: LayoutDashboard, label: "Dashboard" },
@@ -22,6 +27,7 @@ const navItems = [
     icon: BadgePercent,
     label: "Offer Receieved",
   },
+  { href: "/seller/subscription", icon: CreditCard, label: "Subscription" },
   { href: "/seller/settings", icon: ListIcon, label: "Settings" },
 ];
 
@@ -33,6 +39,21 @@ export default function SellerSidebar({
   onClose: () => void;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user: storeUser } = useAuthStore();
+  const { data: apiUser } = useGetMeQuery();
+  const { data: featuredStatus, isLoading: isFeaturedLoading } =
+    useFeaturedStatusQuery();
+  const user = apiUser || storeUser;
+  const isVip = Boolean(user?.isVip ?? user?.vipStatus);
+  const hasActiveSubscription = Boolean(featuredStatus?.hasActiveSubscription);
+  const isVipOrSubscribed = isVip || hasActiveSubscription;
+  const [isBannerDismissed, setIsBannerDismissed] = React.useState(false);
+
+  const handleBannerClick = () => {
+    router.push("/seller/subscription");
+    if (window.innerWidth < 1024) onClose();
+  };
 
   return (
     <>
@@ -97,6 +118,36 @@ export default function SellerSidebar({
             );
           })}
         </nav>
+        {/* VIP Upgrade Banner (shown when seller does not have active subscription / VIP and data has loaded) */}
+        {!isFeaturedLoading && !isVipOrSubscribed && !isBannerDismissed && (
+          <div
+            onClick={handleBannerClick}
+            className="p-5 mt-auto mb-6 mx-4 rounded-2xl bg-linear-to-br from-[#EEA341] to-[#C76E12] relative shadow-[0_10px_30px_rgba(231,143,35,0.2)] text-white overflow-hidden group cursor-pointer"
+          >
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full blur-3xl -mr-10 -mt-10 group-hover:opacity-20 transition-opacity"></div>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsBannerDismissed(true);
+              }}
+              className="absolute top-3 right-3 text-white/70 hover:text-white z-10 transition-colors cursor-pointer"
+              aria-label="Dismiss banner"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+            <h3 className="font-bold text-lg mb-1.5 font-clash">Upgrade to VIP!</h3>
+            <p className="text-[11px] text-white/90 mb-5 leading-relaxed">
+              Unlock Premium Features And Offers
+            </p>
+            <button
+              onClick={handleBannerClick}
+              className="bg-[#111113] w-full py-2.5 rounded-lg text-[#E78F23] font-semibold text-xs flex items-center justify-center gap-2 hover:bg-black transition-colors shadow-lg cursor-pointer"
+            >
+              Upgrade Now
+              <Crown className="w-3.5 h-3.5" fill="currentColor" />
+            </button>
+          </div>
+        )}
       </aside>
     </>
   );
