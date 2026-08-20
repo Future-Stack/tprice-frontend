@@ -103,21 +103,28 @@ apiClient.interceptors.response.use(
       try {
         const refreshResponse = await axios.post(
           `${BASE_URL}/auth/refresh`,
-          { refreshToken },
+          { refreshToken, refresh_token: refreshToken },
           {
             withCredentials: true,
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${refreshToken}`,
               accept: "*/*",
             },
           },
         );
 
-        const {
-          accessToken,
-          refreshToken: newRefreshToken,
-          user,
-        } = refreshResponse.data;
+        const resData = refreshResponse.data?.data || refreshResponse.data;
+        const accessToken =
+          resData?.accessToken ||
+          resData?.token ||
+          resData?.access_token ||
+          refreshResponse.data?.accessToken;
+        const newRefreshToken =
+          resData?.refreshToken ||
+          resData?.refresh_token ||
+          refreshResponse.data?.refreshToken;
+        const user = resData?.user || refreshResponse.data?.user;
 
         if (accessToken) {
           const currentUser = user || useAuthStore.getState().user;

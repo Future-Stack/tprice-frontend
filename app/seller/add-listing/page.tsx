@@ -27,8 +27,12 @@ import AnimationWrapper from "../../components/AnimationWrapper";
 import { useGetCategoriesQuery } from "@/hooks/useCategories";
 import { useGetBrandsQuery } from "@/hooks/useBrands";
 import { useUploadMediaMutation } from "@/hooks/useMedia";
-import { useCreateListingMutation } from "@/hooks/useListings";
+import {
+  useCreateListingMutation,
+  useFeaturedStatusQuery,
+} from "@/hooks/useListings";
 import { useCreateCheckoutSessionMutation } from "@/hooks/usePayments";
+import { getPaymentReturnUrl } from "@/lib/api/payments";
 import { toast } from "sonner";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -55,6 +59,9 @@ export default function AddListing() {
     useGetCategoriesQuery();
   const { data: brandsResponse, isLoading: isLoadingBrands } =
     useGetBrandsQuery({ limit: 100 });
+  const { data: featuredStatus } = useFeaturedStatusQuery();
+  const hasActiveSubscription = Boolean(featuredStatus?.hasActiveSubscription);
+
   const uploadMediaMutation = useUploadMediaMutation();
   const createListingMutation = useCreateListingMutation();
   const createCheckoutMutation = useCreateCheckoutSessionMutation();
@@ -303,26 +310,24 @@ export default function AddListing() {
         (createdListing as any)?.data?.data?.id ||
         (createdListing as any)?.listing?.id;
 
-      if (selectedPlan === "featured") {
+      if (!hasActiveSubscription && selectedPlan === "featured") {
         if (!createdListingId) {
           toast.error(
             "Listing created, but listing ID was not returned for checkout.",
           );
-          router.push("/seller/my-listing");
+          router.push("/dealer/listing");
           return;
         }
 
-        const origin =
-          typeof window !== "undefined"
-            ? window.location.origin
-            : "https://tprice-frontend.vercel.app";
+        const successUrl = getPaymentReturnUrl("/payment/success");
+        const cancelUrl = getPaymentReturnUrl("/payment/cancel");
 
         try {
           const checkoutRes = await createCheckoutMutation.mutateAsync({
-            type: "FEATURED_LISTING",
+            type: "FEATURED_SINGLE_LISTING",
             targetId: String(createdListingId),
-            successUrl: `${origin}/payment/success`,
-            cancelUrl: `${origin}/payment/cancel`,
+            successUrl,
+            cancelUrl,
           });
 
           const checkoutUrl =
@@ -354,7 +359,7 @@ export default function AddListing() {
         toast.success("Listing created successfully!");
       }
 
-      router.push("/seller/my-listing");
+      router.push("/dealer/listing");
     } catch (err: any) {
       const errMsg =
         err?.response?.data?.message ||
@@ -901,75 +906,77 @@ export default function AddListing() {
             </div>
 
             {/* Plans Selection Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-              {/* Standard Plan */}
-              <div
-                onClick={() => setSelectedPlan("standard")}
-                className={`relative cursor-pointer p-6 rounded-2xl border transition-all duration-300 ${
-                  selectedPlan === "standard"
-                    ? "bg-[#1c1c1e] border-primary ring-1 ring-primary/30"
-                    : "bg-[#1c1c1e] border-[#2C2C2E] hover:border-gray-600"
-                }`}
-              >
-                <div className="flex items-start gap-4">
-                  <div
-                    className={`mt-1 transition-colors ${
-                      selectedPlan === "standard"
-                        ? "text-primary"
-                        : "text-gray-600"
-                    }`}
-                  >
-                    {selectedPlan === "standard" ? (
-                      <CheckCircle2 className="w-5 h-5" />
-                    ) : (
-                      <Circle className="w-5 h-5" />
-                    )}
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-clash font-medium text-white">
-                      Standard Listing (Free)
-                    </h4>
-                    <p className="text-gray-400 text-xs mt-1">
-                      List your luxury item on marketplace standard queue.
-                    </p>
+            {!hasActiveSubscription && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+                {/* Standard Plan */}
+                <div
+                  onClick={() => setSelectedPlan("standard")}
+                  className={`relative cursor-pointer p-6 rounded-2xl border transition-all duration-300 ${
+                    selectedPlan === "standard"
+                      ? "bg-[#1c1c1e] border-primary ring-1 ring-primary/30"
+                      : "bg-[#1c1c1e] border-[#2C2C2E] hover:border-gray-600"
+                  }`}
+                >
+                  <div className="flex items-start gap-4">
+                    <div
+                      className={`mt-1 transition-colors ${
+                        selectedPlan === "standard"
+                          ? "text-primary"
+                          : "text-gray-600"
+                      }`}
+                    >
+                      {selectedPlan === "standard" ? (
+                        <CheckCircle2 className="w-5 h-5" />
+                      ) : (
+                        <Circle className="w-5 h-5" />
+                      )}
+                    </div>
+                    <div>
+                      <h4 className="text-lg font-clash font-medium text-white">
+                        Standard Listing (Free)
+                      </h4>
+                      <p className="text-gray-400 text-xs mt-1">
+                        List your luxury item on marketplace standard queue.
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Featured Plan */}
-              <div
-                onClick={() => setSelectedPlan("featured")}
-                className={`relative cursor-pointer p-6 rounded-2xl border transition-all duration-300 ${
-                  selectedPlan === "featured"
-                    ? "bg-[#1c1c1e] border-primary ring-1 ring-primary/30"
-                    : "bg-[#1c1c1e] border-[#2C2C2E] hover:border-gray-600"
-                }`}
-              >
-                <div className="flex items-start gap-4">
-                  <div
-                    className={`mt-1 transition-colors ${
-                      selectedPlan === "featured"
-                        ? "text-primary"
-                        : "text-gray-600"
-                    }`}
-                  >
-                    {selectedPlan === "featured" ? (
-                      <CheckCircle2 className="w-5 h-5" />
-                    ) : (
-                      <Circle className="w-5 h-5" />
-                    )}
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-clash font-medium text-white">
-                      Featured Listing (VIP)
-                    </h4>
-                    <p className="text-gray-400 text-xs mt-1">
-                      Priority placement for higher buyer conversion.
-                    </p>
+                {/* Featured Plan */}
+                <div
+                  onClick={() => setSelectedPlan("featured")}
+                  className={`relative cursor-pointer p-6 rounded-2xl border transition-all duration-300 ${
+                    selectedPlan === "featured"
+                      ? "bg-[#1c1c1e] border-primary ring-1 ring-primary/30"
+                      : "bg-[#1c1c1e] border-[#2C2C2E] hover:border-gray-600"
+                  }`}
+                >
+                  <div className="flex items-start gap-4">
+                    <div
+                      className={`mt-1 transition-colors ${
+                        selectedPlan === "featured"
+                          ? "text-primary"
+                          : "text-gray-600"
+                      }`}
+                    >
+                      {selectedPlan === "featured" ? (
+                        <CheckCircle2 className="w-5 h-5" />
+                      ) : (
+                        <Circle className="w-5 h-5" />
+                      )}
+                    </div>
+                    <div>
+                      <h4 className="text-lg font-clash font-medium text-white">
+                        Featured Listing (VIP)
+                      </h4>
+                      <p className="text-gray-400 text-xs mt-1">
+                        Priority placement for higher buyer conversion.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         );
     }
@@ -1065,7 +1072,7 @@ export default function AddListing() {
                 createCheckoutMutation.isPending ? (
                   <>
                     <Loader2 className="w-4 h-4 text-black animate-spin" />
-                    {selectedPlan === "featured"
+                    {!hasActiveSubscription && selectedPlan === "featured"
                       ? "Processing & Redirecting..."
                       : "Submitting Listing..."}
                   </>

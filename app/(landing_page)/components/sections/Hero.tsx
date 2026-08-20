@@ -3,11 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
 import { useAuthStore } from "@/lib/store/useAuthStore";
-import { useCreateCheckoutSessionMutation } from "@/hooks/usePayments";
 import { useGetMeQuery } from "@/hooks/useAuth";
 import { usePlatformStatsQuery, formatAssetsValue } from "@/hooks/usePlatformStats";
 
@@ -22,12 +18,10 @@ const HERO_ASSETS = [
 export default function Hero() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const currentAsset = HERO_ASSETS[currentIndex];
-  const router = useRouter();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const storeUser = useAuthStore((state) => state.user);
   const { data: userProfile } = useGetMeQuery(isAuthenticated);
   const user = userProfile || storeUser;
-  const { mutate: createCheckoutSession, isPending } = useCreateCheckoutSessionMutation();
   const { data: statsData, isLoading: isStatsLoading } = usePlatformStatsQuery();
 
   const stats = [
@@ -60,41 +54,6 @@ export default function Hero() {
       return () => clearTimeout(timer);
     }
   }, [currentIndex, currentAsset]);
-
-  const handleBecomeVip = () => {
-    if (!isAuthenticated) {
-      toast.error("Please sign in to become a VIP buyer");
-      router.push("/login");
-      return;
-    }
-
-    const origin = typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
-
-    createCheckoutSession(
-      {
-        type: "VIP_BUYER_MEMBERSHIP",
-        successUrl: `${origin}/payment/success`,
-        cancelUrl: `${origin}/payment/cancel`,
-      },
-      {
-        onSuccess: (data) => {
-          if (data?.checkoutUrl) {
-            toast.success("Redirecting to checkout...");
-            window.location.href = data.checkoutUrl;
-          } else {
-            toast.error("Failed to retrieve checkout URL.");
-          }
-        },
-        onError: (error: any) => {
-          const errorMessage =
-            error?.response?.data?.message ||
-            error?.message ||
-            "Failed to create checkout session";
-          toast.error(errorMessage);
-        },
-      }
-    );
-  };
 
   return (
     <section className="relative h-screen min-h-175 w-full overflow-hidden flex flex-col justify-center items-center text-center px-6">
@@ -148,7 +107,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-5xl md:text-7xl lg:text-[80px] font-medium italic font-cormorant text-land leading-tight"
+          className="text-5xl md:text-7xl lg:text-[80px] font-medium font-cormorant tracking-tight text-white mb-6 uppercase"
         >
           Luxury Marketplace
         </motion.h1>
@@ -157,16 +116,18 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-white/80 text-lg md:text-xl max-w-2xl font-mont mx-auto"
+          className="text-gray-300 max-w-2xl mx-auto text-sm md:text-base font-light mb-10 tracking-wide font-montserrat"
         >
-          Cars, Yachts, Jets, Real Estate - All in one Ecosystem
+          From the world&apos;s most prestigious hypercars to private jets and
+          prime estates, acquire high-value assets securely.
         </motion.p>
 
+        {/* Action Buttons */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-6"
+          className="flex flex-col sm:flex-row gap-4 justify-center items-center font-montserrat"
         >
           <Link
             href="/inventory"
@@ -175,20 +136,12 @@ export default function Hero() {
             Explore Listings
           </Link>
           {showVipButton && (
-            <button
-              onClick={handleBecomeVip}
-              disabled={isPending}
-              className="px-10 font-montserrat py-4 bg-land text-black rounded-sm cursor-pointer text-sm font-bold tracking-wide hover:bg-white hover:text-black transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            <Link
+              href={isAuthenticated ? "/buyer/subscription" : "/login"}
+              className="px-10 font-montserrat py-4 bg-land text-black rounded-sm cursor-pointer text-sm font-bold tracking-wide hover:bg-white hover:text-black transition-all duration-300 flex items-center justify-center gap-2"
             >
-              {isPending ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin text-black" />
-                  <span>Redirecting...</span>
-                </>
-              ) : (
-                "Become a VIP Buyer"
-              )}
-            </button>
+              Become a VIP Buyer
+            </Link>
           )}
         </motion.div>
 
