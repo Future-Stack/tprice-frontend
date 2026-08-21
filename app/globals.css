@@ -24,6 +24,7 @@
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
   --font-cormorant: var(--font-cormorant);
+  --font-cormorant-garamond: var(--font-cormorant);
   --font-montserrat: var(--font-montserrat);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
