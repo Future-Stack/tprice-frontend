@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const COMPANY_LINKS = [
   { name: "About Us", href: "/aboutus" },
@@ -69,16 +70,14 @@ const SOCIAL_SVGS = [
 export default function LandingFooter() {
   return (
     <footer className="bg-[#050505] text-white pt-24 pb-10 border-t border-white/5">
-      <div className="container mx-auto px-6 md:px-12">
+      <div className="container mx-auto px-6 md:px-0">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-20 mb-20">
           {/* Brand Column */}
           <div className="space-y-8">
             <Link href="/" className="flex items-center gap-2">
-              <span className="text-2xl font-bold tracking-tight text-primary">
-                Exotic<span className="text-white">World</span>
-              </span>
+               <Image src="/logo.svg" alt="logo" width={200} height={80}/>
             </Link>
-            <p className="text-white/80 text-[13px] leading-relaxed max-w-70">
+            <p className="text-white/80 text-[14px] font-montserrat max-w-70">
               The World&apos;s most exclusive marketplace for extraordinary
               assests by invitation only
             </p>
