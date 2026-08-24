@@ -3,6 +3,8 @@ export interface RegisterPayload {
   password: string;
   firstName: string;
   lastName: string;
+  phone?: string;
+  role?: "BUYER" | "SELLER" | "DEALER" | string;
 }
 
 export interface RegisterUser {

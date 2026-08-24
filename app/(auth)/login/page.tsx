@@ -155,9 +155,9 @@ export default function LoginPage() {
             <h4 className="text-[#D4AF37] text-xs font-bold uppercase tracking-[0.2em] mb-4">
               Log In
             </h4>
-            <h2 className="text-4xl font-serif text-white mb-2">Welcome back</h2>
+            <Link href="/"><h2 className="text-4xl font-serif text-white mb-2">Welcome back</h2></Link>
             <p className="text-white/40 text-sm">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link href="/register" className="text-[#D4AF37] hover:underline">
                 create one
               </Link>

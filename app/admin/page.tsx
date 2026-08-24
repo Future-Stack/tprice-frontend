@@ -613,24 +613,22 @@ export default function AdminDashboard() {
                 return (
                   <div
                     key={activity.id || i}
-                    className={`flex items-start justify-between py-6 ${
-                      i !== data.recentActivities.length - 1
-                        ? "border-b border-white/5"
-                        : ""
-                    } group relative z-10`}
+                    className={`flex items-start justify-between py-6 ${i !== data.recentActivities.length - 1
+                      ? "border-b border-white/5"
+                      : ""
+                      } group relative z-10`}
                   >
                     <div className="flex items-start gap-5">
                       <div className="mt-1.5 shrink-0">
                         <div
-                          className={`w-3 h-3 rounded-full ${
-                            statusType === "new"
-                              ? "bg-primary shadow-[0_0_12px_rgba(234,179,8,0.6)]"
-                              : statusType === "approved"
-                                ? "bg-[#4ADE80] shadow-[0_0_12px_rgba(74,222,128,0.6)]"
-                                : statusType === "closed"
-                                  ? "bg-[#60A5FA] shadow-[0_0_12px_rgba(96,165,250,0.6)]"
-                                  : "bg-[#F87171] shadow-[0_0_12px_rgba(248,113,113,0.6)]"
-                          }`}
+                          className={`w-3 h-3 rounded-full ${statusType === "new"
+                            ? "bg-primary shadow-[0_0_12px_rgba(234,179,8,0.6)]"
+                            : statusType === "approved"
+                              ? "bg-[#4ADE80] shadow-[0_0_12px_rgba(74,222,128,0.6)]"
+                              : statusType === "closed"
+                                ? "bg-[#60A5FA] shadow-[0_0_12px_rgba(96,165,250,0.6)]"
+                                : "bg-[#F87171] shadow-[0_0_12px_rgba(248,113,113,0.6)]"
+                            }`}
                         />
                       </div>
                       <div>
@@ -698,11 +696,10 @@ export default function AdminDashboard() {
                       </p>
                     </div>
                     <div
-                      className={`shrink-0 px-4 py-1.5 rounded-lg text-[10px] font-extrabold uppercase tracking-widest border ${
-                        isNegotiation
-                          ? "text-primary border-primary/20 bg-primary/5"
-                          : "text-[#4ADE80] border-[#4ADE80]/20 bg-[#4ADE80]/5"
-                      }`}
+                      className={`shrink-0 px-4 py-1.5 rounded-lg text-[10px] font-extrabold uppercase tracking-widest border ${isNegotiation
+                        ? "text-primary border-primary/20 bg-primary/5"
+                        : "text-[#4ADE80] border-[#4ADE80]/20 bg-[#4ADE80]/5"
+                        }`}
                     >
                       {stageFormatted}
                     </div>

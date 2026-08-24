@@ -7,10 +7,15 @@ import { motion } from "framer-motion";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
-import Cookies from "js-cookie";
 
-import { registerApi, handleGoogleLogin } from "@/lib/api/auth";
+import { registerApi, handleGoogleLogin, RegisterPayload } from "@/lib/api/auth";
 import { useAuthStore } from "@/lib/store/useAuthStore";
+
+const ROLE_OPTIONS = [
+  { value: "BUYER", label: "Buyer" },
+  { value: "SELLER", label: "Seller" },
+  { value: "DEALER", label: "Dealer" },
+] as const;
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -21,6 +26,7 @@ export default function RegisterPage() {
     email: "",
     password: "",
     confirmPassword: "",
+    role: "BUYER" as "BUYER" | "SELLER" | "DEALER",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -89,11 +95,12 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      const payload = {
+      const payload: RegisterPayload = {
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
         email: formData.email.trim(),
         password: formData.password,
+        role: formData.role,
       };
 
       const res = await registerApi(payload);
@@ -104,6 +111,7 @@ export default function RegisterPage() {
           firstName: payload.firstName,
           lastName: payload.lastName,
           name: `${payload.firstName} ${payload.lastName}`,
+          role: payload.role || res.user?.role || "BUYER",
         };
 
         useAuthStore.getState().setAuth(fullUser, res.accessToken, res.refreshToken);
@@ -173,9 +181,9 @@ export default function RegisterPage() {
             <h4 className="text-[#D4AF37] text-xs font-bold uppercase tracking-[0.2em] mb-3">
               Register
             </h4>
-            <h2 className="text-3xl md:text-4xl font-serif text-white mb-2">
+            <Link href="/"><h2 className="text-3xl md:text-4xl font-serif text-white mb-2">
               Join Exoticworld
-            </h2>
+            </h2></Link>
             <p className="text-white/40 text-sm">
               Already have an account?{" "}
               <Link href="/login" className="text-[#D4AF37] hover:underline">
@@ -185,6 +193,40 @@ export default function RegisterPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
+            {/* Role Selection */}
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block">
+                Select Role
+              </label>
+              <div className="grid grid-cols-3 gap-2.5">
+                {ROLE_OPTIONS.map((item) => {
+                  const isSelected = formData.role === item.value;
+                  return (
+                    <label
+                      key={item.value}
+                      htmlFor={`role-${item.value.toLowerCase()}`}
+                      className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border text-xs font-semibold cursor-pointer transition-all duration-200 select-none ${isSelected
+                        ? "bg-[#D4AF37]/15 border-[#D4AF37] text-white shadow-[0_0_15px_rgba(212,175,55,0.15)]"
+                        : "bg-[#1A1A1A] border-white/5 text-white/50 hover:text-white hover:border-white/20"
+                        } ${isLoading ? "opacity-60 cursor-not-allowed" : ""}`}
+                    >
+                      <input
+                        type="radio"
+                        id={`role-${item.value.toLowerCase()}`}
+                        name="role"
+                        value={item.value}
+                        checked={isSelected}
+                        onChange={handleChange}
+                        disabled={isLoading}
+                        className="w-3.5 h-3.5 accent-[#D4AF37] cursor-pointer"
+                      />
+                      <span>{item.label}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* First Name & Last Name */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
@@ -199,11 +241,10 @@ export default function RegisterPage() {
                   placeholder="Sophia"
                   disabled={isLoading}
                   autoComplete="off"
-                  className={`w-full bg-[#1A1A1A] border rounded-lg px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none transition-all ${
-                    errors.firstName
-                      ? "border-red-500/80 focus:border-red-500"
-                      : "border-white/5 focus:border-[#D4AF37]/50"
-                  }`}
+                  className={`w-full bg-[#1A1A1A] border rounded-lg px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none transition-all ${errors.firstName
+                    ? "border-red-500/80 focus:border-red-500"
+                    : "border-white/5 focus:border-[#D4AF37]/50"
+                    }`}
                 />
                 {errors.firstName && (
                   <p className="text-red-400 text-xs mt-1 font-medium">
@@ -224,11 +265,10 @@ export default function RegisterPage() {
                   placeholder="Vance"
                   disabled={isLoading}
                   autoComplete="off"
-                  className={`w-full bg-[#1A1A1A] border rounded-lg px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none transition-all ${
-                    errors.lastName
-                      ? "border-red-500/80 focus:border-red-500"
-                      : "border-white/5 focus:border-[#D4AF37]/50"
-                  }`}
+                  className={`w-full bg-[#1A1A1A] border rounded-lg px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none transition-all ${errors.lastName
+                    ? "border-red-500/80 focus:border-red-500"
+                    : "border-white/5 focus:border-[#D4AF37]/50"
+                    }`}
                 />
                 {errors.lastName && (
                   <p className="text-red-400 text-xs mt-1 font-medium">
@@ -251,11 +291,10 @@ export default function RegisterPage() {
                 placeholder="buyer@gmail.com"
                 disabled={isLoading}
                 autoComplete="off"
-                className={`w-full bg-[#1A1A1A] border rounded-lg px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none transition-all ${
-                  errors.email
-                    ? "border-red-500/80 focus:border-red-500"
-                    : "border-white/5 focus:border-[#D4AF37]/50"
-                }`}
+                className={`w-full bg-[#1A1A1A] border rounded-lg px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none transition-all ${errors.email
+                  ? "border-red-500/80 focus:border-red-500"
+                  : "border-white/5 focus:border-[#D4AF37]/50"
+                  }`}
               />
               {errors.email && (
                 <p className="text-red-400 text-xs mt-1 font-medium">
@@ -278,11 +317,10 @@ export default function RegisterPage() {
                   placeholder="••••••••"
                   disabled={isLoading}
                   autoComplete="new-password"
-                  className={`w-full bg-[#1A1A1A] border rounded-lg px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none transition-all font-mono ${
-                    errors.password
-                      ? "border-red-500/80 focus:border-red-500"
-                      : "border-white/5 focus:border-[#D4AF37]/50"
-                  }`}
+                  className={`w-full bg-[#1A1A1A] border rounded-lg px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none transition-all font-mono ${errors.password
+                    ? "border-red-500/80 focus:border-red-500"
+                    : "border-white/5 focus:border-[#D4AF37]/50"
+                    }`}
                 />
                 <button
                   type="button"
@@ -313,11 +351,10 @@ export default function RegisterPage() {
                   placeholder="••••••••"
                   disabled={isLoading}
                   autoComplete="new-password"
-                  className={`w-full bg-[#1A1A1A] border rounded-lg px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none transition-all font-mono ${
-                    errors.confirmPassword
-                      ? "border-red-500/80 focus:border-red-500"
-                      : "border-white/5 focus:border-[#D4AF37]/50"
-                  }`}
+                  className={`w-full bg-[#1A1A1A] border rounded-lg px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none transition-all font-mono ${errors.confirmPassword
+                    ? "border-red-500/80 focus:border-red-500"
+                    : "border-white/5 focus:border-[#D4AF37]/50"
+                    }`}
                 />
                 <button
                   type="button"
