@@ -22,6 +22,7 @@ import {
   Clock,
   Briefcase,
   AlertCircle,
+  Search,
 } from "lucide-react";
 import AnimationWrapper from "../../components/AnimationWrapper";
 import { useGetCategoriesQuery } from "@/hooks/useCategories";
@@ -32,6 +33,7 @@ import {
   useFeaturedStatusQuery,
 } from "@/hooks/useListings";
 import { useCreateCheckoutSessionMutation } from "@/hooks/usePayments";
+import { useDecodeVinMutation } from "@/hooks/useVehicles";
 import { getPaymentReturnUrl } from "@/lib/api/payments";
 import { toast } from "sonner";
 import DatePicker from "react-datepicker";
@@ -65,6 +67,7 @@ export default function AddListing() {
   const uploadMediaMutation = useUploadMediaMutation();
   const createListingMutation = useCreateListingMutation();
   const createCheckoutMutation = useCreateCheckoutSessionMutation();
+  const decodeVinMutation = useDecodeVinMutation();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -79,6 +82,7 @@ export default function AddListing() {
   const [locationCity, setLocationCity] = useState("");
   const [locationCountry, setLocationCountry] = useState("");
   const [isOffMarket, setIsOffMarket] = useState(false);
+  const [vin, setVin] = useState("");
 
   // Dynamic Specifications state
   const [specifications, setSpecifications] = useState<KeyValuePair[]>([]);
@@ -124,6 +128,125 @@ export default function AddListing() {
 
   const handleRemoveSpecRow = (id: string) => {
     setSpecifications((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  // Decode VIN handler
+  const handleDecodeVin = async () => {
+    const trimmedVin = vin.trim();
+    if (!trimmedVin) {
+      toast.error("Please enter a VIN number.");
+      return;
+    }
+
+    try {
+      const data = await decodeVinMutation.mutateAsync(trimmedVin);
+
+      if (!data) {
+        toast.error("No data found for this VIN.");
+        return;
+      }
+
+      // Collect all key-value pairs
+      const newSpecs: KeyValuePair[] = [];
+      const addedKeys = new Set<string>();
+
+      const addSpec = (key: string, value: any) => {
+        if (
+          value !== null &&
+          value !== undefined &&
+          String(value).trim() !== "" &&
+          String(value).trim() !== "Not Applicable" &&
+          String(value).trim() !== "N/A"
+        ) {
+          const lowerKey = key.toLowerCase();
+          if (!addedKeys.has(lowerKey)) {
+            addedKeys.add(lowerKey);
+            newSpecs.push({
+              id: `${key}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+              key,
+              value: String(value).trim(),
+            });
+          }
+        }
+      };
+
+      // 1. Top-level properties in structured order
+      if (data.vin) addSpec("vin", data.vin);
+      if (data.year) addSpec("year", data.year);
+      if (data.make) addSpec("make", data.make);
+      if (data.model) addSpec("model", data.model);
+      if (data.trim) addSpec("trim", data.trim);
+      if (data.bodyClass) addSpec("bodyClass", data.bodyClass);
+      if (data.engineDisplacementL)
+        addSpec("engineDisplacementL", data.engineDisplacementL);
+      if (data.engineCylinders) addSpec("engineCylinders", data.engineCylinders);
+      if (data.engineHorsepower)
+        addSpec("engineHorsepower", data.engineHorsepower);
+      if (data.fuelType) addSpec("fuelType", data.fuelType);
+      if (data.manufacturer) addSpec("manufacturer", data.manufacturer);
+      if (data.vehicleType) addSpec("vehicleType", data.vehicleType);
+
+      // 2. Raw properties
+      if (data.raw && typeof data.raw === "object") {
+        const skipRawKeys = new Set([
+          "errorcode",
+          "errortext",
+          "additionalerrortext",
+          "possiblevalues",
+          "suggestedvin",
+          "ncsaerrortext",
+        ]);
+
+        Object.entries(data.raw).forEach(([rawKey, rawVal]) => {
+          if (!skipRawKeys.has(rawKey.toLowerCase())) {
+            addSpec(rawKey, rawVal);
+          }
+        });
+      }
+
+      if (newSpecs.length === 0) {
+        toast.error("No specifications found for this VIN.");
+        return;
+      }
+
+      setSpecifications(newSpecs);
+
+      // Auto-fill other basic info fields if not already populated
+      if (data.year && (!buildYear || buildYear === 2024)) {
+        setBuildYear(data.year);
+      }
+      if (data.make && !brand) {
+        const matchedBrand = brandsList.find(
+          (b: any) => b.name.toLowerCase() === data.make?.toLowerCase(),
+        );
+        if (matchedBrand) {
+          setBrand(matchedBrand.name);
+        }
+      }
+      if (!title && (data.make || data.model)) {
+        const generatedTitle = [
+          data.year,
+          data.make,
+          data.model,
+          data.trim,
+        ]
+          .filter(Boolean)
+          .join(" ");
+        if (generatedTitle) {
+          setTitle(generatedTitle);
+        }
+      }
+
+      toast.success(
+        `VIN decoded successfully! ${newSpecs.length} specifications populated.`,
+      );
+    } catch (err: any) {
+      const errMsg =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to decode VIN. Please verify the VIN number.";
+      toast.error(errMsg);
+    }
   };
 
   // Image Upload handler using useMedia mutation
@@ -524,28 +647,124 @@ export default function AddListing() {
       case 1:
         return (
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            {/* Step Header & Actions */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h3 className="text-xl font-clash font-medium text-white flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-primary" /> Specifications
-                  System
+                  <Sparkles className="w-5 h-5 text-primary" /> Vehicle Specifications
                 </h3>
                 <p className="text-xs text-gray-400 mt-1">
-                  Add dynamic key-value specifications for your luxury item.
+                  Enter VIN to auto-populate all vehicle specifications, or add custom key-value pairs manually.
                 </p>
               </div>
 
-              <button
-                type="button"
-                onClick={handleAddSpecRow}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary/10 border border-primary/30 text-primary hover:bg-primary hover:text-black font-semibold text-xs transition-all cursor-pointer"
-              >
-                <Plus className="w-4 h-4" /> Add Field
-              </button>
+              <div className="flex items-center gap-2 shrink-0">
+                {specifications.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setSpecifications([])}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white font-semibold text-xs transition-all cursor-pointer"
+                    title="Clear all fields"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" /> Clear All
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={handleAddSpecRow}
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary/10 border border-primary/30 text-primary hover:bg-primary hover:text-black font-semibold text-xs transition-all cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" /> Add Field
+                </button>
+              </div>
             </div>
 
-            {/* Key-Value Pair Inputs */}
+            {/* VIN Decoder Card */}
+            <div className="p-4 md:p-5 bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl space-y-3 shadow-inner">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <Search className="w-3.5 h-3.5 text-primary" /> VIN Decoder
+                </label>
+                <span className="text-[11px] text-gray-400">
+                  Auto-decode 17-digit VIN
+                </span>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-stretch gap-2.5">
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    value={vin}
+                    onChange={(e) => setVin(e.target.value.toUpperCase())}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleDecodeVin();
+                      }
+                    }}
+                    placeholder="Enter 17-digit VIN (e.g. 1FA6P8CF0H5100001)"
+                    maxLength={17}
+                    className="w-full bg-[#111113] border border-[#2C2C2E] rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/60 transition-colors uppercase font-mono tracking-wider"
+                  />
+                  {vin && (
+                    <button
+                      type="button"
+                      onClick={() => setVin("")}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white p-1 text-xs"
+                      title="Clear VIN input"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleDecodeVin}
+                  disabled={decodeVinMutation.isPending || !vin.trim()}
+                  className="flex items-center justify-center gap-2 px-6 py-3 bg-primary text-black rounded-xl text-xs font-bold hover:bg-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer shadow-md shadow-primary/20 shrink-0 active:scale-95"
+                >
+                  {decodeVinMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Decoding...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4" />
+                      Decode VIN
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between text-[11px] text-gray-500 pt-1">
+                <span>Supports standard 17-character vehicle VINs</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setVin("1FA6P8CF0H5100001");
+                  }}
+                  className="text-primary hover:underline cursor-pointer"
+                >
+                  Fill Sample VIN (Ford Mustang)
+                </button>
+              </div>
+            </div>
+
+            {/* Dynamic Key-Value Specifications List */}
             <div className="space-y-3 pt-2">
+              <div className="flex items-center justify-between text-xs text-gray-400">
+                <span className="font-semibold uppercase tracking-wider">
+                  Specifications List ({specifications.length})
+                </span>
+                {specifications.length > 0 && (
+                  <span className="text-[11px] text-gray-500">
+                    All keys and values are fully editable
+                  </span>
+                )}
+              </div>
+
               {specifications.length === 0 ? (
                 <div className="p-8 text-center border-2 border-dashed border-[#2C2C2E] rounded-xl bg-[#1c1c1e]/50">
                   <AlertCircle className="w-8 h-8 text-gray-500 mx-auto mb-2" />
@@ -553,47 +772,64 @@ export default function AddListing() {
                     No specifications added yet
                   </p>
                   <p className="text-xs text-gray-600 mt-0.5">
-                    Click &quot;Add Field&quot; or choose a preset above.
+                    Decode a VIN above or click &quot;Add Field&quot; to manually enter specifications.
                   </p>
                 </div>
               ) : (
-                specifications.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex flex-col md:flex-row items-stretch md:items-center gap-3 p-3 bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl hover:border-gray-700 transition-colors"
-                  >
-                    <div className="flex-1">
-                      <input
-                        type="text"
-                        value={item.key}
-                        onChange={(e) =>
-                          handleSpecChange(item.id, "key", e.target.value)
-                        }
-                        placeholder="Key (e.g. horsepower)"
-                        className="w-full bg-[#111113] border border-[#2C2C2E] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/60 transition-colors font-mono"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <input
-                        type="text"
-                        value={item.value}
-                        onChange={(e) =>
-                          handleSpecChange(item.id, "value", e.target.value)
-                        }
-                        placeholder="Value (e.g. 986)"
-                        className="w-full bg-[#111113] border border-[#2C2C2E] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/60 transition-colors"
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveSpecRow(item.id)}
-                      className="p-2.5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer self-end md:self-center shrink-0"
-                      title="Remove specification"
+                <div className="space-y-2.5 max-h-[480px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
+                  {specifications.map((item, index) => (
+                    <div
+                      key={item.id}
+                      className="flex flex-col md:flex-row items-stretch md:items-center gap-3 p-3 bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl hover:border-gray-700 transition-colors"
                     >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))
+                      <div className="flex items-center gap-2 md:w-8 text-[11px] text-gray-500 font-mono">
+                        #{index + 1}
+                      </div>
+                      <div className="flex-1">
+                        <input
+                          type="text"
+                          value={item.key}
+                          onChange={(e) =>
+                            handleSpecChange(item.id, "key", e.target.value)
+                          }
+                          placeholder="Key (e.g. horsepower)"
+                          className="w-full bg-[#111113] border border-[#2C2C2E] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/60 transition-colors font-mono"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <input
+                          type="text"
+                          value={item.value}
+                          onChange={(e) =>
+                            handleSpecChange(item.id, "value", e.target.value)
+                          }
+                          placeholder="Value (e.g. 986)"
+                          className="w-full bg-[#111113] border border-[#2C2C2E] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/60 transition-colors"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSpecRow(item.id)}
+                        className="p-2.5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer self-end md:self-center shrink-0"
+                        title="Remove specification"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {specifications.length > 0 && (
+                <div className="flex justify-end pt-2">
+                  <button
+                    type="button"
+                    onClick={handleAddSpecRow}
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary/10 border border-primary/30 text-primary hover:bg-primary hover:text-black font-semibold text-xs transition-all cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4" /> Add Another Field
+                  </button>
+                </div>
               )}
             </div>
           </div>
@@ -612,11 +848,10 @@ export default function AddListing() {
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className={`relative border-2 border-dashed rounded-2xl aspect-16/6 flex flex-col items-center justify-center p-6 text-center cursor-pointer transition-all duration-300 ${
-                isDragging
-                  ? "border-primary bg-primary/10"
-                  : "border-[#2C2C2E] bg-[#1c1c1e] hover:border-primary/50 hover:bg-[#252528]"
-              }`}
+              className={`relative border-2 border-dashed rounded-2xl aspect-16/6 flex flex-col items-center justify-center p-6 text-center cursor-pointer transition-all duration-300 ${isDragging
+                ? "border-primary bg-primary/10"
+                : "border-[#2C2C2E] bg-[#1c1c1e] hover:border-primary/50 hover:bg-[#252528]"
+                }`}
             >
               <input
                 ref={fileInputRef}
@@ -724,16 +959,14 @@ export default function AddListing() {
                   key={type.id}
                   type="button"
                   onClick={() => setSaleType(type.id as any)}
-                  className={`flex flex-col items-start p-5 rounded-xl border transition-all duration-300 text-left cursor-pointer ${
-                    saleType === type.id
-                      ? "border-primary bg-primary/10 ring-1 ring-primary"
-                      : "border-[#2C2C2E] bg-[#1c1c1e] hover:border-gray-600"
-                  }`}
+                  className={`flex flex-col items-start p-5 rounded-xl border transition-all duration-300 text-left cursor-pointer ${saleType === type.id
+                    ? "border-primary bg-primary/10 ring-1 ring-primary"
+                    : "border-[#2C2C2E] bg-[#1c1c1e] hover:border-gray-600"
+                    }`}
                 >
                   <span
-                    className={`font-semibold text-sm mb-1 ${
-                      saleType === type.id ? "text-primary" : "text-white"
-                    }`}
+                    className={`font-semibold text-sm mb-1 ${saleType === type.id ? "text-primary" : "text-white"
+                      }`}
                   >
                     {type.title}
                   </span>
@@ -911,19 +1144,17 @@ export default function AddListing() {
                 {/* Standard Plan */}
                 <div
                   onClick={() => setSelectedPlan("standard")}
-                  className={`relative cursor-pointer p-6 rounded-2xl border transition-all duration-300 ${
-                    selectedPlan === "standard"
-                      ? "bg-[#1c1c1e] border-primary ring-1 ring-primary/30"
-                      : "bg-[#1c1c1e] border-[#2C2C2E] hover:border-gray-600"
-                  }`}
+                  className={`relative cursor-pointer p-6 rounded-2xl border transition-all duration-300 ${selectedPlan === "standard"
+                    ? "bg-[#1c1c1e] border-primary ring-1 ring-primary/30"
+                    : "bg-[#1c1c1e] border-[#2C2C2E] hover:border-gray-600"
+                    }`}
                 >
                   <div className="flex items-start gap-4">
                     <div
-                      className={`mt-1 transition-colors ${
-                        selectedPlan === "standard"
-                          ? "text-primary"
-                          : "text-gray-600"
-                      }`}
+                      className={`mt-1 transition-colors ${selectedPlan === "standard"
+                        ? "text-primary"
+                        : "text-gray-600"
+                        }`}
                     >
                       {selectedPlan === "standard" ? (
                         <CheckCircle2 className="w-5 h-5" />
@@ -945,19 +1176,17 @@ export default function AddListing() {
                 {/* Featured Plan */}
                 <div
                   onClick={() => setSelectedPlan("featured")}
-                  className={`relative cursor-pointer p-6 rounded-2xl border transition-all duration-300 ${
-                    selectedPlan === "featured"
-                      ? "bg-[#1c1c1e] border-primary ring-1 ring-primary/30"
-                      : "bg-[#1c1c1e] border-[#2C2C2E] hover:border-gray-600"
-                  }`}
+                  className={`relative cursor-pointer p-6 rounded-2xl border transition-all duration-300 ${selectedPlan === "featured"
+                    ? "bg-[#1c1c1e] border-primary ring-1 ring-primary/30"
+                    : "bg-[#1c1c1e] border-[#2C2C2E] hover:border-gray-600"
+                    }`}
                 >
                   <div className="flex items-start gap-4">
                     <div
-                      className={`mt-1 transition-colors ${
-                        selectedPlan === "featured"
-                          ? "text-primary"
-                          : "text-gray-600"
-                      }`}
+                      className={`mt-1 transition-colors ${selectedPlan === "featured"
+                        ? "text-primary"
+                        : "text-gray-600"
+                        }`}
                     >
                       {selectedPlan === "featured" ? (
                         <CheckCircle2 className="w-5 h-5" />
@@ -1018,11 +1247,10 @@ export default function AddListing() {
               {steps.map((step, index) => (
                 <span
                   key={step}
-                  className={`transition-colors duration-300 cursor-default ${
-                    index <= currentStep
-                      ? "text-primary font-semibold"
-                      : "text-gray-500"
-                  }`}
+                  className={`transition-colors duration-300 cursor-default ${index <= currentStep
+                    ? "text-primary font-semibold"
+                    : "text-gray-500"
+                    }`}
                 >
                   {index + 1}. {step}
                 </span>
@@ -1069,7 +1297,7 @@ export default function AddListing() {
                 className="flex items-center gap-2 px-8 py-3 bg-primary text-[#111113] rounded-xl text-sm font-bold hover:bg-yellow-400 transition-all duration-300 shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer active:scale-95 ml-auto"
               >
                 {createListingMutation.isPending ||
-                createCheckoutMutation.isPending ? (
+                  createCheckoutMutation.isPending ? (
                   <>
                     <Loader2 className="w-4 h-4 text-black animate-spin" />
                     {!hasActiveSubscription && selectedPlan === "featured"

@@ -30,13 +30,11 @@ interface NavLink {
 const NAV_LINKS: NavLink[] = [
   { name: "Home", href: "/" },
   {
-    name: "Inventory",
+    name: "MarketPlace",
     href: "/inventory",
-    subLinks: [
-      { name: "Inventory", href: "/inventory" },
-      { name: "MarketPlace", href: "/marketplace" },
-    ],
   },
+  { name: "Prefered Vendor", href: "/marketplace" },
+  { name: "Sell With Us", href: "/login" },
   {
     name: "Events & Media",
     href: "/events",
@@ -131,6 +129,16 @@ export default function LandingNavbar() {
     return "/buyer";
   };
 
+  const getNavLinkHref = (link: NavLink) => {
+    if (link.name === "Sell With Us") {
+      if (isLoggedIn && user?.role?.toUpperCase() === "SELLER") {
+        return "/seller/add-listing";
+      }
+      return "/login";
+    }
+    return link.href;
+  };
+
   const handleLogout = () => {
     setUserDropdownOpen(false);
     logoutMutation.mutate();
@@ -138,9 +146,8 @@ export default function LandingNavbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-100 transition-all duration-300 bg-black ${
-        scrolled ? "bg-black/80 backdrop-blur-lg py-4" : "bg-black py-6"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-100 transition-all duration-300 bg-black ${scrolled ? "bg-black/80 backdrop-blur-lg py-4" : "bg-black py-6"
+        }`}
     >
       <div className="container mx-auto px-6 md:px-0 flex items-center justify-between">
         {/* Logo */}
@@ -157,9 +164,10 @@ export default function LandingNavbar() {
         {/* Desktop Links */}
         <div className="hidden lg:flex items-center gap-10">
           {NAV_LINKS.map((link) => {
+            const currentHref = getNavLinkHref(link);
             const activeSub = link.subLinks?.find((s) => s.href === pathname);
             const displayName = activeSub ? activeSub.name : link.name;
-            const isActive = pathname === link.href || activeSub;
+            const isActive = pathname === currentHref || activeSub;
 
             return (
               <div
@@ -170,20 +178,18 @@ export default function LandingNavbar() {
               >
                 <div className="flex items-center gap-1.5 cursor-pointer">
                   <Link
-                    href={link.href}
-                    className={`text-sm font-montserrat font-normal transition-colors hover:text-land ${
-                      isActive ? "text-primary" : "text-white/80"
-                    }`}
+                    href={currentHref}
+                    className={`text-sm font-montserrat font-normal transition-colors hover:text-land ${isActive ? "text-primary" : "text-white/80"
+                      }`}
                   >
                     {displayName}
                   </Link>
                   {link.subLinks && (
                     <ChevronDown
-                      className={`w-4 h-4 transition-transform duration-300 font-montserrat ${
-                        activeDropdown === link.name
-                          ? "rotate-180 text-primary"
-                          : "text-white/40"
-                      }`}
+                      className={`w-4 h-4 transition-transform duration-300 font-montserrat ${activeDropdown === link.name
+                        ? "rotate-180 text-primary"
+                        : "text-white/40"
+                        }`}
                     />
                   )}
                 </div>
@@ -203,11 +209,10 @@ export default function LandingNavbar() {
                             <Link
                               key={sub.name}
                               href={sub.href}
-                              className={`block px-4 py-3 text-sm font-montserrat font-normal rounded-sm transition-all hover:bg-primary hover:text-black ${
-                                pathname === sub.href
-                                  ? "bg-primary/10 text-primary"
-                                  : "text-white/70"
-                              }`}
+                              className={`block px-4 py-3 text-sm font-montserrat font-normal rounded-sm transition-all hover:bg-primary hover:text-black ${pathname === sub.href
+                                ? "bg-primary/10 text-primary"
+                                : "text-white/70"
+                                }`}
                             >
                               {sub.name}
                             </Link>
@@ -281,9 +286,8 @@ export default function LandingNavbar() {
                 </div>
 
                 <ChevronDown
-                  className={`w-4 h-4 text-white/50 transition-transform duration-300 group-hover:text-white ${
-                    userDropdownOpen ? "rotate-180 text-primary" : ""
-                  }`}
+                  className={`w-4 h-4 text-white/50 transition-transform duration-300 group-hover:text-white ${userDropdownOpen ? "rotate-180 text-primary" : ""
+                    }`}
                 />
               </button>
 
@@ -391,62 +395,62 @@ export default function LandingNavbar() {
             className="lg:hidden bg-black/95 backdrop-blur-xl border-b border-white/10 overflow-hidden"
           >
             <div className="container mx-auto px-6 py-8 flex flex-col gap-6 max-h-[80vh] overflow-y-auto">
-              {NAV_LINKS.map((link) => (
-                <div key={link.name} className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <Link
-                      href={link.href}
-                      className={`text-lg font-medium transition-colors ${
-                        pathname === link.href
+              {NAV_LINKS.map((link) => {
+                const currentHref = getNavLinkHref(link);
+                return (
+                  <div key={link.name} className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <Link
+                        href={currentHref}
+                        className={`text-lg font-medium transition-colors ${pathname === currentHref
                           ? "text-primary"
                           : "text-white/90"
-                      }`}
-                      onClick={() => !link.subLinks && setIsOpen(false)}
-                    >
-                      {link.name}
-                    </Link>
-                    {link.subLinks && (
-                      <button
-                        onClick={() =>
-                          setActiveDropdown(
-                            activeDropdown === link.name ? null : link.name,
-                          )
-                        }
-                        className="p-2 text-white/40"
-                      >
-                        <ChevronDown
-                          className={`w-5 h-5 transition-transform ${
-                            activeDropdown === link.name ? "rotate-180" : ""
                           }`}
-                        />
-                      </button>
-                    )}
-                  </div>
+                        onClick={() => !link.subLinks && setIsOpen(false)}
+                      >
+                        {link.name}
+                      </Link>
+                      {link.subLinks && (
+                        <button
+                          onClick={() =>
+                            setActiveDropdown(
+                              activeDropdown === link.name ? null : link.name,
+                            )
+                          }
+                          className="p-2 text-white/40"
+                        >
+                          <ChevronDown
+                            className={`w-5 h-5 transition-transform ${activeDropdown === link.name ? "rotate-180" : ""
+                              }`}
+                          />
+                        </button>
+                      )}
+                    </div>
 
-                  {link.subLinks && activeDropdown === link.name && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="pl-4 flex flex-col gap-4 border-l border-white/10"
-                    >
-                      {link.subLinks.map((sub) => (
-                        <Link
-                          key={sub.name}
-                          href={sub.href}
-                          className={`text-base font-medium transition-colors ${
-                            pathname === sub.href
+                    {link.subLinks && activeDropdown === link.name && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="pl-4 flex flex-col gap-4 border-l border-white/10"
+                      >
+                        {link.subLinks.map((sub) => (
+                          <Link
+                            key={sub.name}
+                            href={sub.href}
+                            className={`text-base font-medium transition-colors ${pathname === sub.href
                               ? "text-primary"
                               : "text-white/60"
-                          }`}
-                          onClick={() => setIsOpen(false)}
-                        >
-                          {sub.name}
-                        </Link>
-                      ))}
-                    </motion.div>
-                  )}
-                </div>
-              ))}
+                              }`}
+                            onClick={() => setIsOpen(false)}
+                          >
+                            {sub.name}
+                          </Link>
+                        ))}
+                      </motion.div>
+                    )}
+                  </div>
+                );
+              })}
 
               <div className="h-px bg-white/10 my-2" />
 

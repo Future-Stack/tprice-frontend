@@ -36,7 +36,7 @@ export default function MarketplaceHero() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-6xl md:text-[56px] font-cormorant font-normal text-white"
           >
-            The Inventory
+            The Marketplace
           </motion.h1>
 
           <motion.p
