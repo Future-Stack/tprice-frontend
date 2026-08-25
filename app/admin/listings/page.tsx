@@ -9,6 +9,7 @@ import {
   ChevronRight,
   Building2,
   Loader2,
+  Edit3,
 } from "lucide-react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
 import Image from "next/image";
@@ -22,6 +23,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { toast } from "sonner";
 import DeleteListingModal from "./DeleteListingModal";
 import RejectListingModal from "./RejectListingModal";
+import UpdateListingModal from "./UpdateListingModal";
 
 const TABS = ["All listings", "pending", "Approved", "Rejected"];
 const LIMIT_OPTIONS = [10, 20, 50, 100];
@@ -140,6 +142,7 @@ export default function AdminListingsPage() {
   const [limit, setLimit] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [listingToEdit, setListingToEdit] = useState<ListingItem | null>(null);
   const [listingToDelete, setListingToDelete] = useState<ListingItem | null>(null);
   const [listingToReject, setListingToReject] = useState<ListingItem | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -525,6 +528,14 @@ export default function AdminListingsPage() {
                                     </button>
                                   )}
                                   <button
+                                    onClick={() => setListingToEdit(listing)}
+                                    disabled={isRowDeleting || isRowUpdating}
+                                    className="p-2 bg-primary/10 hover:bg-primary text-primary hover:text-black rounded-lg border border-primary/20 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+                                    title="Edit listing"
+                                  >
+                                    <Edit3 size={18} />
+                                  </button>
+                                  <button
                                     onClick={() => setListingToDelete(listing)}
                                     disabled={
                                       deleteListingMutation.isPending ||
@@ -609,6 +620,13 @@ export default function AdminListingsPage() {
           )}
         </div>
       </AnimationWrapper>
+
+      {/* Edit Listing Modal */}
+      <UpdateListingModal
+        isOpen={!!listingToEdit}
+        onClose={() => setListingToEdit(null)}
+        listing={listingToEdit}
+      />
 
       {/* Delete Listing Confirmation Modal */}
       <DeleteListingModal

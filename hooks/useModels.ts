@@ -21,12 +21,16 @@ export const MODELS_QUERY_KEYS = {
 /**
  * Hook to fetch paginated models with TanStack Query caching
  */
-export const useGetModelsQuery = (params?: GetModelsParams) => {
+export const useGetModelsQuery = (
+  params?: GetModelsParams,
+  options?: { enabled?: boolean },
+) => {
   return useQuery<ModelsResponse>({
     queryKey: MODELS_QUERY_KEYS.list(params),
     queryFn: () => getModelsApi(params),
     staleTime: 2 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
+    enabled: options?.enabled ?? true,
   });
 };
 

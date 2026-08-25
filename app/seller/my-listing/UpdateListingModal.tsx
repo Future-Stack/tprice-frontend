@@ -27,12 +27,17 @@ import {
 import { ListingItem, UpdateListingInput } from "@/lib/api/listings";
 import { useGetCategoriesQuery } from "@/hooks/useCategories";
 import { useGetBrandsQuery } from "@/hooks/useBrands";
+import { useGetModelsQuery } from "@/hooks/useModels";
+import { useGetTrimsQuery } from "@/hooks/useTrims";
 import { useUpdateListingMutation } from "@/hooks/useListings";
-import { useUploadMediaMutation } from "@/hooks/useMedia";
+import { useUploadMultipleMediaMutation } from "@/hooks/useMedia";
 import { toast } from "sonner";
 import Image from "next/image";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import SortableMediaGallery, {
+  UploadedMediaItem,
+} from "@/components/SortableMediaGallery";
 
 interface UpdateListingModalProps {
   isOpen: boolean;
@@ -46,13 +51,6 @@ interface KeyValuePair {
   value: string;
 }
 
-interface UploadedMediaItem {
-  id?: string;
-  url: string;
-  type: string;
-  displayOrder: number;
-}
-
 export default function UpdateListingModal({
   isOpen,
   onClose,
@@ -60,13 +58,12 @@ export default function UpdateListingModal({
 }: UpdateListingModalProps) {
   // Category and Brand Queries
   const { data: categoriesResponse, isLoading: isLoadingCategories } =
-    useGetCategoriesQuery();
-  const { data: brandsResponse, isLoading: isLoadingBrands } =
-    useGetBrandsQuery({ limit: 100 });
+    useGetCategoriesQuery({ limit: 100 });
+  const categoriesList = categoriesResponse?.data || [];
 
   // Mutations
   const updateListingMutation = useUpdateListingMutation();
-  const uploadMediaMutation = useUploadMediaMutation();
+  const uploadMediaMutation = useUploadMultipleMediaMutation();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -79,10 +76,65 @@ export default function UpdateListingModal({
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
   const [brand, setBrand] = useState("");
+  const [model, setModel] = useState("");
+  const [trim, setTrim] = useState("");
   const [buildYear, setBuildYear] = useState<number | "">(2024);
   const [locationCity, setLocationCity] = useState("");
   const [locationCountry, setLocationCountry] = useState("");
   const [isOffMarket, setIsOffMarket] = useState(false);
+
+  const selectedCategory = categoriesList.find(
+    (cat) => cat.name === category || cat.id === category,
+  );
+  const selectedCategoryId = selectedCategory?.id;
+
+  const { data: brandsResponse, isLoading: isLoadingBrands } = useGetBrandsQuery(
+    selectedCategoryId
+      ? { categoryId: selectedCategoryId, limit: 100 }
+      : undefined,
+    {
+      enabled: Boolean(selectedCategoryId),
+    },
+  );
+  const brandsList = selectedCategoryId ? brandsResponse?.data || [] : [];
+
+  // Selected Brand & dynamic Model query
+  const selectedBrand = brandsList.find(
+    (b) => b.name === brand || b.id === brand,
+  );
+  const selectedBrandId = selectedBrand?.id;
+
+  const { data: modelsResponse, isLoading: isLoadingModels } = useGetModelsQuery(
+    selectedBrandId
+      ? { brandId: selectedBrandId, limit: 100 }
+      : undefined,
+    {
+      enabled: Boolean(selectedBrandId),
+    },
+  );
+  const modelsList = selectedBrandId ? modelsResponse?.data || [] : [];
+
+  // Selected Model & dynamic Trim query
+  const selectedModel = modelsList.find(
+    (m) => m.name === model || m.id === model,
+  );
+  const selectedModelId = selectedModel?.id;
+
+  const { data: trimsResponse, isLoading: isLoadingTrims } = useGetTrimsQuery(
+    selectedModelId
+      ? { modelId: selectedModelId, limit: 100 }
+      : undefined,
+    {
+      enabled: Boolean(selectedModelId),
+    },
+  );
+  const trimsList = selectedModelId ? trimsResponse?.data || [] : [];
+
+  // Selected Trim
+  const selectedTrim = trimsList.find(
+    (t) => t.name === trim || t.id === trim,
+  );
+  const selectedTrimId = selectedTrim?.id;
 
   // Pricing & Sale Type States
   const [saleType, setSaleType] = useState<
@@ -112,6 +164,8 @@ export default function UpdateListingModal({
       setTitle(listing.title || "");
       setCategory(listing.category || "");
       setBrand(listing.brand || "");
+      setModel(listing.model || (listing.specifications as any)?.model || "");
+      setTrim(listing.trim || (listing.specifications as any)?.trim || "");
       setBuildYear(listing.buildYear ?? 2024);
       setLocationCity(listing.locationCity || "");
       setLocationCountry(listing.locationCountry || "");
@@ -162,10 +216,14 @@ export default function UpdateListingModal({
       if (listing.media && Array.isArray(listing.media)) {
         setMediaList(
           listing.media.map((m, idx) => ({
-            id: m.id,
+            id: m.id || `${Date.now()}-${idx}-${Math.random().toString(36).slice(2, 7)}`,
             url: m.url,
             type: m.type || "IMAGE",
             displayOrder: m.displayOrder ?? idx + 1,
+            isCover: Boolean(
+              m.isCover ||
+                (idx === 0 && listing.media.every((x: any) => !x.isCover)),
+            ),
           })),
         );
       } else {
@@ -175,9 +233,6 @@ export default function UpdateListingModal({
   }, [listing]);
 
   if (!isOpen || !listing) return null;
-
-  const categoriesList = categoriesResponse?.data || [];
-  const brandsList = brandsResponse?.data || [];
 
   // Specifications Handlers
   const handleAddSpecRow = () => {
@@ -202,46 +257,71 @@ export default function UpdateListingModal({
   };
 
   // Media Handlers
-  const handleFileUpload = async (file: File) => {
-    if (!file.type.startsWith("image/")) {
-      toast.error("Please select a valid image file.");
-      return;
+  const handleFilesUpload = async (files: File[]) => {
+    if (!files || files.length === 0) return;
+
+    const validFiles: File[] = [];
+    for (const file of files) {
+      if (!file.type.startsWith("image/")) {
+        toast.error(`"${file.name}" is not a valid image file.`);
+        continue;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error(`"${file.name}" exceeds maximum allowed size (10MB).`);
+        continue;
+      }
+      validFiles.push(file);
     }
 
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error("Image file size should be under 10MB.");
-      return;
-    }
+    if (validFiles.length === 0) return;
 
     try {
       const res = await uploadMediaMutation.mutateAsync({
-        file,
+        files: validFiles,
         folder: "exoticworld/listings",
       });
 
-      if (res?.url) {
-        setMediaList((prev) => [
-          ...prev,
-          {
-            url: res.url,
+      if (res && res.length > 0) {
+        setMediaList((prev) => {
+          const isFirst = prev.length === 0;
+          const newItems = res.map((item, idx) => ({
+            id: `${Date.now()}-${idx}-${Math.random().toString(36).slice(2, 7)}`,
+            url: item.url,
             type: "IMAGE",
-            displayOrder: prev.length + 1,
-          },
-        ]);
-        toast.success("Image uploaded successfully!");
+            displayOrder: prev.length + idx + 1,
+            isCover: isFirst && idx === 0,
+          }));
+
+          const hasCover = prev.some((item) => item.isCover);
+          if (!hasCover && newItems.length > 0) {
+            newItems[0].isCover = true;
+          }
+
+          return [...prev, ...newItems];
+        });
+
+        toast.success(
+          res.length === 1
+            ? "Image uploaded successfully!"
+            : `${res.length} images uploaded successfully!`,
+        );
       }
     } catch (err: any) {
       const errMsg =
         err?.response?.data?.message ||
         err?.message ||
-        "Failed to upload image.";
+        "Failed to upload image(s).";
       toast.error(errMsg);
     }
   };
 
+  const handleFileUpload = (file: File) => handleFilesUpload([file]);
+
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    files.forEach((file) => handleFileUpload(file));
+    if (files.length > 0) {
+      handleFilesUpload(files);
+    }
     if (e.target) {
       e.target.value = "";
     }
@@ -249,32 +329,24 @@ export default function UpdateListingModal({
 
   const handleRemoveMedia = (index: number) => {
     setMediaList((prev) => {
+      const wasCover = prev[index]?.isCover;
       const updated = prev.filter((_, i) => i !== index);
-      return updated.map((item, idx) => ({ ...item, displayOrder: idx + 1 }));
+      return updated.map((item, idx) => ({
+        ...item,
+        displayOrder: idx + 1,
+        isCover: wasCover ? idx === 0 : Boolean(item.isCover),
+      }));
     });
   };
 
   const handleSetCoverMedia = (index: number) => {
-    if (index === 0) return;
-    setMediaList((prev) => {
-      const target = prev[index];
-      const rest = prev.filter((_, i) => i !== index);
-      const updated = [target, ...rest];
-      return updated.map((m, idx) => ({ ...m, displayOrder: idx + 1 }));
-    });
+    setMediaList((prev) =>
+      prev.map((item, idx) => ({
+        ...item,
+        isCover: idx === index,
+      })),
+    );
     toast.success("Cover image updated!");
-  };
-
-  const handleMoveMedia = (index: number, direction: "up" | "down") => {
-    const targetIndex = direction === "up" ? index - 1 : index + 1;
-    if (targetIndex < 0 || targetIndex >= mediaList.length) return;
-    setMediaList((prev) => {
-      const updated = [...prev];
-      const temp = updated[index];
-      updated[index] = updated[targetIndex];
-      updated[targetIndex] = temp;
-      return updated.map((m, idx) => ({ ...m, displayOrder: idx + 1 }));
-    });
   };
 
   const handleAddDirectUrl = () => {
@@ -282,14 +354,19 @@ export default function UpdateListingModal({
       toast.error("Please enter an image URL.");
       return;
     }
-    setMediaList((prev) => [
-      ...prev,
-      {
-        url: directImageUrl.trim(),
-        type: "IMAGE",
-        displayOrder: prev.length + 1,
-      },
-    ]);
+    setMediaList((prev) => {
+      const isFirst = prev.length === 0;
+      return [
+        ...prev,
+        {
+          id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          url: directImageUrl.trim(),
+          type: "IMAGE",
+          displayOrder: prev.length + 1,
+          isCover: isFirst || prev.every((item) => !item.isCover),
+        },
+      ];
+    });
     setDirectImageUrl("");
     toast.success("Image URL added to gallery!");
   };
@@ -379,8 +456,10 @@ export default function UpdateListingModal({
 
     const payload: UpdateListingInput = {
       title: title.trim(),
-      category: category.trim(),
-      brand: brand.trim() || undefined,
+      categoryId: selectedCategoryId || undefined,
+      brandId: selectedBrandId || undefined,
+      modelId: selectedModelId || undefined,
+      trimId: selectedTrimId || undefined,
       buildYear: buildYear ? Number(buildYear) : undefined,
       locationCity: locationCity.trim() || undefined,
       locationCountry: locationCountry.trim() || undefined,
@@ -399,6 +478,9 @@ export default function UpdateListingModal({
         url: m.url,
         type: m.type || "IMAGE",
         displayOrder: idx + 1,
+        isCover: Boolean(
+          m.isCover || (mediaList.every((x) => !x.isCover) && idx === 0),
+        ),
       })),
     };
 
@@ -495,32 +577,36 @@ export default function UpdateListingModal({
                 />
               </div>
 
-              {/* Category */}
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <Layers className="w-3.5 h-3.5 text-primary" /> Category{" "}
-                  <span className="text-primary">*</span>
-                </label>
-                <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary/60 transition-all cursor-pointer"
-                >
-                  <option value="">
-                    {isLoadingCategories
-                      ? "Loading categories..."
-                      : "Select Category"}
-                  </option>
-                  {categoriesList.map((cat) => (
-                    <option key={cat.id} value={cat.name}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Brand & Build Year */}
+              {/* Category & Brand */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <Layers className="w-3.5 h-3.5 text-primary" /> Category{" "}
+                    <span className="text-primary">*</span>
+                  </label>
+                  <select
+                    value={category}
+                    onChange={(e) => {
+                      setCategory(e.target.value);
+                      setBrand("");
+                      setModel("");
+                      setTrim("");
+                    }}
+                    className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary/60 transition-all cursor-pointer"
+                  >
+                    <option value="">
+                      {isLoadingCategories
+                        ? "Loading categories..."
+                        : "Select Category"}
+                    </option>
+                    {categoriesList.map((cat) => (
+                      <option key={cat.id} value={cat.name}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
                     <Briefcase className="w-3.5 h-3.5 text-primary" /> Brand /
@@ -528,11 +614,22 @@ export default function UpdateListingModal({
                   </label>
                   <select
                     value={brand}
-                    onChange={(e) => setBrand(e.target.value)}
-                    className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#E78F23]/60 transition-all cursor-pointer"
+                    onChange={(e) => {
+                      setBrand(e.target.value);
+                      setModel("");
+                      setTrim("");
+                    }}
+                    disabled={!category || isLoadingBrands}
+                    className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#E78F23]/60 transition-all cursor-pointer disabled:opacity-50"
                   >
                     <option value="">
-                      {isLoadingBrands ? "Loading brands..." : "Select Brand"}
+                      {!category
+                        ? "Select Category First"
+                        : isLoadingBrands
+                          ? "Loading brands..."
+                          : brandsList.length === 0
+                            ? "No brands available"
+                            : "Select Brand"}
                     </option>
                     {brandsList.map((b) => (
                       <option key={b.id} value={b.name}>
@@ -541,23 +638,84 @@ export default function UpdateListingModal({
                     ))}
                   </select>
                 </div>
+              </div>
+
+              {/* Model & Trim */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <Tag className="w-3.5 h-3.5 text-primary" /> Model
+                  </label>
+                  <select
+                    value={model}
+                    onChange={(e) => {
+                      setModel(e.target.value);
+                      setTrim("");
+                    }}
+                    disabled={!brand || isLoadingModels}
+                    className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#E78F23]/60 transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    <option value="">
+                      {!brand
+                        ? "Select Brand First"
+                        : isLoadingModels
+                          ? "Loading models..."
+                          : modelsList.length === 0
+                            ? "No models available"
+                            : "Select Model"}
+                    </option>
+                    {modelsList.map((m) => (
+                      <option key={m.id} value={m.name}>
+                        {m.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-primary" /> Build Year
+                    <Sparkles className="w-3.5 h-3.5 text-primary" /> Trim / Edition
                   </label>
-                  <input
-                    type="number"
-                    value={buildYear}
-                    onChange={(e) =>
-                      setBuildYear(
-                        e.target.value ? parseInt(e.target.value, 10) : "",
-                      )
-                    }
-                    placeholder="e.g. 2024"
-                    className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/60 transition-all"
-                  />
+                  <select
+                    value={trim}
+                    onChange={(e) => setTrim(e.target.value)}
+                    disabled={!model || isLoadingTrims}
+                    className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#E78F23]/60 transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    <option value="">
+                      {!model
+                        ? "Select Model First"
+                        : isLoadingTrims
+                          ? "Loading trims..."
+                          : trimsList.length === 0
+                            ? "No trims available"
+                            : "Select Trim"}
+                    </option>
+                    {trimsList.map((t) => (
+                      <option key={t.id} value={t.name}>
+                        {t.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
+              </div>
+
+              {/* Build Year */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-primary" /> Build Year
+                </label>
+                <input
+                  type="number"
+                  value={buildYear}
+                  onChange={(e) =>
+                    setBuildYear(
+                      e.target.value ? parseInt(e.target.value, 10) : "",
+                    )
+                  }
+                  placeholder="e.g. 2024"
+                  className="w-full bg-[#161616] border border-[#2D2D2D] rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/60 transition-all"
+                />
               </div>
 
               {/* Location City & Country */}
@@ -821,7 +979,9 @@ export default function UpdateListingModal({
                   e.preventDefault();
                   setIsDragging(false);
                   const files = Array.from(e.dataTransfer.files || []);
-                  files.forEach((file) => handleFileUpload(file));
+                  if (files.length > 0) {
+                    handleFilesUpload(files);
+                  }
                 }}
                 onClick={() => fileInputRef.current?.click()}
                 className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
@@ -886,9 +1046,11 @@ export default function UpdateListingModal({
                   <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">
                     Media Items ({mediaList.length})
                   </label>
-                  <span className="text-[11px] text-gray-500 font-medium">
-                    First image is set as Cover Photo (#1)
-                  </span>
+                  {mediaList.length > 0 && (
+                    <span className="text-[11px] text-gray-500 font-medium">
+                      Drag photos to reorder • Select any photo as cover
+                    </span>
+                  )}
                 </div>
 
                 {mediaList.length === 0 ? (
@@ -899,135 +1061,12 @@ export default function UpdateListingModal({
                     </p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    {mediaList.map((m, idx) => {
-                      const isCover = idx === 0;
-                      const isEditing = editingMediaIndex === idx;
-
-                      return (
-                        <div
-                          key={idx}
-                          className={`relative rounded-xl border bg-[#141414] overflow-hidden flex flex-col transition-all ${
-                            isCover
-                              ? "border-[#E78F23] ring-1 ring-[#E78F23]/40"
-                              : "border-[#2D2D2D]"
-                          }`}
-                        >
-                          {/* Image Preview & Cover Badge */}
-                          <div className="relative aspect-16/10 w-full bg-black">
-                            <Image
-                              src={m.url}
-                              alt={`Media ${idx + 1}`}
-                              className="w-full h-full object-cover"
-                              width={300}
-                              height={300}
-                            />
-                            <div className="absolute top-2 left-2 flex items-center gap-1.5 z-10">
-                              <span className="px-2 py-0.5 bg-black/80 rounded text-[10px] text-primary font-mono font-bold">
-                                #{m.displayOrder}
-                              </span>
-                              {isCover && (
-                                <span className="px-2 py-0.5 bg-primary text-black font-bold rounded text-[10px] flex items-center gap-1 shadow-md">
-                                  <Star className="w-3 h-3 fill-black" /> Cover
-                                </span>
-                              )}
-                            </div>
-
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveMedia(idx)}
-                              className="absolute top-2 right-2 p-1.5 bg-black/80 hover:bg-rose-600 rounded-lg text-white transition-all cursor-pointer z-10"
-                              title="Delete photo"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-
-                          {/* Media Controls Bar */}
-                          <div className="p-3 bg-[#171717] border-t border-[#262626] flex flex-col gap-2">
-                            {isEditing ? (
-                              <div className="flex flex-col gap-1.5">
-                                <input
-                                  type="url"
-                                  value={editingMediaUrl}
-                                  onChange={(e) =>
-                                    setEditingMediaUrl(e.target.value)
-                                  }
-                                  className="w-full bg-[#1A1A1A] border border-primary rounded px-2.5 py-1 text-xs text-white"
-                                  placeholder="Image URL"
-                                />
-                                <div className="flex justify-end gap-1.5">
-                                  <button
-                                    type="button"
-                                    onClick={() => setEditingMediaIndex(null)}
-                                    className="px-2 py-1 bg-gray-700 text-xs rounded text-gray-200"
-                                  >
-                                    Cancel
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleSaveMediaUrlEdit(idx)}
-                                    className="px-2 py-1 bg-[#E78F23] text-xs font-bold rounded text-black"
-                                  >
-                                    Save URL
-                                  </button>
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="flex items-center justify-between text-xs">
-                                {!isCover && (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleSetCoverMedia(idx)}
-                                    className="text-[11px] font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
-                                  >
-                                    <Star className="w-3 h-3" /> Make Cover
-                                  </button>
-                                )}
-                                {isCover && (
-                                  <span className="text-[11px] font-medium text-emerald-400">
-                                    primary Display
-                                  </span>
-                                )}
-
-                                <div className="flex items-center gap-1.5 ml-auto">
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setEditingMediaIndex(idx);
-                                      setEditingMediaUrl(m.url);
-                                    }}
-                                    className="p-1 text-gray-400 hover:text-white rounded hover:bg-white/10"
-                                    title="Edit URL"
-                                  >
-                                    <Edit2 className="w-3.5 h-3.5" />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleMoveMedia(idx, "up")}
-                                    disabled={idx === 0}
-                                    className="p-1 text-gray-400 hover:text-white disabled:opacity-30 rounded hover:bg-white/10"
-                                    title="Move left/up"
-                                  >
-                                    <ArrowUp className="w-3.5 h-3.5" />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleMoveMedia(idx, "down")}
-                                    disabled={idx === mediaList.length - 1}
-                                    className="p-1 text-gray-400 hover:text-white disabled:opacity-30 rounded hover:bg-white/10"
-                                    title="Move right/down"
-                                  >
-                                    <ArrowDown className="w-3.5 h-3.5" />
-                                  </button>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+                  <SortableMediaGallery
+                    mediaList={mediaList}
+                    setMediaList={setMediaList}
+                    onRemove={handleRemoveMedia}
+                    onSetCover={handleSetCoverMedia}
+                  />
                 )}
               </div>
             </div>

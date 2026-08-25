@@ -22,12 +22,16 @@ export const TRIMS_QUERY_KEYS = {
 /**
  * Hook to fetch paginated trims with TanStack Query caching
  */
-export const useGetTrimsQuery = (params?: GetTrimsParams) => {
+export const useGetTrimsQuery = (
+  params?: GetTrimsParams,
+  options?: { enabled?: boolean },
+) => {
   return useQuery<TrimsResponse>({
     queryKey: TRIMS_QUERY_KEYS.list(params),
     queryFn: () => getTrimsApi(params),
     staleTime: 2 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
+    enabled: options?.enabled ?? true,
   });
 };
 
