@@ -140,7 +140,7 @@ export default function CreateModelModal({
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           {/* Model Name */}
           <div>
-            <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 items-center gap-1.5">
               <Car className="w-3.5 h-3.5 text-primary" /> Model Name{" "}
               <span className="text-primary">*</span>
             </label>
@@ -158,7 +158,7 @@ export default function CreateModelModal({
 
           {/* Brand Selector */}
           <div>
-            <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 items-center gap-1.5">
               <Award className="w-3.5 h-3.5 text-primary" /> Brand{" "}
               <span className="text-primary">*</span>
             </label>
@@ -195,10 +195,6 @@ export default function CreateModelModal({
                       src={selectedBrand.logoUrl}
                       alt={selectedBrand.name}
                       className="max-h-full object-contain"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src =
-                          "https://cdn.exoticworld.com/brands/ferrari-logo.png";
-                      }}
                     />
                   ) : (
                     <span className="text-primary font-bold text-[10px]">
@@ -226,7 +222,7 @@ export default function CreateModelModal({
 
           {/* Optional Custom Slug */}
           <div>
-            <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 items-center gap-1.5">
               <FolderTree className="w-3.5 h-3.5 text-gray-400" /> Custom Slug (Optional)
             </label>
             <input

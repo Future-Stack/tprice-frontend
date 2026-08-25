@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import {
   uploadMediaApi,
+  uploadMultipleMediaApi,
   UploadMediaParams,
+  UploadMultipleMediaParams,
   MediaUploadResponse,
   getLandingMediaApi,
   GetLandingMediaParams,
@@ -19,11 +21,21 @@ export const MEDIA_QUERY_KEYS = {
 };
 
 /**
- * Hook to handle media/image uploads to Cloudinary via backend
+ * Hook to handle media/image uploads via backend (/media/upload-multiple)
  */
 export const useUploadMediaMutation = () => {
   return useMutation<MediaUploadResponse, Error, UploadMediaParams>({
     mutationFn: (params: UploadMediaParams) => uploadMediaApi(params),
+  });
+};
+
+/**
+ * Hook to handle multiple media/image uploads via backend (/media/upload-multiple)
+ */
+export const useUploadMultipleMediaMutation = () => {
+  return useMutation<MediaUploadResponse[], Error, UploadMultipleMediaParams>({
+    mutationFn: (params: UploadMultipleMediaParams) =>
+      uploadMultipleMediaApi(params),
   });
 };
 
