@@ -6,6 +6,7 @@ export interface ListingMedia {
   url: string;
   type: string;
   displayOrder: number;
+  isCover?: boolean;
   createdAt: string;
 }
 
@@ -47,6 +48,10 @@ export interface ListingItem {
   slug: string;
   brand?: string | null;
   brandId?: string | null;
+  model?: string | null;
+  modelId?: string | null;
+  trim?: string | null;
+  trimId?: string | null;
   category: string;
   categoryId?: string | null;
   subCategory?: string | null;
@@ -277,11 +282,15 @@ export interface CreateListingMediaInput {
   url: string;
   type?: string;
   displayOrder?: number;
+  isCover?: boolean;
 }
 
 export interface CreateListingInput {
   title: string;
-  category: string;
+  categoryId?: string;
+  brandId?: string;
+  modelId?: string;
+  trimId?: string;
   subCategory?: string;
   saleType?: string;
   allowCounterOffers?: boolean;
@@ -293,7 +302,6 @@ export interface CreateListingInput {
   locationCity?: string;
   locationCountry?: string;
   buildYear?: number;
-  brand?: string;
   specifications?: string;
   media?: CreateListingMediaInput[];
 }
@@ -305,7 +313,10 @@ export const createListingApi = async (data: CreateListingInput): Promise<Listin
 
 export interface UpdateListingInput {
   title?: string;
-  category?: string;
+  categoryId?: string;
+  brandId?: string;
+  modelId?: string;
+  trimId?: string;
   subCategory?: string;
   saleType?: string;
   allowCounterOffers?: boolean;
@@ -317,7 +328,6 @@ export interface UpdateListingInput {
   locationCity?: string;
   locationCountry?: string;
   buildYear?: number;
-  brand?: string;
   specifications?: string;
   media?: CreateListingMediaInput[];
   status?: string;
