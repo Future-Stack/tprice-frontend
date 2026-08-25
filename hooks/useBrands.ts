@@ -18,12 +18,16 @@ export const BRANDS_QUERY_KEYS = {
 /**
  * Hook to fetch paginated brands with TanStack Query caching
  */
-export const useGetBrandsQuery = (params?: GetBrandsParams) => {
+export const useGetBrandsQuery = (
+  params?: GetBrandsParams,
+  options?: { enabled?: boolean },
+) => {
   return useQuery<BrandsResponse>({
     queryKey: BRANDS_QUERY_KEYS.list(params),
     queryFn: () => getBrandsApi(params),
     staleTime: 2 * 60 * 1000, // 2 minutes stale time
     gcTime: 5 * 60 * 1000, // 5 minutes cache gc time
+    enabled: options?.enabled ?? true,
   });
 };
 

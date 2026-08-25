@@ -32,7 +32,6 @@ import { useGetTrimsQuery } from "@/hooks/useTrims";
 import { useUpdateListingMutation } from "@/hooks/useListings";
 import { useUploadMultipleMediaMutation } from "@/hooks/useMedia";
 import { toast } from "sonner";
-import Image from "next/image";
 import SortableMediaGallery, {
   UploadedMediaItem,
 } from "@/components/SortableMediaGallery";
@@ -312,8 +311,6 @@ export default function UpdateListingModal({
       toast.error(errMsg);
     }
   };
-
-  const handleFileUpload = (file: File) => handleFilesUpload([file]);
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);

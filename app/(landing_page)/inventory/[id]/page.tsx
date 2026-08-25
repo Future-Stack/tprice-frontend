@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
@@ -12,6 +12,11 @@ import {
   useSaveListingMutation,
   useSavedListingsQuery,
 } from "@/hooks/useListings";
+import {
+  useOffersQuery,
+  useCreateOfferMutation,
+  useCounterOfferMutation,
+} from "@/hooks/useOffers";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 import {
   MapPin,
@@ -31,6 +36,12 @@ import {
   Tag,
   Eye,
   Sparkles,
+  Gavel,
+  Send,
+  DollarSign,
+  X,
+  Loader2,
+  Clock,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -97,6 +108,9 @@ export default function InventoryDetailsPage() {
   } = useListingByIdQuery(listingId || "");
 
   const saveMutation = useSaveListingMutation();
+  const createOfferMutation = useCreateOfferMutation();
+  const counterOfferMutation = useCounterOfferMutation();
+
   const token =
     Cookies.get("accessToken") ||
     Cookies.get("token") ||
@@ -106,6 +120,30 @@ export default function InventoryDetailsPage() {
     { page: 1, limit: 100 },
     { enabled: Boolean(token) },
   );
+
+  const { data: offersResponse, isLoading: isOffersLoading } = useOffersQuery(
+    { limit: 100 },
+    { enabled: Boolean(token) },
+  );
+
+  const existingOffer = offersResponse?.data?.find(
+    (off) =>
+      String(off.listingId) === String(item?.id) ||
+      String(off.listing?.id) === String(item?.id),
+  );
+
+  // Modal States
+  const [isBidModalOpen, setIsBidModalOpen] = useState(false);
+  const [bidAmount, setBidAmount] = useState<string>("");
+  const [bidNote, setBidNote] = useState<string>("");
+
+  const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
+  const [offerAmount, setOfferAmount] = useState<string>("");
+  const [offerNote, setOfferNote] = useState<string>("");
+
+  const [isCounterModalOpen, setIsCounterModalOpen] = useState(false);
+  const [counterAmount, setCounterAmount] = useState<string>("");
+  const [counterNote, setCounterNote] = useState<string>("");
 
   const isSavedInListings =
     savedResponse?.data?.some((savedItem) => savedItem.id === item?.id) ??
@@ -247,6 +285,202 @@ export default function InventoryDetailsPage() {
     ? `${item.owner.firstName} ${item.owner.lastName}`
     : item.brand || "Elite Motors Collection";
 
+  // Sale type & auction classification
+  const normalizedSaleType = (item.saleType || "").toUpperCase();
+  const isAuction =
+    normalizedSaleType === "AUCTION" ||
+    (Boolean(item.startingBid) &&
+      normalizedSaleType !== "FIXED_PRICE" &&
+      normalizedSaleType !== "FIXED" &&
+      normalizedSaleType !== "PRIVATE_SALE" &&
+      normalizedSaleType !== "PRIVATE");
+  const isFixedPrice = !isAuction;
+  const allowCounterOffers = Boolean(item.allowCounterOffers);
+
+  // Financial & Bidding values
+  const startingBidVal =
+    item.startingBid !== null &&
+    item.startingBid !== undefined &&
+    item.startingBid !== "" &&
+    !isNaN(Number(item.startingBid))
+      ? Number(item.startingBid)
+      : null;
+
+  const highestBidVal = (() => {
+    if (item.highestBid === null || item.highestBid === undefined) return null;
+    if (typeof item.highestBid === "object") {
+      const num = Number(
+        (item.highestBid as any).amount ?? (item.highestBid as any).price,
+      );
+      return !isNaN(num) && num > 0 ? num : null;
+    }
+    const num = Number(item.highestBid);
+    return !isNaN(num) && num > 0 ? num : null;
+  })();
+
+  const totalBidsCountVal =
+    item.totalBidsCount !== null &&
+    item.totalBidsCount !== undefined &&
+    typeof item.totalBidsCount === "number"
+      ? item.totalBidsCount
+      : null;
+
+  // Handlers for Bidding & Offers
+  const handleOpenPlaceBidModal = () => {
+    if (!token) {
+      toast.error("Please sign in to place a bid.");
+      return;
+    }
+    const currentVal = existingOffer
+      ? Number(existingOffer.currentAmount || existingOffer.initialAmount)
+      : highestBidVal !== null
+        ? highestBidVal
+        : startingBidVal !== null
+          ? startingBidVal
+          : numericPrice > 0
+            ? numericPrice
+            : 0;
+
+    const suggested = currentVal > 0 ? Math.round(currentVal * 1.05) : 1000;
+    setBidAmount(String(suggested));
+    setBidNote("Escrow verified bidder ready to complete acquisition.");
+    setIsBidModalOpen(true);
+  };
+
+  const handleSubmitBid = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!item?.id) return;
+    const numericAmount = parseFloat(bidAmount);
+    if (isNaN(numericAmount) || numericAmount <= 0) {
+      toast.error("Please enter a valid bid amount.");
+      return;
+    }
+
+    const currentMin = highestBidVal ?? startingBidVal ?? 0;
+    if (currentMin > 0 && numericAmount < currentMin) {
+      toast.error(
+        `Your bid must be at least ${currencySymbol}${currentMin.toLocaleString()}`,
+      );
+      return;
+    }
+
+    createOfferMutation.mutate(
+      {
+        listingId: item.id,
+        amount: numericAmount,
+        note: bidNote.trim() || undefined,
+      },
+      {
+        onSuccess: () => {
+          setIsBidModalOpen(false);
+          refetch();
+          toast.success(
+            existingOffer
+              ? "Bid increased successfully!"
+              : "Bid placed successfully!",
+          );
+        },
+      },
+    );
+  };
+
+  const handleOpenSendOfferModal = () => {
+    if (!token) {
+      toast.error("Please sign in to send an offer.");
+      return;
+    }
+    const initialPrice = numericPrice > 0 ? numericPrice : 0;
+    setOfferAmount(initialPrice > 0 ? String(initialPrice) : "");
+    setOfferNote(
+      "Ready to proceed with immediate concierge escrow acquisition.",
+    );
+    setIsOfferModalOpen(true);
+  };
+
+  const handleSubmitOffer = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!item?.id) return;
+    const numericAmount = parseFloat(offerAmount);
+    if (isNaN(numericAmount) || numericAmount <= 0) {
+      toast.error("Please enter a valid offer amount.");
+      return;
+    }
+
+    createOfferMutation.mutate(
+      {
+        listingId: item.id,
+        amount: numericAmount,
+        note: offerNote.trim() || undefined,
+      },
+      {
+        onSuccess: () => {
+          setIsOfferModalOpen(false);
+          refetch();
+        },
+      },
+    );
+  };
+
+  const handleOpenCounterOfferModal = () => {
+    if (!token) {
+      toast.error("Please sign in to submit a counter offer.");
+      return;
+    }
+    const initialPrice = existingOffer
+      ? Number(existingOffer.currentAmount || existingOffer.initialAmount)
+      : numericPrice > 0
+        ? Math.round(numericPrice * 0.95)
+        : 0;
+    setCounterAmount(initialPrice > 0 ? String(initialPrice) : "");
+    setCounterNote(
+      "Counter offer proposed for expedited purchase agreement.",
+    );
+    setIsCounterModalOpen(true);
+  };
+
+  const handleSubmitCounterOffer = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!item?.id) return;
+    const numericAmount = parseFloat(counterAmount);
+    if (isNaN(numericAmount) || numericAmount <= 0) {
+      toast.error("Please enter a valid counter offer amount.");
+      return;
+    }
+
+    if (existingOffer) {
+      counterOfferMutation.mutate(
+        {
+          offerId: existingOffer.id,
+          payload: {
+            amount: numericAmount,
+            note: counterNote.trim() || undefined,
+          },
+        },
+        {
+          onSuccess: () => {
+            setIsCounterModalOpen(false);
+            refetch();
+          },
+        },
+      );
+    } else {
+      createOfferMutation.mutate(
+        {
+          listingId: item.id,
+          amount: numericAmount,
+          note: counterNote.trim() || undefined,
+        },
+        {
+          onSuccess: () => {
+            setIsCounterModalOpen(false);
+            refetch();
+            toast.success("Counter offer submitted successfully!");
+          },
+        },
+      );
+    }
+  };
+
   // Media items list
   const mediaList =
     item.media && item.media.length > 0
@@ -268,7 +502,7 @@ export default function InventoryDetailsPage() {
   return (
     <div className="bg-black min-h-screen text-white font-sans overflow-x-hidden">
       {/* Product Gallery Section */}
-      <section className="relative w-full  ">
+      <section className="relative w-full">
         <ProductGallery media={mediaList} />
       </section>
 
@@ -348,7 +582,7 @@ export default function InventoryDetailsPage() {
                 <h3 className="text-[24px] font-cormorant font-medium text-white border-b border-white/5 pb-4">
                   Description
                 </h3>
-                <p className="text-white/70   font-normal font-montserrat text-sm md:text-base">
+                <p className="text-white/70 font-normal font-montserrat text-sm md:text-base">
                   {(item as any).description ||
                     `${item.buildYear ? `${item.buildYear} ` : ""}${item.title} — An exceptional masterpiece of engineering and craftsmanship, meticulously maintained and available for immediate acquisition.`}
                 </p>
@@ -427,11 +661,129 @@ export default function InventoryDetailsPage() {
                   </p>
                 </div>
 
+                {/* ─── Contextual Sale Type Actions (Auction / Fixed Price / Counter Offer) ─── */}
+                {isAuction && (
+                  <div className="space-y-4 pt-4 border-t border-white/5">
+                    {/* Highest Bid Card */}
+                    <div className="bg-[#0A0A0A] border border-white/10 p-4 rounded-sm space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] text-white/50 uppercase tracking-widest font-bold">
+                          Highest Bid
+                        </span>
+                        {totalBidsCountVal !== null && totalBidsCountVal > 0 ? (
+                          <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-sm border border-emerald-500/20 font-medium">
+                            {totalBidsCountVal}{" "}
+                            {totalBidsCountVal === 1 ? "bid" : "bids"}
+                          </span>
+                        ) : (
+                          <span className="text-[10px] text-white/40 bg-white/5 px-2 py-0.5 rounded-sm font-medium">
+                            {highestBidVal ? "Active" : "No bids yet"}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="text-2xl md:text-3xl font-serif font-bold text-[#D4AF37]">
+                        {highestBidVal !== null
+                          ? `${currencySymbol}${highestBidVal.toLocaleString()}`
+                          : startingBidVal !== null
+                            ? `${currencySymbol}${startingBidVal.toLocaleString()}`
+                            : "No Bids Yet"}
+                      </div>
+
+                      <div className="flex items-center justify-between text-[11px] text-white/40 pt-1 border-t border-white/5">
+                        <span>Starting Bid:</span>
+                        <span className="text-white/70 font-medium">
+                          {startingBidVal !== null
+                            ? `${currencySymbol}${startingBidVal.toLocaleString()}`
+                            : "N/A"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Place Bid Button */}
+                    {isOffersLoading ? (
+                      <div className="w-full h-12 bg-white/5 border border-white/10 rounded-sm animate-pulse" />
+                    ) : existingOffer &&
+                      [
+                        "PENDING",
+                        "LEADING",
+                        "OUTBID",
+                        "COUNTERED",
+                        "ACCEPTED",
+                      ].includes((existingOffer.status || "").toUpperCase()) ? (
+                      <button
+                        onClick={handleOpenPlaceBidModal}
+                        className="w-full py-4 bg-[#D4AF37]/15 border border-[#D4AF37] text-[#D4AF37] font-bold text-sm uppercase tracking-widest hover:bg-[#D4AF37]/25 transition-all cursor-pointer flex items-center justify-center gap-2 rounded-sm active:scale-[0.99]"
+                      >
+                        <Gavel size={16} />
+                        Increase Bid ($
+                        {Number(
+                          existingOffer.currentAmount ||
+                            existingOffer.initialAmount,
+                        ).toLocaleString()}
+                        )
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleOpenPlaceBidModal}
+                        className="w-full py-4 bg-[#D4AF37] text-black font-bold text-sm uppercase tracking-widest hover:bg-[#B8962E] transition-all cursor-pointer flex items-center justify-center gap-2 rounded-sm shadow-lg active:scale-[0.99]"
+                      >
+                        <Gavel size={16} />
+                        Place Bid
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {isFixedPrice && (
+                  <div className="space-y-3 pt-4 border-t border-white/5">
+                    {/* Send Offer Button */}
+                    {isOffersLoading ? (
+                      <div className="w-full h-12 bg-white/5 border border-white/10 rounded-sm animate-pulse" />
+                    ) : existingOffer &&
+                      ["PENDING", "COUNTERED", "ACCEPTED"].includes(
+                        (existingOffer.status || "").toUpperCase(),
+                      ) ? (
+                      <button
+                        onClick={handleOpenSendOfferModal}
+                        className="w-full py-4 bg-[#D4AF37]/15 border border-[#D4AF37] text-[#D4AF37] font-bold text-sm uppercase tracking-widest hover:bg-[#D4AF37]/25 transition-all cursor-pointer flex items-center justify-center gap-2 rounded-sm active:scale-[0.99]"
+                      >
+                        <Clock size={16} />
+                        Offer Sent ($
+                        {Number(
+                          existingOffer.currentAmount ||
+                            existingOffer.initialAmount,
+                        ).toLocaleString()}
+                        )
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleOpenSendOfferModal}
+                        className="w-full py-4 bg-[#D4AF37] text-black font-bold text-sm uppercase tracking-widest hover:bg-[#B8962E] transition-all cursor-pointer flex items-center justify-center gap-2 rounded-sm shadow-lg active:scale-[0.99]"
+                      >
+                        <Send size={16} />
+                        Send Offer
+                      </button>
+                    )}
+
+                    {/* Counter Offer Button when counter offer is true */}
+                    {allowCounterOffers && (
+                      <button
+                        onClick={handleOpenCounterOfferModal}
+                        className="w-full py-4 bg-white/5 border border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37]/10 font-bold text-sm uppercase tracking-widest transition-all cursor-pointer flex items-center justify-center gap-2 rounded-sm active:scale-[0.99]"
+                      >
+                        <RefreshCw size={16} />
+                        Counter Offer
+                      </button>
+                    )}
+                  </div>
+                )}
+
                 {/* Actions */}
                 <div className="space-y-4 pt-4 border-t border-white/5">
                   <button
                     onClick={() => router.push("/inventory")}
-                    className="w-full py-4 bg-[#D4AF37] text-black font-bold text-sm uppercase tracking-widest hover:bg-[#B8962E] transition-all cursor-pointer flex items-center justify-center gap-2 rounded-sm"
+                    className="w-full py-4 bg-white/5 border border-white/10 text-white font-bold text-sm uppercase tracking-widest hover:bg-white hover:text-black transition-all cursor-pointer flex items-center justify-center gap-2 rounded-sm"
                   >
                     View All Listings
                   </button>
@@ -476,6 +828,469 @@ export default function InventoryDetailsPage() {
           </div>
         </div>
       </div>
+
+      {/* ─── Place Bid Modal ─── */}
+      {isBidModalOpen && item && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (
+              e.target === e.currentTarget &&
+              !createOfferMutation.isPending
+            ) {
+              setIsBidModalOpen(false);
+            }
+          }}
+        >
+          <div className="relative w-full max-w-lg bg-[#101216] border border-white/10 rounded-sm shadow-2xl overflow-hidden p-6 sm:p-8 space-y-6">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div>
+                <h3 className="text-xl font-serif font-bold text-white flex items-center gap-2">
+                  <Gavel className="w-5 h-5 text-[#D4AF37]" />
+                  {existingOffer ? "Increase Your Bid" : "Place a Bid"}
+                </h3>
+                <p className="text-xs text-white/50 mt-0.5">
+                  Enter your maximum bid for this luxury auction asset.
+                </p>
+              </div>
+              <button
+                onClick={() => setIsBidModalOpen(false)}
+                disabled={createOfferMutation.isPending}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-colors cursor-pointer disabled:opacity-50"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Asset Summary */}
+            <div className="flex items-center gap-4 bg-[#0A0A0A] border border-white/5 p-3.5 rounded-sm">
+              {mediaList[0]?.url && (
+                <img
+                  src={mediaList[0].url}
+                  alt={item.title}
+                  className="w-16 h-12 rounded-sm object-cover border border-white/10 shrink-0"
+                />
+              )}
+              <div className="min-w-0 flex-1">
+                <h4 className="text-sm font-serif font-semibold text-white truncate">
+                  {item.buildYear ? `${item.buildYear} ` : ""}
+                  {item.title}
+                </h4>
+                <p className="text-xs text-white/50 mt-0.5">
+                  {highestBidVal
+                    ? `Current Highest Bid: ${currencySymbol}${highestBidVal.toLocaleString()}`
+                    : startingBidVal
+                      ? `Starting Bid: ${currencySymbol}${startingBidVal.toLocaleString()}`
+                      : `Price: ${formattedPrice}`}
+                </p>
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmitBid} className="space-y-5">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-white/70">
+                    Your Bid Amount ({item.currency || "USD"}){" "}
+                    <span className="text-red-400">*</span>
+                  </label>
+                  {/* Shortcut pills */}
+                  <div className="flex items-center gap-1.5">
+                    {highestBidVal && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setBidAmount(
+                              String(Math.round(highestBidVal * 1.05)),
+                            )
+                          }
+                          className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-sm text-white/70 transition-colors"
+                        >
+                          +5%
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setBidAmount(
+                              String(Math.round(highestBidVal * 1.1)),
+                            )
+                          }
+                          className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-sm text-white/70 transition-colors"
+                        >
+                          +10%
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setBidAmount(
+                              String(Math.round(highestBidVal * 1.15)),
+                            )
+                          }
+                          className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-sm text-white/70 transition-colors"
+                        >
+                          +15%
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/40">
+                    <DollarSign className="w-4 h-4 text-[#D4AF37]" />
+                  </div>
+                  <input
+                    type="number"
+                    min="1"
+                    step="any"
+                    required
+                    value={bidAmount}
+                    onChange={(e) => setBidAmount(e.target.value)}
+                    placeholder="e.g. 250000"
+                    className="w-full pl-9 pr-4 py-3 bg-[#0A0A0A] border border-white/10 focus:border-[#D4AF37] rounded-sm text-white font-medium text-base outline-none transition-colors"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-white/70 mb-2">
+                  Bidder Notes / Terms{" "}
+                  <span className="text-white/40 font-normal lowercase">
+                    (optional)
+                  </span>
+                </label>
+                <textarea
+                  rows={2}
+                  value={bidNote}
+                  onChange={(e) => setBidNote(e.target.value)}
+                  placeholder="Additional delivery or escrow instructions..."
+                  className="w-full px-4 py-3 bg-[#0A0A0A] border border-white/10 focus:border-[#D4AF37] rounded-sm text-white text-sm outline-none transition-colors resize-none"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsBidModalOpen(false)}
+                  disabled={createOfferMutation.isPending}
+                  className="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs uppercase tracking-widest rounded-sm transition-all cursor-pointer disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={createOfferMutation.isPending}
+                  className="flex-1 py-3 bg-[#D4AF37] hover:bg-[#B8962E] text-black font-bold text-xs uppercase tracking-widest rounded-sm transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {createOfferMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Submitting...
+                    </>
+                  ) : existingOffer ? (
+                    "Increase Bid"
+                  ) : (
+                    "Submit Bid"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Send Offer Modal ─── */}
+      {isOfferModalOpen && item && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (
+              e.target === e.currentTarget &&
+              !createOfferMutation.isPending
+            ) {
+              setIsOfferModalOpen(false);
+            }
+          }}
+        >
+          <div className="relative w-full max-w-lg bg-[#101216] border border-white/10 rounded-sm shadow-2xl overflow-hidden p-6 sm:p-8 space-y-6">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div>
+                <h3 className="text-xl font-serif font-bold text-white flex items-center gap-2">
+                  <Send className="w-5 h-5 text-[#D4AF37]" />
+                  Make an Offer
+                </h3>
+                <p className="text-xs text-white/50 mt-0.5">
+                  Submit your purchase proposal directly to the verified seller.
+                </p>
+              </div>
+              <button
+                onClick={() => setIsOfferModalOpen(false)}
+                disabled={createOfferMutation.isPending}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-colors cursor-pointer disabled:opacity-50"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Asset Summary */}
+            <div className="flex items-center gap-4 bg-[#0A0A0A] border border-white/5 p-3.5 rounded-sm">
+              {mediaList[0]?.url && (
+                <img
+                  src={mediaList[0].url}
+                  alt={item.title}
+                  className="w-16 h-12 rounded-sm object-cover border border-white/10 shrink-0"
+                />
+              )}
+              <div className="min-w-0 flex-1">
+                <h4 className="text-sm font-serif font-semibold text-white truncate">
+                  {item.buildYear ? `${item.buildYear} ` : ""}
+                  {item.title}
+                </h4>
+                <p className="text-xs text-white/50 mt-0.5">
+                  Asking Price:{" "}
+                  <span className="text-[#D4AF37] font-semibold">
+                    {formattedPrice}
+                  </span>
+                </p>
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmitOffer} className="space-y-5">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-white/70">
+                    Your Offer Amount ({item.currency || "USD"}){" "}
+                    <span className="text-red-400">*</span>
+                  </label>
+                  {/* Quick percentage shortcuts */}
+                  {numericPrice > 0 && (
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setOfferAmount(String(numericPrice))}
+                        className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-sm text-white/70 transition-colors"
+                      >
+                        Asking
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setOfferAmount(
+                            String(Math.round(numericPrice * 0.95)),
+                          )
+                        }
+                        className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-sm text-white/70 transition-colors"
+                      >
+                        -5%
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setOfferAmount(
+                            String(Math.round(numericPrice * 0.9)),
+                          )
+                        }
+                        className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-sm text-white/70 transition-colors"
+                      >
+                        -10%
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/40">
+                    <DollarSign className="w-4 h-4 text-[#D4AF37]" />
+                  </div>
+                  <input
+                    type="number"
+                    min="1"
+                    step="any"
+                    required
+                    value={offerAmount}
+                    onChange={(e) => setOfferAmount(e.target.value)}
+                    placeholder="e.g. 500000"
+                    className="w-full pl-9 pr-4 py-3 bg-[#0A0A0A] border border-white/10 focus:border-[#D4AF37] rounded-sm text-white font-medium text-base outline-none transition-colors"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-white/70 mb-2">
+                  Offer Terms / Notes{" "}
+                  <span className="text-white/40 font-normal lowercase">
+                    (optional)
+                  </span>
+                </label>
+                <textarea
+                  rows={2}
+                  value={offerNote}
+                  onChange={(e) => setOfferNote(e.target.value)}
+                  placeholder="Add details regarding timeline, logistics, or verification..."
+                  className="w-full px-4 py-3 bg-[#0A0A0A] border border-white/10 focus:border-[#D4AF37] rounded-sm text-white text-sm outline-none transition-colors resize-none"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsOfferModalOpen(false)}
+                  disabled={createOfferMutation.isPending}
+                  className="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs uppercase tracking-widest rounded-sm transition-all cursor-pointer disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={createOfferMutation.isPending}
+                  className="flex-1 py-3 bg-[#D4AF37] hover:bg-[#B8962E] text-black font-bold text-xs uppercase tracking-widest rounded-sm transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {createOfferMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    "Send Offer"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Counter Offer Modal ─── */}
+      {isCounterModalOpen && item && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (
+              e.target === e.currentTarget &&
+              !counterOfferMutation.isPending &&
+              !createOfferMutation.isPending
+            ) {
+              setIsCounterModalOpen(false);
+            }
+          }}
+        >
+          <div className="relative w-full max-w-lg bg-[#101216] border border-white/10 rounded-sm shadow-2xl overflow-hidden p-6 sm:p-8 space-y-6">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div>
+                <h3 className="text-xl font-serif font-bold text-white flex items-center gap-2">
+                  <RefreshCw className="w-5 h-5 text-[#D4AF37]" />
+                  Submit Counter Offer
+                </h3>
+                <p className="text-xs text-white/50 mt-0.5">
+                  Propose revised pricing terms for immediate consideration.
+                </p>
+              </div>
+              <button
+                onClick={() => setIsCounterModalOpen(false)}
+                disabled={
+                  counterOfferMutation.isPending ||
+                  createOfferMutation.isPending
+                }
+                className="w-8 h-8 rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-colors cursor-pointer disabled:opacity-50"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Asset Summary */}
+            <div className="flex items-center gap-4 bg-[#0A0A0A] border border-white/5 p-3.5 rounded-sm">
+              {mediaList[0]?.url && (
+                <img
+                  src={mediaList[0].url}
+                  alt={item.title}
+                  className="w-16 h-12 rounded-sm object-cover border border-white/10 shrink-0"
+                />
+              )}
+              <div className="min-w-0 flex-1">
+                <h4 className="text-sm font-serif font-semibold text-white truncate">
+                  {item.buildYear ? `${item.buildYear} ` : ""}
+                  {item.title}
+                </h4>
+                <p className="text-xs text-white/50 mt-0.5">
+                  {existingOffer
+                    ? `Current Offer: ${currencySymbol}${Number(existingOffer.currentAmount || existingOffer.initialAmount).toLocaleString()}`
+                    : `Asking Price: ${formattedPrice}`}
+                </p>
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmitCounterOffer} className="space-y-5">
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-white/70 mb-2">
+                  Counter Offer Amount ({item.currency || "USD"}){" "}
+                  <span className="text-red-400">*</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/40">
+                    <DollarSign className="w-4 h-4 text-[#D4AF37]" />
+                  </div>
+                  <input
+                    type="number"
+                    min="1"
+                    step="any"
+                    required
+                    value={counterAmount}
+                    onChange={(e) => setCounterAmount(e.target.value)}
+                    placeholder="e.g. 480000"
+                    className="w-full pl-9 pr-4 py-3 bg-[#0A0A0A] border border-white/10 focus:border-[#D4AF37] rounded-sm text-white font-medium text-base outline-none transition-colors"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-white/70 mb-2">
+                  Counter Terms / Notes{" "}
+                  <span className="text-white/40 font-normal lowercase">
+                    (optional)
+                  </span>
+                </label>
+                <textarea
+                  rows={2}
+                  value={counterNote}
+                  onChange={(e) => setCounterNote(e.target.value)}
+                  placeholder="Specify custom settlement timeline or delivery terms..."
+                  className="w-full px-4 py-3 bg-[#0A0A0A] border border-white/10 focus:border-[#D4AF37] rounded-sm text-white text-sm outline-none transition-colors resize-none"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsCounterModalOpen(false)}
+                  disabled={
+                    counterOfferMutation.isPending ||
+                    createOfferMutation.isPending
+                  }
+                  className="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs uppercase tracking-widest rounded-sm transition-all cursor-pointer disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={
+                    counterOfferMutation.isPending ||
+                    createOfferMutation.isPending
+                  }
+                  className="flex-1 py-3 bg-[#D4AF37] hover:bg-[#B8962E] text-black font-bold text-xs uppercase tracking-widest rounded-sm transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {counterOfferMutation.isPending ||
+                  createOfferMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    "Submit Counter Offer"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

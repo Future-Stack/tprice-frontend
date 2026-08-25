@@ -23,21 +23,29 @@ import {
   Briefcase,
   AlertCircle,
   Search,
+  GripVertical,
+  Star,
 } from "lucide-react";
 import AnimationWrapper from "../../components/AnimationWrapper";
 import { useGetCategoriesQuery } from "@/hooks/useCategories";
 import { useGetBrandsQuery } from "@/hooks/useBrands";
-import { useUploadMediaMutation } from "@/hooks/useMedia";
+import { useGetModelsQuery } from "@/hooks/useModels";
+import { useGetTrimsQuery } from "@/hooks/useTrims";
+import { useUploadMultipleMediaMutation } from "@/hooks/useMedia";
 import {
   useCreateListingMutation,
   useFeaturedStatusQuery,
 } from "@/hooks/useListings";
+import { CreateListingInput } from "@/lib/api/listings";
 import { useCreateCheckoutSessionMutation } from "@/hooks/usePayments";
 import { useDecodeVinMutation } from "@/hooks/useVehicles";
 import { getPaymentReturnUrl } from "@/lib/api/payments";
 import { toast } from "sonner";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import SortableMediaGallery, {
+  UploadedMediaItem,
+} from "@/components/SortableMediaGallery";
 
 const steps = ["Basic Info", "Specifications", "Media", "Pricing", "Review"];
 
@@ -47,29 +55,8 @@ interface KeyValuePair {
   value: string;
 }
 
-interface UploadedMediaItem {
-  url: string;
-  type: string;
-  displayOrder: number;
-}
-
 export default function AddListing() {
   const router = useRouter();
-
-  // Queries & Mutations
-  const { data: categoriesResponse, isLoading: isLoadingCategories } =
-    useGetCategoriesQuery();
-  const { data: brandsResponse, isLoading: isLoadingBrands } =
-    useGetBrandsQuery({ limit: 100 });
-  const { data: featuredStatus } = useFeaturedStatusQuery();
-  const hasActiveSubscription = Boolean(featuredStatus?.hasActiveSubscription);
-
-  const uploadMediaMutation = useUploadMediaMutation();
-  const createListingMutation = useCreateListingMutation();
-  const createCheckoutMutation = useCreateCheckoutSessionMutation();
-  const decodeVinMutation = useDecodeVinMutation();
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Steps
   const [currentStep, setCurrentStep] = useState(0);
@@ -78,11 +65,82 @@ export default function AddListing() {
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
   const [brand, setBrand] = useState("");
+  const [model, setModel] = useState("");
+  const [trim, setTrim] = useState("");
   const [buildYear, setBuildYear] = useState<number | "">(2024);
   const [locationCity, setLocationCity] = useState("");
   const [locationCountry, setLocationCountry] = useState("");
   const [isOffMarket, setIsOffMarket] = useState(false);
   const [vin, setVin] = useState("");
+
+  // Queries & Mutations
+  const { data: categoriesResponse, isLoading: isLoadingCategories } =
+    useGetCategoriesQuery({ limit: 100 });
+  const categoriesList = categoriesResponse?.data || [];
+
+  // Selected Category & dynamic Brand query
+  const selectedCategory = categoriesList.find(
+    (cat) => cat.name === category || cat.id === category,
+  );
+  const selectedCategoryId = selectedCategory?.id;
+
+  const { data: brandsResponse, isLoading: isLoadingBrands } = useGetBrandsQuery(
+    selectedCategoryId
+      ? { categoryId: selectedCategoryId, limit: 100 }
+      : undefined,
+    {
+      enabled: Boolean(selectedCategoryId),
+    },
+  );
+  const brandsList = selectedCategoryId ? brandsResponse?.data || [] : [];
+
+  // Selected Brand & dynamic Model query
+  const selectedBrand = brandsList.find(
+    (b) => b.name === brand || b.id === brand,
+  );
+  const selectedBrandId = selectedBrand?.id;
+
+  const { data: modelsResponse, isLoading: isLoadingModels } = useGetModelsQuery(
+    selectedBrandId
+      ? { brandId: selectedBrandId, limit: 100 }
+      : undefined,
+    {
+      enabled: Boolean(selectedBrandId),
+    },
+  );
+  const modelsList = selectedBrandId ? modelsResponse?.data || [] : [];
+
+  // Selected Model & dynamic Trim query
+  const selectedModel = modelsList.find(
+    (m) => m.name === model || m.id === model,
+  );
+  const selectedModelId = selectedModel?.id;
+
+  const { data: trimsResponse, isLoading: isLoadingTrims } = useGetTrimsQuery(
+    selectedModelId
+      ? { modelId: selectedModelId, limit: 100 }
+      : undefined,
+    {
+      enabled: Boolean(selectedModelId),
+    },
+  );
+  const trimsList = selectedModelId ? trimsResponse?.data || [] : [];
+
+  // Selected Trim
+  const selectedTrim = trimsList.find(
+    (t) => t.name === trim || t.id === trim,
+  );
+  const selectedTrimId = selectedTrim?.id;
+
+  const { data: featuredStatus } = useFeaturedStatusQuery();
+  const hasActiveSubscription = Boolean(featuredStatus?.hasActiveSubscription);
+
+  const uploadMediaMutation = useUploadMultipleMediaMutation();
+  const createListingMutation = useCreateListingMutation();
+  const createCheckoutMutation = useCreateCheckoutSessionMutation();
+  const decodeVinMutation = useDecodeVinMutation();
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Dynamic Specifications state
   const [specifications, setSpecifications] = useState<KeyValuePair[]>([]);
@@ -97,9 +155,11 @@ export default function AddListing() {
   >("FIXED_PRICE");
   const [askingPrice, setAskingPrice] = useState<string>("625000");
   const [startingBid, setStartingBid] = useState<string>("500000");
-  const [auctionEndsAt, setAuctionEndsAt] = useState<string>(
-    "2026-12-31T23:59:59.000Z",
-  );
+  const [auctionEndsAt, setAuctionEndsAt] = useState<string>(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 7);
+    return d.toISOString();
+  });
   const [currency, setCurrency] = useState("USD");
   const [allowCounterOffers, setAllowCounterOffers] = useState(true);
 
@@ -223,6 +283,12 @@ export default function AddListing() {
           setBrand(matchedBrand.name);
         }
       }
+      if (data.model && !model) {
+        setModel(data.model);
+      }
+      if (data.trim && !trim) {
+        setTrim(data.trim);
+      }
       if (!title && (data.make || data.model)) {
         const generatedTitle = [
           data.year,
@@ -249,47 +315,72 @@ export default function AddListing() {
     }
   };
 
-  // Image Upload handler using useMedia mutation
-  const handleFileUpload = async (file: File) => {
-    if (!file.type.startsWith("image/")) {
-      toast.error("Please select a valid image file.");
-      return;
+  // Image Upload handler using uploadMultipleMedia mutation
+  const handleFilesUpload = async (files: File[]) => {
+    if (!files || files.length === 0) return;
+
+    const validFiles: File[] = [];
+    for (const file of files) {
+      if (!file.type.startsWith("image/")) {
+        toast.error(`"${file.name}" is not a valid image file.`);
+        continue;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error(`"${file.name}" exceeds maximum allowed size (10MB).`);
+        continue;
+      }
+      validFiles.push(file);
     }
 
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error("Image file size should be under 10MB.");
-      return;
-    }
+    if (validFiles.length === 0) return;
 
     try {
       const res = await uploadMediaMutation.mutateAsync({
-        file,
+        files: validFiles,
         folder: "exoticworld/listings",
       });
 
-      if (res?.url) {
-        setMediaList((prev) => [
-          ...prev,
-          {
-            url: res.url,
+      if (res && res.length > 0) {
+        setMediaList((prev) => {
+          const isFirst = prev.length === 0;
+          const newItems = res.map((item, idx) => ({
+            id: `${Date.now()}-${idx}-${Math.random().toString(36).slice(2, 7)}`,
+            url: item.url,
             type: "IMAGE",
-            displayOrder: prev.length + 1,
-          },
-        ]);
-        toast.success("Image uploaded successfully!");
+            displayOrder: prev.length + idx + 1,
+            isCover: isFirst && idx === 0,
+          }));
+
+          const hasCover = prev.some((item) => item.isCover);
+          if (!hasCover && newItems.length > 0) {
+            newItems[0].isCover = true;
+          }
+
+          return [...prev, ...newItems];
+        });
+
+        toast.success(
+          res.length === 1
+            ? "Image uploaded successfully!"
+            : `${res.length} images uploaded successfully!`,
+        );
       }
     } catch (err: any) {
       const errMsg =
         err?.response?.data?.message ||
         err?.message ||
-        "Failed to upload image.";
+        "Failed to upload image(s).";
       toast.error(errMsg);
     }
   };
 
+  const handleFileUpload = (file: File) => handleFilesUpload([file]);
+
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    files.forEach((file) => handleFileUpload(file));
+    if (files.length > 0) {
+      handleFilesUpload(files);
+    }
     if (e.target) {
       e.target.value = "";
     }
@@ -309,13 +400,31 @@ export default function AddListing() {
     e.preventDefault();
     setIsDragging(false);
     const files = Array.from(e.dataTransfer.files || []);
-    files.forEach((file) => handleFileUpload(file));
+    if (files.length > 0) {
+      handleFilesUpload(files);
+    }
+  };
+
+  // Reorder & Cover Handlers
+  const handleSetCover = (index: number) => {
+    setMediaList((prev) =>
+      prev.map((item, idx) => ({
+        ...item,
+        isCover: idx === index,
+      })),
+    );
+    toast.success("Cover photo updated!");
   };
 
   const handleRemoveMedia = (index: number) => {
     setMediaList((prev) => {
+      const wasCover = prev[index]?.isCover;
       const updated = prev.filter((_, i) => i !== index);
-      return updated.map((item, idx) => ({ ...item, displayOrder: idx + 1 }));
+      return updated.map((item, idx) => ({
+        ...item,
+        displayOrder: idx + 1,
+        isCover: wasCover ? idx === 0 : Boolean(item.isCover),
+      }));
     });
   };
 
@@ -348,8 +457,15 @@ export default function AddListing() {
           toast.error("Please select an auction end date and time.");
           return false;
         }
-        if (new Date(auctionEndsAt) <= new Date()) {
+        const selectedDate = new Date(auctionEndsAt);
+        const now = new Date();
+        const maxDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+        if (selectedDate <= now) {
           toast.error("Auction end date must be in the future.");
+          return false;
+        }
+        if (selectedDate > maxDate) {
+          toast.error("Auction end date cannot be more than 7 days from today.");
           return false;
         }
       }
@@ -400,14 +516,12 @@ export default function AddListing() {
         ? Number(startingBid)
         : 0;
 
-    const payload = {
+    const payload: CreateListingInput = {
       title: title.trim(),
-      category,
-      brand: brand.trim() || undefined,
-      buildYear: buildYear ? Number(buildYear) : undefined,
-      locationCity: locationCity.trim() || undefined,
-      locationCountry: locationCountry.trim() || undefined,
-      isOffMarket,
+      categoryId: selectedCategoryId || undefined,
+      brandId: selectedBrandId || undefined,
+      modelId: selectedModelId || undefined,
+      trimId: selectedTrimId || undefined,
       saleType,
       allowCounterOffers:
         saleType === "FIXED_PRICE" ? allowCounterOffers : false,
@@ -417,11 +531,18 @@ export default function AddListing() {
       auctionEndsAt:
         saleType === "AUCTION" && auctionEndsAt ? auctionEndsAt : undefined,
       currency: currency || "USD",
+      isOffMarket,
+      locationCity: locationCity.trim() || undefined,
+      locationCountry: locationCountry.trim() || undefined,
+      buildYear: buildYear ? Number(buildYear) : undefined,
       specifications: specificationsJson,
       media: mediaList.map((m, idx) => ({
         url: m.url,
         type: m.type || "IMAGE",
         displayOrder: idx + 1,
+        isCover: Boolean(
+          m.isCover || (mediaList.every((x) => !x.isCover) && idx === 0),
+        ),
       })),
     };
 
@@ -492,10 +613,6 @@ export default function AddListing() {
     }
   };
 
-  // Categories & Brands extraction
-  const categoriesList = categoriesResponse?.data || [];
-  const brandsList = brandsResponse?.data || [];
-
   const renderStepContent = () => {
     switch (currentStep) {
       case 0:
@@ -530,7 +647,12 @@ export default function AddListing() {
                 <div className="relative">
                   <select
                     value={category}
-                    onChange={(e) => setCategory(e.target.value)}
+                    onChange={(e) => {
+                      setCategory(e.target.value);
+                      setBrand("");
+                      setModel("");
+                      setTrim("");
+                    }}
                     className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-primary/60 transition-colors appearance-none cursor-pointer"
                   >
                     <option value="">
@@ -558,11 +680,22 @@ export default function AddListing() {
                 <div className="relative">
                   <select
                     value={brand}
-                    onChange={(e) => setBrand(e.target.value)}
-                    className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-primary/60 transition-colors appearance-none cursor-pointer"
+                    onChange={(e) => {
+                      setBrand(e.target.value);
+                      setModel("");
+                      setTrim("");
+                    }}
+                    disabled={!category || isLoadingBrands}
+                    className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-primary/60 transition-colors appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <option value="">
-                      {isLoadingBrands ? "Loading brands..." : "Select Brand"}
+                      {!category
+                        ? "Select Category First"
+                        : isLoadingBrands
+                          ? "Loading brands..."
+                          : brandsList.length === 0
+                            ? "No brands available"
+                            : "Select Brand"}
                     </option>
                     {brandsList.map((b) => (
                       <option key={b.id} value={b.name}>
@@ -571,7 +704,89 @@ export default function AddListing() {
                     ))}
                   </select>
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                    <ChevronRight className="w-4 h-4 rotate-90" />
+                    {isLoadingBrands ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4 rotate-90" />
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Model & Trim */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <Tag className="w-3.5 h-3.5 text-primary" /> Model
+                </label>
+                <div className="relative">
+                  <select
+                    value={model}
+                    onChange={(e) => {
+                      setModel(e.target.value);
+                      setTrim("");
+                    }}
+                    disabled={!brand || isLoadingModels}
+                    className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-primary/60 transition-colors appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <option value="">
+                      {!brand
+                        ? "Select Brand First"
+                        : isLoadingModels
+                          ? "Loading models..."
+                          : modelsList.length === 0
+                            ? "No models available"
+                            : "Select Model"}
+                    </option>
+                    {modelsList.map((m) => (
+                      <option key={m.id} value={m.name}>
+                        {m.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                    {isLoadingModels ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4 rotate-90" />
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-primary" /> Trim / Edition
+                </label>
+                <div className="relative">
+                  <select
+                    value={trim}
+                    onChange={(e) => setTrim(e.target.value)}
+                    disabled={!model || isLoadingTrims}
+                    className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-primary/60 transition-colors appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <option value="">
+                      {!model
+                        ? "Select Model First"
+                        : isLoadingTrims
+                          ? "Loading trims..."
+                          : trimsList.length === 0
+                            ? "No trims available"
+                            : "Select Trim"}
+                    </option>
+                    {trimsList.map((t) => (
+                      <option key={t.id} value={t.name}>
+                        {t.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                    {isLoadingTrims ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4 rotate-90" />
+                    )}
                   </div>
                 </div>
               </div>
@@ -838,9 +1053,16 @@ export default function AddListing() {
       case 2:
         return (
           <div className="space-y-6">
-            <h3 className="text-xl font-clash font-medium text-white flex items-center gap-2 mb-2">
-              <ImageIcon className="w-5 h-5 text-primary" /> Media Gallery
-            </h3>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <h3 className="text-xl font-clash font-medium text-white flex items-center gap-2">
+                <ImageIcon className="w-5 h-5 text-primary" /> Media Gallery
+              </h3>
+              {mediaList.length > 0 && (
+                <span className="text-xs text-gray-400">
+                  Drag photos to reorder • Choose any photo as cover
+                </span>
+              )}
+            </div>
 
             {/* Dropzone & Upload Area */}
             <div
@@ -850,7 +1072,7 @@ export default function AddListing() {
               onClick={() => fileInputRef.current?.click()}
               className={`relative border-2 border-dashed rounded-2xl aspect-16/6 flex flex-col items-center justify-center p-6 text-center cursor-pointer transition-all duration-300 ${
                 isDragging
-                  ? "border-primary bg-primary/10"
+                  ? "border-primary bg-primary/10 scale-[1.005]"
                   : "border-[#2C2C2E] bg-[#1c1c1e] hover:border-primary/50 hover:bg-[#252528]"
               }`}
             >
@@ -889,41 +1111,29 @@ export default function AddListing() {
             </div>
 
             {/* Uploaded Images Preview Grid */}
-            <div>
-              <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                Uploaded Media ({mediaList.length})
-              </label>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                  Uploaded Media ({mediaList.length})
+                </label>
+                {mediaList.length > 0 && (
+                  <span className="text-[11px] text-gray-500 flex items-center gap-1">
+                    <GripVertical className="w-3.5 h-3.5 text-primary" /> Drag & drop photos to reorder
+                  </span>
+                )}
+              </div>
 
               {mediaList.length === 0 ? (
                 <p className="text-xs text-gray-500 italic">
                   No images uploaded yet.
                 </p>
               ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                  {mediaList.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="relative aspect-square rounded-xl border border-[#2C2C2E] bg-[#1c1c1e] overflow-hidden group shadow-md"
-                    >
-                      <img
-                        src={item.url}
-                        alt={`Upload ${idx + 1}`}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                      <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/70 backdrop-blur-md rounded-md text-[10px] text-primary font-mono font-bold">
-                        #{item.displayOrder}
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveMedia(idx)}
-                        className="absolute top-2 right-2 p-1.5 bg-black/70 backdrop-blur-md hover:bg-red-500 rounded-lg text-white opacity-0 group-hover:opacity-100 transition-all cursor-pointer z-10"
-                        title="Remove image"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
+                <SortableMediaGallery
+                  mediaList={mediaList}
+                  setMediaList={setMediaList}
+                  onRemove={handleRemoveMedia}
+                  onSetCover={handleSetCover}
+                />
               )}
             </div>
           </div>
@@ -1029,10 +1239,15 @@ export default function AddListing() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5 text-primary" /> Auction
-                      Ends At
-                    </label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5 text-primary" /> Auction
+                        Ends At <span className="text-primary">*</span>
+                      </label>
+                      <span className="text-[11px] text-gray-400">
+                        Max 7 days from today
+                      </span>
+                    </div>
                     <DatePicker
                       selected={auctionEndsAt ? new Date(auctionEndsAt) : null}
                       onChange={(date: Date | null) => {
@@ -1049,6 +1264,7 @@ export default function AddListing() {
                       dateFormat="MMMM d, yyyy h:mm aa"
                       placeholderText="Select date and time"
                       minDate={new Date()}
+                      maxDate={new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)}
                       className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/60 transition-colors shadow-inner cursor-pointer"
                       wrapperClassName="w-full"
                     />
@@ -1096,20 +1312,36 @@ export default function AddListing() {
 
             {/* Listing Details Card Summary */}
             <div className="p-5 bg-[#1c1c1e] border border-[#2C2C2E] rounded-2xl space-y-4">
-              <div className="flex items-center justify-between border-b border-[#2C2C2E] pb-3">
-                <div>
-                  <h4 className="text-base font-bold text-white">
-                    {title || "Untitled Listing"}
-                  </h4>
-                  <p className="text-xs text-gray-400">
-                    Category:{" "}
-                    <span className="text-primary font-semibold">
-                      {category || "Unassigned"}
-                    </span>{" "}
-                    {brand && `• Brand: ${brand}`}
-                  </p>
+              <div className="flex items-center justify-between border-b border-[#2C2C2E] pb-3 gap-4">
+                <div className="flex items-center gap-3 min-w-0">
+                  {mediaList.length > 0 && (
+                    <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-primary/40 shrink-0 bg-black">
+                      <img
+                        src={(mediaList.find((m) => m.isCover) || mediaList[0]).url}
+                        alt="Cover Preview"
+                        className="w-full h-full object-cover"
+                      />
+                      <span className="absolute bottom-0 inset-x-0 bg-primary text-[8px] font-bold text-black text-center py-0.2">
+                        COVER
+                      </span>
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <h4 className="text-base font-bold text-white truncate">
+                      {title || "Untitled Listing"}
+                    </h4>
+                    <p className="text-xs text-gray-400 truncate">
+                      Category:{" "}
+                      <span className="text-primary font-semibold">
+                        {category || "Unassigned"}
+                      </span>{" "}
+                      {brand && `• Brand: ${brand}`}
+                      {model && ` • Model: ${model}`}
+                      {trim && ` • Trim: ${trim}`}
+                    </p>
+                  </div>
                 </div>
-                <span className="px-3 py-1 bg-primary/10 border border-primary/20 text-primary text-xs font-bold rounded-lg">
+                <span className="px-3 py-1 bg-primary/10 border border-primary/20 text-primary text-xs font-bold rounded-lg shrink-0">
                   {currency}{" "}
                   {askingPrice ? Number(askingPrice).toLocaleString() : "0"}
                 </span>

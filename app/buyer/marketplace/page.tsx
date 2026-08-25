@@ -669,7 +669,7 @@ function MarketplaceCard({ asset }: { asset: ListingItem }) {
   const imageUrl = asset.media?.[0]?.url;
 
   const formattedPrice = asset.askingPrice
-    ? `${asset.currency || "$"}${Number(asset.askingPrice).toLocaleString()}`
+    ? `${"$"}${Number(asset.askingPrice).toLocaleString()}`
     : "Price on Request";
 
   const locationText =
