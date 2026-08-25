@@ -102,7 +102,7 @@ export default function CreateModelModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200"
       onClick={() => {
         if (!createModelMutation.isPending) onClose();
       }}
