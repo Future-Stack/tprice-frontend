@@ -13,7 +13,8 @@ import {
 
 export const CATEGORIES_QUERY_KEYS = {
   all: ["categories"] as const,
-  list: (params?: GetCategoriesParams) => ["categories", "list", params] as const,
+  list: (params?: GetCategoriesParams) =>
+    ["categories", "list", params] as const,
 };
 
 /**

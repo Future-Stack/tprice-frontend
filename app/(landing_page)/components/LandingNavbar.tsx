@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo, Suspense } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Menu,
@@ -15,6 +15,7 @@ import {
 import { useAuthStore, User } from "@/lib/store/useAuthStore";
 import { useLogoutMutation, useGetMeQuery } from "@/hooks/useAuth";
 import Image from "next/image";
+import { useGetCategoriesQuery } from "@/hooks/useCategories";
 
 interface SubLink {
   name: string;
@@ -27,27 +28,14 @@ interface NavLink {
   subLinks?: SubLink[];
 }
 
-const NAV_LINKS: NavLink[] = [
-  { name: "Home", href: "/" },
-  {
-    name: "MarketPlace",
-    href: "/inventory",
-  },
-  { name: "Prefered Vendor", href: "/marketplace" },
-  { name: "Sell With Us", href: "/login" },
-  {
-    name: "Events & Media",
-    href: "/events",
-    subLinks: [
-      { name: "Events & Media", href: "/events" },
-      { name: "Sponsors", href: "/sponsors" },
-    ],
-  },
-  { name: "About Us", href: "/aboutus" },
-  { name: "Contact", href: "/contact" },
+const FALLBACK_CATEGORIES = [
+  { id: "1", name: "Cars", slug: "cars" },
+  { id: "2", name: "Yachts", slug: "yachts" },
+  { id: "3", name: "Real Estate", slug: "real-estate" },
+  { id: "4", name: "Watches", slug: "watches" },
 ];
 
-export default function LandingNavbar() {
+function LandingNavbarContent() {
   const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -56,6 +44,8 @@ export default function LandingNavbar() {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentCategory = searchParams?.get("category")?.toLowerCase();
 
   const {
     user: storeUser,
@@ -63,14 +53,57 @@ export default function LandingNavbar() {
     isAuthenticated,
   } = useAuthStore();
   const logoutMutation = useLogoutMutation();
+  const { data: categoryResponse } = useGetCategoriesQuery();
+
+  const categories = useMemo(() => {
+    const list = categoryResponse?.data;
+    if (Array.isArray(list) && list.length > 0) {
+      return list
+        .filter((c) => c.isActive !== false)
+        .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
+    }
+    return FALLBACK_CATEGORIES;
+  }, [categoryResponse]);
+
+  const navLinks: NavLink[] = useMemo(() => {
+    const marketplaceSubLinks: SubLink[] = [
+      { name: "All Inventory", href: "/inventory" },
+      ...categories.map((cat) => ({
+        name: cat.name,
+        href: `/inventory?category=${encodeURIComponent(cat.slug || cat.name)}`,
+      })),
+    ];
+
+    return [
+      { name: "Home", href: "/" },
+      {
+        name: "MarketPlace",
+        href: "/inventory",
+        subLinks: marketplaceSubLinks,
+      },
+      { name: "Prefered Vendor", href: "/marketplace" },
+      { name: "Sell With Us", href: "/login" },
+      {
+        name: "Events & Media",
+        href: "/events",
+        subLinks: [
+          { name: "Events & Media", href: "/events" },
+          { name: "Sponsors", href: "/sponsors" },
+        ],
+      },
+      { name: "About Us", href: "/aboutus" },
+      { name: "Contact", href: "/contact" },
+    ];
+  }, [categories]);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   // Fetch user profile via TanStack Query
-  const { data: userProfile, isLoading: isUserLoading } =
-    useGetMeQuery(mounted && (isAuthenticated || !!storeToken));
+  const { data: userProfile, isLoading: isUserLoading } = useGetMeQuery(
+    mounted && (isAuthenticated || !!storeToken),
+  );
 
   const user = userProfile || storeUser;
   const isLoading = isUserLoading && mounted && !user;
@@ -139,6 +172,33 @@ export default function LandingNavbar() {
     return link.href;
   };
 
+  const isLinkActive = (link: NavLink, currentHref: string) => {
+    if (link.name === "MarketPlace") {
+      return pathname.startsWith("/inventory");
+    }
+    if (link.name === "Events & Media") {
+      return pathname.startsWith("/events") || pathname.startsWith("/sponsors");
+    }
+    return pathname === currentHref;
+  };
+
+  const isSubLinkActive = (sub: SubLink) => {
+    if (sub.href === "/inventory") {
+      return pathname === "/inventory" && !currentCategory;
+    }
+    if (sub.href.startsWith("/inventory?category=")) {
+      const targetCat = new URL(sub.href, "http://localhost").searchParams
+        .get("category")
+        ?.toLowerCase();
+      return (
+        pathname === "/inventory" &&
+        Boolean(currentCategory) &&
+        currentCategory === targetCat
+      );
+    }
+    return pathname === sub.href;
+  };
+
   const handleLogout = () => {
     setUserDropdownOpen(false);
     logoutMutation.mutate();
@@ -146,8 +206,9 @@ export default function LandingNavbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-100 transition-all duration-300 bg-black ${scrolled ? "bg-black/80 backdrop-blur-lg py-4" : "bg-black py-6"
-        }`}
+      className={`fixed top-0 left-0 right-0 z-100 transition-all duration-300 bg-black ${
+        scrolled ? "bg-black/80 backdrop-blur-lg py-4" : "bg-black py-6"
+      }`}
     >
       <div className="container mx-auto px-6 md:px-0 flex items-center justify-between">
         {/* Logo */}
@@ -158,16 +219,15 @@ export default function LandingNavbar() {
             className="w-full"
             width={40}
             height={40}
+            priority
           />
         </Link>
 
         {/* Desktop Links */}
         <div className="hidden lg:flex items-center gap-10">
-          {NAV_LINKS.map((link) => {
+          {navLinks.map((link) => {
             const currentHref = getNavLinkHref(link);
-            const activeSub = link.subLinks?.find((s) => s.href === pathname);
-            const displayName = activeSub ? activeSub.name : link.name;
-            const isActive = pathname === currentHref || activeSub;
+            const isActive = isLinkActive(link, currentHref);
 
             return (
               <div
@@ -179,17 +239,19 @@ export default function LandingNavbar() {
                 <div className="flex items-center gap-1.5 cursor-pointer">
                   <Link
                     href={currentHref}
-                    className={`text-sm font-montserrat font-normal transition-colors hover:text-land ${isActive ? "text-primary" : "text-white/80"
-                      }`}
+                    className={`text-sm font-montserrat font-normal transition-colors hover:text-land ${
+                      isActive ? "text-primary" : "text-white/80"
+                    }`}
                   >
-                    {displayName}
+                    {link.name}
                   </Link>
                   {link.subLinks && (
                     <ChevronDown
-                      className={`w-4 h-4 transition-transform duration-300 font-montserrat ${activeDropdown === link.name
-                        ? "rotate-180 text-primary"
-                        : "text-white/40"
-                        }`}
+                      className={`w-4 h-4 transition-transform duration-300 font-montserrat ${
+                        activeDropdown === link.name
+                          ? "rotate-180 text-primary"
+                          : "text-white/40"
+                      }`}
                     />
                   )}
                 </div>
@@ -202,21 +264,26 @@ export default function LandingNavbar() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
+                        transition={{ duration: 0.18, ease: "easeOut" }}
                         className="absolute top-full left-0 pt-6 z-101"
                       >
                         <div className="bg-[#0A0A0A] border border-white/10 rounded-sm p-2 min-w-50 shadow-2xl backdrop-blur-xl">
-                          {link.subLinks.map((sub) => (
-                            <Link
-                              key={sub.name}
-                              href={sub.href}
-                              className={`block px-4 py-3 text-sm font-montserrat font-normal rounded-sm transition-all hover:bg-primary hover:text-black ${pathname === sub.href
-                                ? "bg-primary/10 text-primary"
-                                : "text-white/70"
+                          {link.subLinks.map((sub) => {
+                            const isSubActive = isSubLinkActive(sub);
+                            return (
+                              <Link
+                                key={sub.name}
+                                href={sub.href}
+                                className={`block px-4 py-3 text-sm font-montserrat font-normal rounded-sm transition-all hover:bg-primary hover:text-black ${
+                                  isSubActive
+                                    ? "bg-primary/10 text-primary font-medium"
+                                    : "text-white/70"
                                 }`}
-                            >
-                              {sub.name}
-                            </Link>
-                          ))}
+                              >
+                                {sub.name}
+                              </Link>
+                            );
+                          })}
                         </div>
                       </motion.div>
                     )}
@@ -286,8 +353,9 @@ export default function LandingNavbar() {
                 </div>
 
                 <ChevronDown
-                  className={`w-4 h-4 text-white/50 transition-transform duration-300 group-hover:text-white ${userDropdownOpen ? "rotate-180 text-primary" : ""
-                    }`}
+                  className={`w-4 h-4 text-white/50 transition-transform duration-300 group-hover:text-white ${
+                    userDropdownOpen ? "rotate-180 text-primary" : ""
+                  }`}
                 />
               </button>
 
@@ -378,8 +446,9 @@ export default function LandingNavbar() {
 
         {/* Mobile Toggle */}
         <button
-          className="lg:hidden text-white"
+          className="lg:hidden text-white cursor-pointer p-1"
           onClick={() => setIsOpen(!isOpen)}
+          aria-label="Toggle mobile menu"
         >
           {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
@@ -395,17 +464,18 @@ export default function LandingNavbar() {
             className="lg:hidden bg-black/95 backdrop-blur-xl border-b border-white/10 overflow-hidden"
           >
             <div className="container mx-auto px-6 py-8 flex flex-col gap-6 max-h-[80vh] overflow-y-auto">
-              {NAV_LINKS.map((link) => {
+              {navLinks.map((link) => {
                 const currentHref = getNavLinkHref(link);
+                const isActive = isLinkActive(link, currentHref);
+
                 return (
                   <div key={link.name} className="space-y-4">
                     <div className="flex items-center justify-between">
                       <Link
                         href={currentHref}
-                        className={`text-lg font-medium transition-colors ${pathname === currentHref
-                          ? "text-primary"
-                          : "text-white/90"
-                          }`}
+                        className={`text-lg font-medium transition-colors ${
+                          isActive ? "text-primary" : "text-white/90"
+                        }`}
                         onClick={() => !link.subLinks && setIsOpen(false)}
                       >
                         {link.name}
@@ -417,11 +487,13 @@ export default function LandingNavbar() {
                               activeDropdown === link.name ? null : link.name,
                             )
                           }
-                          className="p-2 text-white/40"
+                          className="p-2 text-white/40 cursor-pointer"
+                          aria-label={`Toggle ${link.name} submenu`}
                         >
                           <ChevronDown
-                            className={`w-5 h-5 transition-transform ${activeDropdown === link.name ? "rotate-180" : ""
-                              }`}
+                            className={`w-5 h-5 transition-transform ${
+                              activeDropdown === link.name ? "rotate-180" : ""
+                            }`}
                           />
                         </button>
                       )}
@@ -433,19 +505,23 @@ export default function LandingNavbar() {
                         animate={{ opacity: 1, y: 0 }}
                         className="pl-4 flex flex-col gap-4 border-l border-white/10"
                       >
-                        {link.subLinks.map((sub) => (
-                          <Link
-                            key={sub.name}
-                            href={sub.href}
-                            className={`text-base font-medium transition-colors ${pathname === sub.href
-                              ? "text-primary"
-                              : "text-white/60"
+                        {link.subLinks.map((sub) => {
+                          const isSubActive = isSubLinkActive(sub);
+                          return (
+                            <Link
+                              key={sub.name}
+                              href={sub.href}
+                              className={`text-base font-medium transition-colors ${
+                                isSubActive
+                                  ? "text-primary"
+                                  : "text-white/60 hover:text-white"
                               }`}
-                            onClick={() => setIsOpen(false)}
-                          >
-                            {sub.name}
-                          </Link>
-                        ))}
+                              onClick={() => setIsOpen(false)}
+                            >
+                              {sub.name}
+                            </Link>
+                          );
+                        })}
                       </motion.div>
                     )}
                   </div>
@@ -560,5 +636,30 @@ export default function LandingNavbar() {
         )}
       </AnimatePresence>
     </nav>
+  );
+}
+
+export default function LandingNavbar() {
+  return (
+    <Suspense
+      fallback={
+        <nav className="fixed top-0 left-0 right-0 z-100 bg-black py-6">
+          <div className="container mx-auto px-6 md:px-0 flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-2">
+              <Image
+                src="/logo.svg"
+                alt="Logo"
+                className="w-full"
+                width={40}
+                height={40}
+                priority
+              />
+            </Link>
+          </div>
+        </nav>
+      }
+    >
+      <LandingNavbarContent />
+    </Suspense>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ChevronLeft,
@@ -16,11 +17,21 @@ import ProductCard from "./components/ProductCard";
 import { useListingsQuery } from "@/hooks/useListings";
 import { useDebounce } from "@/hooks/useDebounce";
 
-export default function MarketplacePage() {
+function MarketplaceContent() {
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams.get("category");
+
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("ALL");
+  const [category, setCategory] = useState(categoryParam || "ALL");
   const [brands, setBrands] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("NEWEST");
+
+  // Sync category state when URL search parameter changes
+  useEffect(() => {
+    if (categoryParam) {
+      setCategory(categoryParam);
+    }
+  }, [categoryParam]);
 
   // Filter sliders state
   const [priceRange, setPriceRange] = useState({ min: 0, max: 20000000 });
@@ -265,5 +276,21 @@ function MarketplaceSkeletonGrid() {
         </div>
       ))}
     </div>
+  );
+}
+
+export default function MarketplacePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="bg-black min-h-screen py-20 text-white flex items-center justify-center">
+          <div className="animate-pulse text-white/50 font-montserrat">
+            Loading marketplace...
+          </div>
+        </div>
+      }
+    >
+      <MarketplaceContent />
+    </Suspense>
   );
 }
