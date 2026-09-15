@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useSyncExternalStore } from "react";
+import React, { useState, useEffect, useRef, useMemo, Suspense, useSyncExternalStore } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown, LayoutDashboard, LogOut, Loader2 } from "lucide-react";
 import { useAuthStore, User } from "@/lib/store/useAuthStore";
 import { useLogoutMutation, useGetMeQuery } from "@/hooks/useAuth";
 import Image from "next/image";
+import { useGetCategoriesQuery } from "@/hooks/useCategories";
 
 interface SubLink {
   name: string;
@@ -20,26 +21,16 @@ interface NavLink {
   subLinks?: SubLink[];
 }
 
-const NAV_LINKS: NavLink[] = [
-  { name: "Home", href: "/" },
-  { name: "VIP Deals", href: "/vip-deals" },
-  { name: "Browse", href: "/browse" },
-  {
-    name: "Marketplace",
-    href: "/marketplace",
-    subLinks: [
-      { name: "Services", href: "/marketplace" },
-      { name: "Events & Media", href: "/events" },
-      { name: "Sponsors", href: "/sponsors" },
-    ],
-  },
-  { name: "About Us", href: "/aboutus" },
-  { name: "Contact", href: "/contact" },
+const FALLBACK_CATEGORIES = [
+  { id: "1", name: "Cars", slug: "cars" },
+  { id: "2", name: "Yachts", slug: "yachts" },
+  { id: "3", name: "Real Estate", slug: "real-estate" },
+  { id: "4", name: "Watches", slug: "watches" },
 ];
 
 const emptySubscribe = () => () => {};
 
-export default function LandingNavbar() {
+function LandingNavbarContent() {
   const mounted = useSyncExternalStore(
     emptySubscribe,
     () => true,
@@ -52,9 +43,53 @@ export default function LandingNavbar() {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentCategory = searchParams?.get("category")?.toLowerCase();
 
   const { user: storeUser, token: storeToken, isAuthenticated } = useAuthStore();
   const logoutMutation = useLogoutMutation();
+  const { data: categoryResponse } = useGetCategoriesQuery();
+
+  const categories = useMemo(() => {
+    const list = categoryResponse?.data;
+    if (Array.isArray(list) && list.length > 0) {
+      return list
+        .filter((c) => c.isActive !== false)
+        .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
+    }
+    return FALLBACK_CATEGORIES;
+  }, [categoryResponse]);
+
+  const navLinks: NavLink[] = useMemo(() => {
+    const marketplaceSubLinks: SubLink[] = [
+      { name: "All Inventory", href: "/inventory" },
+      ...categories.map((cat) => ({
+        name: cat.name,
+        href: `/inventory?category=${encodeURIComponent(cat.slug || cat.name)}`,
+      })),
+    ];
+
+    return [
+      { name: "Home", href: "/" },
+      {
+        name: "MarketPlace",
+        href: "/inventory",
+        subLinks: marketplaceSubLinks,
+      },
+      { name: "Prefered Vendor", href: "/marketplace" },
+      { name: "Sell With Us", href: "/login" },
+      {
+        name: "Events & Media",
+        href: "/events",
+        subLinks: [
+          { name: "Events & Media", href: "/events" },
+          { name: "Sponsors", href: "/sponsors" },
+        ],
+      },
+      { name: "About Us", href: "/aboutus" },
+      { name: "Contact", href: "/contact" },
+    ];
+  }, [categories]);
 
   // Fetch user profile via TanStack Query
   const { data: userProfile, isLoading: isUserLoading } = useGetMeQuery(
@@ -125,9 +160,39 @@ export default function LandingNavbar() {
     return link.href;
   };
 
+  const isLinkActive = (link: NavLink, currentHref: string) => {
+    if (link.name === "MarketPlace") {
+      return pathname.startsWith("/inventory");
+    }
+    if (link.name === "Events & Media") {
+      return pathname.startsWith("/events") || pathname.startsWith("/sponsors");
+    }
+    return pathname === currentHref;
+  };
+
+  const isSubLinkActive = (sub: SubLink) => {
+    if (sub.href === "/inventory") {
+      return pathname === "/inventory" && !currentCategory;
+    }
+    if (sub.href.startsWith("/inventory?category=")) {
+      const targetCat = new URL(sub.href, "http://localhost").searchParams
+        .get("category")
+        ?.toLowerCase();
+      return (
+        pathname === "/inventory" &&
+        Boolean(currentCategory) &&
+        currentCategory === targetCat
+      );
+    }
+    return pathname === sub.href;
+  };
+
   const handleLogout = () => {
-    setUserDropdownOpen(false);
-    logoutMutation.mutate();
+    logoutMutation.mutate(undefined, {
+      onSettled: () => {
+        setUserDropdownOpen(false);
+      },
+    });
   };
 
   return (
@@ -139,48 +204,39 @@ export default function LandingNavbar() {
       <div className="container mx-auto px-6 md:px-0 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <Image
-            src="/logo.svg"
-            alt="Logo"
-            className="w-auto h-10"
-            width={40}
-            height={40}
-            priority
-          />
+          <Image src="/logo.svg" alt="Logo" className="w-auto h-10" width={40} height={40} priority />
         </Link>
 
         {/* Desktop Links */}
         <div className="hidden lg:flex items-center gap-10">
-          {NAV_LINKS.map((link) => {
+          {navLinks.map((link) => {
             const currentHref = getNavLinkHref(link);
-            const activeSub = link.subLinks?.find((s) => s.href === pathname);
-            const displayName = activeSub ? activeSub.name : link.name;
-            const isActive = pathname === currentHref || activeSub;
+            const isActive = isLinkActive(link, currentHref);
 
             return (
               <div
                 key={link.name}
-                className="relative group h-full flex items-center"
-                onMouseEnter={() => setActiveDropdown(link.name)}
-                onMouseLeave={() => setActiveDropdown(null)}
+                className="relative"
+                onMouseEnter={() => link.subLinks && setActiveDropdown(link.name)}
+                onMouseLeave={() => link.subLinks && setActiveDropdown(null)}
               >
-                <div className="flex items-center gap-1.5 cursor-pointer">
-                  <Link
-                    href={currentHref}
-                    className={`text-sm font-montserrat font-normal transition-colors hover:text-land ${
-                      isActive ? "text-primary" : "text-white/80"
-                    }`}
-                  >
-                    {displayName}
-                  </Link>
+                <Link
+                  href={currentHref}
+                  className={`flex items-center gap-1.5 text-sm font-montserrat tracking-wide transition-colors py-2 ${
+                    isActive ? "text-primary font-medium" : "text-white/80 hover:text-white"
+                  }`}
+                >
+                  {link.name}
                   {link.subLinks && (
                     <ChevronDown
                       className={`w-4 h-4 transition-transform duration-300 font-montserrat ${
-                        activeDropdown === link.name ? "rotate-180 text-primary" : "text-white/40"
+                        activeDropdown === link.name
+                          ? "rotate-180 text-primary"
+                          : "text-white/40"
                       }`}
                     />
                   )}
-                </div>
+                </Link>
 
                 {/* Dropdown Menu */}
                 {link.subLinks && (
@@ -190,22 +246,26 @@ export default function LandingNavbar() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
+                        transition={{ duration: 0.2 }}
                         className="absolute top-full left-0 pt-6 z-101"
                       >
                         <div className="bg-[#0A0A0A] border border-white/10 rounded-sm p-2 min-w-50 shadow-2xl backdrop-blur-xl">
-                          {link.subLinks.map((sub) => (
-                            <Link
-                              key={sub.name}
-                              href={sub.href}
-                              className={`block px-4 py-3 text-sm font-montserrat font-normal rounded-sm transition-all hover:bg-primary hover:text-black ${
-                                pathname === sub.href
-                                  ? "bg-primary/10 text-primary"
-                                  : "text-white/70"
-                              }`}
-                            >
-                              {sub.name}
-                            </Link>
-                          ))}
+                          {link.subLinks.map((sub) => {
+                            const isSubActive = isSubLinkActive(sub);
+                            return (
+                              <Link
+                                key={sub.name}
+                                href={sub.href}
+                                className={`block px-4 py-3 text-sm font-montserrat font-normal rounded-sm transition-all hover:bg-primary hover:text-black ${
+                                  isSubActive
+                                    ? "bg-primary/10 text-primary font-medium"
+                                    : "text-white/70"
+                                }`}
+                              >
+                                {sub.name}
+                              </Link>
+                            );
+                          })}
                         </div>
                       </motion.div>
                     )}
@@ -216,38 +276,33 @@ export default function LandingNavbar() {
           })}
         </div>
 
-        {/* Desktop Auth */}
+        {/* Desktop Auth Section */}
         <div className="hidden lg:flex items-center gap-6">
           {!mounted ? (
             <>
               <Link
                 href="/login"
-                className="text-sm font-normal text-white/80 font-montserrat hover:text-white transition-colors"
+                className="text-sm font-medium tracking-wide text-white/80 hover:text-white transition-colors"
               >
                 Log in
               </Link>
               <Link
                 href="/register"
-                className="px-6 py-2.5 rounded-sm font-montserrat border border-land text-land text-sm font-normal hover:bg-primary hover:text-black transition-all duration-300"
+                className="px-6 py-2.5 rounded-sm border border-primary text-primary text-sm font-semibold tracking-wide hover:bg-primary hover:text-black transition-all duration-300"
               >
                 Register
               </Link>
             </>
           ) : isLoading ? (
-            /* Skeleton Loading State */
-            <div className="flex items-center gap-3 py-1.5 px-3.5 rounded-full bg-white/5 border border-white/10 animate-pulse">
+            <div className="flex items-center gap-3 animate-pulse">
               <div className="w-8 h-8 rounded-full bg-white/20" />
-              <div className="flex flex-col gap-1.5">
-                <div className="w-20 h-3 bg-white/20 rounded" />
-                <div className="w-12 h-2 bg-white/15 rounded" />
-              </div>
+              <div className="w-20 h-4 bg-white/20 rounded" />
             </div>
           ) : isLoggedIn ? (
-            /* Authenticated User Menu */
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                className="flex items-center gap-3 py-1.5 px-3.5 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-primary/40 transition-all cursor-pointer group"
+                className="flex items-center gap-3 py-1 px-2 rounded-full hover:bg-white/5 transition-all duration-200 cursor-pointer border border-transparent hover:border-white/10 group"
               >
                 {/* Avatar */}
                 <div className="relative w-8 h-8 rounded-full overflow-hidden bg-linear-to-br from-primary/30 to-primary/10 border border-primary/40 flex items-center justify-center shrink-0">
@@ -266,12 +321,12 @@ export default function LandingNavbar() {
                   )}
                 </div>
 
-                {/* User Name & Role */}
-                <div className="text-left hidden xl:block">
-                  <p className="text-xs font-medium text-white font-montserrat leading-tight truncate max-w-30">
+                {/* User Info */}
+                <div className="hidden xl:flex flex-col text-left">
+                  <span className="text-sm font-semibold text-white font-montserrat leading-tight group-hover:text-primary transition-colors">
                     {getUserDisplayName(user)}
-                  </p>
-                  <span className="inline-block text-[10px] font-semibold tracking-wider text-primary uppercase leading-tight font-montserrat">
+                  </span>
+                  <span className="text-[10px] text-primary/80 font-montserrat uppercase tracking-wider font-bold">
                     {user.role || "BUYER"}
                   </span>
                 </div>
@@ -283,15 +338,15 @@ export default function LandingNavbar() {
                 />
               </button>
 
-              {/* User Dropdown Menu */}
+              {/* Profile Dropdown Menu */}
               <AnimatePresence>
                 {userDropdownOpen && (
                   <motion.div
-                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute right-0 top-full mt-3 w-64 bg-[#0A0A0A] border border-white/10 rounded-md p-3 shadow-2xl backdrop-blur-xl z-105"
+                    exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                    transition={{ duration: 0.15, ease: "easeOut" }}
+                    className="absolute right-0 top-full mt-3 w-64 bg-[#0d0d0d] border border-white/10 rounded-xl shadow-2xl backdrop-blur-2xl overflow-hidden z-102"
                   >
                     {/* User Card */}
                     <div className="flex items-center gap-3 p-3 bg-white/5 rounded border border-white/5">
@@ -314,55 +369,55 @@ export default function LandingNavbar() {
                         <h4 className="text-sm font-semibold text-white font-montserrat truncate">
                           {getUserDisplayName(user)}
                         </h4>
-                        <p className="text-xs text-white/50 font-montserrat truncate">
-                          {user.email}
-                        </p>
+                        <p className="text-xs text-white/50 font-montserrat truncate">{user.email}</p>
                         <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-bold tracking-wider text-primary uppercase bg-primary/10 border border-primary/20 rounded-full">
                           {user.role || "BUYER"}
                         </span>
                       </div>
                     </div>
 
-                    <div className="h-px bg-white/10 my-2" />
+                    <div className="h-px bg-white/10 my-1" />
 
-                    {/* Dashboard & Logout Actions */}
-                    <Link
-                      href={getDashboardPath(user.role)}
-                      onClick={() => setUserDropdownOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-white/80 hover:text-black hover:bg-primary rounded transition-all font-montserrat"
-                    >
-                      <LayoutDashboard className="w-4 h-4" />
-                      Dashboard
-                    </Link>
+                    {/* Dashboard Link */}
+                    <div className="p-1">
+                      <Link
+                        href={getDashboardPath(user.role)}
+                        onClick={() => setUserDropdownOpen(false)}
+                        className="flex items-center gap-3 px-3.5 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors font-montserrat"
+                      >
+                        <LayoutDashboard className="w-4 h-4 text-primary" />
+                        <span>Dashboard</span>
+                      </Link>
 
-                    <button
-                      onClick={handleLogout}
-                      disabled={logoutMutation.isPending}
-                      className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-red-400 hover:text-white hover:bg-red-500/20 rounded transition-all font-montserrat mt-1 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {logoutMutation.isPending ? (
-                        <Loader2 className="w-4 h-4 animate-spin text-red-400" />
-                      ) : (
-                        <LogOut className="w-4 h-4" />
-                      )}
-                      {logoutMutation.isPending ? "Logging out..." : "Logout"}
-                    </button>
+                      {/* Logout Button */}
+                      <button
+                        onClick={handleLogout}
+                        disabled={logoutMutation.isPending}
+                        className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors font-montserrat cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {logoutMutation.isPending ? (
+                          <Loader2 className="w-4 h-4 animate-spin text-red-400" />
+                        ) : (
+                          <LogOut className="w-4 h-4 text-red-400" />
+                        )}
+                        <span>{logoutMutation.isPending ? "Logging out..." : "Log out"}</span>
+                      </button>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
           ) : (
-            /* Logged Out Buttons */
             <>
               <Link
                 href="/login"
-                className="text-sm font-normal text-white/80 font-montserrat hover:text-white transition-colors"
+                className="text-sm font-medium tracking-wide text-white/80 hover:text-white transition-colors"
               >
                 Log in
               </Link>
               <Link
                 href="/register"
-                className="px-6 py-2.5 rounded-sm font-montserrat border border-land text-land text-sm font-normal hover:bg-primary hover:text-black transition-all duration-300"
+                className="px-6 py-2.5 rounded-sm border border-primary text-primary text-sm font-semibold tracking-wide hover:bg-primary hover:text-black transition-all duration-300"
               >
                 Register
               </Link>
@@ -371,7 +426,11 @@ export default function LandingNavbar() {
         </div>
 
         {/* Mobile Toggle */}
-        <button className="lg:hidden text-white" onClick={() => setIsOpen(!isOpen)}>
+        <button
+          className="lg:hidden text-white cursor-pointer p-1"
+          onClick={() => setIsOpen(!isOpen)}
+          aria-label="Toggle mobile menu"
+        >
           {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
@@ -386,15 +445,17 @@ export default function LandingNavbar() {
             className="lg:hidden bg-black/95 backdrop-blur-xl border-b border-white/10 overflow-hidden"
           >
             <div className="container mx-auto px-6 py-8 flex flex-col gap-6 max-h-[80vh] overflow-y-auto">
-              {NAV_LINKS.map((link) => {
+              {navLinks.map((link) => {
                 const currentHref = getNavLinkHref(link);
+                const isActive = isLinkActive(link, currentHref);
+
                 return (
                   <div key={link.name} className="space-y-4">
                     <div className="flex items-center justify-between">
                       <Link
                         href={currentHref}
                         className={`text-lg font-medium transition-colors ${
-                          pathname === currentHref ? "text-primary" : "text-white/90"
+                          isActive ? "text-primary" : "text-white/90"
                         }`}
                         onClick={() => !link.subLinks && setIsOpen(false)}
                       >
@@ -405,7 +466,8 @@ export default function LandingNavbar() {
                           onClick={() =>
                             setActiveDropdown(activeDropdown === link.name ? null : link.name)
                           }
-                          className="p-2 text-white/40"
+                          className="p-2 text-white/40 cursor-pointer"
+                          aria-label={`Toggle ${link.name} submenu`}
                         >
                           <ChevronDown
                             className={`w-5 h-5 transition-transform ${
@@ -422,18 +484,23 @@ export default function LandingNavbar() {
                         animate={{ opacity: 1, y: 0 }}
                         className="pl-4 flex flex-col gap-4 border-l border-white/10"
                       >
-                        {link.subLinks.map((sub) => (
-                          <Link
-                            key={sub.name}
-                            href={sub.href}
-                            className={`text-base font-medium transition-colors ${
-                              pathname === sub.href ? "text-primary" : "text-white/60"
-                            }`}
-                            onClick={() => setIsOpen(false)}
-                          >
-                            {sub.name}
-                          </Link>
-                        ))}
+                        {link.subLinks.map((sub) => {
+                          const isSubActive = isSubLinkActive(sub);
+                          return (
+                            <Link
+                              key={sub.name}
+                              href={sub.href}
+                              className={`text-base font-medium transition-colors ${
+                                isSubActive
+                                  ? "text-primary"
+                                  : "text-white/60 hover:text-white"
+                              }`}
+                              onClick={() => setIsOpen(false)}
+                            >
+                              {sub.name}
+                            </Link>
+                          );
+                        })}
                       </motion.div>
                     )}
                   </div>
@@ -548,5 +615,30 @@ export default function LandingNavbar() {
         )}
       </AnimatePresence>
     </nav>
+  );
+}
+
+export default function LandingNavbar() {
+  return (
+    <Suspense
+      fallback={
+        <nav className="fixed top-0 left-0 right-0 z-100 bg-black py-6">
+          <div className="container mx-auto px-6 md:px-0 flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-2">
+              <Image
+                src="/logo.svg"
+                alt="Logo"
+                className="w-auto h-10"
+                width={40}
+                height={40}
+                priority
+              />
+            </Link>
+          </div>
+        </nav>
+      }
+    >
+      <LandingNavbarContent />
+    </Suspense>
   );
 }

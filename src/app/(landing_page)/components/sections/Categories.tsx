@@ -134,7 +134,6 @@ export default function Categories() {
             : categoriesToShow.map((cat, i) => {
                 const IconComponent = getCategoryIcon(cat.iconName, cat.name);
                 const count = cat._count?.listings ?? 0;
-                const countLabel = `${count}+ Listing${count === 1 ? "" : "s"}`;
                 const imageSrc = cat.imageUrl || DEFAULT_IMAGES[i % DEFAULT_IMAGES.length];
 
                 return (
@@ -162,7 +161,7 @@ export default function Categories() {
                         alt={cat.name}
                         fill
                         unoptimized
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                         className="object-cover transition-transform duration-700 group-hover:scale-110"
                       />
                       {/* Gradient Overlay */}

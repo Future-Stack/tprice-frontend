@@ -215,7 +215,8 @@ export default function FilterSidebar({
           {categoriesList.map((catItem) => {
             const isSelected =
               (catItem === "All" && (!category || category === "ALL" || category === "All")) ||
-              category === catItem;
+              category?.toLowerCase() === catItem.toLowerCase() ||
+              category?.toLowerCase() === catItem.toLowerCase().replace(/\s+/g, "-");
             return (
               <button
                 key={catItem}
