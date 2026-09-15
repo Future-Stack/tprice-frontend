@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { Star, MapPin, Briefcase } from "lucide-react";
 import { ServiceItem } from "../../data";
 
@@ -13,8 +14,8 @@ export default function ProfileCard({ item }: ProfileCardProps) {
     <div className="bg-[#1A1A1A] rounded-2xl p-8 relative mt-[-100px] shadow-2xl border border-white/5 md:p-10 z-10 w-full mb-8">
       {/* Dynamic Avatar Overlap */}
       <div className="absolute -top-16 left-8 md:left-10 z-20">
-        <div className="w-32 h-32 rounded-full border-8 border-[#1A1A1A] overflow-hidden bg-black shadow-xl">
-          <img src={item.expertImage} alt={item.name} className="w-full h-full object-cover" />
+        <div className="relative w-32 h-32 rounded-full border-8 border-[#1A1A1A] overflow-hidden bg-black shadow-xl">
+          <Image src={item.expertImage} alt={item.name} fill unoptimized className="object-cover" />
         </div>
       </div>
 

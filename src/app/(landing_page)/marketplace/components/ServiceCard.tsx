@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { Star, Heart, MoveRight } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -37,10 +38,12 @@ export default function ServiceCard({ item }: ServiceCardProps) {
       {/* Top Image Section */}
       <Link href={`/marketplace/${profileSlug}`} className="block relative aspect-[4/3] w-full">
         <div className="absolute inset-0 overflow-hidden">
-          <img
+          <Image
             src={item.image}
             alt={item.name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+            fill
+            unoptimized
+            className="object-cover group-hover:scale-110 transition-transform duration-700"
           />
         </div>
 
@@ -65,7 +68,13 @@ export default function ServiceCard({ item }: ServiceCardProps) {
         {/* Expert Profile Overlap */}
         <div className="absolute -bottom-7 left-6 z-20">
           <div className="relative w-14 h-14 rounded-full border-[3px] border-[#0A0A0A] overflow-hidden bg-[#1A1A1A] shadow-xl">
-            <img src={item.expertImage} alt={item.name} className="w-full h-full object-cover" />
+            <Image
+              src={item.expertImage}
+              alt={item.name}
+              fill
+              unoptimized
+              className="object-cover"
+            />
           </div>
         </div>
       </Link>

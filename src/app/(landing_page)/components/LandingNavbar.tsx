@@ -245,10 +245,12 @@ export default function LandingNavbar() {
                 {/* Avatar */}
                 <div className="relative w-8 h-8 rounded-full overflow-hidden bg-linear-to-br from-primary/30 to-primary/10 border border-primary/40 flex items-center justify-center shrink-0">
                   {user.avatarUrl || user.avatar ? (
-                    <img
-                      src={user.avatarUrl || user.avatar}
+                    <Image
+                      src={user.avatarUrl || user.avatar || ""}
                       alt={getUserDisplayName(user)}
-                      className="w-full h-full object-cover"
+                      fill
+                      unoptimized
+                      className="object-cover"
                     />
                   ) : (
                     <span className="text-xs font-bold text-primary font-montserrat">
@@ -286,12 +288,14 @@ export default function LandingNavbar() {
                   >
                     {/* User Card */}
                     <div className="flex items-center gap-3 p-3 bg-white/5 rounded border border-white/5">
-                      <div className="w-10 h-10 rounded-full bg-linear-to-br from-primary/30 to-primary/10 border border-primary/40 flex items-center justify-center shrink-0 overflow-hidden">
+                      <div className="relative w-10 h-10 rounded-full bg-linear-to-br from-primary/30 to-primary/10 border border-primary/40 flex items-center justify-center shrink-0 overflow-hidden">
                         {user.avatarUrl || user.avatar ? (
-                          <img
-                            src={user.avatarUrl || user.avatar}
+                          <Image
+                            src={user.avatarUrl || user.avatar || ""}
                             alt={getUserDisplayName(user)}
-                            className="w-full h-full object-cover"
+                            fill
+                            unoptimized
+                            className="object-cover"
                           />
                         ) : (
                           <span className="text-sm font-bold text-primary font-montserrat">
@@ -461,12 +465,14 @@ export default function LandingNavbar() {
                 <div className="flex flex-col gap-4">
                   {/* User Profile Card */}
                   <div className="flex items-center gap-3 p-3 bg-white/5 rounded border border-white/10">
-                    <div className="w-10 h-10 rounded-full bg-linear-to-br from-primary/30 to-primary/10 border border-primary/40 flex items-center justify-center shrink-0 overflow-hidden">
+                    <div className="relative w-10 h-10 rounded-full bg-linear-to-br from-primary/30 to-primary/10 border border-primary/40 flex items-center justify-center shrink-0 overflow-hidden">
                       {user.avatarUrl || user.avatar ? (
-                        <img
-                          src={user.avatarUrl || user.avatar}
+                        <Image
+                          src={user.avatarUrl || user.avatar || ""}
                           alt={getUserDisplayName(user)}
-                          className="w-full h-full object-cover"
+                          fill
+                          unoptimized
+                          className="object-cover"
                         />
                       ) : (
                         <span className="text-sm font-bold text-primary font-montserrat">

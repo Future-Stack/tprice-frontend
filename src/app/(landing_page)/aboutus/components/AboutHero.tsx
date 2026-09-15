@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 
 const STATS = [
@@ -15,9 +16,11 @@ export default function AboutHero() {
       <section className="relative min-h-125 w-full overflow-hidden flex flex-col justify-center pt-35">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
-          <img
+          <Image
             src="/images/landing/hero-yacht.png"
-            className="w-full h-auto object-cover"
+            fill
+            priority
+            className="object-cover"
             alt="Luxury Yacht"
           />
           {/* Aggressive Dark Overlay as seen in Image 2 */}

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 
 export default function ServicesHero() {
@@ -8,10 +9,12 @@ export default function ServicesHero() {
     <section className="relative h-screen w-full overflow-hidden flex flex-col justify-center">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
-        <img
+        <Image
           src="/images/services/hero.png"
           alt="Services Hero"
-          className="w-full h-full object-cover"
+          fill
+          priority
+          className="object-cover"
         />
         {/* Cinematic Overlays */}
         <div className="absolute inset-0 bg-black/20 z-[1]" />

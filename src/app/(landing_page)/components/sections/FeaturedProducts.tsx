@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, MapPin, AlertTriangle, Sparkles } from "lucide-react";
 import Link from "next/link";
@@ -49,14 +50,12 @@ const ProductCard = React.memo(({ product, variant, heightClass }: ProductCardPr
         href={`/inventory/${product.slug || product.id}`}
         className={`group relative ${heightClass} block overflow-hidden rounded-xl border border-white/5 hover:border-primary/40 transition-all shadow-2xl`}
       >
-        <img
+        <Image
           src={getProductImage(product)}
           alt={product.title}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src =
-              "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
-          }}
+          fill
+          unoptimized
+          className="object-cover transition-transform duration-1000 group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-linear-to-t from-black via-black/30 to-transparent" />
 
@@ -90,14 +89,12 @@ const ProductCard = React.memo(({ product, variant, heightClass }: ProductCardPr
       href={`/inventory/${product.slug || product.id}`}
       className={`group relative ${heightClass} block overflow-hidden rounded-xl border border-white/5 hover:border-primary/40 transition-all shadow-xl`}
     >
-      <img
+      <Image
         src={getProductImage(product)}
         alt={product.title}
-        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-        onError={(e) => {
-          (e.target as HTMLImageElement).src =
-            "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
-        }}
+        fill
+        unoptimized
+        className="object-cover transition-transform duration-700 group-hover:scale-105"
       />
       <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-transparent" />
       <div className="absolute top-4 left-4 px-3 py-1 bg-white/10 backdrop-blur-md border border-white/10 rounded-full text-white/90 text-[10px] font-bold uppercase">

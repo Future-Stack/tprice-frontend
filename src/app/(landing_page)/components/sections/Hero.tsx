@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useAuthStore } from "@/lib/store/useAuthStore";
@@ -79,9 +80,11 @@ export default function Hero() {
                 <source src={currentAsset.src} type="video/mp4" />
               </video>
             ) : (
-              <img
+              <Image
                 src={currentAsset.src}
-                className="w-full h-full object-cover"
+                fill
+                priority
+                className="object-cover"
                 alt="Luxury Asset"
               />
             )}

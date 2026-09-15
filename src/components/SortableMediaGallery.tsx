@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import {
   DndContext,
   closestCenter,
@@ -71,10 +72,12 @@ function SortableMediaCard({ item, index, isCover, onRemove, onSetCover }: Sorta
             : "border-[#2C2C2E] bg-[#1c1c1e] hover:border-gray-600"
       }`}
     >
-      <img
+      <Image
         src={item.url}
         alt={`Upload ${index + 1}`}
-        className="w-full h-full object-cover pointer-events-none transition-transform duration-300 group-hover:scale-105"
+        fill
+        unoptimized
+        className="object-cover pointer-events-none transition-transform duration-300 group-hover:scale-105"
       />
 
       {/* Top Gradient Overlay */}
@@ -203,8 +206,8 @@ export default function SortableMediaGallery({
 
       <DragOverlay dropAnimation={{ duration: 250, easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)" }}>
         {activeItem ? (
-          <div className="aspect-square rounded-xl border-2 border-primary bg-[#1c1c1e] overflow-hidden shadow-2xl scale-105 rotate-1 ring-4 ring-primary/20 pointer-events-none">
-            <img src={activeItem.url} alt="Dragging" className="w-full h-full object-cover" />
+          <div className="relative aspect-square rounded-xl border-2 border-primary bg-[#1c1c1e] overflow-hidden shadow-2xl scale-105 rotate-1 ring-4 ring-primary/20 pointer-events-none">
+            <Image src={activeItem.url} alt="Dragging" fill unoptimized className="object-cover" />
             <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/90 backdrop-blur-md rounded-md text-[10px] text-primary font-mono font-bold border border-primary/30 flex items-center gap-1">
               <GripVertical className="w-3 h-3 text-primary" />#{activeItem.displayOrder}
             </div>

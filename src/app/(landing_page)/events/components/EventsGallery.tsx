@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Play, AlertCircle, RefreshCw } from "lucide-react";
 import MediaModal from "./MediaModal";
@@ -194,9 +195,11 @@ function MediaCard({
       onClick={onClick}
       className={`relative rounded-sm overflow-hidden group cursor-pointer border border-white/5 ${aspectClass}`}
     >
-      <img
+      <Image
         src={displayImage}
-        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+        fill
+        unoptimized
+        className="object-cover group-hover:scale-110 transition-transform duration-700"
         alt={item.title || "Media item"}
       />
 

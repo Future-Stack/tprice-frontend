@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 
@@ -48,7 +49,7 @@ export default function MediaModal({ isOpen, onClose, media }: MediaModalProps) 
 
             {/* Media Rendering */}
             <div
-              className="w-full h-full flex items-center justify-center"
+              className="w-full h-full flex items-center justify-center relative"
               onClick={(e) => e.stopPropagation()}
             >
               {media.type === "video" ? (
@@ -56,9 +57,11 @@ export default function MediaModal({ isOpen, onClose, media }: MediaModalProps) 
                   <source src={media.src} type="video/mp4" />
                 </video>
               ) : (
-                <img
+                <Image
                   src={media.src}
-                  className="w-full h-full object-contain"
+                  fill
+                  unoptimized
+                  className="object-contain"
                   alt={media.title || "Gallery Item"}
                 />
               )}

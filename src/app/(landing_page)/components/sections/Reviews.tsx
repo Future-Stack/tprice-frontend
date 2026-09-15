@@ -190,16 +190,21 @@ export default function Reviews() {
                     }`}
                     aria-label={`Go to review by ${review.reviewerName}`}
                   >
-                    <img
-                      src={review.avatarUrl || DEFAULT_AVATAR}
-                      alt={review.reviewerName || "Reviewer"}
-                      onError={handleImageError}
-                      className={`w-10 h-10 rounded-full object-cover ${
+                    <div
+                      className={`relative w-10 h-10 rounded-full overflow-hidden ${
                         currentActiveIndex === i
                           ? "border-2 border-primary"
                           : "border border-white/10"
                       }`}
-                    />
+                    >
+                      <Image
+                        src={review.avatarUrl || DEFAULT_AVATAR}
+                        alt={review.reviewerName || "Reviewer"}
+                        fill
+                        unoptimized
+                        className="object-cover"
+                      />
+                    </div>
                   </button>
                 ))}
               </div>

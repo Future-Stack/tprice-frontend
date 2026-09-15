@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import {
@@ -160,17 +161,15 @@ export default function EventsList() {
                     >
                       {/* Image Section */}
                       <div className="relative aspect-16/10 overflow-hidden bg-white/5">
-                        <img
+                        <Image
                           src={
                             event.coverImageUrl ||
                             "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
                           }
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          fill
+                          unoptimized
+                          className="object-cover transition-transform duration-700 group-hover:scale-105"
                           alt={event.title}
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src =
-                              "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
-                          }}
                         />
                         <div className="absolute top-6 left-6">
                           <span className="px-4 py-1.5 bg-[#31473B] backdrop-blur-md border border-[#4ADE80]/30 text-[#4ADE80] text-[10px] font-bold uppercase tracking-[0.2em] rounded-full">

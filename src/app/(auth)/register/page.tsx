@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -147,10 +148,12 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-black flex flex-col lg:flex-row overflow-hidden">
       {/* Left Side: Luxury Image & Text */}
       <div className="hidden lg:flex lg:w-1/2 relative h-full min-h-screen">
-        <img
+        <Image
           src="/images/landing/hero-villa.png"
           alt="Luxury Gateway"
-          className="absolute inset-0 w-full h-full object-cover grayscale-[0.2]"
+          fill
+          priority
+          className="object-cover grayscale-[0.2]"
         />
         <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
 

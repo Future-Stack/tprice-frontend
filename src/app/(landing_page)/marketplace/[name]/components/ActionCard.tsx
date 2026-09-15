@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { ServiceItem } from "../../data";
 
 interface ActionCardProps {
@@ -11,8 +12,8 @@ export default function ActionCard({ item }: ActionCardProps) {
   return (
     <div className="bg-[#1A1A1A] rounded-2xl p-6 shadow-2xl border border-white/5 sticky top-32 z-20">
       <div className="flex items-center gap-4 mb-6">
-        <div className="w-14 h-14 rounded-full overflow-hidden bg-black shrink-0">
-          <img src={item.expertImage} alt={item.name} className="w-full h-full object-cover" />
+        <div className="relative w-14 h-14 rounded-full overflow-hidden bg-black shrink-0">
+          <Image src={item.expertImage} alt={item.name} fill unoptimized className="object-cover" />
         </div>
         <div>
           <h3 className="text-xl font-serif text-white">{item.name}</h3>

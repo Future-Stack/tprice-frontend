@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { ServiceItem } from "../../data";
 import { MapPin } from "lucide-react";
 
@@ -18,10 +19,12 @@ export default function PortfolioGallery({ item }: PortfolioGalleryProps) {
 
       {/* Main Image */}
       <div className="relative w-full aspect-[2/1] md:aspect-[2.5/1] rounded-lg overflow-hidden mb-4">
-        <img
+        <Image
           src={images[activeIndex]}
           alt="Portfolio Main"
-          className="w-full h-full object-cover"
+          fill
+          unoptimized
+          className="object-cover"
         />
         <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
         <div className="absolute bottom-6 left-6">
@@ -45,7 +48,7 @@ export default function PortfolioGallery({ item }: PortfolioGalleryProps) {
                 : "border-transparent opacity-60 hover:opacity-100"
             }`}
           >
-            <img src={img} alt={`Thumb ${i}`} className="w-full h-full object-cover" />
+            <Image src={img} alt={`Thumb ${i}`} fill unoptimized className="object-cover" />
           </button>
         ))}
       </div>

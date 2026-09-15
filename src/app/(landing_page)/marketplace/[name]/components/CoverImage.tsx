@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 
 interface CoverImageProps {
   image: string;
@@ -9,7 +10,7 @@ interface CoverImageProps {
 export default function CoverImage({ image }: CoverImageProps) {
   return (
     <div className="relative w-full h-[350px] md:h-[450px] lg:h-[500px]">
-      <img src={image} alt="Cover" className="w-full h-full object-cover" />
+      <Image src={image} alt="Cover" fill priority unoptimized className="object-cover" />
       <div className="absolute inset-0 bg-linear-to-t from-black via-black/20 to-transparent" />
       <div className="absolute inset-0 bg-black/40" />
     </div>

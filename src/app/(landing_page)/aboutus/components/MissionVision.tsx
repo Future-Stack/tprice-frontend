@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 
 const SLIDE_ASSETS = [
@@ -68,11 +69,12 @@ export default function MissionVision() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 1.05 }}
                 transition={{ duration: 1 }}
-                className="w-1/2 h-full rounded-lg overflow-hidden border border-white/5"
+                className="w-1/2 h-full rounded-lg overflow-hidden border border-white/5 relative"
               >
-                <img
+                <Image
                   src={SLIDE_ASSETS[currentIndex].src}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                   alt="Luxury Asset 1"
                 />
               </motion.div>
@@ -85,11 +87,12 @@ export default function MissionVision() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 1.05 }}
                 transition={{ duration: 1, delay: 0.2 }}
-                className="w-1/2 h-full rounded-lg overflow-hidden border border-white/5 mt-12"
+                className="w-1/2 h-full rounded-lg overflow-hidden border border-white/5 mt-12 relative"
               >
-                <img
+                <Image
                   src={SLIDE_ASSETS[(currentIndex + 1) % SLIDE_ASSETS.length].src}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                   alt="Luxury Asset 2"
                 />
               </motion.div>

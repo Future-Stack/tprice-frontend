@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight, Calendar, MapPin, AlertCircle, RefreshCw } from "lucide-react";
@@ -131,13 +132,12 @@ export default function Events() {
                 className="relative aspect-video md:aspect-21/9 w-full rounded-2xl overflow-hidden cursor-default"
               >
                 {/* Background Image */}
-                <img
+                <Image
                   src={currentEvent.coverImageUrl || "/images/landing/hero-car.png"}
                   alt={currentEvent.title}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = "/images/landing/hero-car.png";
-                  }}
+                  fill
+                  unoptimized
+                  className="object-cover"
                 />
 
                 {/* Overlay */}
