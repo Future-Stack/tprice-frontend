@@ -13,7 +13,7 @@ import {
   useSavedListingsQuery,
 } from "@/hooks/useListings";
 import { useOffersQuery, useCreateOfferMutation, useCounterOfferMutation } from "@/hooks/useOffers";
-import { useAuthStore } from "@/lib/store/useAuthStore";
+import { useAuth } from "@/hooks/useAuth";
 import {
   MapPin,
   ChevronLeft,
@@ -96,8 +96,7 @@ export default function InventoryDetailsPage() {
   const createOfferMutation = useCreateOfferMutation();
   const counterOfferMutation = useCounterOfferMutation();
 
-  const token =
-    Cookies.get("accessToken") || Cookies.get("token") || useAuthStore((state) => state.token);
+  const { token } = useAuth();
 
   const { data: savedResponse } = useSavedListingsQuery(
     { page: 1, limit: 100 },

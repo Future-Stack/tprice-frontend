@@ -1,11 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useSyncExternalStore } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import Cookies from "js-cookie";
 import { Loader2 as SpinnerIcon } from "lucide-react";
-import { useAuthStore } from "@/lib/store/useAuthStore";
-import { useGetMeQuery } from "@/hooks/useAuth";
+import { useAuth, useGetMeQuery } from "@/hooks/useAuth";
 
 export const getDashboardPath = (role?: string): string => {
   if (!role) return "/buyer";
@@ -21,23 +19,18 @@ interface ProtectedRouteProps {
   allowedRoles?: string[];
 }
 
+const emptySubscribe = () => () => {};
+
 export default function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const [isMounted, setIsMounted] = useState(false);
+  const isMounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
 
-  const { user: storeUser, token: storeToken, logout } = useAuthStore();
-  const token =
-    storeToken || Cookies.get("accessToken") || Cookies.get("accessToken") || Cookies.get("token");
-
-  // Fetch user if token exists
-  const { data: fetchedUser, isLoading, isError } = useGetMeQuery(!!token);
-
-  const currentUser = fetchedUser || storeUser;
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  const { user: storeUser, token, logout } = useAuth();
 
   useEffect(() => {
     if (!isMounted) return;

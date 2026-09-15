@@ -4,11 +4,10 @@ import React, { useMemo } from "react";
 import { Heart, MapPin, CheckCircle2, MoveRight, Gauge, Calendar, Zap, Cog } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import Cookies from "js-cookie";
-import { toast } from "sonner";
 import { ListingItem } from "@/lib/api/listings";
 import { useSaveListingMutation, useSavedListingsQuery } from "@/hooks/useListings";
-import { useAuthStore } from "@/lib/store/useAuthStore";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 interface ProductCardProps {
   item: ListingItem;
@@ -16,8 +15,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ item }: ProductCardProps) {
   const saveMutation = useSaveListingMutation();
-  const token =
-    Cookies.get("accessToken") || Cookies.get("token") || useAuthStore((state) => state.token);
+  const { token } = useAuth();
 
   // Fetch saved listings if authenticated to cross-reference saved status
   const { data: savedResponse } = useSavedListingsQuery(

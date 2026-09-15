@@ -28,7 +28,7 @@ import {
   useSavedListingsQuery,
 } from "@/hooks/useListings";
 import { useOffersQuery, useCreateOfferMutation } from "@/hooks/useOffers";
-import { useAuthStore } from "@/lib/store/useAuthStore";
+import { useAuth } from "@/hooks/useAuth";
 import { ListingItem } from "@/lib/api/listings";
 import Image from "next/image";
 
@@ -181,8 +181,7 @@ export default function VIPDetailsPage() {
   const [offerNote, setOfferNote] = useState("");
 
   const saveMutation = useSaveListingMutation();
-  const token =
-    Cookies.get("accessToken") || Cookies.get("token") || useAuthStore((state) => state.token);
+  const { token } = useAuth();
 
   const { data: savedResponse } = useSavedListingsQuery(
     { page: 1, limit: 100 },

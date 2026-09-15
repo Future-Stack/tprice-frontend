@@ -23,7 +23,7 @@ import {
   useSaveListingMutation,
   useSavedListingsQuery,
 } from "@/hooks/useListings";
-import { useAuthStore } from "@/lib/store/useAuthStore";
+import { useAuth } from "@/hooks/useAuth";
 import { ListingItem } from "@/lib/api/listings";
 
 /* ─── Helpers ─── */
@@ -171,8 +171,7 @@ export default function VIPDetailsPage() {
   const [copied, setCopied] = useState(false);
 
   const saveMutation = useSaveListingMutation();
-  const token =
-    Cookies.get("accessToken") || Cookies.get("token") || useAuthStore((state) => state.token);
+  const { token } = useAuth();
 
   const { data: savedResponse } = useSavedListingsQuery(
     { page: 1, limit: 100 },

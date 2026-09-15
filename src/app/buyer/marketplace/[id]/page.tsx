@@ -33,7 +33,7 @@ import {
   useSavedListingsQuery,
 } from "@/hooks/useListings";
 import { useOffersQuery, useCreateOfferMutation } from "@/hooks/useOffers";
-import { useAuthStore } from "@/lib/store/useAuthStore";
+import { useAuth } from "@/hooks/useAuth";
 
 /* ─── Helper utilities for dynamic key-value specifications ─── */
 function formatSpecKey(key: string): string {
@@ -92,8 +92,7 @@ export default function BuyerListingDetailPage() {
 
   const saveMutation = useSaveListingMutation();
   const createOfferMutation = useCreateOfferMutation();
-  const token =
-    Cookies.get("accessToken") || Cookies.get("token") || useAuthStore((state) => state.token);
+  const { token } = useAuth();
 
   const { data: savedResponse } = useSavedListingsQuery(
     { page: 1, limit: 100 },

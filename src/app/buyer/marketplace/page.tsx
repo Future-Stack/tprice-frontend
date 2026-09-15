@@ -26,7 +26,7 @@ import {
 } from "@/hooks/useListings";
 import { useGetCategoriesQuery } from "@/hooks/useCategories";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useAuthStore } from "@/lib/store/useAuthStore";
+import { useAuth } from "@/hooks/useAuth";
 import { ListingItem } from "@/lib/api/listings";
 
 const SORT_OPTIONS = [
@@ -603,8 +603,7 @@ function ListingsSkeleton() {
 /* ─── MarketplaceCard Component ─── */
 function MarketplaceCard({ asset }: { asset: ListingItem }) {
   const saveMutation = useSaveListingMutation();
-  const token =
-    Cookies.get("accessToken") || Cookies.get("token") || useAuthStore((state) => state.token);
+  const { token } = useAuth();
 
   const { data: savedResponse } = useSavedListingsQuery(
     { page: 1, limit: 100 },

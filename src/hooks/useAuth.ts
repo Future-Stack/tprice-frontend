@@ -206,3 +206,32 @@ export const useResetPasswordMutation = () => {
     mutationFn: (payload: ResetPasswordPayload) => resetPasswordApi(payload),
   });
 };
+
+/**
+ * Centralized Auth Hook
+ * Single source of truth for authentication state throughout the app.
+ */
+export const useAuth = () => {
+  const user = useAuthStore((state) => state.user);
+  const token = useAuthStore((state) => state.token);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const logout = useAuthStore((state) => state.logout);
+  const setUser = useAuthStore((state) => state.setUser);
+  const setToken = useAuthStore((state) => state.setToken);
+
+  const activeToken =
+    token ||
+    (typeof window !== "undefined"
+      ? Cookies.get("accessToken") || Cookies.get("token") || Cookies.get("access_token") || null
+      : null);
+
+  return {
+    user,
+    token: activeToken,
+    isAuthenticated: isAuthenticated || Boolean(activeToken),
+    logout,
+    setUser,
+    setToken,
+  };
+};
+
