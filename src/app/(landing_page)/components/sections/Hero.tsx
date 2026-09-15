@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -16,8 +16,15 @@ const HERO_ASSETS = [
   { type: "image", src: "/images/landing/hero-villa.png" },
 ];
 
+const emptySubscribe = () => () => {};
+
 export default function Hero() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const isMounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
   const currentAsset = HERO_ASSETS[currentIndex];
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const storeUser = useAuthStore((state) => state.user);
@@ -40,7 +47,9 @@ export default function Hero() {
     },
   ];
 
-  const showVipButton = !user || (!user.vipStatus && user.role?.toUpperCase() === "BUYER");
+  const effectiveUser = isMounted ? user : null;
+  const showVipButton =
+    !effectiveUser || (!effectiveUser.vipStatus && effectiveUser.role?.toUpperCase() === "BUYER");
 
   const nextAsset = () => {
     setCurrentIndex((prev) => (prev + 1) % HERO_ASSETS.length);
@@ -140,7 +149,7 @@ export default function Hero() {
           </Link>
           {showVipButton && (
             <Link
-              href={isAuthenticated ? "/buyer/subscription" : "/login"}
+              href={isMounted && isAuthenticated ? "/buyer/subscription" : "/login"}
               className="px-10 font-montserrat py-4 bg-land text-black rounded-sm cursor-pointer text-sm font-bold tracking-wide hover:bg-white hover:text-black transition-all duration-300 flex items-center justify-center gap-2"
             >
               Become a VIP Buyer

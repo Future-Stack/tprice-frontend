@@ -133,9 +133,10 @@ export default function Reviews() {
                           src={currentReview.avatarUrl || DEFAULT_AVATAR}
                           alt={currentReview.reviewerName || "Reviewer"}
                           onError={handleImageError}
-                          className="w-14 h-14 rounded-full object-cover border-2 border-primary/20  "
+                          className="w-14 h-14 rounded-full object-cover border-2 border-primary/20"
                           width={56}
                           height={56}
+                          unoptimized
                         />
                       </div>
                       <div className=" ">

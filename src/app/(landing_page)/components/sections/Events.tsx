@@ -137,6 +137,7 @@ export default function Events() {
                   alt={currentEvent.title}
                   fill
                   unoptimized
+                  sizes="(max-width: 768px) 100vw, 1200px"
                   className="object-cover"
                 />
 
