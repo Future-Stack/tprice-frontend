@@ -48,7 +48,7 @@ export const useLogoutMutation = () => {
       toast.success(data?.message || "Logged out successfully!");
       router.push("/");
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error("Logout API error:", error);
 
       // Perform local cleanup as fallback even if backend request fails
@@ -137,12 +137,9 @@ export const useGetMeQuery = (enabled: boolean = true) => {
     },
     enabled: enabled && hasToken,
     staleTime: 5 * 60 * 1000,
-    retry: (failureCount, error: any) => {
-      if (
-        error?.response?.status === 401 ||
-        error?.response?.status === 403 ||
-        error?.response?.status === 404
-      ) {
+    retry: (failureCount, error: unknown) => {
+      const status = (error as { response?: { status?: number } })?.response?.status;
+      if (status === 401 || status === 403 || status === 404) {
         return false;
       }
       return failureCount < 1;
@@ -166,8 +163,10 @@ export const useUpdateProfileMutation = () => {
       queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.user });
       toast.success("Profile updated successfully!");
     },
-    onError: (error: any) => {
-      const msg = error.response?.data?.message || "Failed to update profile";
+    onError: (error: unknown) => {
+      const msg =
+        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        "Failed to update profile";
       toast.error(msg);
     },
   });
@@ -182,8 +181,10 @@ export const useChangePasswordMutation = () => {
     onSuccess: (data) => {
       toast.success(data?.message || "Password changed successfully!");
     },
-    onError: (error: any) => {
-      const msg = error.response?.data?.message || "Failed to change password";
+    onError: (error: unknown) => {
+      const msg =
+        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        "Failed to change password";
       toast.error(msg);
     },
   });
@@ -234,4 +235,3 @@ export const useAuth = () => {
     setToken,
   };
 };
-

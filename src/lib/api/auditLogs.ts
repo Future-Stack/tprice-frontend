@@ -16,7 +16,7 @@ export interface AuditLogItem {
   resourceId: string;
   ipAddress?: string | null;
   userAgent?: string | null;
-  changes?: Record<string, any> | null;
+  changes?: Record<string, unknown> | null;
   createdAt: string;
   user?: AuditLogUser | null;
 }
@@ -45,7 +45,7 @@ export interface GetAuditLogsParams {
  * Fetch audit logs via GET /audit-logs
  */
 export const getAuditLogsApi = async (params?: GetAuditLogsParams): Promise<AuditLogsResponse> => {
-  const queryParams: Record<string, any> = {};
+  const queryParams: Record<string, string | number> = {};
 
   if (params) {
     if (params.page !== undefined) queryParams.page = params.page;

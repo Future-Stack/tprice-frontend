@@ -36,8 +36,11 @@ export const useRevokeSessionMutation = () => {
       });
       toast.success(data?.message || "Session revoked successfully");
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.message || "Failed to revoke session";
+    onError: (error: unknown) => {
+      const message =
+        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (error as Error)?.message ||
+        "Failed to revoke session";
       toast.error(message);
     },
   });

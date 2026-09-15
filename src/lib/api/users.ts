@@ -1,3 +1,4 @@
+import axios from "axios";
 import apiClient from "./axios";
 
 export interface UserCount {
@@ -64,7 +65,7 @@ export interface UpdateUserStatusPayload {
 export const getAdminUsersApi = async (
   params?: GetAdminUsersParams
 ): Promise<AdminUsersResponse> => {
-  const queryParams: Record<string, any> = {};
+  const queryParams: Record<string, string | number | boolean> = {};
 
   if (params) {
     if (params.page !== undefined) queryParams.page = params.page;
@@ -97,9 +98,9 @@ export const updateAdminUserStatusApi = async (
   try {
     const response = await apiClient.patch<AdminUserItem>(`/admin/users/${id}`, payload);
     return response.data;
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Fallback if status endpoint is /admin/users/:id/status
-    if (error.response?.status === 404) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
       const fallbackResponse = await apiClient.patch<AdminUserItem>(
         `/admin/users/${id}/status`,
         payload
@@ -154,7 +155,7 @@ export interface VipStatusResponse {
 export interface ClaimVipTrialResponse {
   message?: string;
   success?: boolean;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**
@@ -165,11 +166,11 @@ export const getVipStatusApi = async (): Promise<VipStatusResponse> => {
     "/users/me/vip-status"
   );
 
-  const resData = response.data as any;
-  if (resData?.data && resData?.data?.isVip !== undefined) {
+  const resData = response.data;
+  if ("data" in resData && (resData.data as VipStatusResponse)?.isVip !== undefined) {
     return resData.data;
   }
-  return resData;
+  return resData as VipStatusResponse;
 };
 
 /**
@@ -181,9 +182,9 @@ export const claimVipTrialApi = async (): Promise<ClaimVipTrialResponse> => {
     {}
   );
 
-  const resData = response.data as any;
-  if (resData?.data) {
-    return resData.data;
+  const resData = response.data;
+  if ("data" in resData && resData.data) {
+    return resData.data as ClaimVipTrialResponse;
   }
-  return resData;
+  return resData as ClaimVipTrialResponse;
 };

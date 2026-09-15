@@ -8,7 +8,7 @@ export interface NotificationItem {
   type: string;
   isRead: boolean;
   link: string | null;
-  metadata: Record<string, any> | null;
+  metadata: Record<string, unknown> | null;
   createdAt: string;
   updatedAt: string;
 }

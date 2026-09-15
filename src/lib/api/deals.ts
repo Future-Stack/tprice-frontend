@@ -14,7 +14,7 @@ export interface DealMessage {
   dealId: string;
   senderId: string;
   message: string;
-  attachments?: any | null;
+  attachments?: unknown | null;
   createdAt: string;
   sender?: DealUser | null;
 }
@@ -49,7 +49,7 @@ export interface DealItem {
   buyer?: DealUser | null;
   seller?: DealUser | null;
   messages?: DealMessage[];
-  offer?: any;
+  offer?: Record<string, unknown> | null;
 }
 
 export interface DealsMeta {
@@ -104,15 +104,17 @@ export const getDealDetailApi = async (dealId: string): Promise<DealItem> => {
  * Fetch messages for a specific deal
  */
 export const getDealMessagesApi = async (dealId: string): Promise<DealMessage[]> => {
-  const response = await apiClient.get<any>(`/deals/${dealId}/messages`);
+  const response = await apiClient.get<
+    DealMessage[] | { data?: DealMessage[]; messages?: DealMessage[] }
+  >(`/deals/${dealId}/messages`);
   if (Array.isArray(response.data)) {
     return response.data;
   }
-  if (response.data && Array.isArray(response.data.data)) {
-    return response.data.data;
+  if (response.data && Array.isArray((response.data as { data?: DealMessage[] }).data)) {
+    return (response.data as { data: DealMessage[] }).data;
   }
-  if (response.data && Array.isArray(response.data.messages)) {
-    return response.data.messages;
+  if (response.data && Array.isArray((response.data as { messages?: DealMessage[] }).messages)) {
+    return (response.data as { messages: DealMessage[] }).messages;
   }
   return [];
 };
@@ -124,8 +126,18 @@ export const sendDealMessageApi = async (
   dealId: string,
   payload: SendDealMessagePayload
 ): Promise<DealMessage> => {
-  const response = await apiClient.post<any>(`/deals/${dealId}/messages`, payload);
-  return response.data?.data || response.data?.message || response.data;
+  const response = await apiClient.post<
+    DealMessage | { data?: DealMessage; message?: DealMessage }
+  >(`/deals/${dealId}/messages`, payload);
+  const data = response.data;
+  if (data && typeof data === "object") {
+    const extracted =
+      (data as { data?: DealMessage }).data || (data as { message?: DealMessage }).message;
+    if (extracted && typeof extracted === "object") {
+      return extracted;
+    }
+  }
+  return data as DealMessage;
 };
 
 export type DealStage = "COMPLETED" | "CANCELLED" | "FLAGGED";

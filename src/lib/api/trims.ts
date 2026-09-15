@@ -77,7 +77,7 @@ export interface UpdateTrimInput {
  * Fetch paginated trims from GET /trims
  */
 export const getTrimsApi = async (params?: GetTrimsParams): Promise<TrimsResponse> => {
-  const queryParams: Record<string, any> = {};
+  const queryParams: Record<string, string | number> = {};
 
   if (params) {
     if (params.page !== undefined) queryParams.page = params.page;

@@ -47,8 +47,10 @@ export const useUpdateGeneralSettingsMutation = () => {
       });
       toast.success("General notification settings updated successfully");
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.message || "Failed to update general settings";
+    onError: (error: unknown) => {
+      const message =
+        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        "Failed to update general settings";
       toast.error(message);
     },
   });
@@ -71,8 +73,10 @@ export const useUpdateModerationSettingsMutation = () => {
       });
       toast.success("Moderation settings updated successfully");
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.message || "Failed to update moderation settings";
+    onError: (error: unknown) => {
+      const message =
+        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        "Failed to update moderation settings";
       toast.error(message);
     },
   });
@@ -95,8 +99,10 @@ export const useUpdateLogsSettingsMutation = () => {
       });
       toast.success("Audit and log settings updated successfully");
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.message || "Failed to update audit and log settings";
+    onError: (error: unknown) => {
+      const message =
+        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        "Failed to update audit and log settings";
       toast.error(message);
     },
   });
@@ -120,8 +126,10 @@ export const useUpdateAdminSettingsMutation = () => {
       });
       toast.success("Settings updated successfully");
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.message || "Failed to update settings";
+    onError: (error: unknown) => {
+      const message =
+        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        "Failed to update settings";
       toast.error(message);
     },
   });

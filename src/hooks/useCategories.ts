@@ -4,7 +4,6 @@ import {
   createCategoryApi,
   updateCategoryApi,
   deleteCategoryApi,
-  Category,
   CategoriesResponse,
   GetCategoriesParams,
   CreateCategoryInput,

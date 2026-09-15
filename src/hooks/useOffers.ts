@@ -65,12 +65,15 @@ export const useCreateOfferMutation = () => {
 
   return useMutation<OfferDetailItem, Error, CreateOfferPayload>({
     mutationFn: (payload: CreateOfferPayload) => createOfferApi(payload),
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success("Offer sent successfully!");
       queryClient.invalidateQueries({ queryKey: OFFERS_QUERY_KEYS.all });
     },
     onError: (err) => {
-      const errMsg = (err as any)?.response?.data?.message || err.message || "Failed to send offer";
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to send offer";
       toast.error(errMsg);
     },
   });
@@ -134,7 +137,9 @@ export const useAcceptOfferMutation = () => {
         });
       }
       const errMsg =
-        (err as any)?.response?.data?.message || err.message || "Failed to accept offer";
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to accept offer";
       toast.error(errMsg);
     },
     onSuccess: (data) => {
@@ -160,7 +165,9 @@ export const useWithdrawOfferMutation = () => {
     },
     onError: (err) => {
       const errMsg =
-        (err as any)?.response?.data?.message || err.message || "Failed to withdraw offer";
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to withdraw offer";
       toast.error(errMsg);
     },
   });
@@ -185,7 +192,9 @@ export const useCounterOfferMutation = () => {
     },
     onError: (err) => {
       const errMsg =
-        (err as any)?.response?.data?.message || err.message || "Failed to send counter offer";
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to send counter offer";
       toast.error(errMsg);
     },
   });
@@ -205,7 +214,9 @@ export const useRejectOfferMutation = () => {
     },
     onError: (err) => {
       const errMsg =
-        (err as any)?.response?.data?.message || err.message || "Failed to reject offer";
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to reject offer";
       toast.error(errMsg);
     },
   });

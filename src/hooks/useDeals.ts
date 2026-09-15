@@ -8,7 +8,6 @@ import {
   sendDealMessageApi,
   updateDealStageApi,
   UpdateDealStagePayload,
-  DealStage,
   GetDealsParams,
   GetDealsResponse,
   DealItem,
@@ -72,7 +71,7 @@ export const useDealMessagesQuery = (dealId?: string) => {
     queryFn: async () => {
       try {
         return await getDealMessagesApi(dealId!);
-      } catch (e) {
+      } catch {
         // Return empty array if backend endpoint returns 404/error for deals without messages yet
         return [];
       }
@@ -126,14 +125,17 @@ export const useSendDealMessageMutation = () => {
 
       return { previousMessages };
     },
-    onError: (err: any, variables, context) => {
+    onError: (err: unknown, variables, context) => {
       if (context?.previousMessages) {
         queryClient.setQueryData<DealMessage[]>(
           DEALS_QUERY_KEYS.messages(variables.dealId),
           context.previousMessages
         );
       }
-      const errMsg = err?.response?.data?.message || err?.message || "Failed to send message";
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to send message";
       toast.error(errMsg);
     },
     onSuccess: (data, variables) => {
@@ -164,8 +166,11 @@ export const useUpdateDealStageMutation = () => {
       queryClient.invalidateQueries({ queryKey: DEALS_QUERY_KEYS.all });
       queryClient.invalidateQueries({ queryKey: ["offers"] });
     },
-    onError: (err: any) => {
-      const errMsg = err?.response?.data?.message || err?.message || "Failed to update deal stage";
+    onError: (err: unknown) => {
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to update deal stage";
       toast.error(errMsg);
     },
   });

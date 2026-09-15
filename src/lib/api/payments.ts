@@ -6,13 +6,13 @@ export interface CreateCheckoutSessionPayload {
   listingId?: string;
   successUrl: string;
   cancelUrl: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface TransactionMetadata {
   title?: string;
   userEmail?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface Transaction {
@@ -46,11 +46,11 @@ export const createCheckoutSessionApi = async (
     CheckoutSessionResponse | { data: CheckoutSessionResponse }
   >("/payments/create-checkout-session", payload);
 
-  const resData = response.data as any;
-  if (resData?.data && resData?.data?.checkoutUrl) {
+  const resData = response.data;
+  if ("data" in resData && resData.data?.checkoutUrl) {
     return resData.data;
   }
-  return resData;
+  return resData as CheckoutSessionResponse;
 };
 
 /**

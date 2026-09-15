@@ -81,7 +81,7 @@ export interface UpdateModelInput {
  * Fetch paginated models from GET /models
  */
 export const getModelsApi = async (params?: GetModelsParams): Promise<ModelsResponse> => {
-  const queryParams: Record<string, any> = {};
+  const queryParams: Record<string, string | number> = {};
 
   if (params) {
     if (params.page !== undefined) queryParams.page = params.page;

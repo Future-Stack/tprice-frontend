@@ -280,7 +280,9 @@ export const useUpdateAdminListingStatusMutation = () => {
         queryClient.setQueryData(ADMIN_DASHBOARD_QUERY_KEYS.overview, context.previousDashboard);
       }
       const errMsg =
-        (err as any)?.response?.data?.message || err.message || "Failed to update listing status";
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        err.message ||
+        "Failed to update listing status";
       toast.error(errMsg);
     },
     onSuccess: (_data, variables) => {
@@ -347,7 +349,9 @@ export const useDeleteListingMutation = () => {
         });
       }
       const errMsg =
-        (err as any)?.response?.data?.message || err.message || "Failed to delete listing";
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        err.message ||
+        "Failed to delete listing";
       toast.error(errMsg);
     },
     onSuccess: (data) => {
@@ -438,7 +442,9 @@ export const useSaveListingMutation = () => {
         queryClient.setQueryData(LISTINGS_QUERY_KEYS.detail(id), context.previousDetail);
       }
       const errMsg =
-        (err as any)?.response?.data?.message || err.message || "Failed to save listing";
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        err.message ||
+        "Failed to save listing";
       toast.error(errMsg);
     },
     onSuccess: (data, id) => {

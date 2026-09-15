@@ -31,6 +31,8 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
   );
 
   const { user: storeUser, token, logout } = useAuth();
+  const { data: userFromApi, isLoading, isError } = useGetMeQuery();
+  const currentUser = userFromApi || storeUser;
 
   useEffect(() => {
     if (!isMounted) return;

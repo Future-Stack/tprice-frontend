@@ -56,6 +56,10 @@ export const useAdminContactInquiriesQuery = (
   });
 };
 
+interface UpdateContactContext {
+  previousQueries?: Array<[readonly unknown[], unknown]>;
+}
+
 /**
  * Custom React Query hook for updating admin contact inquiry status & notes
  * Includes optimistic update and query cache invalidation.
@@ -66,7 +70,8 @@ export const useUpdateAdminContactInquiryMutation = () => {
   return useMutation<
     ContactInquiryItem,
     Error,
-    { id: string; payload: UpdateContactInquiryPayload }
+    { id: string; payload: UpdateContactInquiryPayload },
+    UpdateContactContext
   >({
     mutationFn: ({ id, payload }) => updateAdminContactInquiryApi(id, payload),
 
@@ -103,10 +108,10 @@ export const useUpdateAdminContactInquiryMutation = () => {
       return { previousQueries };
     },
 
-    onError: (_err, _variables, context: any) => {
+    onError: (_err, _variables, context?: UpdateContactContext) => {
       // Rollback cache on error
       if (context?.previousQueries) {
-        context.previousQueries.forEach(([queryKey, data]: [any, any]) => {
+        context.previousQueries.forEach(([queryKey, data]) => {
           queryClient.setQueryData(queryKey, data);
         });
       }

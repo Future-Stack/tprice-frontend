@@ -12,9 +12,11 @@ export interface RegisterUser {
   email: string;
   role: string;
   vipStatus: boolean;
+  isVip?: boolean;
   firstName?: string;
   lastName?: string;
-  [key: string]: any;
+  name?: string;
+  fullName?: string;
 }
 
 export interface RegisterResponse {
@@ -33,16 +35,17 @@ export interface User {
   email: string;
   role: string;
   vipStatus?: boolean;
+  isVip?: boolean;
   firstName?: string;
   lastName?: string;
   name?: string;
+  fullName?: string;
   phone?: string | null;
   avatar?: string;
   avatarUrl?: string | null;
   isVerified?: boolean;
   createdAt?: string;
-  dealerProfile?: any;
-  [key: string]: any;
+  dealerProfile?: Record<string, unknown> | null;
 }
 
 export interface LoginResponse {
@@ -58,12 +61,11 @@ export interface RefreshPayload {
 export interface RefreshResponse {
   accessToken: string;
   refreshToken: string;
-  user: User;
 }
 
 export interface LogoutResponse {
   message?: string;
-  [key: string]: any;
+  success?: boolean;
 }
 
 export interface ForgotPasswordPayload {
@@ -72,7 +74,7 @@ export interface ForgotPasswordPayload {
 
 export interface ForgotPasswordResponse {
   message?: string;
-  [key: string]: unknown;
+  success?: boolean;
 }
 
 export interface ResetPasswordPayload {
@@ -82,5 +84,5 @@ export interface ResetPasswordPayload {
 
 export interface ResetPasswordResponse {
   message?: string;
-  [key: string]: unknown;
+  success?: boolean;
 }

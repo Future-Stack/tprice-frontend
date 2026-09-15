@@ -80,26 +80,31 @@ export const decodeJwtUser = (token: string): User | null => {
 
 export const getMeApi = async (): Promise<User> => {
   try {
-    const response = await apiClient.get<any>("/users/me");
+    const response = await apiClient.get<Record<string, unknown>>("/users/me");
     const resData = response.data;
     if (resData && typeof resData === "object") {
       const extracted =
-        resData.data?.user || resData.user || resData.data || resData.result || resData;
+        (resData as Record<string, unknown>).data ||
+        (resData as Record<string, unknown>).user ||
+        (resData as Record<string, unknown>).result ||
+        resData;
       if (extracted && typeof extracted === "object") {
-        return extracted;
+        return extracted as User;
       }
     }
-    return resData;
-  } catch (error: any) {
-    if (error.response?.status === 404) {
+    return resData as unknown as User;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
       try {
-        const fallback = await apiClient.get<any>("/auth/me");
+        const fallback = await apiClient.get<Record<string, unknown>>("/auth/me");
         const resData = fallback.data;
-        return resData?.data?.user || resData?.data || resData?.user || resData;
+        const inner = (resData?.data as Record<string, unknown>) || resData;
+        return (inner?.user || inner) as unknown as User;
       } catch {
-        const fallback2 = await apiClient.get<any>("/me");
+        const fallback2 = await apiClient.get<Record<string, unknown>>("/me");
         const resData = fallback2.data;
-        return resData?.data?.user || resData?.data || resData?.user || resData;
+        const inner = (resData?.data as Record<string, unknown>) || resData;
+        return (inner?.user || inner) as unknown as User;
       }
     }
     throw error;
@@ -118,7 +123,7 @@ export interface ChangePasswordPayload {
 
 export interface ChangePasswordResponse {
   message?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export const changePasswordApi = async (
@@ -154,8 +159,8 @@ export const getUserSessionsApi = async (): Promise<UserSession[]> => {
   try {
     const response = await apiClient.get<UserSession[]>("/users/me/sessions");
     return response.data;
-  } catch (error: any) {
-    if (error.response?.status === 404) {
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
       try {
         const fallbackRes = await apiClient.get<UserSession[]>("/auth/sessions");
         return fallbackRes.data;
@@ -174,8 +179,8 @@ export const revokeUserSessionApi = async (sessionId: string): Promise<RevokeSes
       `/users/me/sessions/${sessionId}`
     );
     return response.data;
-  } catch (error: any) {
-    if (error.response?.status === 404) {
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
       try {
         const fallbackRes = await apiClient.delete<RevokeSessionResponse>(
           `/auth/sessions/${sessionId}`

@@ -38,7 +38,7 @@ export interface ListingSpecifications {
   sleepingCapacity?: number | string;
   passengerCapacity?: number | string;
   rangeNauticalMiles?: number | string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface ListingItem {
@@ -121,7 +121,7 @@ export interface GetListingsParams {
 }
 
 export const getListingsApi = async (params?: GetListingsParams): Promise<ListingsResponse> => {
-  const queryParams: Record<string, any> = {};
+  const queryParams: Record<string, string | number | boolean> = {};
 
   if (params) {
     if (params.category && params.category !== "ALL" && params.category !== "All") {
@@ -176,7 +176,7 @@ export const getListingsApi = async (params?: GetListingsParams): Promise<Listin
  * Fetch VIP listings via GET /listings/vip
  */
 export const getVipListingsApi = async (params?: GetListingsParams): Promise<ListingsResponse> => {
-  const queryParams: Record<string, any> = {};
+  const queryParams: Record<string, string | number | boolean> = {};
 
   if (params) {
     if (params.category && params.category !== "ALL" && params.category !== "All") {
@@ -244,7 +244,7 @@ export interface GetMyListingsParams {
 }
 
 export const getMyListingsApi = async (params?: GetMyListingsParams): Promise<ListingsResponse> => {
-  const queryParams: Record<string, any> = {};
+  const queryParams: Record<string, string | number | boolean> = {};
 
   if (params) {
     if (params.sortBy) {
@@ -350,7 +350,7 @@ export interface GetAdminListingsParams {
 export const getAdminListingsApi = async (
   params?: GetAdminListingsParams
 ): Promise<ListingsResponse> => {
-  const queryParams: Record<string, any> = {};
+  const queryParams: Record<string, string | number | boolean> = {};
 
   if (params) {
     if (params.page !== undefined) queryParams.page = params.page;
@@ -425,7 +425,7 @@ export interface GetSavedListingsParams {
 export const getSavedListingsApi = async (
   params?: GetSavedListingsParams
 ): Promise<ListingsResponse> => {
-  const queryParams: Record<string, any> = {};
+  const queryParams: Record<string, string | number | boolean> = {};
 
   if (params) {
     if (params.maxPrice !== undefined && params.maxPrice !== null && params.maxPrice > 0) {
@@ -477,11 +477,11 @@ export const getFeaturedPricingApi = async (): Promise<FeaturedPricingResponse> 
     "/listings/featured-pricing"
   );
 
-  const resData = response.data as any;
-  if (resData?.data && resData?.data?.singleListing) {
+  const resData = response.data;
+  if ("data" in resData && resData.data?.singleListing) {
     return resData.data;
   }
-  return resData;
+  return resData as FeaturedPricingResponse;
 };
 
 export interface ActiveFeaturedSubscription {
@@ -516,9 +516,9 @@ export const getFeaturedStatusApi = async (): Promise<FeaturedStatusResponse> =>
     "/listings/me/featured-status"
   );
 
-  const resData = response.data as any;
-  if (resData?.data && resData?.data?.hasActiveSubscription !== undefined) {
+  const resData = response.data;
+  if ("data" in resData && resData.data?.hasActiveSubscription !== undefined) {
     return resData.data;
   }
-  return resData;
+  return resData as FeaturedStatusResponse;
 };

@@ -1,3 +1,4 @@
+import axios from "axios";
 import apiClient from "./axios";
 
 export interface AdminSettingsData {
@@ -81,8 +82,11 @@ export const updateAdminSettingsApi = async (
   try {
     const response = await apiClient.patch<AdminSettingsData>("/admin/settings", payload);
     return response.data;
-  } catch (error: any) {
-    if (error.response?.status === 405 || error.response?.status === 404) {
+  } catch (error: unknown) {
+    if (
+      axios.isAxiosError(error) &&
+      (error.response?.status === 405 || error.response?.status === 404)
+    ) {
       const fallbackResponse = await apiClient.put<AdminSettingsData>("/admin/settings", payload);
       return fallbackResponse.data;
     }

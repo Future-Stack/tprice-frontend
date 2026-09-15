@@ -65,7 +65,7 @@ export interface UpdateBrandInput {
  * Fetch paginated brands from GET /brands
  */
 export const getBrandsApi = async (params?: GetBrandsParams): Promise<BrandsResponse> => {
-  const queryParams: Record<string, any> = {};
+  const queryParams: Record<string, string | number> = {};
 
   if (params) {
     if (params.page !== undefined) queryParams.page = params.page;

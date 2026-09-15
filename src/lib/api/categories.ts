@@ -63,7 +63,7 @@ export interface UpdateCategoryInput {
 export const getCategoriesApi = async (
   params?: GetCategoriesParams
 ): Promise<CategoriesResponse> => {
-  const queryParams: Record<string, any> = {};
+  const queryParams: Record<string, string | number | boolean> = {};
 
   if (params) {
     if (params.page !== undefined) queryParams.page = params.page;

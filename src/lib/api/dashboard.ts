@@ -49,7 +49,7 @@ export interface PendingApproval {
   locationCity: string | null;
   locationCountry: string | null;
   buildYear: number | null;
-  specifications?: Record<string, any>;
+  specifications?: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
   media: PendingApprovalMedia[];
@@ -80,7 +80,7 @@ export interface RecentActivity {
   resourceId: string;
   ipAddress: string | null;
   userAgent: string | null;
-  changes?: Record<string, any>;
+  changes?: Record<string, unknown>;
   createdAt: string;
   user: RecentActivityUser;
 }
