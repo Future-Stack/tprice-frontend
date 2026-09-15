@@ -30,10 +30,9 @@ import {
   formatPrice,
 } from "./_components";
 
-const BuyerCounterOfferModal = dynamic(
-  () => import("./_components/BuyerCounterOfferModal"),
-  { ssr: false }
-);
+const BuyerCounterOfferModal = dynamic(() => import("./_components/BuyerCounterOfferModal"), {
+  ssr: false,
+});
 
 export default function BuyerOfferDetailsPage() {
   const params = useParams();
@@ -45,7 +44,13 @@ export default function BuyerOfferDetailsPage() {
   const [updatingStage, setUpdatingStage] = useState<DealStage | null>(null);
   const chatScrollRef = useRef<HTMLDivElement>(null);
 
-  const { data: offer, isLoading: isLoadingOffer, isError, error, refetch } = useOfferDetailQuery(offerId);
+  const {
+    data: offer,
+    isLoading: isLoadingOffer,
+    isError,
+    error,
+    refetch,
+  } = useOfferDetailQuery(offerId);
   const { data: dealsResponse, isLoading: isLoadingDeals } = useDealsQuery({ page: 1, limit: 10 });
   const dealsList = dealsResponse?.data || [];
   const matchedDeal = dealsList.find((d) => d.offerId === offerId || d.id === offerId);
@@ -59,7 +64,12 @@ export default function BuyerOfferDetailsPage() {
   const sendDealMessageMutation = useSendDealMessageMutation();
   const updateDealStageMutation = useUpdateDealStageMutation();
 
-  const currentStage = (dealDetail?.stage || offer?.deal?.stage || matchedDeal?.stage || "").toUpperCase() as DealStage | "";
+  const currentStage = (
+    dealDetail?.stage ||
+    offer?.deal?.stage ||
+    matchedDeal?.stage ||
+    ""
+  ).toUpperCase() as DealStage | "";
 
   useEffect(() => {
     if (chatScrollRef.current) {
@@ -114,9 +124,13 @@ export default function BuyerOfferDetailsPage() {
         <AlertCircle className="w-12 h-12 text-red-500" />
         <h2 className="text-2xl font-bold font-clash">Failed to load offer details</h2>
         <p className="text-gray-400 text-sm max-w-md text-center">
-          {(error as { message?: string })?.message || "The requested offer detail could not be loaded."}
+          {(error as { message?: string })?.message ||
+            "The requested offer detail could not be loaded."}
         </p>
-        <button onClick={() => refetch()} className="px-6 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold uppercase tracking-widest transition-all cursor-pointer">
+        <button
+          onClick={() => refetch()}
+          className="px-6 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold uppercase tracking-widest transition-all cursor-pointer"
+        >
           Try Again
         </button>
       </div>
@@ -127,13 +141,24 @@ export default function BuyerOfferDetailsPage() {
   const seller = offer.seller;
   const statusUpper = (offer.status || "").toUpperCase();
   const allowCounterOffers = listing?.allowCounterOffers ?? false;
-  const isFixedWithCounter = (listing?.saleType || "").toUpperCase() === "FIXED_PRICE" && allowCounterOffers;
+  const isFixedWithCounter =
+    (listing?.saleType || "").toUpperCase() === "FIXED_PRICE" && allowCounterOffers;
   const isAccepted = statusUpper === "ACCEPTED" || Boolean(offer?.deal) || Boolean(matchedDeal);
-  const isTerminal = ["ACCEPTED", "REJECTED", "DECLINED", "WITHDRAWN", "CANCELLED", "EXPIRED"].includes(statusUpper);
+  const isTerminal = [
+    "ACCEPTED",
+    "REJECTED",
+    "DECLINED",
+    "WITHDRAWN",
+    "CANCELLED",
+    "EXPIRED",
+  ].includes(statusUpper);
   const showCounterButton = (statusUpper === "COUNTERED" || isFixedWithCounter) && !isTerminal;
 
-  const imageUrl = listing?.media?.[0]?.url || "https://images.unsplash.com/photo-1621135802920-133df287f89c?auto=format&fit=crop&q=80&w=1200";
-  const sellerName = [seller?.firstName, seller?.lastName].filter(Boolean).join(" ").trim() || "Dealer";
+  const imageUrl =
+    listing?.media?.[0]?.url ||
+    "https://images.unsplash.com/photo-1621135802920-133df287f89c?auto=format&fit=crop&q=80&w=1200";
+  const sellerName =
+    [seller?.firstName, seller?.lastName].filter(Boolean).join(" ").trim() || "Dealer";
   const sellerAvatar = seller?.avatarUrl || "https://i.pravatar.cc/150?u=seller";
 
   const rawMessages = [
@@ -143,7 +168,9 @@ export default function BuyerOfferDetailsPage() {
     ...(dealMessages || []),
   ];
   const uniqueMessagesMap = new Map<string, DealMessage>();
-  rawMessages.forEach((m) => { if (m?.id) uniqueMessagesMap.set(m.id, m); });
+  rawMessages.forEach((m) => {
+    if (m?.id) uniqueMessagesMap.set(m.id, m);
+  });
 
   const formattedDealMessages = Array.from(uniqueMessagesMap.values()).map((m) => {
     const isBuyer = m.senderId === offer.buyerId || m.sender?.role === "BUYER";
@@ -151,7 +178,8 @@ export default function BuyerOfferDetailsPage() {
       id: `chat-${m.id}`,
       type: "chat" as const,
       senderId: m.senderId,
-      senderName: `${m.sender?.firstName || (isBuyer ? offer.buyer?.firstName || "Buyer" : seller?.firstName || "Seller")} ${m.sender?.lastName || ""}`.trim(),
+      senderName:
+        `${m.sender?.firstName || (isBuyer ? offer.buyer?.firstName || "Buyer" : seller?.firstName || "Seller")} ${m.sender?.lastName || ""}`.trim(),
       senderRole: m.sender?.role || (isBuyer ? "BUYER" : "SELLER"),
       senderAvatar: m.sender?.avatarUrl || (isBuyer ? offer.buyer?.avatarUrl : sellerAvatar),
       text: m.message,
@@ -163,7 +191,10 @@ export default function BuyerOfferDetailsPage() {
     id: `history-${h.id}`,
     type: "history" as const,
     senderId: h.senderId,
-    senderName: h.senderId === offer.buyerId ? "Buyer" : `${h.sender?.firstName || sellerName} ${h.sender?.lastName || ""}`.trim(),
+    senderName:
+      h.senderId === offer.buyerId
+        ? "Buyer"
+        : `${h.sender?.firstName || sellerName} ${h.sender?.lastName || ""}`.trim(),
     senderRole: h.senderId === offer.buyerId ? "BUYER" : "SELLER",
     senderAvatar: h.senderId === offer.buyerId ? undefined : sellerAvatar,
     text: h.note || `Offer updated to ${formatPrice(h.amount)}`,
@@ -180,7 +211,9 @@ export default function BuyerOfferDetailsPage() {
     <div className="min-h-screen bg-black text-white font-inter">
       <div className="w-full space-y-8">
         <div className="flex items-center gap-2 text-white/60 text-sm md:text-[32px] font-medium font-clash">
-          <Link href="/buyer/my-offer" className="hover:text-white transition-colors">My Offers</Link>
+          <Link href="/buyer/my-offer" className="hover:text-white transition-colors">
+            My Offers
+          </Link>
           <ChevronRight size={16} />
           <span className="text-white">Negotiation Details</span>
         </div>
@@ -188,7 +221,11 @@ export default function BuyerOfferDetailsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-8 space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-11 gap-8">
-              <BuyerOfferSummary offer={offer} sellerName={sellerName} sellerAvatar={sellerAvatar} />
+              <BuyerOfferSummary
+                offer={offer}
+                sellerName={sellerName}
+                sellerAvatar={sellerAvatar}
+              />
               <BuyerOfferActions
                 offer={offer}
                 imageUrl={imageUrl}

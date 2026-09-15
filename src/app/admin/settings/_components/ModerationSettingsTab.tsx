@@ -35,9 +35,7 @@ export function ModerationSettingsTab({ settings }: ModerationSettingsTabProps) 
             <div className="w-10 h-10 rounded-xl bg-[#facc15]/10 flex items-center justify-center">
               <CheckCircle2 className="w-6 h-6 text-[#facc15]" />
             </div>
-            <h2 className="text-xl md:text-2xl font-bold text-white">
-              Approval Workflow
-            </h2>
+            <h2 className="text-xl md:text-2xl font-bold text-white">Approval Workflow</h2>
           </div>
           <div className="space-y-6">
             <ToggleItem
@@ -88,9 +86,7 @@ export function ModerationSettingsTab({ settings }: ModerationSettingsTabProps) 
             <div className="w-10 h-10 rounded-xl bg-[#facc15]/10 flex items-center justify-center">
               <Search className="w-6 h-6 text-[#facc15]" />
             </div>
-            <h2 className="text-xl md:text-2xl font-bold text-white">
-              Auto flag rules
-            </h2>
+            <h2 className="text-xl md:text-2xl font-bold text-white">Auto flag rules</h2>
           </div>
           <div className="space-y-6">
             <ToggleItem

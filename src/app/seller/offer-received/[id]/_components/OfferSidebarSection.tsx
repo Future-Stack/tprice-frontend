@@ -147,9 +147,7 @@ export function OfferSidebarSection({
               <ShieldCheck size={14} className="text-emerald-400" />
               <span className="text-xs text-gray-400">Verified Buyer</span>
             </div>
-            <p className="text-[11px] font-mono text-gray-500 truncate">
-              ID: {offer.buyerId}
-            </p>
+            <p className="text-[11px] font-mono text-gray-500 truncate">ID: {offer.buyerId}</p>
           </div>
         </div>
       </div>

@@ -30,17 +30,13 @@ export function AuditLogsSettingsTab({ settings }: AuditLogsSettingsTabProps) {
             <div className="w-10 h-10 rounded-xl bg-[#facc15]/10 flex items-center justify-center">
               <ClipboardList className="w-6 h-6 text-primary" />
             </div>
-            <h2 className="text-xl md:text-2xl font-bold text-white">
-              Log retention
-            </h2>
+            <h2 className="text-xl md:text-2xl font-bold text-white">Log retention</h2>
           </div>
 
           <div className="space-y-10">
             {/* Retention Period Dropdown */}
             <div className="space-y-3 max-w-sm">
-              <label className="text-[13px] font-medium text-[#666]">
-                Retention Period
-              </label>
+              <label className="text-[13px] font-medium text-[#666]">Retention Period</label>
               <div className="relative">
                 <select
                   value={auditLogs.retentionPeriod}
@@ -109,9 +105,7 @@ export function AuditLogsSettingsTab({ settings }: AuditLogsSettingsTabProps) {
             disabled={updateLogsSettingsMutation.isPending}
             className="bg-primary hover:bg-[#eab308] text-black px-10 py-4 rounded-xl text-sm font-bold transition-all shadow-lg cursor-pointer shadow-[#facc15]/10 hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2 disabled:opacity-50"
           >
-            {updateLogsSettingsMutation.isPending && (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            )}
+            {updateLogsSettingsMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
             Save Changes
           </button>
         </div>

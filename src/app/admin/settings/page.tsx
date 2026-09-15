@@ -21,8 +21,7 @@ export default function AdminSettings() {
   const router = useRouter();
 
   const tabParam = searchParams.get("tab");
-  const initialTab =
-    tabs.find((t) => t.toLowerCase() === tabParam?.toLowerCase()) ?? "General";
+  const initialTab = tabs.find((t) => t.toLowerCase() === tabParam?.toLowerCase()) ?? "General";
 
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);
 
@@ -113,15 +112,9 @@ export default function AdminSettings() {
             <div className="h-12 bg-[#1A1A1A] rounded-xl w-full" />
           </div>
         ) : activeTab === "General" ? (
-          <GeneralSettingsTab
-            key={settings?.updatedAt || "general"}
-            settings={settings}
-          />
+          <GeneralSettingsTab key={settings?.updatedAt || "general"} settings={settings} />
         ) : activeTab === "Moderation" ? (
-          <ModerationSettingsTab
-            key={settings?.updatedAt || "moderation"}
-            settings={settings}
-          />
+          <ModerationSettingsTab key={settings?.updatedAt || "moderation"} settings={settings} />
         ) : activeTab === "Security" ? (
           <SecuritySettingsTab
             key={settings?.updatedAt || "security"}
@@ -132,10 +125,7 @@ export default function AdminSettings() {
             onRefetchSessions={refetchSessions}
           />
         ) : (
-          <AuditLogsSettingsTab
-            key={settings?.updatedAt || "audit"}
-            settings={settings}
-          />
+          <AuditLogsSettingsTab key={settings?.updatedAt || "audit"} settings={settings} />
         )}
       </div>
     </AnimationWrapper>

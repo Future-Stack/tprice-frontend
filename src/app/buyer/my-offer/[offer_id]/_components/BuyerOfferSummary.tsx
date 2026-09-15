@@ -5,11 +5,7 @@ import AnimationWrapper from "@/app/components/AnimationWrapper";
 import { formatPrice, formatDate } from "./types";
 import type { BuyerOfferSummaryProps } from "./types";
 
-export function BuyerOfferSummary({
-  offer,
-  sellerName,
-  sellerAvatar,
-}: BuyerOfferSummaryProps) {
+export function BuyerOfferSummary({ offer, sellerName, sellerAvatar }: BuyerOfferSummaryProps) {
   const listing = offer.listing;
 
   return (
@@ -23,12 +19,7 @@ export function BuyerOfferSummary({
         <div className="bg-[#111113] rounded-2xl border border-white/5 p-4 flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
             <div className="relative w-10 h-10 rounded-full overflow-hidden border border-white/10">
-              <Image
-                src={sellerAvatar}
-                alt={sellerName}
-                fill
-                className="object-cover"
-              />
+              <Image src={sellerAvatar} alt={sellerName} fill className="object-cover" />
             </div>
             <div>
               <div className="font-bold text-sm text-white/90">{sellerName}</div>
@@ -53,9 +44,7 @@ export function BuyerOfferSummary({
 
           <div className="flex justify-between items-end">
             <div>
-              <div className="text-[11px] font-bold text-gray-400 mb-1">
-                Current Offer
-              </div>
+              <div className="text-[11px] font-bold text-gray-400 mb-1">Current Offer</div>
               <div className="flex text-[32px] md:text-[40px] font-black text-[#D4AF37] leading-none tracking-tight">
                 <DollarSign />
                 {formatPrice(offer.currentAmount || offer.initialAmount)}
@@ -70,29 +59,19 @@ export function BuyerOfferSummary({
 
           <div className="space-y-4 pt-4 border-t border-white/5">
             <div className="flex justify-between text-[11px] font-medium">
-              <span className="text-gray-500 uppercase tracking-widest">
-                Last Updated
-              </span>
+              <span className="text-gray-500 uppercase tracking-widest">Last Updated</span>
               <span className="text-white/80">
                 {formatDate(offer.updatedAt || offer.createdAt)}
               </span>
             </div>
             <div className="flex justify-between text-[11px] font-medium">
-              <span className="text-gray-500 uppercase tracking-widest">
-                Offer ID
-              </span>
-              <span className="text-white/80 font-mono tracking-normal">
-                {offer.id}
-              </span>
+              <span className="text-gray-500 uppercase tracking-widest">Offer ID</span>
+              <span className="text-white/80 font-mono tracking-normal">{offer.id}</span>
             </div>
             {listing?.askingPrice && (
               <div className="flex justify-between text-[11px] font-medium">
-                <span className="text-gray-500 uppercase tracking-widest">
-                  Listed Price
-                </span>
-                <span className="text-white/80">
-                  {formatPrice(listing.askingPrice)}
-                </span>
+                <span className="text-gray-500 uppercase tracking-widest">Listed Price</span>
+                <span className="text-white/80">{formatPrice(listing.askingPrice)}</span>
               </div>
             )}
           </div>

@@ -137,9 +137,7 @@ export function ToggleItem({
         >
           {label}
         </h4>
-        {subtext && (
-          <p className="text-[#666] text-xs md:text-sm font-medium">{subtext}</p>
-        )}
+        {subtext && <p className="text-[#666] text-xs md:text-sm font-medium">{subtext}</p>}
       </div>
       <button
         type="button"
@@ -162,9 +160,7 @@ export function QualityItem({ text }: { text: string }) {
   return (
     <div className="flex items-center gap-4 py-1.5">
       <div className="w-2.5 h-2.5 rounded-full bg-[#facc15] shadow-[0_0_10px_rgba(250,204,21,0.4)]" />
-      <span className="text-[#888] text-[15px] md:text-[16px] font-medium">
-        {text}
-      </span>
+      <span className="text-[#888] text-[15px] md:text-[16px] font-medium">{text}</span>
     </div>
   );
 }

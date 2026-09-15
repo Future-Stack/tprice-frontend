@@ -41,18 +41,15 @@ export function OfferConversationSection({
           <div className="text-center py-10 text-gray-500 text-sm flex flex-col items-center gap-2">
             <MessageSquare size={28} className="text-gray-600 stroke-[1.5]" />
             <span>
-              No conversation messages recorded yet. Send a message below to communicate with the buyer.
+              No conversation messages recorded yet. Send a message below to communicate with the
+              buyer.
             </span>
           </div>
         ) : (
           combinedTimeline.map((item) => {
-            const isSelf =
-              item.senderId === offer.sellerId || item.senderRole === "SELLER";
+            const isSelf = item.senderId === offer.sellerId || item.senderRole === "SELLER";
             return (
-              <div
-                key={item.id}
-                className={`flex ${isSelf ? "justify-end" : "justify-start"}`}
-              >
+              <div key={item.id} className={`flex ${isSelf ? "justify-end" : "justify-start"}`}>
                 <div
                   className={`max-w-[80%] p-4 rounded-2xl text-xs md:text-sm leading-relaxed ${
                     item.type === "history"
@@ -83,9 +80,7 @@ export function OfferConversationSection({
                   <div className="text-[10px] text-gray-500 mt-2 flex items-center justify-between gap-2">
                     <span>{formatDate(item.createdAt)}</span>
                     {item.type === "history" && (
-                      <span className="italic text-[9px] text-[#E78F23]/70">
-                        Offer Event
-                      </span>
+                      <span className="italic text-[9px] text-[#E78F23]/70">Offer Event</span>
                     )}
                   </div>
                 </div>

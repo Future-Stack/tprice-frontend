@@ -43,17 +43,12 @@ export function OfferTimelineSection({
         </div>
 
         {!offer.histories || offer.histories.length === 0 ? (
-          <p className="text-sm text-gray-500 italic py-4">
-            No negotiation history recorded yet.
-          </p>
+          <p className="text-sm text-gray-500 italic py-4">No negotiation history recorded yet.</p>
         ) : (
           <div className="relative pl-6 space-y-6 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-white/10">
             {offer.histories.map((item, index) => {
               const senderName =
-                [item.sender?.firstName, item.sender?.lastName]
-                  .filter(Boolean)
-                  .join(" ")
-                  .trim() ||
+                [item.sender?.firstName, item.sender?.lastName].filter(Boolean).join(" ").trim() ||
                 (item.senderId === offer.buyerId
                   ? buyerName
                   : item.senderId === offer.sellerId
@@ -146,9 +141,7 @@ export function OfferTimelineSection({
             </div>
             <div>
               <span className="text-gray-500 text-xs block mb-1">Created Date</span>
-              <span className="text-xs text-gray-300">
-                {formatDate(offer.deal.createdAt)}
-              </span>
+              <span className="text-xs text-gray-300">{formatDate(offer.deal.createdAt)}</span>
             </div>
           </div>
         </div>

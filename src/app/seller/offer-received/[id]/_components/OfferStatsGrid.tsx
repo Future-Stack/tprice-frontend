@@ -30,9 +30,7 @@ export function OfferStatsGrid({
               priceDiffPercent >= 0 ? "text-emerald-400" : "text-primary"
             }`}
           >
-            <span>
-              {priceDiffPercent >= 0 ? `+${priceDiffPercent}%` : `${priceDiffPercent}%`}
-            </span>
+            <span>{priceDiffPercent >= 0 ? `+${priceDiffPercent}%` : `${priceDiffPercent}%`}</span>
             <span className="text-gray-500">vs asking price</span>
           </p>
         )}
@@ -43,9 +41,7 @@ export function OfferStatsGrid({
         <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">
           Initial Offer
         </p>
-        <div className="text-2xl font-bold text-white tracking-tight">
-          {formattedInitialAmount}
-        </div>
+        <div className="text-2xl font-bold text-white tracking-tight">{formattedInitialAmount}</div>
         <p className="text-[11px] text-gray-500 mt-2">Starting proposal</p>
       </div>
 
@@ -71,9 +67,7 @@ export function OfferStatsGrid({
             {roundsCount === 1 ? "round" : "rounds"}
           </span>
         </div>
-        <p className="text-[11px] text-gray-500 mt-2">
-          Last update {formatTimeAgo(updatedAt)}
-        </p>
+        <p className="text-[11px] text-gray-500 mt-2">Last update {formatTimeAgo(updatedAt)}</p>
       </div>
     </div>
   );

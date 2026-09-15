@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  Clock,
-  RefreshCcw,
-  CheckCircle2,
-  X,
-} from "lucide-react";
+import { Clock, RefreshCcw, CheckCircle2, X } from "lucide-react";
 import type { OfferDetailItem } from "@/lib/api/offers";
 import type { DealStage } from "@/lib/api/deals";
 

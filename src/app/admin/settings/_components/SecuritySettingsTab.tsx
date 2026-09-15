@@ -1,13 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Lock,
-  Monitor,
-  LogOut,
-  Loader2,
-  RefreshCw,
-} from "lucide-react";
+import { Lock, Monitor, LogOut, Loader2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
 import { useChangePasswordMutation } from "@/hooks/useAuth";
@@ -25,9 +19,7 @@ export function SecuritySettingsTab({
 }: SecuritySettingsTabProps) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [requireApproval, setRequireApproval] = useState(
-    settings?.requireAdminApproval ?? true
-  );
+  const [requireApproval, setRequireApproval] = useState(settings?.requireAdminApproval ?? true);
   const [revokingId, setRevokingId] = useState<string | null>(null);
 
   const changePasswordMutation = useChangePasswordMutation();
@@ -83,9 +75,7 @@ export function SecuritySettingsTab({
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-10">
             <div className="space-y-3">
-              <label className="text-[13px] font-medium text-[#666]">
-                Current Password
-              </label>
+              <label className="text-[13px] font-medium text-[#666]">Current Password</label>
               <input
                 type="password"
                 placeholder="********"
@@ -96,9 +86,7 @@ export function SecuritySettingsTab({
               />
             </div>
             <div className="space-y-3">
-              <label className="text-[13px] font-medium text-[#666]">
-                New Password
-              </label>
+              <label className="text-[13px] font-medium text-[#666]">New Password</label>
               <input
                 type="password"
                 placeholder="****************"
@@ -115,9 +103,7 @@ export function SecuritySettingsTab({
             disabled={changePasswordMutation.isPending}
             className="border border-[#facc15]/50 text-[#facc15] hover:bg-[#facc15] hover:text-black hover:border-[#facc15] px-8 py-3 rounded-xl text-sm font-bold transition-all duration-300 cursor-pointer flex items-center gap-2 disabled:opacity-50"
           >
-            {changePasswordMutation.isPending && (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            )}
+            {changePasswordMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
             Save Changes
           </button>
         </section>
@@ -132,9 +118,7 @@ export function SecuritySettingsTab({
               <h3 className="text-lg font-bold text-white mb-1">
                 Require admin approval for listings
               </h3>
-              <p className="text-[#666] text-sm">
-                Automatically flag stale listings
-              </p>
+              <p className="text-[#666] text-sm">Automatically flag stale listings</p>
             </div>
           </div>
           <button
@@ -147,9 +131,7 @@ export function SecuritySettingsTab({
           >
             <div
               className={`inline-block h-7 w-7 transform rounded-full transition-all duration-300 ${
-                requireApproval
-                  ? "translate-x-8 bg-black shadow-lg"
-                  : "translate-x-1 bg-[#444]"
+                requireApproval ? "translate-x-8 bg-black shadow-lg" : "translate-x-1 bg-[#444]"
               }`}
             />
           </button>
@@ -163,9 +145,7 @@ export function SecuritySettingsTab({
                 <Monitor className="w-6 h-6 text-[#facc15]" />
               </div>
               <div>
-                <h2 className="text-xl md:text-2xl font-bold text-white">
-                  Active Sessions
-                </h2>
+                <h2 className="text-xl md:text-2xl font-bold text-white">Active Sessions</h2>
                 <p className="text-[#666] text-xs md:text-sm">
                   Manage devices currently logged into your account
                 </p>
@@ -203,9 +183,7 @@ export function SecuritySettingsTab({
             </div>
           ) : isSessionsError ? (
             <div className="text-center py-8 bg-[#1A1A1A]/30 rounded-xl border border-red-500/10">
-              <p className="text-red-400 text-sm mb-3">
-                Failed to load active sessions.
-              </p>
+              <p className="text-red-400 text-sm mb-3">Failed to load active sessions.</p>
               <button
                 type="button"
                 onClick={onRefetchSessions}

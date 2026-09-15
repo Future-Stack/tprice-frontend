@@ -62,7 +62,12 @@ export default function OfferDetailsPage() {
   const sendDealMessageMutation = useSendDealMessageMutation();
   const updateDealStageMutation = useUpdateDealStageMutation();
 
-  const currentStage = (dealDetail?.stage || offer?.deal?.stage || matchedDeal?.stage || "").toUpperCase() as DealStage | "";
+  const currentStage = (
+    dealDetail?.stage ||
+    offer?.deal?.stage ||
+    matchedDeal?.stage ||
+    ""
+  ).toUpperCase() as DealStage | "";
 
   useEffect(() => {
     if (chatScrollRef.current) {
@@ -145,13 +150,20 @@ export default function OfferDetailsPage() {
           <AlertCircle size={56} className="mx-auto text-rose-500 stroke-[1.5]" />
           <h2 className="text-2xl font-bold text-white">Offer Not Found</h2>
           <p className="text-gray-400 max-w-md mx-auto text-sm">
-            We couldn&apos;t load the details for this offer. It may have been deleted or the URL might be invalid.
+            We couldn&apos;t load the details for this offer. It may have been deleted or the URL
+            might be invalid.
           </p>
           <div className="flex items-center justify-center gap-4 pt-2">
-            <Link href="/seller/offer-received" className="px-6 py-2.5 rounded-xl border border-white/10 text-xs font-bold uppercase tracking-wider text-gray-300 hover:text-white hover:border-white/30 transition-all">
+            <Link
+              href="/seller/offer-received"
+              className="px-6 py-2.5 rounded-xl border border-white/10 text-xs font-bold uppercase tracking-wider text-gray-300 hover:text-white hover:border-white/30 transition-all"
+            >
               Back to Offers
             </Link>
-            <button onClick={() => refetch()} className="px-6 py-2.5 rounded-xl bg-[#E78F23] text-black font-bold text-xs uppercase tracking-wider hover:bg-[#E78F23]/90 transition-all cursor-pointer">
+            <button
+              onClick={() => refetch()}
+              className="px-6 py-2.5 rounded-xl bg-[#E78F23] text-black font-bold text-xs uppercase tracking-wider hover:bg-[#E78F23]/90 transition-all cursor-pointer"
+            >
               Try Again
             </button>
           </div>
@@ -160,12 +172,17 @@ export default function OfferDetailsPage() {
     );
   }
 
-  const isPending = offer.status?.toUpperCase() === "PENDING" || offer.status?.toUpperCase() === "ACTION REQUIRED" || offer.status?.toUpperCase() === "COUNTERED";
+  const isPending =
+    offer.status?.toUpperCase() === "PENDING" ||
+    offer.status?.toUpperCase() === "ACTION REQUIRED" ||
+    offer.status?.toUpperCase() === "COUNTERED";
   const isAccepted = offer.status?.toUpperCase() === "ACCEPTED";
   const allowCounterOffers = offer.listing?.allowCounterOffers === true;
   const currency = offer.listing?.currency || "USD";
-  const buyerName = [offer.buyer?.firstName, offer.buyer?.lastName].filter(Boolean).join(" ").trim() || "Buyer";
-  const sellerName = [offer.seller?.firstName, offer.seller?.lastName].filter(Boolean).join(" ").trim() || "Seller";
+  const buyerName =
+    [offer.buyer?.firstName, offer.buyer?.lastName].filter(Boolean).join(" ").trim() || "Buyer";
+  const sellerName =
+    [offer.seller?.firstName, offer.seller?.lastName].filter(Boolean).join(" ").trim() || "Seller";
 
   let priceDiffPercent: number | null = null;
   if (offer.listing?.askingPrice && offer.currentAmount) {
@@ -183,7 +200,9 @@ export default function OfferDetailsPage() {
     ...(dealMessages || []),
   ];
   const uniqueMessagesMap = new Map<string, DealMessage>();
-  rawMessages.forEach((m) => { if (m?.id) uniqueMessagesMap.set(m.id, m); });
+  rawMessages.forEach((m) => {
+    if (m?.id) uniqueMessagesMap.set(m.id, m);
+  });
 
   const formattedDealMessages = Array.from(uniqueMessagesMap.values()).map((m) => {
     const isSeller = m.senderId === offer.sellerId || m.sender?.role === "SELLER";
@@ -191,9 +210,11 @@ export default function OfferDetailsPage() {
       id: `chat-${m.id}`,
       type: "chat" as const,
       senderId: m.senderId,
-      senderName: `${m.sender?.firstName || (isSeller ? offer.seller?.firstName || "Seller" : offer.buyer?.firstName || "Buyer")} ${m.sender?.lastName || ""}`.trim(),
+      senderName:
+        `${m.sender?.firstName || (isSeller ? offer.seller?.firstName || "Seller" : offer.buyer?.firstName || "Buyer")} ${m.sender?.lastName || ""}`.trim(),
       senderRole: m.sender?.role || (isSeller ? "SELLER" : "BUYER"),
-      senderAvatar: m.sender?.avatarUrl || (isSeller ? offer.seller?.avatarUrl : offer.buyer?.avatarUrl),
+      senderAvatar:
+        m.sender?.avatarUrl || (isSeller ? offer.seller?.avatarUrl : offer.buyer?.avatarUrl),
       text: m.message,
       createdAt: m.createdAt,
     };
@@ -203,7 +224,10 @@ export default function OfferDetailsPage() {
     id: `history-${h.id}`,
     type: "history" as const,
     senderId: h.senderId,
-    senderName: h.senderId === offer.buyerId ? buyerName : `${h.sender?.firstName || sellerName} ${h.sender?.lastName || ""}`.trim(),
+    senderName:
+      h.senderId === offer.buyerId
+        ? buyerName
+        : `${h.sender?.firstName || sellerName} ${h.sender?.lastName || ""}`.trim(),
     senderRole: h.senderId === offer.buyerId ? "BUYER" : "SELLER",
     senderAvatar: h.senderId === offer.buyerId ? offer.buyer?.avatarUrl : offer.seller?.avatarUrl,
     text: h.note || `Offer updated to ${formatCurrency(h.amount, currency)}`,
@@ -220,7 +244,10 @@ export default function OfferDetailsPage() {
     <div className="w-full max-w-full mx-auto">
       <AnimationWrapper type="fade-up">
         <div className="mb-6">
-          <Link href="/seller/offer-received" className="inline-flex items-center gap-2 text-sm font-semibold text-gray-400 hover:text-white transition-colors group cursor-pointer">
+          <Link
+            href="/seller/offer-received"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-gray-400 hover:text-white transition-colors group cursor-pointer"
+          >
             <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
             <span>Back to Offers Received</span>
           </Link>
@@ -242,7 +269,9 @@ export default function OfferDetailsPage() {
         <OfferStatsGrid
           formattedCurrentAmount={formatCurrency(offer.currentAmount, currency)}
           formattedInitialAmount={formatCurrency(offer.initialAmount, currency)}
-          formattedAskingPrice={offer.listing?.askingPrice ? formatCurrency(offer.listing.askingPrice, currency) : "N/A"}
+          formattedAskingPrice={
+            offer.listing?.askingPrice ? formatCurrency(offer.listing.askingPrice, currency) : "N/A"
+          }
           priceDiffPercent={priceDiffPercent}
           roundsCount={offer.roundsCount}
           updatedAt={offer.updatedAt}
@@ -253,7 +282,11 @@ export default function OfferDetailsPage() {
             <OfferTimelineSection
               offer={offer}
               currency={currency}
-              formattedAskingPrice={offer.listing?.askingPrice ? formatCurrency(offer.listing.askingPrice, currency) : "N/A"}
+              formattedAskingPrice={
+                offer.listing?.askingPrice
+                  ? formatCurrency(offer.listing.askingPrice, currency)
+                  : "N/A"
+              }
               buyerName={buyerName}
               sellerName={sellerName}
             />
@@ -279,7 +312,9 @@ export default function OfferDetailsPage() {
               currentStage={currentStage}
               updatingStage={updatingStage}
               isUpdatingStage={updateDealStageMutation.isPending}
-              buyerInitial={(offer.buyer?.firstName || offer.buyer?.lastName || "B").charAt(0).toUpperCase()}
+              buyerInitial={(offer.buyer?.firstName || offer.buyer?.lastName || "B")
+                .charAt(0)
+                .toUpperCase()}
               buyerName={buyerName}
               sellerName={sellerName}
               onUpdateStage={handleUpdateStage}

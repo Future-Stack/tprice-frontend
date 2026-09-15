@@ -1,14 +1,7 @@
 "use client";
 
 import React from "react";
-import {
-  CheckCircle2,
-  XCircle,
-  Flag,
-  ChevronDown,
-  Circle,
-  Loader2,
-} from "lucide-react";
+import { CheckCircle2, XCircle, Flag, ChevronDown, Circle, Loader2 } from "lucide-react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
 import { formatPrice, formatDate } from "./types";
 import type { BuyerOfferSidebarProps } from "./types";

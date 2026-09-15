@@ -30,9 +30,7 @@ export function GeneralSettingsTab({ settings }: GeneralSettingsTabProps) {
   return (
     <div className="space-y-12">
       <section>
-        <h2 className="text-xl md:text-2xl font-bold text-white mb-6">
-          Notification
-        </h2>
+        <h2 className="text-xl md:text-2xl font-bold text-white mb-6">Notification</h2>
         <div className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-10 shadow-2xl">
           <div className="flex justify-between items-center mb-6 px-2">
             <span className="text-[13px] font-medium text-[#666]">Alert Type</span>

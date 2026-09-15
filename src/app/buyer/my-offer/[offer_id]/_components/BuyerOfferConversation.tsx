@@ -44,13 +44,9 @@ export function BuyerOfferConversation({
               </div>
             ) : (
               combinedTimeline.map((item) => {
-                const isSelf =
-                  item.senderId === offer.buyerId || item.senderRole === "BUYER";
+                const isSelf = item.senderId === offer.buyerId || item.senderRole === "BUYER";
                 return (
-                  <div
-                    key={item.id}
-                    className={`flex ${isSelf ? "justify-end" : "justify-start"}`}
-                  >
+                  <div key={item.id} className={`flex ${isSelf ? "justify-end" : "justify-start"}`}>
                     <div
                       className={`max-w-[75%] p-5 rounded-2xl text-sm leading-relaxed ${
                         item.type === "history"
@@ -113,11 +109,7 @@ export function BuyerOfferConversation({
               disabled={isSending || !messageInput.trim()}
               className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-lg bg-[#D4AF37] text-black flex items-center justify-center hover:bg-[#c4a132] disabled:opacity-50 transition-colors cursor-pointer"
             >
-              {isSending ? (
-                <Loader2 size={18} className="animate-spin" />
-              ) : (
-                <Send size={18} />
-              )}
+              {isSending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
             </button>
           </div>
         </div>
