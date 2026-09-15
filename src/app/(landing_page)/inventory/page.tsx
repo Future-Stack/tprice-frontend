@@ -126,7 +126,8 @@ export default function MarketplacePage() {
                 </h3>
                 <p className="text-sm text-white/50 mb-6">
                   {(error && typeof error === "object" && "response" in error
-                    ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
+                    ? (error as { response?: { data?: { message?: string } } }).response?.data
+                        ?.message
                     : undefined) ||
                     (error instanceof Error ? error.message : undefined) ||
                     "An unexpected error occurred while fetching listings."}
