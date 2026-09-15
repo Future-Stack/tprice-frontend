@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useParams, usePathname } from "next/navigation";
 import Link from "next/link";
-import Cookies from "js-cookie";
+import Image from "next/image";
 import { toast } from "sonner";
 import {
   MapPin,
@@ -205,7 +205,7 @@ export default function VIPDetailsPage() {
   };
 
   if (isLoading) {
-    return <VIPDetailsSkeleton backLink={backLink} />;
+    return <VIPDetailsSkeleton />;
   }
 
   if (isError || !product) {
@@ -221,7 +221,7 @@ export default function VIPDetailsPage() {
                 VIP Listing Not Found
               </h3>
               <p className="text-gray-400 text-sm mt-2">
-                {(error as any)?.response?.data?.message ||
+                {(error as unknown as { response?: { data?: { message?: string } } })?.response?.data?.message ||
                   error?.message ||
                   "The VIP listing you are looking for is currently unavailable or does not exist."}
               </p>
@@ -337,9 +337,12 @@ export default function VIPDetailsPage() {
           {/* Main Image */}
           <AnimationWrapper type="zoom" duration={0.6} delay={0.1}>
             <div className="relative rounded-2xl overflow-hidden bg-black w-full max-h-102.25 group">
-              <img
+              <Image
                 src={activeImageSrc}
                 alt={product.title}
+                width={1200}
+                height={410}
+                unoptimized
                 className="w-full h-102.25 object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]"
               />
               {/* Floating actions */}
@@ -383,9 +386,12 @@ export default function VIPDetailsPage() {
                         : "border-[#2C2C2E] hover:border-[#E78F23]/40 opacity-60 hover:opacity-100"
                     }`}
                   >
-                    <img
+                    <Image
                       src={img}
                       alt={`${product.title} ${idx + 1}`}
+                      width={100}
+                      height={72}
+                      unoptimized
                       className="w-full h-full object-cover"
                     />
                   </button>
@@ -486,9 +492,12 @@ export default function VIPDetailsPage() {
                   <h4 className="text-sm font-semibold mb-5 text-white">Seller Information</h4>
                   <div className="flex items-center gap-4">
                     {product.owner?.avatarUrl ? (
-                      <img
+                      <Image
                         src={product.owner.avatarUrl}
                         alt={sellerName}
+                        width={44}
+                        height={44}
+                        unoptimized
                         className="w-11 h-11 rounded-full object-cover border border-[#3C3C3E]"
                       />
                     ) : (
@@ -613,9 +622,12 @@ export default function VIPDetailsPage() {
               <AnimationWrapper type="fade-up" duration={0.5} delay={0.3}>
                 <div className="bg-[#161618] rounded-xl p-4 flex items-center gap-3.5 border border-white/3">
                   {product.owner?.avatarUrl ? (
-                    <img
+                    <Image
                       src={product.owner.avatarUrl}
                       alt={sellerName}
+                      width={40}
+                      height={40}
+                      unoptimized
                       className="w-10 h-10 rounded-full object-cover border border-white/5"
                     />
                   ) : (
@@ -628,7 +640,7 @@ export default function VIPDetailsPage() {
                       {sellerName}
                     </p>
                     <p className="text-[11px] text-green-500/80 flex items-center gap-1.5 font-medium">
-                      <BadgeCheck className="w-3 h-3" />
+                      <BadgeCheck className="w-3.5 h-3.5" />
                       {sellerBadge}
                     </p>
                   </div>
@@ -701,7 +713,7 @@ function SpecItem({ label, value }: { label: string; value: string }) {
   );
 }
 
-function VIPDetailsSkeleton({ backLink }: { backLink: string }) {
+function VIPDetailsSkeleton() {
   return (
     <div className="mx-auto relative z-0 animate-pulse">
       {/* Page Header Skeleton */}

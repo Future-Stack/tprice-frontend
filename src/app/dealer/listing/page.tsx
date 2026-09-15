@@ -23,7 +23,7 @@ import { useMyListingsQuery, useDeleteListingMutation } from "@/hooks/useListing
 import { useDebounce } from "@/hooks/useDebounce";
 import { ListingItem } from "@/lib/api/listings";
 import DeleteListingModal from "./DeleteListingModal";
-import UpdateListingModal from "./UpdateListingModal";
+import UpdateListingModal from "@/components/shared/modals/UpdateListingModal";
 
 const formatTimeAgo = (dateString?: string) => {
   if (!dateString) return "N/A";
@@ -279,7 +279,7 @@ export default function ListingPage() {
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                         unoptimized
                       />
-                      <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/80 to-transparent pointer-events-none"></div>
+                      <div className="absolute inset-x-0 top-0 h-24 bg-linear-to-b from-black/80 to-transparent pointer-events-none"></div>
 
                       <div className="absolute top-3 left-3 flex gap-2 z-10">
                         {activeDeals > 0 && (

@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   ChevronLeft,
@@ -24,7 +25,6 @@ import {
   AlertCircle,
   Search,
   GripVertical,
-  Star,
 } from "lucide-react";
 import AnimationWrapper from "../../components/AnimationWrapper";
 import { useGetCategoriesQuery } from "@/hooks/useCategories";
@@ -144,8 +144,15 @@ export default function AddListing() {
     d.setDate(d.getDate() + 7);
     return d.toISOString();
   });
-  const [currency, setCurrency] = useState("USD");
+  const [currency] = useState("USD");
   const [allowCounterOffers, setAllowCounterOffers] = useState(true);
+
+  const minAuctionDate = useMemo(() => new Date(), []);
+  const maxAuctionDate = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 7);
+    return d;
+  }, []);
 
   // Plan Selection
   const [selectedPlan, setSelectedPlan] = useState<"standard" | "featured">("standard");
@@ -185,7 +192,7 @@ export default function AddListing() {
       const newSpecs: KeyValuePair[] = [];
       const addedKeys = new Set<string>();
 
-      const addSpec = (key: string, value: any) => {
+      const addSpec = (key: string, value: unknown) => {
         if (
           value !== null &&
           value !== undefined &&
@@ -250,7 +257,7 @@ export default function AddListing() {
       }
       if (data.make && !brand) {
         const matchedBrand = brandsList.find(
-          (b: any) => b.name.toLowerCase() === data.make?.toLowerCase()
+          (b: { name: string }) => b.name.toLowerCase() === data.make?.toLowerCase()
         );
         if (matchedBrand) {
           setBrand(matchedBrand.name);
@@ -272,10 +279,11 @@ export default function AddListing() {
       }
 
       toast.success(`VIN decoded successfully! ${newSpecs.length} specifications populated.`);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { message?: string } }; message?: string };
       const errMsg =
-        err?.response?.data?.message ||
-        err?.message ||
+        axiosErr?.response?.data?.message ||
+        axiosErr?.message ||
         "Failed to decode VIN. Please verify the VIN number.";
       toast.error(errMsg);
     }
@@ -331,13 +339,13 @@ export default function AddListing() {
             : `${res.length} images uploaded successfully!`
         );
       }
-    } catch (err: any) {
-      const errMsg = err?.response?.data?.message || err?.message || "Failed to upload image(s).";
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { message?: string } }; message?: string };
+      const errMsg =
+        axiosErr?.response?.data?.message || axiosErr?.message || "Failed to upload image(s).";
       toast.error(errMsg);
     }
   };
-
-  const handleFileUpload = (file: File) => handleFilesUpload([file]);
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -451,7 +459,7 @@ export default function AddListing() {
     if (!validateCurrentStep()) return;
 
     // Convert dynamic specifications array to JSON string
-    const specsObject: Record<string, any> = {};
+    const specsObject: Record<string, string | number> = {};
     specifications.forEach((item) => {
       const trimmedKey = item.key.trim();
       const trimmedVal = item.value.trim();
@@ -501,11 +509,16 @@ export default function AddListing() {
 
     try {
       const createdListing = await createListingMutation.mutateAsync(payload);
+      const resListing = createdListing as unknown as {
+        id?: string;
+        data?: { id?: string; data?: { id?: string } };
+        listing?: { id?: string };
+      };
       const createdListingId =
-        (createdListing as any)?.id ||
-        (createdListing as any)?.data?.id ||
-        (createdListing as any)?.data?.data?.id ||
-        (createdListing as any)?.listing?.id;
+        resListing?.id ||
+        resListing?.data?.id ||
+        resListing?.data?.data?.id ||
+        resListing?.listing?.id;
 
       if (!hasActiveSubscription && selectedPlan === "featured") {
         if (!createdListingId) {
@@ -525,10 +538,15 @@ export default function AddListing() {
             cancelUrl,
           });
 
+          const resCheckout = checkoutRes as unknown as {
+            checkoutUrl?: string;
+            data?: { checkoutUrl?: string };
+            url?: string;
+          };
           const checkoutUrl =
             checkoutRes?.checkoutUrl ||
-            (checkoutRes as any)?.data?.checkoutUrl ||
-            (checkoutRes as any)?.url;
+            resCheckout?.data?.checkoutUrl ||
+            resCheckout?.url;
 
           if (checkoutUrl) {
             toast.success(
@@ -540,11 +558,12 @@ export default function AddListing() {
             console.error("No checkoutUrl in response:", checkoutRes);
             toast.error("Checkout session created, but no checkout URL was returned.");
           }
-        } catch (paymentErr: any) {
+        } catch (paymentErr: unknown) {
           console.error("Checkout session error:", paymentErr);
+          const axiosErr = paymentErr as { response?: { data?: { message?: string } }; message?: string };
           const payMsg =
-            paymentErr?.response?.data?.message ||
-            paymentErr?.message ||
+            axiosErr?.response?.data?.message ||
+            axiosErr?.message ||
             "Failed to initiate checkout session.";
           toast.error(`Listing created, but payment error: ${payMsg}`);
         }
@@ -553,10 +572,11 @@ export default function AddListing() {
       }
 
       router.push("/dealer/listing");
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { message?: string } }; message?: string };
       const errMsg =
-        err?.response?.data?.message ||
-        err?.message ||
+        axiosErr?.response?.data?.message ||
+        axiosErr?.message ||
         "Failed to create listing. Please check required fields.";
       toast.error(errMsg);
     }
@@ -929,7 +949,7 @@ export default function AddListing() {
                   </p>
                 </div>
               ) : (
-                <div className="space-y-2.5 max-h-[480px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
+                <div className="space-y-2.5 max-h-120 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
                   {specifications.map((item, index) => (
                     <div
                       key={item.id}
@@ -1083,17 +1103,17 @@ export default function AddListing() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
                 {
-                  id: "FIXED_PRICE",
+                  id: "FIXED_PRICE" as const,
                   title: "Fixed Price",
                   desc: "Set a specific asking price",
                 },
                 {
-                  id: "AUCTION",
+                  id: "AUCTION" as const,
                   title: "Auction",
                   desc: "Set starting bid and auction end date",
                 },
                 {
-                  id: "PRIVATE_SALE",
+                  id: "PRIVATE_SALE" as const,
                   title: "Private Sale",
                   desc: "Price on Application (POA)",
                 },
@@ -1101,7 +1121,7 @@ export default function AddListing() {
                 <button
                   key={type.id}
                   type="button"
-                  onClick={() => setSaleType(type.id as any)}
+                  onClick={() => setSaleType(type.id)}
                   className={`flex flex-col items-start p-5 rounded-xl border transition-all duration-300 text-left cursor-pointer ${
                     saleType === type.id
                       ? "border-primary bg-primary/10 ring-1 ring-primary"
@@ -1192,8 +1212,8 @@ export default function AddListing() {
                       timeCaption="Time"
                       dateFormat="MMMM d, yyyy h:mm aa"
                       placeholderText="Select date and time"
-                      minDate={new Date()}
-                      maxDate={new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)}
+                      minDate={minAuctionDate}
+                      maxDate={maxAuctionDate}
                       className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/60 transition-colors shadow-inner cursor-pointer"
                       wrapperClassName="w-full"
                     />

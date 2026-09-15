@@ -23,7 +23,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { toast } from "sonner";
 import DeleteListingModal from "./DeleteListingModal";
 import RejectListingModal from "./RejectListingModal";
-import UpdateListingModal from "./UpdateListingModal";
+import UpdateListingModal from "@/components/shared/modals/UpdateListingModal";
 
 const TABS = ["All listings", "pending", "Approved", "Rejected"];
 const LIMIT_OPTIONS = [10, 20, 50, 100];

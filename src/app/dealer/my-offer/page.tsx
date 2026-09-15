@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
 import {
   Eye,
@@ -77,8 +77,6 @@ const initialOffers = [
   },
 ];
 
-const categories = ["All", "Cars", "Yachts", "Aviation", "Real Estate", "Watches"];
-
 /* ─── Counter Offer Modal ─── */
 interface CounterOfferModalProps {
   isOpen: boolean;
@@ -98,13 +96,22 @@ const CounterOfferModal = ({ isOpen, onClose, offer }: CounterOfferModalProps) =
   const [isClosing, setIsClosing] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // Reset on open
-  useEffect(() => {
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
     if (isOpen) {
       setCounterAmount("");
       setIsClosing(false);
     }
-  }, [isOpen]);
+  }
+
+  const handleClose = useCallback(() => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+      setIsClosing(false);
+    }, 250);
+  }, [onClose]);
 
   // Close on Escape key
   useEffect(() => {
@@ -113,16 +120,7 @@ const CounterOfferModal = ({ isOpen, onClose, offer }: CounterOfferModalProps) =
     };
     if (isOpen) window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
-
-  const handleClose = () => {
-    setIsClosing(true);
-    setTimeout(() => {
-      onClose();
-      setIsClosing(false);
-    }, 250);
-  };
+  }, [isOpen, handleClose]);
 
   if (!isOpen || !offer) return null;
 
@@ -178,7 +176,7 @@ const CounterOfferModal = ({ isOpen, onClose, offer }: CounterOfferModalProps) =
             {offer.sellerCounter && (
               <div>
                 <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">
-                  Seller's counter
+                  Seller&apos;s counter
                 </div>
                 <div className="text-lg font-black text-[#D4AF37] leading-none tracking-tight">
                   {offer.sellerCounter}
@@ -328,7 +326,7 @@ const StatusBadge = ({ status }: { status: string }) => {
 };
 
 function BuyerOffer() {
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeCategory] = useState("All");
   const [expandedOffer, setExpandedOffer] = useState<number | null>(4); // Default expand id 4 as in image
   const [counterModalOpen, setCounterModalOpen] = useState(false);
   const [counterOffer, setCounterOffer] = useState<(typeof initialOffers)[0] | null>(null);
@@ -415,7 +413,7 @@ function BuyerOffer() {
                           {offer.sellerCounter && (
                             <div className="text-center">
                               <div className="text-[10px] font-bold text-[#D4AF37] uppercase tracking-widest mb-1">
-                                Seller's Counter
+                                Seller&apos;s Counter
                               </div>
                               <div className="text-2xl font-black text-[#D4AF37] leading-none tracking-tight">
                                 {offer.sellerCounter}

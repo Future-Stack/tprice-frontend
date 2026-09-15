@@ -6,7 +6,6 @@ import Link from "next/link";
 import {
   Search,
   Eye,
-  MoreVertical,
   ChevronLeft,
   ChevronRight,
   PackageOpen,
@@ -19,7 +18,7 @@ import AnimationWrapper from "../../components/AnimationWrapper";
 import { useMyListingsQuery, useDeleteListingMutation } from "@/hooks/useListings";
 import { useDebounce } from "@/hooks/useDebounce";
 import { ListingItem } from "@/lib/api/listings";
-import UpdateListingModal from "./UpdateListingModal";
+import UpdateListingModal from "@/components/shared/modals/UpdateListingModal";
 import DeleteListingModal from "./DeleteListingModal";
 
 const getStatusStyles = (status: string) => {

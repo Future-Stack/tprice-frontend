@@ -1,14 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { MapPin, Info, BadgeCheck, ChevronLeft, Heart, Share2 } from "lucide-react";
 import Link from "next/link";
 
 import AnimationWrapper from "@/app/components/AnimationWrapper";
 
 /* ─── Static Data (will be replaced by API) ─── */
-const categories = ["All", "Cars", "Yachts", "Aviation", "Real Estate", "Watches"];
-
 const productImages = [
   "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&q=80&w=1200",
   "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?auto=format&fit=crop&q=80&w=800",
@@ -37,7 +36,6 @@ const product = {
 
 export default function ProductDetailsPage() {
   const [selectedImage, setSelectedImage] = useState(0);
-  const [showBidSummary, setShowBidSummary] = useState(false);
   const [inclFees, setInclFees] = useState(true);
   const [isBiddingMode, setIsBiddingMode] = useState(false);
 
@@ -73,18 +71,21 @@ export default function ProductDetailsPage() {
           {/* Main Image aspect-16/10*/}
           <AnimationWrapper type="zoom" duration={0.6} delay={0.1}>
             <div className="relative rounded-2xl overflow-hidden bg-black w-full max-h-[409px]  group">
-              <img
+              <Image
                 src={productImages[selectedImage]}
                 alt={product.title}
+                width={1200}
+                height={409}
+                unoptimized
                 className="w-full h-[409px] object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]"
               />
               {/* Floating actions */}
               <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <button className="w-10 h-10 bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center text-white/80 hover:text-red-400 transition-colors border border-white/10">
-                  <Heart className="w-[18px] h-[18px]" />
+                  <Heart className="w-4.5 h-4.5" />
                 </button>
                 <button className="w-10 h-10 bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center text-white/80 hover:text-[#E78F23] transition-colors border border-white/10">
-                  <Share2 className="w-[18px] h-[18px]" />
+                  <Share2 className="w-4.5 h-4.5" />
                 </button>
               </div>
               {/* Gradient overlay */}
@@ -105,9 +106,12 @@ export default function ProductDetailsPage() {
                         : "border-[#2C2C2E] hover:border-[#E78F23]/40 opacity-60 hover:opacity-100"
                     }`}
                 >
-                  <img
+                  <Image
                     src={img}
                     alt={`${product.title} ${idx + 1}`}
+                    width={100}
+                    height={72}
+                    unoptimized
                     className="w-full h-full object-cover"
                   />
                 </button>
@@ -174,6 +178,7 @@ export default function ProductDetailsPage() {
                 <div className="border border-[#2C2C2E] rounded-2xl p-6 bg-white/[0.02]">
                   <div className="flex items-center gap-2.5 mb-5">
                     <Info className="w-4 h-4 text-[#E78F23]" />
+                    bg-white/2
                     <h4 className="text-sm font-semibold text-white">Key Specifications</h4>
                   </div>
 
@@ -281,25 +286,25 @@ export default function ProductDetailsPage() {
               {/* Attributes Grid (image style 2x2) */}
               <AnimationWrapper type="fade-up" duration={0.5} delay={0.2}>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-[#161618] rounded-xl p-4 border border-white/[0.03]">
+                  <div className="bg-[#161618] rounded-xl p-4 border border-white/3">
                     <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">
                       Mileage
                     </p>
                     <p className="text-[15px] font-medium text-white">1,200 mi</p>
                   </div>
-                  <div className="bg-[#161618] rounded-xl p-4 border border-white/[0.03]">
+                  <div className="bg-[#161618] rounded-xl p-4 border border-white/3">
                     <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">
                       Engine
                     </p>
                     <p className="text-[15px] font-medium text-white">3.9L V8 Twin-Turbo</p>
                   </div>
-                  <div className="bg-[#161618] rounded-xl p-4 border border-white/[0.03]">
+                  <div className="bg-[#161618] rounded-xl p-4 border border-white/3">
                     <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">
                       Power
                     </p>
                     <p className="text-[15px] font-medium text-white">661 HP</p>
                   </div>
-                  <div className="bg-[#161618] rounded-xl p-4 border border-white/[0.03]">
+                  <div className="bg-[#161618] rounded-xl p-4 border border-white/3">
                     <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">
                       0-60
                     </p>
@@ -310,8 +315,8 @@ export default function ProductDetailsPage() {
 
               {/* Seller - image style */}
               <AnimationWrapper type="fade-up" duration={0.5} delay={0.3}>
-                <div className="bg-[#161618] rounded-xl p-4 flex items-center gap-3.5 border border-white/[0.03]">
-                  <div className="w-10 h-10 rounded-full bg-white/[0.05] flex items-center justify-center text-gray-400 font-medium text-sm border border-white/5">
+                <div className="bg-[#161618] rounded-xl p-4 flex items-center gap-3.5 border border-white/3">
+                  <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 font-medium text-sm border border-white/5">
                     M
                   </div>
                   <div>

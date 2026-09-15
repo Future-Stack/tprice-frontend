@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { MapPin, Info, BadgeCheck, ArrowUpRight, Share2, Eye } from "lucide-react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
 
@@ -177,9 +178,12 @@ export default function MyBidsPage() {
                     {/* Item */}
                     <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                       <div className="w-10 h-8 sm:w-12 sm:h-10 rounded-lg overflow-hidden bg-black shrink-0 border border-white/5">
-                        <img
+                        <Image
                           src={bid.image}
                           alt={bid.title}
+                          width={48}
+                          height={40}
+                          unoptimized
                           className="w-full h-full object-cover"
                         />
                       </div>

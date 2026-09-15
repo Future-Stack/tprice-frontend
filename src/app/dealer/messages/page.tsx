@@ -198,7 +198,7 @@ const Messages = () => {
                   className="w-full bg-[#1A1A1C] border border-white/10 rounded-xl py-3.5 md:py-4 px-4 md:px-5 pr-14 md:pr-16 text-xs md:text-sm text-white focus:outline-hidden focus:border-[#D4AF37]/50 transition-all placeholder:text-gray-500"
                 />
                 <button className="absolute right-2 md:right-3 w-8 h-8 md:w-10 md:h-10 rounded-lg bg-[#D4AF37] hover:bg-[#c4a132] text-black flex items-center justify-center transition-colors">
-                  <Send size={16} className="md:w-[18px] md:h-[18px]" />
+                  <Send size={16} className="md:w-4.5 md:h-4.5" />
                 </button>
               </div>
             </div>

@@ -1,12 +1,22 @@
 "use client";
 
 import React, { useState } from "react";
-import { Eye, MapPin, ChevronDown, RotateCcw, Filter, X } from "lucide-react";
+import Image from "next/image";
+import { Eye, MapPin, ChevronDown, Filter, X } from "lucide-react";
 import Link from "next/link";
 import AnimationWrapper from "../../components/AnimationWrapper";
 
 /* ─── Data (unchanged) ─── */
 const categories = ["All", "Car", "Yacht", "Jet", "Real Estate", "Watch"];
+
+export interface FilterState {
+  type: string;
+  model: string;
+  yearFrom: string;
+  yearTo: string;
+  priceMin: number;
+  priceMax: number;
+}
 
 interface Asset {
   id: number;
@@ -186,7 +196,7 @@ export default function VIPDeals() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Applied filters
-  const [appliedFilters, setAppliedFilters] = useState({
+  const [appliedFilters, setAppliedFilters] = useState<FilterState>({
     type: "All",
     model: "All",
     yearFrom: "2005",
@@ -196,7 +206,7 @@ export default function VIPDeals() {
   });
 
   // Draft filters (for sidebar inputs)
-  const [draftFilters, setDraftFilters] = useState({ ...appliedFilters });
+  const [draftFilters, setDraftFilters] = useState<FilterState>({ ...appliedFilters });
 
   const minLimit = 0;
   const maxLimit = 500000;
@@ -364,8 +374,8 @@ export default function VIPDeals() {
 interface FilterSidebarProps {
   activeCategory: string;
   setActiveCategory: (cat: string) => void;
-  draftFilters: any;
-  setDraftFilters: React.Dispatch<React.SetStateAction<any>>;
+  draftFilters: FilterState;
+  setDraftFilters: React.Dispatch<React.SetStateAction<FilterState>>;
   handleReset: () => void;
   handleApply: () => void;
   minLimit: number;
@@ -420,7 +430,7 @@ function FilterSidebar({
       <FilterSelect
         label="Type"
         value={draftFilters.type}
-        onChange={(val) => setDraftFilters((prev: any) => ({ ...prev, type: val }))}
+        onChange={(val) => setDraftFilters((prev) => ({ ...prev, type: val }))}
         options={["All", "Sport", "Yacht", "Luxury", "Private Jet", "Convertible", "Casual"]}
       />
 
@@ -428,7 +438,7 @@ function FilterSidebar({
       <FilterSelect
         label="Model"
         value={draftFilters.model}
-        onChange={(val) => setDraftFilters((prev: any) => ({ ...prev, model: val }))}
+        onChange={(val) => setDraftFilters((prev) => ({ ...prev, model: val }))}
         options={["All", "Ferrari", "Volvo", "Rolex", "Azimut", "Gulfstream"]}
       />
 
@@ -440,7 +450,7 @@ function FilterSidebar({
             type="text"
             value={draftFilters.yearFrom}
             onChange={(e) =>
-              setDraftFilters((prev: any) => ({ ...prev, yearFrom: e.target.value }))
+              setDraftFilters((prev) => ({ ...prev, yearFrom: e.target.value }))
             }
             className="w-full bg-transparent border border-[#E78F23]/20 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-white focus:outline-none focus:border-[#E78F23] transition-colors"
             placeholder="2005"
@@ -449,7 +459,7 @@ function FilterSidebar({
           <input
             type="text"
             value={draftFilters.yearTo}
-            onChange={(e) => setDraftFilters((prev: any) => ({ ...prev, yearTo: e.target.value }))}
+            onChange={(e) => setDraftFilters((prev) => ({ ...prev, yearTo: e.target.value }))}
             className="w-full bg-transparent border border-[#E78F23]/20 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-white focus:outline-none focus:border-[#E78F23] transition-colors"
             placeholder="2024"
           />
@@ -475,7 +485,7 @@ function FilterSidebar({
             max={maxLimit}
             value={draftFilters.priceMin}
             onChange={(e) =>
-              setDraftFilters((prev: any) => ({
+              setDraftFilters((prev) => ({
                 ...prev,
                 priceMin: Math.min(Number(e.target.value), draftFilters.priceMax - 1000),
               }))
@@ -496,7 +506,7 @@ function FilterSidebar({
             max={maxLimit}
             value={draftFilters.priceMax}
             onChange={(e) =>
-              setDraftFilters((prev: any) => ({
+              setDraftFilters((prev) => ({
                 ...prev,
                 priceMax: Math.max(Number(e.target.value), draftFilters.priceMin + 1000),
               }))
@@ -567,9 +577,12 @@ function MarketplaceCard({ asset }: { asset: Asset }) {
   return (
     <div className="bg-[#1C1C1E] rounded-[8px] border border-[#2C2C2E] overflow-hidden group hover:border-[#E78F23]/20 transition-all shadow-xl hover:shadow-[#E78F23]/5">
       <div className="relative h-45 sm:h-50 lg:h-54.25 overflow-hidden bg-black">
-        <img
+        <Image
           src={asset.image}
           alt={asset.title}
+          width={400}
+          height={220}
+          unoptimized
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out opacity-90 group-hover:opacity-100"
         />
       </div>

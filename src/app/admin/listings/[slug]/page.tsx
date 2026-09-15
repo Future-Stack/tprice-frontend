@@ -31,7 +31,7 @@ import {
 import AnimationWrapper from "@/app/components/AnimationWrapper";
 import { useListingByIdQuery, useUpdateAdminListingStatusMutation } from "@/hooks/useListings";
 import RejectListingModal from "@/app/admin/listings/RejectListingModal";
-import UpdateListingModal from "@/app/admin/listings/UpdateListingModal";
+import UpdateListingModal from "@/components/shared/modals/UpdateListingModal";
 import { toast } from "sonner";
 
 const formatPrice = (priceStr?: string | number, currency = "USD") => {
@@ -154,7 +154,7 @@ function ListingDetailsSkeleton() {
           <div className="lg:col-span-2 space-y-8">
             {/* Gallery Skeleton */}
             <div className="space-y-4">
-              <div className="rounded-2xl overflow-hidden border border-[#262626] bg-[#141414] h-[400px] md:h-[500px] animate-pulse" />
+              <div className="rounded-2xl overflow-hidden border border-[#262626] bg-[#141414] h-100 md:h-125 animate-pulse" />
               <div className="grid grid-cols-3 gap-4">
                 {[1, 2, 3].map((i) => (
                   <div
@@ -178,7 +178,7 @@ function ListingDetailsSkeleton() {
                   </div>
                 ))}
               </div>
-              <div className="bg-[#141414] border border-[#262626] p-6 rounded-xl h-full min-h-[100px] animate-pulse" />
+              <div className="bg-[#141414] border border-[#262626] p-6 rounded-xl h-full min-h-25 animate-pulse" />
             </div>
 
             {/* Description Skeleton */}
@@ -190,7 +190,7 @@ function ListingDetailsSkeleton() {
 
           {/* Right Column (1/3) */}
           <div className="space-y-6">
-            <div className="bg-[#141414] border border-[#262626] rounded-2xl p-6 space-y-8 h-[380px] animate-pulse" />
+            <div className="bg-[#141414] border border-[#262626] rounded-2xl p-6 space-y-8 h-95 animate-pulse" />
             <div className="bg-[#141414] border border-[#262626] rounded-2xl p-6 space-y-6 h-48 animate-pulse" />
           </div>
         </div>
@@ -360,7 +360,9 @@ export default function AdminListingDetails() {
       });
       toast.success("Listing approved successfully");
     } catch (err: unknown) {
-      const errMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to approve listing";
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        "Failed to approve listing";
       toast.error(errMsg);
     }
   };
@@ -375,7 +377,9 @@ export default function AdminListingDetails() {
       setIsRejectModalOpen(false);
       toast.success("Listing rejected");
     } catch (err: unknown) {
-      const errMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to reject listing";
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        "Failed to reject listing";
       toast.error(errMsg);
     }
   };
@@ -467,7 +471,7 @@ export default function AdminListingDetails() {
                     width={800}
                     height={500}
                     unoptimized
-                    className="w-full h-[400px] md:h-[500px] object-cover"
+                    className="w-full h-100 md:h-125 object-cover"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src =
                         "https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&q=80&w=1200";

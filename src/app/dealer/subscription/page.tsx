@@ -75,8 +75,13 @@ export default function DealerSubscriptionPage() {
       },
       {
         onSuccess: (data) => {
+          const responseData = data as unknown as {
+            checkoutUrl?: string;
+            data?: { checkoutUrl?: string };
+            url?: string;
+          };
           const checkoutUrl =
-            data?.checkoutUrl || (data as any)?.data?.checkoutUrl || (data as any)?.url;
+            data?.checkoutUrl || responseData?.data?.checkoutUrl || responseData?.url;
 
           if (checkoutUrl) {
             toast.success("Redirecting to secure Stripe checkout...");
@@ -85,15 +90,19 @@ export default function DealerSubscriptionPage() {
             toast.error("Checkout session created, but no checkout URL was returned.");
           }
         },
-        onError: (err: any) => {
+        onError: (err: unknown) => {
           let errorMessage = "Failed to initiate subscription checkout.";
-          const rawMsg = err?.response?.data?.message;
+          const axiosErr = err as {
+            response?: { data?: { message?: string | string[] } };
+            message?: string;
+          };
+          const rawMsg = axiosErr?.response?.data?.message;
           if (Array.isArray(rawMsg)) {
             errorMessage = rawMsg.join(", ");
           } else if (typeof rawMsg === "string" && rawMsg.trim()) {
             errorMessage = rawMsg;
-          } else if (err?.message) {
-            errorMessage = err.message;
+          } else if (axiosErr?.message) {
+            errorMessage = axiosErr.message;
           }
           toast.error(errorMessage);
         },
@@ -139,7 +148,7 @@ export default function DealerSubscriptionPage() {
       {/* Active Subscription Banner (Visible when dealer has purchased active plan) */}
       {!isLoading && hasActiveSubscription && (
         <AnimationWrapper type="fade-up" duration={0.4}>
-          <div className="p-6 rounded-2xl bg-gradient-to-r from-emerald-950/50 via-[#18181A] to-emerald-950/30 border-2 border-emerald-500/50 shadow-[0_0_40px_rgba(16,185,129,0.15)] flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+          <div className="p-6 rounded-2xl bg-linear-to-r from-emerald-950/50 via-[#18181A] to-emerald-950/30 border-2 border-emerald-500/50 shadow-[0_0_40px_rgba(16,185,129,0.15)] flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
             {/* Background Glow */}
             <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -176,7 +185,7 @@ export default function DealerSubscriptionPage() {
             </div>
 
             <div className="flex items-center gap-3 relative z-10 self-stretch sm:self-center shrink-0">
-              <div className="px-5 py-3 rounded-xl bg-white/[0.05] border border-emerald-500/30 text-center flex-1 sm:flex-initial">
+              <div className="px-5 py-3 rounded-xl bg-white/5 border border-emerald-500/30 text-center flex-1 sm:flex-initial">
                 <span className="text-xs text-gray-400 block font-inter uppercase tracking-wider">
                   Featured Listings
                 </span>
@@ -196,7 +205,8 @@ export default function DealerSubscriptionPage() {
             <div className="flex items-center gap-3">
               <AlertCircle className="w-5 h-5 shrink-0" />
               <p className="text-sm">
-                {(error as any)?.response?.data?.message ||
+                {(error as unknown as { response?: { data?: { message?: string } } })?.response
+                  ?.data?.message ||
                   error?.message ||
                   "Unable to load subscription pricing and status. Please try again."}
               </p>
@@ -291,7 +301,7 @@ export default function DealerSubscriptionPage() {
           <AnimationWrapper type="fade-up" duration={0.5} delay={0.1}>
             <div className="h-full bg-[#18181A] border border-white/10 hover:border-white/20 rounded-2xl p-7 sm:p-9 flex flex-col justify-between transition-all duration-300 shadow-xl relative overflow-hidden">
               {/* Subtle background gradient */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/[0.02] rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/2 rounded-full blur-3xl pointer-events-none" />
 
               <div>
                 {/* Header & Badge */}
@@ -376,7 +386,7 @@ export default function DealerSubscriptionPage() {
 
               {/* Informational Footer Note (Strictly no action button per requirement) */}
               <div className="pt-6 mt-8 border-t border-white/10">
-                <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white/[0.03] border border-white/5 text-gray-400 text-xs leading-relaxed">
+                <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white/3 border border-white/5 text-gray-400 text-xs leading-relaxed">
                   <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                   <span>
                     This plan is applied directly when adding or upgrading individual listings from
@@ -392,8 +402,8 @@ export default function DealerSubscriptionPage() {
             <div
               className={`h-full rounded-2xl p-7 sm:p-9 flex flex-col justify-between transition-all duration-300 relative overflow-hidden ${
                 hasActiveSubscription
-                  ? "bg-gradient-to-b from-[#0e271a] via-[#14231b] to-[#18181A] border-2 border-emerald-500 shadow-[0_0_50px_rgba(16,185,129,0.25)]"
-                  : "bg-gradient-to-b from-[#1E1A14] to-[#18181A] border-2 border-primary/80 shadow-[0_0_40px_rgba(231,143,35,0.15)]"
+                  ? "bg-linear-to-b from-[#0e271a] via-[#14231b] to-[#18181A] border-2 border-emerald-500 shadow-[0_0_50px_rgba(16,185,129,0.25)]"
+                  : "bg-linear-to-b from-[#1E1A14] to-[#18181A] border-2 border-primary/80 shadow-[0_0_40px_rgba(231,143,35,0.15)]"
               }`}
             >
               {/* Decorative Ambient Glow */}
