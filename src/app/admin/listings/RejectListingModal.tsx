@@ -1,15 +1,21 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { XCircle, X, Loader2 } from "lucide-react";
 import Image from "next/image";
-import { ListingItem } from "@/lib/api/listings";
+
 
 interface RejectListingModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (reason: string) => Promise<void>;
-  listing: ListingItem | null;
+  listing: {
+    id: string;
+    title: string;
+    category?: string | null;
+    brand?: string | null;
+    media?: { url: string }[] | null;
+  } | null;
   isSubmitting: boolean;
 }
 
@@ -27,13 +33,15 @@ export default function RejectListingModal({
   listing,
   isSubmitting,
 }: RejectListingModalProps) {
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
   const [reason, setReason] = useState("Missing proof of ownership documents.");
 
-  useEffect(() => {
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
     if (isOpen) {
       setReason("Missing proof of ownership documents.");
     }
-  }, [isOpen]);
+  }
 
   if (!isOpen || !listing) return null;
 

@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
+import Image from "next/image";
 import {
   X,
   Tag,
@@ -35,28 +36,28 @@ export default function EditBrandModal({ isOpen, onClose, brand }: EditBrandModa
     : categoriesResponse?.data || [];
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [prevBrandId, setPrevBrandId] = useState<string | null>(brand?.id || null);
   const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    websiteUrl: "",
-    logoUrl: "",
-    categoryId: "",
+    name: brand?.name || "",
+    description: brand?.description || "",
+    websiteUrl: brand?.websiteUrl || "",
+    logoUrl: brand?.logoUrl || "",
+    categoryId: brand?.categoryId || brand?.category?.id || "",
   });
+
+  if (brand && brand.id !== prevBrandId) {
+    setPrevBrandId(brand.id);
+    setFormData({
+      name: brand.name || "",
+      description: brand.description || "",
+      websiteUrl: brand.websiteUrl || "",
+      logoUrl: brand.logoUrl || "",
+      categoryId: brand.categoryId || brand.category?.id || "",
+    });
+  }
 
   const [inputMode, setInputMode] = useState<"upload" | "url">("upload");
   const [isDragging, setIsDragging] = useState(false);
-
-  useEffect(() => {
-    if (brand) {
-      setFormData({
-        name: brand.name || "",
-        description: brand.description || "",
-        websiteUrl: brand.websiteUrl || "",
-        logoUrl: brand.logoUrl || "",
-        categoryId: brand.categoryId || brand.category?.id || "",
-      });
-    }
-  }, [brand]);
 
   if (!isOpen || !brand) return null;
 
@@ -88,8 +89,11 @@ export default function EditBrandModal({ isOpen, onClose, brand }: EditBrandModa
         setFormData((prev) => ({ ...prev, logoUrl: res.url }));
         toast.success("Brand logo uploaded successfully!");
       }
-    } catch (err: any) {
-      const errMsg = err?.response?.data?.message || err?.message || "Failed to upload logo";
+    } catch (err: unknown) {
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to upload logo";
       toast.error(errMsg);
     }
   };
@@ -154,8 +158,11 @@ export default function EditBrandModal({ isOpen, onClose, brand }: EditBrandModa
 
       toast.success("Brand updated successfully!");
       onClose();
-    } catch (err: any) {
-      const errMsg = err?.response?.data?.message || err?.message || "Failed to update brand";
+    } catch (err: unknown) {
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to update brand";
       toast.error(errMsg);
     }
   };
@@ -293,14 +300,13 @@ export default function EditBrandModal({ isOpen, onClose, brand }: EditBrandModa
                 {formData.logoUrl ? (
                   <div className="relative group rounded-xl border border-primary/30 overflow-hidden bg-[#0E0E10] p-2 flex items-center gap-4">
                     <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-[#262626] shrink-0 bg-[#1A1A1A] flex items-center justify-center p-1">
-                      <img
+                      <Image
                         src={formData.logoUrl}
                         alt="Logo Preview"
+                        width={80}
+                        height={80}
+                        unoptimized
                         className="w-full h-full object-contain"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            "https://cdn.exoticworld.com/brands/ferrari-logo.png";
-                        }}
                       />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -376,14 +382,13 @@ export default function EditBrandModal({ isOpen, onClose, brand }: EditBrandModa
                 />
                 {formData.logoUrl && (
                   <div className="mt-2 relative w-full h-28 rounded-xl overflow-hidden border border-[#262626] bg-[#0E0E10] flex items-center justify-center p-2">
-                    <img
+                    <Image
                       src={formData.logoUrl}
                       alt="URL Preview"
+                      width={112}
+                      height={112}
+                      unoptimized
                       className="max-h-full object-contain"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src =
-                          "https://cdn.exoticworld.com/brands/ferrari-logo.png";
-                      }}
                     />
                   </div>
                 )}

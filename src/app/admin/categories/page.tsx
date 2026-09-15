@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import {
   Plus,
   Search,
@@ -301,14 +302,13 @@ export default function AdminCategoriesPage() {
                         <div className="flex items-center gap-4">
                           <div className="relative w-16 h-14 rounded-lg overflow-hidden border border-[#262626] bg-[#1A1A1A] shrink-0">
                             {category.imageUrl ? (
-                              <img
+                              <Image
                                 src={category.imageUrl}
                                 alt={category.name}
+                                width={64}
+                                height={56}
+                                unoptimized
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                onError={(e) => {
-                                  (e.target as HTMLImageElement).src =
-                                    "https://images.unsplash.com/photo-1583121274602-3e2820c69888";
-                                }}
                               />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary">

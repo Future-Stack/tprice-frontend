@@ -290,6 +290,42 @@ function AdminActivity() {
               );
             })}
           </div>
+
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+            {/* Search Box */}
+            <div className="relative w-full sm:w-56">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search logs..."
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setPage(1);
+                }}
+                className="w-full bg-[#161616] border border-[#262626] rounded-xl pl-10 pr-4 py-1.5 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-primary/60 transition-colors"
+              />
+            </div>
+
+            {/* Limit Selector */}
+            <div className="flex items-center gap-2 text-xs text-gray-400 shrink-0">
+              <span>Per page:</span>
+              <select
+                value={limit}
+                onChange={(e) => {
+                  setLimit(Number(e.target.value));
+                  setPage(1);
+                }}
+                className="bg-[#161616] border border-[#262626] rounded-xl px-2.5 py-1.5 text-xs text-gray-300 focus:outline-none focus:border-primary/60 cursor-pointer"
+              >
+                {LIMIT_OPTIONS.map((opt) => (
+                  <option key={opt} value={opt} className="bg-[#141416]">
+                    {opt}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
       </AnimationWrapper>
 

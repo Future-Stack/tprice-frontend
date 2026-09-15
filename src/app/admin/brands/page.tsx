@@ -127,8 +127,12 @@ export default function AdminBrandsPage() {
       await deleteBrandMutation.mutateAsync(brandToDelete.id);
       toast.success(`Brand "${brandToDelete.name}" deleted successfully`);
       setBrandToDelete(null);
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to delete brand");
+    } catch (err: unknown) {
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to delete brand";
+      toast.error(errMsg);
     }
   };
 

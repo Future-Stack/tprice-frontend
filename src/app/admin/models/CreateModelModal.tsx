@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { X, Car, Award, Sparkles, Loader2, FolderTree, CheckCircle2 } from "lucide-react";
 import { useCreateModelMutation } from "@/hooks/useModels";
 import { useGetBrandsQuery } from "@/hooks/useBrands";
@@ -31,11 +32,13 @@ export default function CreateModelModal({
   });
   const brands = brandsResponse?.data || [];
 
-  useEffect(() => {
-    if (defaultBrandId && !formData.brandId) {
+  const [prevDefaultBrandId, setPrevDefaultBrandId] = useState(defaultBrandId);
+  if (defaultBrandId !== prevDefaultBrandId) {
+    setPrevDefaultBrandId(defaultBrandId);
+    if (!formData.brandId) {
       setFormData((prev) => ({ ...prev, brandId: defaultBrandId }));
     }
-  }, [defaultBrandId, formData.brandId]);
+  }
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -81,8 +84,11 @@ export default function CreateModelModal({
         slug: "",
       });
       onClose();
-    } catch (err: any) {
-      const errMsg = err?.response?.data?.message || err?.message || "Failed to create model";
+    } catch (err: unknown) {
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to create model";
       toast.error(errMsg);
     }
   };
@@ -176,9 +182,12 @@ export default function CreateModelModal({
               <div className="flex items-center gap-2.5">
                 <div className="w-7 h-7 rounded-lg bg-[#111] border border-[#262626] flex items-center justify-center p-1 overflow-hidden shrink-0">
                   {selectedBrand.logoUrl ? (
-                    <img
+                    <Image
                       src={selectedBrand.logoUrl}
                       alt={selectedBrand.name}
+                      width={28}
+                      height={28}
+                      unoptimized
                       className="max-h-full object-contain"
                     />
                   ) : (

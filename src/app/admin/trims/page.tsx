@@ -11,7 +11,6 @@ import {
   Calendar,
   Layers,
   Car,
-  Award,
   FolderTree,
   Eye,
   ChevronLeft,
@@ -144,8 +143,12 @@ export default function AdminTrimsPage() {
       await deleteTrimMutation.mutateAsync(trimToDelete.id);
       toast.success(`Trim "${trimToDelete.name}" deleted successfully`);
       setTrimToDelete(null);
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to delete trim");
+    } catch (err: unknown) {
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to delete trim";
+      toast.error(errMsg);
     }
   };
 

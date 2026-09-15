@@ -132,7 +132,7 @@ export default function AdminDeals() {
     limit,
   });
 
-  const deals = data?.data || [];
+  const deals = React.useMemo(() => data?.data || [], [data?.data]);
   const meta = data?.meta || { total: 0, page: 1, limit: 10, totalPages: 1 };
 
   const filteredDeals = React.useMemo(() => {

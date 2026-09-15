@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
+import Image from "next/image";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {
@@ -41,14 +42,14 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: categoriesResponse } = useGetCategoriesQuery();
-  const categoriesList = categoriesResponse?.data || [];
+  const categoriesData = categoriesResponse?.data;
 
   const displayCategories = React.useMemo(() => {
-    if (!categoriesList || categoriesList.length === 0) {
+    if (!categoriesData || categoriesData.length === 0) {
       return CATEGORIES;
     }
 
-    return categoriesList.map((cat) => {
+    return categoriesData.map((cat) => {
       let val = cat.slug ? cat.slug.toUpperCase().replace(/-/g, "_") : cat.name.toUpperCase();
       if (val === "SUPERCARS") val = "AUTOMOTIVE";
       if (val === "PRIVATE_JETS") val = "AVIATION";
@@ -60,7 +61,7 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
         value: val,
       };
     });
-  }, [categoriesList]);
+  }, [categoriesData]);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -104,8 +105,8 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
         setFormData((prev) => ({ ...prev, coverImageUrl: res.url }));
         toast.success("Image uploaded successfully!");
       }
-    } catch (err: any) {
-      const errMsg = err?.response?.data?.message || err?.message || "Failed to upload image";
+    } catch (err: unknown) {
+      const errMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || (err as Error)?.message || "Failed to upload image";
       toast.error(errMsg);
     }
   };
@@ -183,8 +184,8 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
       });
       setSelectedDate(null);
       onClose();
-    } catch (err: any) {
-      const errMsg = err?.response?.data?.message || err?.message || "Failed to create event";
+    } catch (err: unknown) {
+      const errMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || (err as Error)?.message || "Failed to create event";
       toast.error(errMsg);
     }
   };
@@ -326,13 +327,13 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
                   /* Preview uploaded image */
                   <div className="relative group rounded-xl border border-primary/30 overflow-hidden bg-[#0E0E10] p-2 flex items-center gap-4">
                     <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-[#262626] shrink-0 bg-[#1A1A1A]">
-                      <img
+                      <Image
                         src={formData.coverImageUrl}
                         alt="Cover Preview"
+                        width={80}
+                        height={80}
+                        unoptimized
                         className="w-full h-full object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = "/images/landing/hero-car.png";
-                        }}
                       />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -413,13 +414,13 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
                 />
                 {formData.coverImageUrl && (
                   <div className="mt-2 relative w-full h-32 rounded-xl overflow-hidden border border-[#262626] bg-[#0E0E10]">
-                    <img
+                    <Image
                       src={formData.coverImageUrl}
                       alt="URL Preview"
+                      width={128}
+                      height={128}
+                      unoptimized
                       className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "/images/landing/hero-car.png";
-                      }}
                     />
                   </div>
                 )}

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { X, Edit3, Loader2, CheckCircle2, Clock, AlertCircle, FileText, User } from "lucide-react";
+import React, { useState } from "react";
+import { X, Edit3, Loader2, CheckCircle2, AlertCircle, FileText, User } from "lucide-react";
 import { ContactInquiryItem, UpdateContactInquiryPayload } from "@/lib/api/contact";
 
 interface UpdateInquiryModalProps {
@@ -35,15 +35,15 @@ export default function UpdateInquiryModal({
   onUpdate,
   isUpdating,
 }: UpdateInquiryModalProps) {
-  const [status, setStatus] = useState<string>("NEW");
-  const [adminNotes, setAdminNotes] = useState<string>("");
+  const [prevInquiryId, setPrevInquiryId] = useState<string | null>(inquiry?.id || null);
+  const [status, setStatus] = useState<string>(inquiry?.status || "NEW");
+  const [adminNotes, setAdminNotes] = useState<string>(inquiry?.adminNotes || "");
 
-  useEffect(() => {
-    if (inquiry) {
-      setStatus(inquiry.status || "NEW");
-      setAdminNotes(inquiry.adminNotes || "");
-    }
-  }, [inquiry]);
+  if (inquiry && inquiry.id !== prevInquiryId) {
+    setPrevInquiryId(inquiry.id);
+    setStatus(inquiry.status || "NEW");
+    setAdminNotes(inquiry.adminNotes || "");
+  }
 
   if (!isOpen || !inquiry) return null;
 

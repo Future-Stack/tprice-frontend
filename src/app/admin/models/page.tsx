@@ -14,7 +14,6 @@ import {
   ChevronLeft,
   ChevronRight,
   FolderTree,
-  Award,
   Car,
   Layers,
   Eye,
@@ -144,8 +143,12 @@ export default function AdminModelsPage() {
       await deleteModelMutation.mutateAsync(modelToDelete.id);
       toast.success(`Model "${modelToDelete.name}" deleted successfully`);
       setModelToDelete(null);
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to delete model");
+    } catch (err: unknown) {
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to delete model";
+      toast.error(errMsg);
     }
   };
 

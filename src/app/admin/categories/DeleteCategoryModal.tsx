@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
+import Image from "next/image";
 import { AlertTriangle, Trash2, X, Loader2, Tag } from "lucide-react";
 import { Category } from "@/lib/api/categories";
 
@@ -67,14 +68,13 @@ export default function DeleteCategoryModal({
         <div className="flex items-center gap-4 p-3 bg-[#1A1A1C] border border-[#262626] rounded-xl">
           <div className="relative w-16 h-14 rounded-lg overflow-hidden border border-[#262626] bg-[#111] shrink-0 flex items-center justify-center">
             {category.imageUrl ? (
-              <img
+              <Image
                 src={category.imageUrl}
                 alt={category.name}
+                width={64}
+                height={56}
+                unoptimized
                 className="w-full h-full object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src =
-                    "https://images.unsplash.com/photo-1583121274602-3e2820c69888";
-                }}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary">

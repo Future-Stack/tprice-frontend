@@ -127,8 +127,12 @@ export default function AdminReviewsPage() {
         setSelectedReview(null);
       }
       setReviewToDelete(null);
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || err?.message || "Failed to delete review");
+    } catch (err: unknown) {
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to delete review";
+      toast.error(errMsg);
     }
   };
 
@@ -448,7 +452,7 @@ export default function AdminReviewsPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         review={selectedReview}
-        onDelete={(id, name) => {
+        onDelete={(id) => {
           const review = reviews.find((r) => r.id === id) || selectedReview;
           if (review) {
             setReviewToDelete(review);

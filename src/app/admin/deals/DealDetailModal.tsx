@@ -1,14 +1,14 @@
 "use client";
 
 import React from "react";
-import { X, Flag, FileText } from "lucide-react";
+import { X } from "lucide-react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
 import { DealItem } from "@/lib/api/deals";
 
 interface DealDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
-  deal: DealItem | null | any;
+  deal: DealItem | null;
 }
 
 const formatPrice = (priceStr?: string | number) => {
@@ -47,10 +47,14 @@ const DealDetailModal = ({ isOpen, onClose, deal }: DealDetailModalProps) => {
     ? `${deal.seller.firstName || ""} ${deal.seller.lastName || ""}`.trim() ||
       deal.seller.email ||
       "Unknown Dealer"
-    : deal.dealer || "Unknown Dealer";
+    : (deal as unknown as { dealer?: string })?.dealer || "Unknown Dealer";
 
   const offerPrice =
-    deal.agreedPrice !== undefined ? formatPrice(deal.agreedPrice) : deal.offer || "$0";
+    deal.agreedPrice !== undefined && deal.agreedPrice !== null
+      ? formatPrice(deal.agreedPrice)
+      : typeof deal.offer?.amount === "number" || typeof deal.offer?.amount === "string"
+        ? formatPrice(deal.offer.amount)
+        : "$0";
 
   const createdTime = formatDate(deal.createdAt);
   const updatedTime = formatDate(deal.updatedAt);

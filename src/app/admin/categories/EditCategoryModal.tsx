@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
+import Image from "next/image";
 import {
   X,
   Tag,
@@ -30,28 +31,28 @@ export default function EditCategoryModal({ isOpen, onClose, category }: EditCat
   const uploadMediaMutation = useUploadMediaMutation();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [prevCategoryId, setPrevCategoryId] = useState<string | null>(category?.id || null);
   const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    imageUrl: "",
-    displayOrder: 1,
-    isActive: true,
+    name: category?.name || "",
+    description: category?.description || "",
+    imageUrl: category?.imageUrl || "",
+    displayOrder: category?.displayOrder ?? 1,
+    isActive: category?.isActive ?? true,
   });
+
+  if (category && category.id !== prevCategoryId) {
+    setPrevCategoryId(category.id);
+    setFormData({
+      name: category.name || "",
+      description: category.description || "",
+      imageUrl: category.imageUrl || "",
+      displayOrder: category.displayOrder ?? 1,
+      isActive: category.isActive ?? true,
+    });
+  }
 
   const [inputMode, setInputMode] = useState<"upload" | "url">("upload");
   const [isDragging, setIsDragging] = useState(false);
-
-  useEffect(() => {
-    if (category) {
-      setFormData({
-        name: category.name || "",
-        description: category.description || "",
-        imageUrl: category.imageUrl || "",
-        displayOrder: category.displayOrder ?? 1,
-        isActive: category.isActive ?? true,
-      });
-    }
-  }, [category]);
 
   if (!isOpen || !category) return null;
 
@@ -91,8 +92,11 @@ export default function EditCategoryModal({ isOpen, onClose, category }: EditCat
         setFormData((prev) => ({ ...prev, imageUrl: res.url }));
         toast.success("Category image uploaded successfully!");
       }
-    } catch (err: any) {
-      const errMsg = err?.response?.data?.message || err?.message || "Failed to upload image";
+    } catch (err: unknown) {
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to upload image";
       toast.error(errMsg);
     }
   };
@@ -157,8 +161,11 @@ export default function EditCategoryModal({ isOpen, onClose, category }: EditCat
 
       toast.success("Category updated successfully!");
       onClose();
-    } catch (err: any) {
-      const errMsg = err?.response?.data?.message || err?.message || "Failed to update category";
+    } catch (err: unknown) {
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to update category";
       toast.error(errMsg);
     }
   };
@@ -253,17 +260,6 @@ export default function EditCategoryModal({ isOpen, onClose, category }: EditCat
                 >
                   Upload File
                 </button>
-                {/* <button
-                  type="button"
-                  onClick={() => setInputMode("url")}
-                  className={`px-2.5 py-1 rounded-md transition-colors font-medium cursor-pointer ${
-                    inputMode === "url"
-                      ? "bg-primary text-black"
-                      : "text-gray-400 hover:text-white"
-                  }`}
-                >
-                  Image URL
-                </button> */}
               </div>
             </div>
 
@@ -273,14 +269,13 @@ export default function EditCategoryModal({ isOpen, onClose, category }: EditCat
                   /* Preview uploaded image */
                   <div className="relative group rounded-xl border border-primary/30 overflow-hidden bg-[#0E0E10] p-2 flex items-center gap-4">
                     <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-[#262626] shrink-0 bg-[#1A1A1A]">
-                      <img
+                      <Image
                         src={formData.imageUrl}
                         alt="Category Preview"
+                        width={80}
+                        height={80}
+                        unoptimized
                         className="w-full h-full object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            "https://images.unsplash.com/photo-1583121274602-3e2820c69888";
-                        }}
                       />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -361,14 +356,13 @@ export default function EditCategoryModal({ isOpen, onClose, category }: EditCat
                 />
                 {formData.imageUrl && (
                   <div className="mt-2 relative w-full h-32 rounded-xl overflow-hidden border border-[#262626] bg-[#0E0E10]">
-                    <img
+                    <Image
                       src={formData.imageUrl}
                       alt="URL Preview"
+                      width={128}
+                      height={128}
+                      unoptimized
                       className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src =
-                          "https://images.unsplash.com/photo-1583121274602-3e2820c69888";
-                      }}
                     />
                   </div>
                 )}

@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
+import Image from "next/image";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {
@@ -51,14 +52,14 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: categoriesResponse } = useGetCategoriesQuery();
-  const categoriesList = categoriesResponse?.data || [];
+  const categoriesData = categoriesResponse?.data;
 
   const displayCategories = React.useMemo(() => {
-    if (!categoriesList || categoriesList.length === 0) {
+    if (!categoriesData || categoriesData.length === 0) {
       return CATEGORIES;
     }
 
-    return categoriesList.map((cat) => {
+    return categoriesData.map((cat) => {
       let val = cat.slug ? cat.slug.toUpperCase().replace(/-/g, "_") : cat.name.toUpperCase();
       if (val === "SUPERCARS") val = "AUTOMOTIVE";
       if (val === "PRIVATE_JETS") val = "AVIATION";
@@ -70,34 +71,37 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
         value: val,
       };
     });
-  }, [categoriesList]);
+  }, [categoriesData]);
 
+  const [prevEventId, setPrevEventId] = useState<string | null>(event?.id || null);
   const [formData, setFormData] = useState({
-    title: "",
-    category: "YACHT",
-    description: "",
-    location: "",
-    coverImageUrl: "",
-    status: "UPCOMING",
+    title: event?.title || "",
+    category: event?.category || "YACHT",
+    description: event?.description || "",
+    location: event?.location || "",
+    coverImageUrl: event?.coverImageUrl || "",
+    status: event?.status || "UPCOMING",
   });
 
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(
+    event?.eventDate ? new Date(event.eventDate) : null
+  );
+
+  if (event && event.id !== prevEventId) {
+    setPrevEventId(event.id);
+    setFormData({
+      title: event.title || "",
+      category: event.category || "YACHT",
+      description: event.description || "",
+      location: event.location || "",
+      coverImageUrl: event.coverImageUrl || "",
+      status: event.status || "UPCOMING",
+    });
+    setSelectedDate(event.eventDate ? new Date(event.eventDate) : null);
+  }
+
   const [inputMode, setInputMode] = useState<"upload" | "url">("upload");
   const [isDragging, setIsDragging] = useState(false);
-
-  useEffect(() => {
-    if (event) {
-      setFormData({
-        title: event.title || "",
-        category: event.category || "YACHT",
-        description: event.description || "",
-        location: event.location || "",
-        coverImageUrl: event.coverImageUrl || "",
-        status: event.status || "UPCOMING",
-      });
-      setSelectedDate(event.eventDate ? new Date(event.eventDate) : null);
-    }
-  }, [event]);
 
   if (!isOpen || !event) return null;
 
@@ -129,8 +133,8 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
         setFormData((prev) => ({ ...prev, coverImageUrl: res.url }));
         toast.success("Image uploaded successfully!");
       }
-    } catch (err: any) {
-      const errMsg = err?.response?.data?.message || err?.message || "Failed to upload image";
+    } catch (err: unknown) {
+      const errMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || (err as Error)?.message || "Failed to upload image";
       toast.error(errMsg);
     }
   };
@@ -204,8 +208,8 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
 
       toast.success("Event updated successfully!");
       onClose();
-    } catch (err: any) {
-      const errMsg = err?.response?.data?.message || err?.message || "Failed to update event";
+    } catch (err: unknown) {
+      const errMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || (err as Error)?.message || "Failed to update event";
       toast.error(errMsg);
     }
   };
@@ -367,13 +371,13 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
                   /* Preview uploaded image */
                   <div className="relative group rounded-xl border border-primary/30 overflow-hidden bg-[#0E0E10] p-2 flex items-center gap-4">
                     <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-[#262626] shrink-0 bg-[#1A1A1A]">
-                      <img
+                      <Image
                         src={formData.coverImageUrl}
                         alt="Cover Preview"
+                        width={80}
+                        height={80}
+                        unoptimized
                         className="w-full h-full object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = "/images/landing/hero-car.png";
-                        }}
                       />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -454,13 +458,13 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
                 />
                 {formData.coverImageUrl && (
                   <div className="mt-2 relative w-full h-32 rounded-xl overflow-hidden border border-[#262626] bg-[#0E0E10]">
-                    <img
+                    <Image
                       src={formData.coverImageUrl}
                       alt="URL Preview"
+                      width={128}
+                      height={128}
+                      unoptimized
                       className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "/images/landing/hero-car.png";
-                      }}
                     />
                   </div>
                 )}

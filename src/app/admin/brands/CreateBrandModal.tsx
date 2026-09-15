@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
+import Image from "next/image";
 import {
   X,
   Tag,
@@ -74,8 +75,11 @@ export default function CreateBrandModal({ isOpen, onClose }: CreateBrandModalPr
         setFormData((prev) => ({ ...prev, logoUrl: res.url }));
         toast.success("Brand logo uploaded successfully!");
       }
-    } catch (err: any) {
-      const errMsg = err?.response?.data?.message || err?.message || "Failed to upload logo";
+    } catch (err: unknown) {
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to upload logo";
       toast.error(errMsg);
     }
   };
@@ -144,8 +148,11 @@ export default function CreateBrandModal({ isOpen, onClose }: CreateBrandModalPr
         categoryId: "",
       });
       onClose();
-    } catch (err: any) {
-      const errMsg = err?.response?.data?.message || err?.message || "Failed to create brand";
+    } catch (err: unknown) {
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to create brand";
       toast.error(errMsg);
     }
   };
@@ -283,14 +290,13 @@ export default function CreateBrandModal({ isOpen, onClose }: CreateBrandModalPr
                 {formData.logoUrl ? (
                   <div className="relative group rounded-xl border border-primary/30 overflow-hidden bg-[#0E0E10] p-2 flex items-center gap-4">
                     <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-[#262626] shrink-0 bg-[#1A1A1A] flex items-center justify-center p-1">
-                      <img
+                      <Image
                         src={formData.logoUrl}
                         alt="Logo Preview"
+                        width={80}
+                        height={80}
+                        unoptimized
                         className="w-full h-full object-contain"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            "https://cdn.exoticworld.com/brands/ferrari-logo.png";
-                        }}
                       />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -366,14 +372,13 @@ export default function CreateBrandModal({ isOpen, onClose }: CreateBrandModalPr
                 />
                 {formData.logoUrl && (
                   <div className="mt-2 relative w-full h-28 rounded-xl overflow-hidden border border-[#262626] bg-[#0E0E10] flex items-center justify-center p-2">
-                    <img
+                    <Image
                       src={formData.logoUrl}
                       alt="URL Preview"
+                      width={112}
+                      height={112}
+                      unoptimized
                       className="max-h-full object-contain"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src =
-                          "https://cdn.exoticworld.com/brands/ferrari-logo.png";
-                      }}
                     />
                   </div>
                 )}

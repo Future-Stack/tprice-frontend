@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
+import Image from "next/image";
 import { AlertTriangle, Trash2, X, Loader2, FolderTree } from "lucide-react";
 import { Brand } from "@/lib/api/brands";
 
@@ -67,14 +68,13 @@ export default function DeleteBrandModal({
         <div className="flex items-center gap-4 p-3 bg-[#1A1A1C] border border-[#262626] rounded-xl">
           <div className="relative w-16 h-14 rounded-lg overflow-hidden border border-[#262626] bg-[#111] shrink-0 flex items-center justify-center p-1">
             {brand.logoUrl ? (
-              <img
+              <Image
                 src={brand.logoUrl}
                 alt={brand.name}
+                width={64}
+                height={56}
+                unoptimized
                 className="max-w-full max-h-full object-contain"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src =
-                    "https://cdn.exoticworld.com/brands/ferrari-logo.png";
-                }}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary font-bold text-sm">

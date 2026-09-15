@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import {
-  MessageSquare,
   RefreshCw,
   Search,
   ChevronLeft,
@@ -13,7 +12,6 @@ import {
   Phone,
   Calendar,
   Clock,
-  Filter,
   CheckCircle2,
   AlertCircle,
   Inbox,
@@ -187,8 +185,12 @@ export default function AdminInquiriesPage() {
       toast.success("Inquiry updated successfully");
       setIsUpdateModalOpen(false);
       setSelectedInquiryForUpdate(null);
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || err?.message || "Failed to update inquiry");
+    } catch (err: unknown) {
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to update inquiry";
+      toast.error(errMsg);
     }
   };
 
@@ -202,7 +204,7 @@ export default function AdminInquiriesPage() {
           <div>
             <h1 className="text-3xl font-bold font-montserrat  ">Inquiries Management</h1>
             <p className="text-gray-400 text-sm mt-1">
-              View and manage customer contact messages and inquiries
+              View and manage customer contact messages and inquiries{newCount > 0 ? ` (${newCount} new)` : ""}
             </p>
           </div>
         </AnimationWrapper>
@@ -231,6 +233,23 @@ export default function AdminInquiriesPage() {
 
         {/* Limit Selector & Refresh Button */}
         <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
+          <div className="flex items-center gap-2 text-xs text-gray-400">
+            <span>Status:</span>
+            <select
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setPage(1);
+              }}
+              className="bg-[#141416] border border-[#262626] rounded-xl px-3 py-2 text-xs text-gray-300 focus:outline-none focus:border-primary/60 cursor-pointer"
+            >
+              <option value="ALL">All</option>
+              <option value="NEW">New</option>
+              <option value="READ">Read</option>
+              <option value="RESOLVED">Resolved</option>
+            </select>
+          </div>
+
           <div className="flex items-center gap-2 text-xs text-gray-400">
             <span>Per page:</span>
             <select

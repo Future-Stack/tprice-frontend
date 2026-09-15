@@ -21,6 +21,7 @@ import { useGetAdminDashboardOverviewQuery } from "@/hooks/useAdminDashboard";
 import { useUpdateAdminListingStatusMutation } from "@/hooks/useListings";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 import RejectListingModal from "@/app/admin/listings/RejectListingModal";
+import { PendingApproval } from "@/lib/api/dashboard";
 import { toast } from "sonner";
 
 // Helpers
@@ -61,7 +62,7 @@ function formatActivityAction(action: string): string {
     .join(" ");
 }
 
-function getActivityDescription(activity: any): string {
+function getActivityDescription(activity: { action?: string; changes?: Record<string, unknown>; resource?: string }): string {
   const changes = activity.changes || {};
   if (activity.action === "LISTING_APPROVED") {
     return changes.status
@@ -89,7 +90,7 @@ function getActivityDescription(activity: any): string {
 
 function getActivityStatusType(
   action: string,
-  changes?: any
+  changes?: Record<string, unknown>
 ): "new" | "approved" | "closed" | "rejected" {
   const upper = (action || "").toUpperCase();
   if (upper.includes("REJECT") || upper.includes("FLAG")) return "rejected";
@@ -231,7 +232,7 @@ export default function AdminDashboard() {
 
   const updateStatusMutation = useUpdateAdminListingStatusMutation();
   const [processingId, setProcessingId] = useState<string | null>(null);
-  const [rejectModalListing, setRejectModalListing] = useState<any | null>(null);
+  const [rejectModalListing, setRejectModalListing] = useState<PendingApproval | null>(null);
 
   const handleApprove = async (id: string) => {
     setProcessingId(id);
@@ -240,7 +241,7 @@ export default function AdminDashboard() {
         id,
         status: "LIVE",
       });
-    } catch (error) {
+    } catch {
       // Error toast is handled by mutation hook
     } finally {
       setProcessingId(null);

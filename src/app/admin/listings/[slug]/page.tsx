@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 import {
   MapPin,
@@ -358,8 +359,8 @@ export default function AdminListingDetails() {
         status: "LIVE",
       });
       toast.success("Listing approved successfully");
-    } catch (err: any) {
-      const errMsg = err?.response?.data?.message || "Failed to approve listing";
+    } catch (err: unknown) {
+      const errMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to approve listing";
       toast.error(errMsg);
     }
   };
@@ -373,8 +374,8 @@ export default function AdminListingDetails() {
       });
       setIsRejectModalOpen(false);
       toast.success("Listing rejected");
-    } catch (err: any) {
-      const errMsg = err?.response?.data?.message || "Failed to reject listing";
+    } catch (err: unknown) {
+      const errMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to reject listing";
       toast.error(errMsg);
     }
   };
@@ -415,9 +416,12 @@ export default function AdminListingDetails() {
               <div className="flex flex-wrap items-center gap-4">
                 <span className="text-primary text-2xl font-semibold">{formattedPrice}</span>
                 <div className="flex items-center gap-2 bg-[#1A1A1A] px-3 py-1.5 rounded-full border border-primary">
-                  <img
+                  <Image
                     src={sellerAvatar}
                     alt={sellerName}
+                    width={20}
+                    height={20}
+                    unoptimized
                     className="w-5 h-5 rounded-full object-cover"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src =
@@ -457,9 +461,12 @@ export default function AdminListingDetails() {
             <div className="space-y-4">
               <AnimationWrapper type="zoom" duration={0.6}>
                 <div className="rounded-2xl overflow-hidden border border-primary bg-[#141414]">
-                  <img
+                  <Image
                     src={activeImage}
                     alt={listing.title}
+                    width={800}
+                    height={500}
+                    unoptimized
                     className="w-full h-[400px] md:h-[500px] object-cover"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src =
@@ -481,9 +488,12 @@ export default function AdminListingDetails() {
                             : "border-[#262626] opacity-70 hover:opacity-100"
                         }`}
                       >
-                        <img
+                        <Image
                           src={img}
                           alt=""
+                          width={200}
+                          height={120}
+                          unoptimized
                           className="w-full h-full object-cover"
                           onError={(e) => {
                             (e.target as HTMLImageElement).src =

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { X, Car, Award, Pencil, Loader2, CheckCircle2 } from "lucide-react";
 import { useUpdateModelMutation } from "@/hooks/useModels";
 import { useGetBrandsQuery } from "@/hooks/useBrands";
@@ -16,9 +17,10 @@ interface EditModelModalProps {
 export default function EditModelModal({ isOpen, onClose, model }: EditModelModalProps) {
   const updateModelMutation = useUpdateModelMutation();
 
+  const [prevModelId, setPrevModelId] = useState<string | null>(model?.id || null);
   const [formData, setFormData] = useState({
-    name: "",
-    brandId: "",
+    name: model?.name || "",
+    brandId: model?.brandId || model?.brand?.id || "",
   });
 
   const { data: brandsResponse, isLoading: isBrandsLoading } = useGetBrandsQuery({
@@ -26,14 +28,13 @@ export default function EditModelModal({ isOpen, onClose, model }: EditModelModa
   });
   const brands = brandsResponse?.data || [];
 
-  useEffect(() => {
-    if (model) {
-      setFormData({
-        name: model.name || "",
-        brandId: model.brandId || model.brand?.id || "",
-      });
-    }
-  }, [model]);
+  if (model && model.id !== prevModelId) {
+    setPrevModelId(model.id);
+    setFormData({
+      name: model.name || "",
+      brandId: model.brandId || model.brand?.id || "",
+    });
+  }
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -72,8 +73,11 @@ export default function EditModelModal({ isOpen, onClose, model }: EditModelModa
 
       toast.success(`Model "${formData.name.trim()}" updated successfully!`);
       onClose();
-    } catch (err: any) {
-      const errMsg = err?.response?.data?.message || err?.message || "Failed to update model";
+    } catch (err: unknown) {
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to update model";
       toast.error(errMsg);
     }
   };
@@ -165,14 +169,13 @@ export default function EditModelModal({ isOpen, onClose, model }: EditModelModa
               <div className="flex items-center gap-2.5">
                 <div className="w-7 h-7 rounded-lg bg-[#111] border border-[#262626] flex items-center justify-center p-1 overflow-hidden shrink-0">
                   {selectedBrand.logoUrl ? (
-                    <img
+                    <Image
                       src={selectedBrand.logoUrl}
                       alt={selectedBrand.name}
+                      width={28}
+                      height={28}
+                      unoptimized
                       className="max-h-full object-contain"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src =
-                          "https://cdn.exoticworld.com/brands/ferrari-logo.png";
-                      }}
                     />
                   ) : (
                     <span className="text-primary font-bold text-[10px]">

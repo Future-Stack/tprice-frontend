@@ -32,11 +32,13 @@ export default function CreateTrimModal({
   });
   const models = modelsResponse?.data || [];
 
-  useEffect(() => {
-    if (defaultModelId && !formData.modelId) {
+  const [prevDefaultModelId, setPrevDefaultModelId] = useState(defaultModelId);
+  if (defaultModelId !== prevDefaultModelId) {
+    setPrevDefaultModelId(defaultModelId);
+    if (!formData.modelId) {
       setFormData((prev) => ({ ...prev, modelId: defaultModelId }));
     }
-  }, [defaultModelId, formData.modelId]);
+  }
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -96,8 +98,11 @@ export default function CreateTrimModal({
         yearEnd: "",
       });
       onClose();
-    } catch (err: any) {
-      const errMsg = err?.response?.data?.message || err?.message || "Failed to create trim";
+    } catch (err: unknown) {
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to create trim";
       toast.error(errMsg);
     }
   };

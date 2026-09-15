@@ -12,7 +12,6 @@ import {
   ExternalLink,
   Copy,
   Check,
-  Hash,
 } from "lucide-react";
 import { ModelItem } from "@/lib/api/models";
 import Image from "next/image";

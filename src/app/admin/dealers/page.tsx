@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
-import DealerDetailModal from "./DealerDetailModal";
+import DealerDetailModal, { DealerDetail } from "./DealerDetailModal";
 
 const DEALERS_DATA = [
   {
@@ -58,10 +58,10 @@ const DEALERS_DATA = [
 ];
 
 export default function AdminDealers() {
-  const [selectedDealer, setSelectedDealer] = useState<any>(null);
+  const [selectedDealer, setSelectedDealer] = useState<DealerDetail | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleManageClick = (dealer: any) => {
+  const handleManageClick = (dealer: DealerDetail) => {
     setSelectedDealer(dealer);
     setIsModalOpen(true);
   };

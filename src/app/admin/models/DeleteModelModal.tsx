@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
+import Image from "next/image";
 import { AlertTriangle, Trash2, X, Loader2, Car, Award, FolderTree } from "lucide-react";
 import { ModelItem } from "@/lib/api/models";
 
@@ -67,14 +68,13 @@ export default function DeleteModelModal({
         <div className="flex items-center gap-4 p-3.5 bg-[#1A1A1C] border border-[#262626] rounded-xl">
           <div className="relative w-14 h-14 rounded-xl overflow-hidden border border-[#262626] bg-[#111] shrink-0 flex items-center justify-center p-1 text-primary">
             {model.brand?.logoUrl ? (
-              <img
+              <Image
                 src={model.brand.logoUrl}
                 alt={model.brand.name}
+                width={56}
+                height={56}
+                unoptimized
                 className="max-w-full max-h-full object-contain"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src =
-                    "https://cdn.exoticworld.com/brands/ferrari-logo.png";
-                }}
               />
             ) : (
               <Car className="w-6 h-6" />

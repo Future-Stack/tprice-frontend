@@ -94,8 +94,11 @@ export default function AdminMediaPage() {
       if (selectedMedia?.id === mediaToDelete.id) {
         setSelectedMedia(null);
       }
-    } catch (err: any) {
-      const errMsg = err?.response?.data?.message || err?.message || "Failed to delete media asset";
+    } catch (err: unknown) {
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to delete media asset";
       toast.error(errMsg);
     }
   };

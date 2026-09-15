@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import Image from "next/image";
 import {
   Calendar,
   Plus,
@@ -295,13 +296,13 @@ export default function AdminEventsPage() {
                       <td className="px-6 py-5">
                         <div className="flex items-center gap-4">
                           <div className="relative w-20 h-14 rounded-lg overflow-hidden border border-[#262626] bg-[#1A1A1A] shrink-0">
-                            <img
+                            <Image
                               src={event.coverImageUrl || "/images/landing/hero-car.png"}
                               alt={event.title}
+                              width={80}
+                              height={56}
+                              unoptimized
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src = "/images/landing/hero-car.png";
-                              }}
                             />
                           </div>
                           <div>

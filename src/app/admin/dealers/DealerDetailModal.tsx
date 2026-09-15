@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import {
   X,
   Mail,
@@ -13,10 +14,22 @@ import {
 } from "lucide-react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
 
+export interface DealerDetail {
+  id?: string | number;
+  name: string;
+  email: string;
+  status?: string;
+  activeDeals?: number | string;
+  totalListings?: number | string;
+  completed?: number | string;
+  wonBids?: number | string;
+  lastActive?: string;
+}
+
 interface DealerDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
-  dealer: any;
+  dealer: DealerDetail | null;
 }
 
 const DealerDetailModal = ({ isOpen, onClose, dealer }: DealerDetailModalProps) => {
@@ -29,7 +42,7 @@ const DealerDetailModal = ({ isOpen, onClose, dealer }: DealerDetailModalProps) 
           {/* Header */}
           <div className="p-8 pb-4 flex justify-between items-center">
             <h2 className="text-2xl font-bold text-white">Dealer Details</h2>
-            <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">
+            <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors cursor-pointer">
               <X className="w-6 h-6" />
             </button>
           </div>
@@ -41,10 +54,13 @@ const DealerDetailModal = ({ isOpen, onClose, dealer }: DealerDetailModalProps) 
             {/* Profile Section */}
             <div className="flex items-start gap-4 mb-8">
               <div className="relative">
-                <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-[#262626]">
-                  <img
+                <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-[#262626] relative">
+                  <Image
                     src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=2574&auto=format&fit=crop"
                     alt={dealer.name}
+                    width={80}
+                    height={80}
+                    unoptimized
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -119,11 +135,11 @@ const DealerDetailModal = ({ isOpen, onClose, dealer }: DealerDetailModalProps) 
 
             {/* Action Buttons */}
             <div className="space-y-3">
-              <button className="w-full flex items-center justify-center gap-2 py-4 bg-[#D4AF37] hover:bg-[#B8962E] text-black font-bold rounded-xl transition-all active:scale-[0.98] text-sm">
+              <button className="w-full flex items-center justify-center gap-2 py-4 bg-[#D4AF37] hover:bg-[#B8962E] text-black font-bold rounded-xl transition-all active:scale-[0.98] text-sm cursor-pointer">
                 View Full profile
                 <ArrowRight className="w-4 h-4" />
               </button>
-              <button className="w-full flex items-center justify-center gap-2 py-4 bg-[#1A1111] border border-red-500/20 hover:border-red-500/40 text-red-500 font-bold rounded-xl transition-all active:scale-[0.98] text-sm">
+              <button className="w-full flex items-center justify-center gap-2 py-4 bg-[#1A1111] border border-red-500/20 hover:border-red-500/40 text-red-500 font-bold rounded-xl transition-all active:scale-[0.98] text-sm cursor-pointer">
                 <AlertCircle className="w-4 h-4" />
                 Suspend Dealer
               </button>

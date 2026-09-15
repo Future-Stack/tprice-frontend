@@ -9,7 +9,6 @@ import {
   Calendar,
   MessageSquare,
   Copy,
-  ExternalLink,
   Clock,
   CheckCircle2,
   AlertCircle,
@@ -82,7 +81,6 @@ export default function InquiryDetailModal({
   isOpen,
   onClose,
   inquiry,
-  onOpenUpdateModal,
 }: InquiryDetailModalProps) {
   if (!isOpen || !inquiry) return null;
 

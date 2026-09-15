@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
+import Image from "next/image";
 import {
   X,
   Tag,
@@ -84,8 +85,11 @@ export default function CreateCategoryModal({
         setFormData((prev) => ({ ...prev, imageUrl: res.url }));
         toast.success("Category image uploaded successfully!");
       }
-    } catch (err: any) {
-      const errMsg = err?.response?.data?.message || err?.message || "Failed to upload image";
+    } catch (err: unknown) {
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to upload image";
       toast.error(errMsg);
     }
   };
@@ -155,8 +159,11 @@ export default function CreateCategoryModal({
         isActive: true,
       });
       onClose();
-    } catch (err: any) {
-      const errMsg = err?.response?.data?.message || err?.message || "Failed to create category";
+    } catch (err: unknown) {
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to create category";
       toast.error(errMsg);
     }
   };
@@ -269,14 +276,13 @@ export default function CreateCategoryModal({
                   /* Preview uploaded image */
                   <div className="relative group rounded-xl border border-primary/30 overflow-hidden bg-[#0E0E10] p-2 flex items-center gap-4">
                     <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-[#262626] shrink-0 bg-[#1A1A1A]">
-                      <img
+                      <Image
                         src={formData.imageUrl}
                         alt="Category Preview"
+                        width={80}
+                        height={80}
+                        unoptimized
                         className="w-full h-full object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            "https://images.unsplash.com/photo-1583121274602-3e2820c69888";
-                        }}
                       />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -357,14 +363,13 @@ export default function CreateCategoryModal({
                 />
                 {formData.imageUrl && (
                   <div className="mt-2 relative w-full h-32 rounded-xl overflow-hidden border border-[#262626] bg-[#0E0E10]">
-                    <img
+                    <Image
                       src={formData.imageUrl}
                       alt="URL Preview"
+                      width={128}
+                      height={128}
+                      unoptimized
                       className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src =
-                          "https://images.unsplash.com/photo-1583121274602-3e2820c69888";
-                      }}
                     />
                   </div>
                 )}

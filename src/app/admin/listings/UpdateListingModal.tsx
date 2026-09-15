@@ -1,28 +1,18 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import {
   X,
   Loader2,
   Tag,
   Layers,
-  Briefcase,
-  Calendar,
-  MapPin,
-  Sparkles,
   DollarSign,
-  Clock,
   UploadCloud,
   ImageIcon,
   Plus,
   Trash2,
   Check,
-  AlertCircle,
-  Star,
-  ArrowUp,
-  ArrowDown,
   Edit2,
-  Link as LinkIcon,
 } from "lucide-react";
 import { ListingItem, UpdateListingInput } from "@/lib/api/listings";
 import { useGetCategoriesQuery } from "@/hooks/useCategories";
@@ -131,80 +121,80 @@ export default function UpdateListingModal({ isOpen, onClose, listing }: UpdateL
   const [mediaList, setMediaList] = useState<UploadedMediaItem[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [directImageUrl, setDirectImageUrl] = useState("");
-  const [editingMediaIndex, setEditingMediaIndex] = useState<number | null>(null);
-  const [editingMediaUrl, setEditingMediaUrl] = useState("");
 
   // Populate form state when listing prop changes
-  useEffect(() => {
-    if (listing) {
-      setTitle(listing.title || "");
-      setCategory(listing.category || "");
-      setBrand(listing.brand || "");
-      setModel(listing.model || (listing.specifications as any)?.model || "");
-      setTrim(listing.trim || (listing.specifications as any)?.trim || "");
-      setBuildYear(listing.buildYear ?? 2024);
-      setLocationCity(listing.locationCity || "");
-      setLocationCountry(listing.locationCountry || "");
-      setIsOffMarket(Boolean(listing.isOffMarket));
+  const [prevListing, setPrevListing] = useState<ListingItem | null>(null);
 
-      const rawSaleType = ((listing.saleType as string) || "").toUpperCase();
-      const initialSaleType =
-        rawSaleType === "PRIVATE" || rawSaleType === "PRIVATE_SALE"
-          ? "PRIVATE_SALE"
-          : (rawSaleType as "FIXED_PRICE" | "AUCTION" | "PRIVATE_SALE") || "FIXED_PRICE";
-      setSaleType(initialSaleType);
-      setAskingPrice(
-        listing.askingPrice !== undefined && listing.askingPrice !== null
-          ? String(listing.askingPrice)
-          : ""
-      );
-      setStartingBid(listing.startingBid ? String(listing.startingBid) : "");
-      setAuctionEndsAt(listing.auctionEndsAt || "");
-      setCurrency(listing.currency || "USD");
-      setAllowCounterOffers(listing.allowCounterOffers !== false);
+  if (listing && listing !== prevListing) {
+    setPrevListing(listing);
+    setTitle(listing.title || "");
+    setCategory(listing.category || "");
+    setBrand(listing.brand || "");
+    const specs = listing.specifications as Record<string, unknown> | undefined;
+    setModel(listing.model || (specs?.model as string) || "");
+    setTrim(listing.trim || (specs?.trim as string) || "");
+    setBuildYear(listing.buildYear ?? 2024);
+    setLocationCity(listing.locationCity || "");
+    setLocationCountry(listing.locationCountry || "");
+    setIsOffMarket(Boolean(listing.isOffMarket));
 
-      // Parse specifications
-      const specsList: KeyValuePair[] = [];
-      if (listing.specifications) {
-        let specsObj: Record<string, any> = {};
-        if (typeof listing.specifications === "string") {
-          try {
-            specsObj = JSON.parse(listing.specifications);
-          } catch {
-            specsObj = {};
-          }
-        } else if (typeof listing.specifications === "object") {
-          specsObj = listing.specifications;
+    const rawSaleType = ((listing.saleType as string) || "").toUpperCase();
+    const initialSaleType =
+      rawSaleType === "PRIVATE" || rawSaleType === "PRIVATE_SALE"
+        ? "PRIVATE_SALE"
+        : (rawSaleType as "FIXED_PRICE" | "AUCTION" | "PRIVATE_SALE") || "FIXED_PRICE";
+    setSaleType(initialSaleType);
+    setAskingPrice(
+      listing.askingPrice !== undefined && listing.askingPrice !== null
+        ? String(listing.askingPrice)
+        : ""
+    );
+    setStartingBid(listing.startingBid ? String(listing.startingBid) : "");
+    setAuctionEndsAt(listing.auctionEndsAt || "");
+    setCurrency(listing.currency || "USD");
+    setAllowCounterOffers(listing.allowCounterOffers !== false);
+
+    // Parse specifications
+    const specsList: KeyValuePair[] = [];
+    if (listing.specifications) {
+      let specsObj: Record<string, unknown> = {};
+      if (typeof listing.specifications === "string") {
+        try {
+          specsObj = JSON.parse(listing.specifications);
+        } catch {
+          specsObj = {};
         }
+      } else if (typeof listing.specifications === "object") {
+        specsObj = listing.specifications as Record<string, unknown>;
+      }
 
-        Object.entries(specsObj).forEach(([k, v], idx) => {
-          specsList.push({
-            id: `spec-${idx}-${Date.now()}`,
-            key: k,
-            value: v !== undefined && v !== null ? String(v) : "",
-          });
+      Object.entries(specsObj).forEach(([k, v], idx) => {
+        specsList.push({
+          id: `spec-${idx}-${k}`,
+          key: k,
+          value: v !== undefined && v !== null ? String(v) : "",
         });
-      }
-      setSpecifications(specsList);
-
-      // Populate media
-      if (listing.media && Array.isArray(listing.media)) {
-        setMediaList(
-          listing.media.map((m, idx) => ({
-            id: m.id || `${Date.now()}-${idx}-${Math.random().toString(36).slice(2, 7)}`,
-            url: m.url,
-            type: m.type || "IMAGE",
-            displayOrder: m.displayOrder ?? idx + 1,
-            isCover: Boolean(
-              m.isCover || (idx === 0 && listing.media.every((x: any) => !x.isCover))
-            ),
-          }))
-        );
-      } else {
-        setMediaList([]);
-      }
+      });
     }
-  }, [listing]);
+    setSpecifications(specsList);
+
+    // Populate media
+    if (listing.media && Array.isArray(listing.media)) {
+      setMediaList(
+        listing.media.map((m, idx) => ({
+          id: m.id || `media-${listing.id}-${idx}`,
+          url: m.url,
+          type: m.type || "IMAGE",
+          displayOrder: m.displayOrder ?? idx + 1,
+          isCover: Boolean(
+            m.isCover || (idx === 0 && listing.media.every((x) => !x.isCover))
+          ),
+        }))
+      );
+    } else {
+      setMediaList([]);
+    }
+  }
 
   if (!isOpen || !listing) return null;
 
@@ -273,8 +263,11 @@ export default function UpdateListingModal({ isOpen, onClose, listing }: UpdateL
             : `${res.length} images uploaded successfully!`
         );
       }
-    } catch (err: any) {
-      const errMsg = err?.response?.data?.message || err?.message || "Failed to upload image(s).";
+    } catch (err: unknown) {
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to upload image(s).";
       toast.error(errMsg);
     }
   };
@@ -333,18 +326,7 @@ export default function UpdateListingModal({ isOpen, onClose, listing }: UpdateL
     toast.success("Image URL added to gallery!");
   };
 
-  const handleSaveMediaUrlEdit = (index: number) => {
-    if (!editingMediaUrl.trim()) {
-      toast.error("Image URL cannot be empty.");
-      return;
-    }
-    setMediaList((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, url: editingMediaUrl.trim() } : item))
-    );
-    setEditingMediaIndex(null);
-    setEditingMediaUrl("");
-    toast.success("Image URL updated successfully!");
-  };
+
 
   // Form Validation
   const validateForm = (): boolean => {
@@ -384,7 +366,7 @@ export default function UpdateListingModal({ isOpen, onClose, listing }: UpdateL
     if (!validateForm()) return;
 
     // Convert specifications key-value list to JSON string
-    const specsObj: Record<string, any> = {};
+    const specsObj: Record<string, string | number> = {};
     specifications.forEach((item) => {
       const trimmedKey = item.key.trim();
       const trimmedVal = item.value.trim();
@@ -441,8 +423,11 @@ export default function UpdateListingModal({ isOpen, onClose, listing }: UpdateL
       });
       toast.success("Listing updated successfully!");
       onClose();
-    } catch (err: any) {
-      const errMsg = err?.response?.data?.message || err?.message || "Failed to update listing.";
+    } catch (err: unknown) {
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to update listing.";
       toast.error(errMsg);
     }
   };
@@ -481,19 +466,21 @@ export default function UpdateListingModal({ isOpen, onClose, listing }: UpdateL
 
         {/* Modal Tabs Header */}
         <div className="px-6 border-b border-[#2A2A2A] bg-[#171717] flex gap-2 overflow-x-auto scrollbar-none">
-          {[
-            { id: "general", label: "General Info", icon: Tag },
-            { id: "pricing", label: "Pricing & Sale", icon: DollarSign },
-            { id: "specs", label: "Specifications", icon: Layers },
-            { id: "media", label: "Media Gallery", icon: ImageIcon },
-          ].map((tab) => {
+          {(
+            [
+              { id: "general" as const, label: "General Info", icon: Tag },
+              { id: "pricing" as const, label: "Pricing & Sale", icon: DollarSign },
+              { id: "specs" as const, label: "Specifications", icon: Layers },
+              { id: "media" as const, label: "Media Gallery", icon: ImageIcon },
+            ]
+          ).map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap ${
                   isActive
                     ? "border-[#EAB308] text-[#EAB308] bg-[#EAB308]/5"
@@ -719,15 +706,17 @@ export default function UpdateListingModal({ isOpen, onClose, listing }: UpdateL
                   Sale Format <span className="text-rose-500">*</span>
                 </label>
                 <div className="grid grid-cols-3 gap-3">
-                  {[
-                    { id: "FIXED_PRICE", label: "Fixed Price" },
-                    { id: "AUCTION", label: "Auction" },
-                    { id: "PRIVATE_SALE", label: "Private Treaty" },
-                  ].map((st) => (
+                  {(
+                    [
+                      { id: "FIXED_PRICE" as const, label: "Fixed Price" },
+                      { id: "AUCTION" as const, label: "Auction" },
+                      { id: "PRIVATE_SALE" as const, label: "Private Treaty" },
+                    ]
+                  ).map((st) => (
                     <button
                       key={st.id}
                       type="button"
-                      onClick={() => setSaleType(st.id as any)}
+                      onClick={() => setSaleType(st.id)}
                       className={`py-3 px-4 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                         saleType === st.id
                           ? "bg-[#EAB308] text-black border-[#EAB308]"

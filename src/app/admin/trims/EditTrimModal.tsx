@@ -16,11 +16,12 @@ interface EditTrimModalProps {
 export default function EditTrimModal({ isOpen, onClose, trim }: EditTrimModalProps) {
   const updateTrimMutation = useUpdateTrimMutation();
 
+  const [prevTrimId, setPrevTrimId] = useState<string | null>(trim?.id || null);
   const [formData, setFormData] = useState({
-    name: "",
-    modelId: "",
-    yearStart: "" as string | number,
-    yearEnd: "" as string | number,
+    name: trim?.name || "",
+    modelId: trim?.modelId || trim?.model?.id || "",
+    yearStart: trim?.yearStart ?? ("" as string | number),
+    yearEnd: trim?.yearEnd ?? ("" as string | number),
   });
 
   const { data: modelsResponse, isLoading: isModelsLoading } = useGetModelsQuery({
@@ -28,16 +29,15 @@ export default function EditTrimModal({ isOpen, onClose, trim }: EditTrimModalPr
   });
   const models = modelsResponse?.data || [];
 
-  useEffect(() => {
-    if (trim) {
-      setFormData({
-        name: trim.name || "",
-        modelId: trim.modelId || trim.model?.id || "",
-        yearStart: trim.yearStart ?? "",
-        yearEnd: trim.yearEnd ?? "",
-      });
-    }
-  }, [trim]);
+  if (trim && trim.id !== prevTrimId) {
+    setPrevTrimId(trim.id);
+    setFormData({
+      name: trim.name || "",
+      modelId: trim.modelId || trim.model?.id || "",
+      yearStart: trim.yearStart ?? "",
+      yearEnd: trim.yearEnd ?? "",
+    });
+  }
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -89,8 +89,11 @@ export default function EditTrimModal({ isOpen, onClose, trim }: EditTrimModalPr
 
       toast.success(`Trim "${formData.name.trim()}" updated successfully!`);
       onClose();
-    } catch (err: any) {
-      const errMsg = err?.response?.data?.message || err?.message || "Failed to update trim";
+    } catch (err: unknown) {
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to update trim";
       toast.error(errMsg);
     }
   };

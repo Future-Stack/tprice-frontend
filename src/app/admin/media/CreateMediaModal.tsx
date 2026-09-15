@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
+import Image from "next/image";
 import {
   X,
   Sparkles,
@@ -103,8 +104,8 @@ export default function CreateMediaModal({ isOpen, onClose }: CreateMediaModalPr
         }));
         toast.success("Media file uploaded successfully!");
       }
-    } catch (err: any) {
-      const errMsg = err?.response?.data?.message || err?.message || "Failed to upload media file";
+    } catch (err: unknown) {
+      const errMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || (err as Error)?.message || "Failed to upload media file";
       toast.error(errMsg);
     }
   };
@@ -131,8 +132,8 @@ export default function CreateMediaModal({ isOpen, onClose }: CreateMediaModalPr
         setFormData((prev) => ({ ...prev, thumbnailUrl: res.url }));
         toast.success("Thumbnail uploaded successfully!");
       }
-    } catch (err: any) {
-      const errMsg = err?.response?.data?.message || err?.message || "Failed to upload thumbnail";
+    } catch (err: unknown) {
+      const errMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || (err as Error)?.message || "Failed to upload thumbnail";
       toast.error(errMsg);
     } finally {
       setIsUploadingThumb(false);
@@ -223,9 +224,8 @@ export default function CreateMediaModal({ isOpen, onClose }: CreateMediaModalPr
         isPublished: true,
       });
       onClose();
-    } catch (err: any) {
-      const errMsg =
-        err?.response?.data?.message || err?.message || "Failed to create landing media";
+    } catch (err: unknown) {
+      const errMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || (err as Error)?.message || "Failed to create landing media";
       toast.error(errMsg);
     }
   };
@@ -371,14 +371,13 @@ export default function CreateMediaModal({ isOpen, onClose }: CreateMediaModalPr
                           muted
                         />
                       ) : (
-                        <img
+                        <Image
                           src={formData.mediaUrl}
                           alt="Media Preview"
+                          width={96}
+                          height={96}
+                          unoptimized
                           className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src =
-                              "https://res.cloudinary.com/demo/image/upload/sample.jpg";
-                          }}
                         />
                       )}
                     </div>
@@ -467,14 +466,13 @@ export default function CreateMediaModal({ isOpen, onClose }: CreateMediaModalPr
                         controls
                       />
                     ) : (
-                      <img
+                      <Image
                         src={formData.mediaUrl}
                         alt="URL Preview"
+                        width={144}
+                        height={144}
+                        unoptimized
                         className="w-full h-full object-contain"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            "https://res.cloudinary.com/demo/image/upload/sample.jpg";
-                        }}
                       />
                     )}
                   </div>
