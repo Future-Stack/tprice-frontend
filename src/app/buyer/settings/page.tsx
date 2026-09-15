@@ -2,14 +2,7 @@
 
 import React, { useState } from "react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
-import {
-  Crown,
-  User,
-  Shield,
-  Loader2,
-  Eye,
-  EyeOff,
-} from "lucide-react";
+import { Crown, User, Shield, Loader2, Eye, EyeOff } from "lucide-react";
 import {
   useGetMeQuery,
   useUpdateProfileMutation,
@@ -137,7 +130,7 @@ export default function BuyerSettings() {
           {/* Profile Section */}
           <section className="mb-10 relative z-10">
             <div className="flex items-center gap-2 mb-4">
-              <User className="w-[18px] h-[18px] text-gray-400" strokeWidth={2} />
+              <User className="w-4.5 h-4.5 text-gray-400" strokeWidth={2} />
               <h2 className="text-[11px] font-semibold text-gray-300 tracking-widest uppercase">
                 Profile
               </h2>
@@ -184,7 +177,7 @@ export default function BuyerSettings() {
                 <button
                   type="submit"
                   disabled={isSavingProfile || isUserLoading}
-                  className="bg-[#facc15] text-[#111] font-semibold text-xs px-6 py-2.5 rounded-lg hover:bg-opacity-90 transition-all min-w-[120px] text-center flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="bg-[#facc15] text-[#111] font-semibold text-xs px-6 py-2.5 rounded-lg hover:bg-opacity-90 transition-all min-w-30 text-center flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {isSavingProfile && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   <span>{isSavingProfile ? "Saving..." : "Save Changes"}</span>
@@ -196,7 +189,7 @@ export default function BuyerSettings() {
           {/* Notifications Section - Commented out
                     <section className="mb-10 relative z-10">
                         <div className="flex items-center gap-2 mb-4">
-                            <Bell className="w-[18px] h-[18px] text-gray-400" strokeWidth={2} />
+                            <Bell className="w-4.5 h-4.5 text-gray-400" strokeWidth={2} />
                             <h2 className="text-[11px] font-semibold text-gray-300 tracking-widest uppercase">Notifications</h2>
                         </div>
                         <div className="space-y-2">
@@ -227,7 +220,7 @@ export default function BuyerSettings() {
           {/* Security Section */}
           <section className="mb-10 relative z-10">
             <div className="flex items-center gap-2 mb-4">
-              <Shield className="w-[18px] h-[18px] text-gray-400" strokeWidth={2} />
+              <Shield className="w-4.5 h-4.5 text-gray-400" strokeWidth={2} />
               <h2 className="text-[11px] font-semibold text-gray-300 tracking-widest uppercase">
                 Security
               </h2>
@@ -329,7 +322,7 @@ export default function BuyerSettings() {
                   <button
                     type="submit"
                     disabled={isSavingPassword}
-                    className="bg-[#facc15] text-[#111] font-semibold text-xs px-6 py-2.5 rounded-lg hover:bg-opacity-90 transition-all min-w-[120px] text-center flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="bg-[#facc15] text-[#111] font-semibold text-xs px-6 py-2.5 rounded-lg hover:bg-opacity-90 transition-all min-w-30 text-center flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     {isSavingPassword && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                     <span>{isSavingPassword ? "Updating..." : "Update Password"}</span>

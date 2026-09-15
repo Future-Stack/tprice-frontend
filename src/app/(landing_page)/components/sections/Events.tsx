@@ -128,7 +128,7 @@ export default function Events() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -100 }}
                 transition={{ duration: 0.6, ease: "easeInOut" }}
-                className="relative aspect-[16/9] md:aspect-[21/9] w-full rounded-2xl overflow-hidden cursor-default"
+                className="relative aspect-video md:aspect-21/9 w-full rounded-2xl overflow-hidden cursor-default"
               >
                 {/* Background Image */}
                 <img
@@ -141,7 +141,7 @@ export default function Events() {
                 />
 
                 {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/30 to-transparent" />
 
                 {/* Content Box */}
                 <div className="absolute bottom-10 left-10 right-10 flex flex-col md:flex-row justify-between items-end gap-8">

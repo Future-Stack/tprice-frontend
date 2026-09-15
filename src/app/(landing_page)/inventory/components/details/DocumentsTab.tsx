@@ -23,7 +23,7 @@ export default function DocumentsTab({ documents }: DocumentsTabProps) {
         {documents.map((doc, idx) => (
           <div
             key={idx}
-            className="group flex items-center justify-between p-6 bg-white/[0.02] border border-white/5 rounded-xl hover:border-primary/20 transition-all cursor-pointer"
+            className="group flex items-center justify-between p-6 bg-white/2 border border-white/5 rounded-xl hover:border-primary/20 transition-all cursor-pointer"
           >
             <div className="flex items-center gap-6">
               <div className="w-12 h-12 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-primary/10 transition-colors">

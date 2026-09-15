@@ -78,7 +78,7 @@ function SortableMediaCard({ item, index, isCover, onRemove, onSetCover }: Sorta
       />
 
       {/* Top Gradient Overlay */}
-      <div className="absolute inset-x-0 top-0 h-14 bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 top-0 h-14 bg-linear-to-b from-black/80 via-black/40 to-transparent pointer-events-none" />
 
       {/* Order Badge & Drag Handle */}
       <div className="absolute top-2 left-2 flex items-center gap-1.5 z-10">
@@ -103,7 +103,7 @@ function SortableMediaCard({ item, index, isCover, onRemove, onSetCover }: Sorta
       </button>
 
       {/* Bottom Gradient & Cover Status / Button */}
-      <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/90 via-black/60 to-transparent flex items-center justify-between z-10">
+      <div className="absolute inset-x-0 bottom-0 p-2 bg-linear-to-t from-black/90 via-black/60 to-transparent flex items-center justify-between z-10">
         {isCover ? (
           <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-primary text-black font-bold rounded text-[10px] shadow-md">
             <Star className="w-3 h-3 fill-black text-black" /> Cover

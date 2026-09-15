@@ -338,11 +338,11 @@ export default function ProductDetailsPage() {
                     Place Bid
                   </button>
                   <div className="grid grid-cols-2 gap-3">
-                    <button className="flex items-center justify-center gap-2 py-4 bg-[#161618] text-white text-[13px] font-semibold rounded-xl border border-white/5 hover:bg-white/[0.08] transition-colors">
+                    <button className="flex items-center justify-center gap-2 py-4 bg-[#161618] text-white text-[13px] font-semibold rounded-xl border border-white/5 hover:bg-white/8 transition-colors">
                       <Heart className="w-4 h-4 text-[#E78F23]" fill="#E78F23" />
                       Saved
                     </button>
-                    <button className="flex items-center justify-center gap-2 py-4 bg-[#161618] text-white text-[13px] font-semibold rounded-xl border border-white/5 hover:bg-white/[0.08] transition-colors">
+                    <button className="flex items-center justify-center gap-2 py-4 bg-[#161618] text-white text-[13px] font-semibold rounded-xl border border-white/5 hover:bg-white/8 transition-colors">
                       <Share2 className="w-4 h-4 text-gray-400" />
                       Share
                     </button>

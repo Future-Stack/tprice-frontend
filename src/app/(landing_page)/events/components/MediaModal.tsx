@@ -66,7 +66,7 @@ export default function MediaModal({ isOpen, onClose, media }: MediaModalProps) 
 
             {/* Optional Caption */}
             {media.title && (
-              <div className="absolute bottom-0 left-0 w-full p-8 bg-gradient-to-t from-black to-transparent">
+              <div className="absolute bottom-0 left-0 w-full p-8 bg-linear-to-t from-black to-transparent">
                 <h3 className="text-xl md:text-2xl font-serif text-white">{media.title}</h3>
               </div>
             )}

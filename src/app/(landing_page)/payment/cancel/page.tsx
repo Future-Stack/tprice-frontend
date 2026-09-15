@@ -66,7 +66,7 @@ function PaymentCancelContent() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35 }}
-          className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-4 sm:p-5 mb-8 text-left space-y-2.5"
+          className="bg-white/3 border border-white/6 rounded-2xl p-4 sm:p-5 mb-8 text-left space-y-2.5"
         >
           <div className="flex items-start gap-2.5 text-xs sm:text-sm text-white/70">
             <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
@@ -98,7 +98,7 @@ function PaymentCancelContent() {
 
           <Link
             href="/"
-            className="w-full sm:w-auto py-3 px-5 rounded-xl bg-white/[0.05] border border-white/10 text-white font-medium text-sm hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+            className="w-full sm:w-auto py-3 px-5 rounded-xl bg-white/5 border border-white/10 text-white font-medium text-sm hover:bg-white/10 transition-all flex items-center justify-center gap-2"
           >
             <Home className="w-4 h-4 text-white/70" />
             Return Home
@@ -110,7 +110,7 @@ function PaymentCancelContent() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.45 }}
-          className="mt-8 pt-6 border-t border-white/[0.06] flex items-center justify-center gap-1.5 text-xs text-white/40"
+          className="mt-8 pt-6 border-t border-white/6 flex items-center justify-center gap-1.5 text-xs text-white/40"
         >
           <HelpCircle className="w-3.5 h-3.5" />
           Encountering issues during payment?{" "}

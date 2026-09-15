@@ -53,8 +53,8 @@ export default function EventsGallery() {
                   return (
                     <div
                       key={cardIndex}
-                      className={`relative rounded-sm overflow-hidden border border-white/5 bg-white/[0.03] animate-pulse ${
-                        isTall ? "aspect-[3/4]" : "aspect-[3/2]"
+                      className={`relative rounded-sm overflow-hidden border border-white/5 bg-white/3 animate-pulse ${
+                        isTall ? "aspect-3/4" : "aspect-3/2"
                       }`}
                     >
                       <div className="absolute top-4 left-4 w-16 h-6 rounded-sm bg-white/10" />
@@ -90,7 +90,7 @@ export default function EventsGallery() {
 
         {/* Empty State */}
         {!isLoading && !isError && mediaItems.length === 0 && (
-          <div className="py-16 text-center border border-white/5 rounded-sm bg-white/[0.02]">
+          <div className="py-16 text-center border border-white/5 rounded-sm bg-white/2">
             <p className="text-white/40 text-sm font-serif">
               No media items available at this time.
             </p>
@@ -219,7 +219,7 @@ function MediaCard({
       )}
 
       {/* Hover Info Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-8">
+      <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-8">
         <div className="space-y-2">
           <h3 className="text-lg font-serif text-white">{item.title}</h3>
           {item.caption && (

@@ -16,7 +16,7 @@ export default function ServicesHero() {
         {/* Cinematic Overlays */}
         <div className="absolute inset-0 bg-black/20 z-[1]" />
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/30 to-transparent z-[2]" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-[2]" />
+        <div className="absolute inset-0 bg-linear-to-t from-black to-transparent z-[2]" />
       </div>
 
       {/* Content */}

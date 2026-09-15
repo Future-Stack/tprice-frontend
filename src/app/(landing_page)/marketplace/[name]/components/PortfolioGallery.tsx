@@ -23,7 +23,7 @@ export default function PortfolioGallery({ item }: PortfolioGalleryProps) {
           alt="Portfolio Main"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
         <div className="absolute bottom-6 left-6">
           <h3 className="text-white text-2xl font-serif mb-2">Pink Villa</h3>
           <div className="flex items-center gap-2 text-white/50 text-sm">

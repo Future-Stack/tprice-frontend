@@ -90,7 +90,7 @@ export default function UpdateUserStatusModal({
 
         {/* User Card Preview */}
         <div className="flex items-center gap-4 p-4 bg-[#1A1A1C] border border-[#262626] rounded-xl">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/30 to-amber-600/30 border border-primary/40 flex items-center justify-center text-primary font-bold text-base shrink-0">
+          <div className="w-12 h-12 rounded-xl bg-linear-to-br from-primary/30 to-amber-600/30 border border-primary/40 flex items-center justify-center text-primary font-bold text-base shrink-0">
             {user.avatarUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img

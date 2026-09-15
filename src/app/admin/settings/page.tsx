@@ -598,10 +598,10 @@ export default function AdminSettings() {
                 <button
                   onClick={handleToggleRequireApprovalInSecurity}
                   disabled={updateModerationSettingsMutation.isPending}
-                  className={`relative inline-flex h-[34px] w-[64px] items-center rounded-full transition-all duration-300 focus:outline-none cursor-pointer ${moderation.requireApproval ? "bg-[#facc15]" : "bg-[#2A2A2A]"}`}
+                  className={`relative inline-flex h-8.5 w-16 items-center rounded-full transition-all duration-300 focus:outline-none cursor-pointer ${moderation.requireApproval ? "bg-[#facc15]" : "bg-[#2A2A2A]"}`}
                 >
                   <div
-                    className={`inline-block h-7 w-7 transform rounded-full transition-all duration-300 ${moderation.requireApproval ? "translate-x-[32px] bg-black shadow-lg" : "translate-x-1 bg-[#444]"}`}
+                    className={`inline-block h-7 w-7 transform rounded-full transition-all duration-300 ${moderation.requireApproval ? "translate-x-8 bg-black shadow-lg" : "translate-x-1 bg-[#444]"}`}
                   />
                 </button>
               </section>
@@ -672,7 +672,7 @@ export default function AdminSettings() {
 
                       return (
                         <React.Fragment key={session.id}>
-                          {index > 0 && <div className="h-[1px] bg-white/[0.03]" />}
+                          {index > 0 && <div className="h-px bg-white/3" />}
                           <div className="flex items-center justify-between group py-2">
                             <div className="space-y-1">
                               <h4 className="text-white font-medium flex items-center gap-2 text-base">
