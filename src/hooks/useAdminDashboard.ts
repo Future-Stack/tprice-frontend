@@ -1,8 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import {
-  getAdminDashboardOverviewApi,
-  AdminDashboardOverviewResponse,
-} from "@/lib/api/dashboard";
+import { getAdminDashboardOverviewApi, AdminDashboardOverviewResponse } from "@/lib/api/dashboard";
 
 export const ADMIN_DASHBOARD_QUERY_KEYS = {
   overview: ["admin", "dashboard", "overview"] as const,

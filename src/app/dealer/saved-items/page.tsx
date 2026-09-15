@@ -1,16 +1,16 @@
 "use client";
 
-import React, { useState } from 'react';
-import { MapPin, Heart } from 'lucide-react';
+import React, { useState } from "react";
+import { MapPin, Heart } from "lucide-react";
 import AnimationWrapper from "../../components/AnimationWrapper";
 
 interface SavedItem {
   id: number;
   image: string;
-  badge: { type: 'buy_now' | 'auction', text: string };
+  badge: { type: "buy_now" | "auction"; text: string };
   title: string;
   location: string;
-  priceType: 'Current Bid' | 'Price';
+  priceType: "Current Bid" | "Price";
   price: string;
   feesPrice: string;
 }
@@ -18,54 +18,59 @@ interface SavedItem {
 const savedItems: SavedItem[] = [
   {
     id: 1,
-    image: "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&q=80&w=800",
-    badge: { type: 'auction', text: 'Auction' },
+    image:
+      "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&q=80&w=800",
+    badge: { type: "auction", text: "Auction" },
     title: "Ferrari 488 Spider",
     location: "Monaco",
-    priceType: 'Current Bid',
+    priceType: "Current Bid",
     price: "$372,000",
     feesPrice: "$377,580 incl. fees",
   },
   {
     id: 2,
-    image: "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?auto=format&fit=crop&q=80&w=800",
-    badge: { type: 'buy_now', text: 'Buy Now' },
+    image:
+      "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?auto=format&fit=crop&q=80&w=800",
+    badge: { type: "buy_now", text: "Buy Now" },
     title: "Azimut Grande 35M",
     location: "Cannes, France",
-    priceType: 'Price',
+    priceType: "Price",
     price: "$12,500,000",
     feesPrice: "$12,687,500 incl. fees",
   },
   {
     id: 3,
-    image: "https://images.unsplash.com/photo-1508614999368-92751c144e53?auto=format&fit=crop&q=80&w=800", // Used a more general luxury watch image since precise patek might not be found easily
-    badge: { type: 'auction', text: 'Auction' },
+    image:
+      "https://images.unsplash.com/photo-1508614999368-92751c144e53?auto=format&fit=crop&q=80&w=800", // Used a more general luxury watch image since precise patek might not be found easily
+    badge: { type: "auction", text: "Auction" },
     title: "Patek Philippe Nautilus 5711",
     location: "Geneva, Switzerland",
-    priceType: 'Current Bid',
+    priceType: "Current Bid",
     price: "$178,000",
     feesPrice: "$180,670 incl. fees",
   },
   {
     id: 4,
-    image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=800",
-    badge: { type: 'buy_now', text: 'Buy Now' },
+    image:
+      "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=800",
+    badge: { type: "buy_now", text: "Buy Now" },
     title: "Porsche 911 GT3 RS",
     location: "Stuttgart, Germany",
-    priceType: 'Price',
+    priceType: "Price",
     price: "$289,000",
     feesPrice: "$293,335 incl. fees",
   },
   {
     id: 5,
-    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=800",
-    badge: { type: 'buy_now', text: 'Buy Now' },
+    image:
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=800",
+    badge: { type: "buy_now", text: "Buy Now" },
     title: "Mediterranean Villa",
     location: "Ibiza, Spain",
-    priceType: 'Price',
+    priceType: "Price",
     price: "$8,500,000",
     feesPrice: "$8,627,500 incl. fees",
-  }
+  },
 ];
 
 export default function SavedItems() {
@@ -107,7 +112,7 @@ function SavedItemCard({ item }: { item: SavedItem }) {
 
         {/* Badges */}
         <div className="absolute top-3 left-3 flex items-center gap-2">
-          {item.badge.type === 'auction' ? (
+          {item.badge.type === "auction" ? (
             <span className="bg-[#3b3211] text-[#E78F23] text-[10px] sm:text-xs font-semibold px-2.5 py-1 rounded-md">
               {item.badge.text}
             </span>
@@ -120,11 +125,14 @@ function SavedItemCard({ item }: { item: SavedItem }) {
 
         {/* Heart Icon */}
         <button
-          onClick={(e) => { e.preventDefault(); setIsSaved(!isSaved); }}
+          onClick={(e) => {
+            e.preventDefault();
+            setIsSaved(!isSaved);
+          }}
           className="absolute top-3 right-3 p-1.5 sm:p-2 bg-black/60 rounded-full hover:bg-black/80 transition-colors"
         >
           <Heart
-            className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-colors ${isSaved ? 'fill-[#E78F23] text-[#E78F23]' : 'text-gray-400'}`}
+            className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-colors ${isSaved ? "fill-[#E78F23] text-[#E78F23]" : "text-gray-400"}`}
           />
         </button>
       </div>
@@ -141,15 +149,9 @@ function SavedItemCard({ item }: { item: SavedItem }) {
         {/* Price and Button section at bottom */}
         <div className="mt-auto flex items-end justify-between">
           <div>
-            <div className="text-[11px] text-gray-500 mb-0.5">
-              {item.priceType}
-            </div>
-            <div className="font-semibold text-[17px] text-white mb-1">
-              {item.price}
-            </div>
-            <div className="text-[10px] text-gray-500">
-              {item.feesPrice}
-            </div>
+            <div className="text-[11px] text-gray-500 mb-0.5">{item.priceType}</div>
+            <div className="font-semibold text-[17px] text-white mb-1">{item.price}</div>
+            <div className="text-[10px] text-gray-500">{item.feesPrice}</div>
           </div>
 
           <button className="px-5 py-2.5 bg-[#D4AE4B] hover:bg-[#c4a045] text-white text-xs sm:text-[13px] font-semibold rounded-lg transition-transform active:scale-95 shadow-lg">

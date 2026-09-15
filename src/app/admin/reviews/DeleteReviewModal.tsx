@@ -82,35 +82,29 @@ export default function DeleteReviewModal({
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <h4 className="font-semibold text-sm text-white line-clamp-1">
-              {review.reviewerName}
-            </h4>
+            <h4 className="font-semibold text-sm text-white line-clamp-1">{review.reviewerName}</h4>
             {review.reviewerTitle && (
-              <p className="text-xs text-gray-400 truncate">
-                {review.reviewerTitle}
-              </p>
+              <p className="text-xs text-gray-400 truncate">{review.reviewerTitle}</p>
             )}
             <div className="flex items-center gap-1 mt-1">
               {Array.from({ length: 5 }).map((_, i) => (
                 <Star
                   key={i}
                   className={`w-3 h-3 ${
-                    i < review.rating
-                      ? "text-yellow-400 fill-yellow-400"
-                      : "text-gray-600"
+                    i < review.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-600"
                   }`}
                 />
               ))}
-              <span className="text-[10px] text-gray-400 ml-1 font-medium">
-                {review.rating}.0
-              </span>
+              <span className="text-[10px] text-gray-400 ml-1 font-medium">{review.rating}.0</span>
             </div>
           </div>
         </div>
 
         {/* Warning Message */}
         <p className="text-sm text-gray-300 leading-relaxed">
-          Are you sure you want to permanently delete the review from <strong className="text-white">&quot;{review.reviewerName}&quot;</strong>? This will permanently remove the testimonial.
+          Are you sure you want to permanently delete the review from{" "}
+          <strong className="text-white">&quot;{review.reviewerName}&quot;</strong>? This will
+          permanently remove the testimonial.
         </p>
 
         {/* Footer Actions */}

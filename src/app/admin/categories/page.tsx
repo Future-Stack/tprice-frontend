@@ -18,10 +18,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
-import {
-  useGetCategoriesQuery,
-  useDeleteCategoryMutation,
-} from "@/hooks/useCategories";
+import { useGetCategoriesQuery, useDeleteCategoryMutation } from "@/hooks/useCategories";
 import { Category } from "@/lib/api/categories";
 import CreateCategoryModal from "./CreateCategoryModal";
 import EditCategoryModal from "./EditCategoryModal";
@@ -150,9 +147,7 @@ export default function AdminCategoriesPage() {
       <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <AnimationWrapper type="fade-down" duration={0.5}>
           <div>
-            <h1 className="text-3xl font-bold font-montserrat">
-              Categories Management
-            </h1>
+            <h1 className="text-3xl font-bold font-montserrat">Categories Management</h1>
             <p className="text-gray-400 text-sm mt-1">
               Organize, monitor, and create luxury marketplace categories
             </p>
@@ -200,11 +195,7 @@ export default function AdminCategoriesPage() {
                 className="w-full bg-[#141416] border border-[#262626] rounded-xl px-4 py-2.5 text-xs text-gray-300 focus:outline-none focus:border-primary/60 transition-colors cursor-pointer appearance-none pr-8"
               >
                 {STATUS_OPTIONS.map((st) => (
-                  <option
-                    key={st.value}
-                    value={st.value}
-                    className="bg-[#141416] text-white"
-                  >
+                  <option key={st.value} value={st.value} className="bg-[#141416] text-white">
                     {st.label}
                   </option>
                 ))}
@@ -245,9 +236,7 @@ export default function AdminCategoriesPage() {
             className="p-2.5 bg-[#141416] border border-[#262626] rounded-xl text-gray-400 hover:text-white hover:border-primary/40 transition-colors cursor-pointer"
             title="Refresh list"
           >
-            <RefreshCw
-              className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`}
-            />
+            <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`} />
           </button>
         </div>
       </div>
@@ -292,9 +281,7 @@ export default function AdminCategoriesPage() {
                     <td colSpan={9} className="px-6 py-16 text-center">
                       <div className="max-w-md mx-auto space-y-3">
                         <FolderTree className="w-10 h-10 text-gray-600 mx-auto" />
-                        <p className="text-base font-semibold text-gray-300">
-                          No categories found
-                        </p>
+                        <p className="text-base font-semibold text-gray-300">No categories found</p>
                         <p className="text-xs text-gray-500">
                           {searchQuery
                             ? `No categories matching "${searchQuery}"`
@@ -341,9 +328,7 @@ export default function AdminCategoriesPage() {
                       <td className="px-6 py-5 text-xs text-gray-400 max-w-xs">
                         <p className="line-clamp-2">
                           {category.description || (
-                            <span className="text-gray-600 italic">
-                              No description
-                            </span>
+                            <span className="text-gray-600 italic">No description</span>
                           )}
                         </p>
                       </td>
@@ -420,16 +405,12 @@ export default function AdminCategoriesPage() {
             <div className="px-6 py-4 bg-[#141416] border-t border-[#262626] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
               <div>
                 Showing{" "}
-                <span className="font-semibold text-white">
-                  {(meta.page - 1) * meta.limit + 1}
-                </span>{" "}
+                <span className="font-semibold text-white">{(meta.page - 1) * meta.limit + 1}</span>{" "}
                 to{" "}
                 <span className="font-semibold text-white">
                   {Math.min(meta.page * meta.limit, meta.total)}
                 </span>{" "}
-                of{" "}
-                <span className="font-semibold text-white">{meta.total}</span>{" "}
-                categories
+                of <span className="font-semibold text-white">{meta.total}</span> categories
               </div>
 
               {/* Page Buttons */}
@@ -443,21 +424,19 @@ export default function AdminCategoriesPage() {
                   <span className="hidden sm:inline">Previous</span>
                 </button>
 
-                {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map(
-                  (pageNum) => (
-                    <button
-                      key={pageNum}
-                      onClick={() => handlePageChange(pageNum)}
-                      className={`w-8 h-8 rounded-lg border font-semibold text-xs transition-all cursor-pointer ${
-                        pageNum === meta.page
-                          ? "bg-primary text-black border-primary font-bold shadow-[0_2px_10px_rgba(231,143,35,0.3)]"
-                          : "bg-[#1A1A1C] border-[#262626] text-gray-300 hover:text-white hover:border-primary/40"
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  )
-                )}
+                {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    onClick={() => handlePageChange(pageNum)}
+                    className={`w-8 h-8 rounded-lg border font-semibold text-xs transition-all cursor-pointer ${
+                      pageNum === meta.page
+                        ? "bg-primary text-black border-primary font-bold shadow-[0_2px_10px_rgba(231,143,35,0.3)]"
+                        : "bg-[#1A1A1C] border-[#262626] text-gray-300 hover:text-white hover:border-primary/40"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
 
                 <button
                   onClick={() => handlePageChange(meta.page + 1)}

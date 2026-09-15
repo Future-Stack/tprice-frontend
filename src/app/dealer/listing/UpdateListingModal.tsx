@@ -33,9 +33,7 @@ import { useUpdateListingMutation } from "@/hooks/useListings";
 import { useUploadMultipleMediaMutation } from "@/hooks/useMedia";
 import { toast } from "sonner";
 import Image from "next/image";
-import SortableMediaGallery, {
-  UploadedMediaItem,
-} from "@/components/SortableMediaGallery";
+import SortableMediaGallery, { UploadedMediaItem } from "@/components/SortableMediaGallery";
 
 interface UpdateListingModalProps {
   isOpen: boolean;
@@ -49,14 +47,11 @@ interface KeyValuePair {
   value: string;
 }
 
-export default function UpdateListingModal({
-  isOpen,
-  onClose,
-  listing,
-}: UpdateListingModalProps) {
+export default function UpdateListingModal({ isOpen, onClose, listing }: UpdateListingModalProps) {
   // Category and Brand Queries
-  const { data: categoriesResponse, isLoading: isLoadingCategories } =
-    useGetCategoriesQuery({ limit: 100 });
+  const { data: categoriesResponse, isLoading: isLoadingCategories } = useGetCategoriesQuery({
+    limit: 100,
+  });
   const categoriesList = categoriesResponse?.data || [];
 
   // Mutations
@@ -66,9 +61,7 @@ export default function UpdateListingModal({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Form Tabs State
-  const [activeTab, setActiveTab] = useState<
-    "general" | "pricing" | "specs" | "media"
-  >("general");
+  const [activeTab, setActiveTab] = useState<"general" | "pricing" | "specs" | "media">("general");
 
   // Form Field States
   const [title, setTitle] = useState("");
@@ -82,62 +75,50 @@ export default function UpdateListingModal({
   const [isOffMarket, setIsOffMarket] = useState(false);
 
   const selectedCategory = categoriesList.find(
-    (cat) => cat.name === category || cat.id === category,
+    (cat) => cat.name === category || cat.id === category
   );
   const selectedCategoryId = selectedCategory?.id;
 
   const { data: brandsResponse, isLoading: isLoadingBrands } = useGetBrandsQuery(
-    selectedCategoryId
-      ? { categoryId: selectedCategoryId, limit: 100 }
-      : undefined,
+    selectedCategoryId ? { categoryId: selectedCategoryId, limit: 100 } : undefined,
     {
       enabled: Boolean(selectedCategoryId),
-    },
+    }
   );
   const brandsList = selectedCategoryId ? brandsResponse?.data || [] : [];
 
   // Selected Brand & dynamic Model query
-  const selectedBrand = brandsList.find(
-    (b) => b.name === brand || b.id === brand,
-  );
+  const selectedBrand = brandsList.find((b) => b.name === brand || b.id === brand);
   const selectedBrandId = selectedBrand?.id;
 
   const { data: modelsResponse, isLoading: isLoadingModels } = useGetModelsQuery(
-    selectedBrandId
-      ? { brandId: selectedBrandId, limit: 100 }
-      : undefined,
+    selectedBrandId ? { brandId: selectedBrandId, limit: 100 } : undefined,
     {
       enabled: Boolean(selectedBrandId),
-    },
+    }
   );
   const modelsList = selectedBrandId ? modelsResponse?.data || [] : [];
 
   // Selected Model & dynamic Trim query
-  const selectedModel = modelsList.find(
-    (m) => m.name === model || m.id === model,
-  );
+  const selectedModel = modelsList.find((m) => m.name === model || m.id === model);
   const selectedModelId = selectedModel?.id;
 
   const { data: trimsResponse, isLoading: isLoadingTrims } = useGetTrimsQuery(
-    selectedModelId
-      ? { modelId: selectedModelId, limit: 100 }
-      : undefined,
+    selectedModelId ? { modelId: selectedModelId, limit: 100 } : undefined,
     {
       enabled: Boolean(selectedModelId),
-    },
+    }
   );
   const trimsList = selectedModelId ? trimsResponse?.data || [] : [];
 
   // Selected Trim
-  const selectedTrim = trimsList.find(
-    (t) => t.name === trim || t.id === trim,
-  );
+  const selectedTrim = trimsList.find((t) => t.name === trim || t.id === trim);
   const selectedTrimId = selectedTrim?.id;
 
   // Pricing & Sale Type States
-  const [saleType, setSaleType] = useState<
-    "FIXED_PRICE" | "AUCTION" | "PRIVATE_SALE"
-  >("FIXED_PRICE");
+  const [saleType, setSaleType] = useState<"FIXED_PRICE" | "AUCTION" | "PRIVATE_SALE">(
+    "FIXED_PRICE"
+  );
   const [askingPrice, setAskingPrice] = useState<string>("");
   const [startingBid, setStartingBid] = useState<string>("");
   const [auctionEndsAt, setAuctionEndsAt] = useState<string>("");
@@ -151,9 +132,7 @@ export default function UpdateListingModal({
   const [mediaList, setMediaList] = useState<UploadedMediaItem[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [directImageUrl, setDirectImageUrl] = useState("");
-  const [editingMediaIndex, setEditingMediaIndex] = useState<number | null>(
-    null,
-  );
+  const [editingMediaIndex, setEditingMediaIndex] = useState<number | null>(null);
   const [editingMediaUrl, setEditingMediaUrl] = useState("");
 
   // Populate form state when listing prop changes
@@ -169,17 +148,16 @@ export default function UpdateListingModal({
       setLocationCountry(listing.locationCountry || "");
       setIsOffMarket(Boolean(listing.isOffMarket));
 
-      const rawSaleType = (listing.saleType as string || "").toUpperCase();
+      const rawSaleType = ((listing.saleType as string) || "").toUpperCase();
       const initialSaleType =
         rawSaleType === "PRIVATE" || rawSaleType === "PRIVATE_SALE"
           ? "PRIVATE_SALE"
-          : (rawSaleType as "FIXED_PRICE" | "AUCTION" | "PRIVATE_SALE") ||
-          "FIXED_PRICE";
+          : (rawSaleType as "FIXED_PRICE" | "AUCTION" | "PRIVATE_SALE") || "FIXED_PRICE";
       setSaleType(initialSaleType);
       setAskingPrice(
         listing.askingPrice !== undefined && listing.askingPrice !== null
           ? String(listing.askingPrice)
-          : "",
+          : ""
       );
       setStartingBid(listing.startingBid ? String(listing.startingBid) : "");
       setAuctionEndsAt(listing.auctionEndsAt || "");
@@ -219,10 +197,9 @@ export default function UpdateListingModal({
             type: m.type || "IMAGE",
             displayOrder: m.displayOrder ?? idx + 1,
             isCover: Boolean(
-              m.isCover ||
-              (idx === 0 && listing.media.every((x: any) => !x.isCover)),
+              m.isCover || (idx === 0 && listing.media.every((x: any) => !x.isCover))
             ),
-          })),
+          }))
         );
       } else {
         setMediaList([]);
@@ -234,19 +211,12 @@ export default function UpdateListingModal({
 
   // Specifications Handlers
   const handleAddSpecRow = () => {
-    setSpecifications((prev) => [
-      ...prev,
-      { id: Date.now().toString(), key: "", value: "" },
-    ]);
+    setSpecifications((prev) => [...prev, { id: Date.now().toString(), key: "", value: "" }]);
   };
 
-  const handleSpecChange = (
-    id: string,
-    field: "key" | "value",
-    val: string,
-  ) => {
+  const handleSpecChange = (id: string, field: "key" | "value", val: string) => {
     setSpecifications((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, [field]: val } : item)),
+      prev.map((item) => (item.id === id ? { ...item, [field]: val } : item))
     );
   };
 
@@ -301,14 +271,11 @@ export default function UpdateListingModal({
         toast.success(
           res.length === 1
             ? "Image uploaded successfully!"
-            : `${res.length} images uploaded successfully!`,
+            : `${res.length} images uploaded successfully!`
         );
       }
     } catch (err: any) {
-      const errMsg =
-        err?.response?.data?.message ||
-        err?.message ||
-        "Failed to upload image(s).";
+      const errMsg = err?.response?.data?.message || err?.message || "Failed to upload image(s).";
       toast.error(errMsg);
     }
   };
@@ -342,7 +309,7 @@ export default function UpdateListingModal({
       prev.map((item, idx) => ({
         ...item,
         isCover: idx === index,
-      })),
+      }))
     );
     toast.success("Cover image updated!");
   };
@@ -375,9 +342,7 @@ export default function UpdateListingModal({
       return;
     }
     setMediaList((prev) =>
-      prev.map((item, i) =>
-        i === index ? { ...item, url: editingMediaUrl.trim() } : item,
-      ),
+      prev.map((item, i) => (i === index ? { ...item, url: editingMediaUrl.trim() } : item))
     );
     setEditingMediaIndex(null);
     setEditingMediaUrl("");
@@ -398,11 +363,7 @@ export default function UpdateListingModal({
     }
 
     if (saleType === "FIXED_PRICE") {
-      if (
-        askingPrice === "" ||
-        isNaN(Number(askingPrice)) ||
-        Number(askingPrice) <= 0
-      ) {
+      if (askingPrice === "" || isNaN(Number(askingPrice)) || Number(askingPrice) <= 0) {
         toast.error("Please enter a valid asking price greater than 0.");
         setActiveTab("pricing");
         return false;
@@ -410,11 +371,7 @@ export default function UpdateListingModal({
     }
 
     if (saleType === "AUCTION") {
-      if (
-        startingBid === "" ||
-        isNaN(Number(startingBid)) ||
-        Number(startingBid) <= 0
-      ) {
+      if (startingBid === "" || isNaN(Number(startingBid)) || Number(startingBid) <= 0) {
         toast.error("Please enter a valid starting bid greater than 0.");
         setActiveTab("pricing");
         return false;
@@ -463,25 +420,20 @@ export default function UpdateListingModal({
       locationCountry: locationCountry.trim() || undefined,
       isOffMarket,
       saleType,
-      allowCounterOffers:
-        saleType === "FIXED_PRICE" ? allowCounterOffers : false,
+      allowCounterOffers: saleType === "FIXED_PRICE" ? allowCounterOffers : false,
       askingPrice: askingPriceNum,
-      startingBid:
-        saleType === "AUCTION" && startingBid ? Number(startingBid) : undefined,
-      auctionEndsAt:
-        saleType === "AUCTION" && auctionEndsAt ? auctionEndsAt : undefined,
+      startingBid: saleType === "AUCTION" && startingBid ? Number(startingBid) : undefined,
+      auctionEndsAt: saleType === "AUCTION" && auctionEndsAt ? auctionEndsAt : undefined,
       currency,
       specifications: specificationsJson,
       media:
         mediaList.length > 0
           ? mediaList.map((m, idx) => ({
-            url: m.url,
-            type: m.type || "IMAGE",
-            displayOrder: idx + 1,
-            isCover: Boolean(
-              m.isCover || (mediaList.every((x) => !x.isCover) && idx === 0),
-            ),
-          }))
+              url: m.url,
+              type: m.type || "IMAGE",
+              displayOrder: idx + 1,
+              isCover: Boolean(m.isCover || (mediaList.every((x) => !x.isCover) && idx === 0)),
+            }))
           : undefined,
     };
 
@@ -493,10 +445,7 @@ export default function UpdateListingModal({
       toast.success("Listing updated successfully!");
       onClose();
     } catch (err: any) {
-      const errMsg =
-        err?.response?.data?.message ||
-        err?.message ||
-        "Failed to update listing.";
+      const errMsg = err?.response?.data?.message || err?.message || "Failed to update listing.";
       toast.error(errMsg);
     }
   };
@@ -548,10 +497,11 @@ export default function UpdateListingModal({
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap ${isActive
-                  ? "border-[#EAB308] text-[#EAB308] bg-[#EAB308]/5"
-                  : "border-transparent text-gray-400 hover:text-gray-200"
-                  }`}
+                className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap ${
+                  isActive
+                    ? "border-[#EAB308] text-[#EAB308] bg-[#EAB308]/5"
+                    : "border-transparent text-gray-400 hover:text-gray-200"
+                }`}
               >
                 <Icon className="w-4 h-4" />
                 <span>{tab.label}</span>
@@ -601,9 +551,7 @@ export default function UpdateListingModal({
                     required
                   >
                     <option value="">
-                      {isLoadingCategories
-                        ? "Loading categories..."
-                        : "Select Category"}
+                      {isLoadingCategories ? "Loading categories..." : "Select Category"}
                     </option>
                     {categoriesList.map((cat) => (
                       <option key={cat.id} value={cat.name}>
@@ -647,9 +595,7 @@ export default function UpdateListingModal({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-2">
-                    Model
-                  </label>
+                  <label className="block text-xs font-semibold text-gray-300 mb-2">Model</label>
                   <select
                     value={model}
                     onChange={(e) => {
@@ -712,9 +658,7 @@ export default function UpdateListingModal({
                   <input
                     type="number"
                     value={buildYear}
-                    onChange={(e) =>
-                      setBuildYear(e.target.value ? Number(e.target.value) : "")
-                    }
+                    onChange={(e) => setBuildYear(e.target.value ? Number(e.target.value) : "")}
                     placeholder="2024"
                     min="1900"
                     max="2030"
@@ -787,10 +731,11 @@ export default function UpdateListingModal({
                       key={st.id}
                       type="button"
                       onClick={() => setSaleType(st.id as any)}
-                      className={`py-3 px-4 rounded-xl text-xs font-bold border transition-all cursor-pointer ${saleType === st.id
-                        ? "bg-[#EAB308] text-black border-[#EAB308]"
-                        : "bg-[#111111] border-[#333333] text-gray-300 hover:text-white"
-                        }`}
+                      className={`py-3 px-4 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                        saleType === st.id
+                          ? "bg-[#EAB308] text-black border-[#EAB308]"
+                          : "bg-[#111111] border-[#333333] text-gray-300 hover:text-white"
+                      }`}
                     >
                       {st.label}
                     </button>
@@ -848,9 +793,7 @@ export default function UpdateListingModal({
                       <input
                         type="datetime-local"
                         value={
-                          auctionEndsAt
-                            ? new Date(auctionEndsAt).toISOString().slice(0, 16)
-                            : ""
+                          auctionEndsAt ? new Date(auctionEndsAt).toISOString().slice(0, 16) : ""
                         }
                         onChange={(e) => setAuctionEndsAt(e.target.value)}
                         className="w-full bg-[#111111] border border-[#333333] rounded-xl px-4 py-3 text-sm text-gray-100 focus:outline-none focus:border-[#EAB308] transition-colors"
@@ -860,9 +803,7 @@ export default function UpdateListingModal({
                 )}
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-2">
-                    Currency
-                  </label>
+                  <label className="block text-xs font-semibold text-gray-300 mb-2">Currency</label>
                   <select
                     value={currency}
                     onChange={(e) => setCurrency(e.target.value)}
@@ -904,9 +845,7 @@ export default function UpdateListingModal({
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-100">
-                    Custom Specifications
-                  </h3>
+                  <h3 className="text-sm font-semibold text-gray-100">Custom Specifications</h3>
                   <p className="text-xs text-gray-400">
                     Add key-value properties (e.g. Mileage, Engine, Color, Condition)
                   </p>
@@ -923,7 +862,8 @@ export default function UpdateListingModal({
 
               {specifications.length === 0 ? (
                 <div className="py-8 text-center bg-[#111111] border border-[#2A2A2A] rounded-xl text-gray-400 text-xs">
-                  No custom specifications added yet. Click &quot;Add Property&quot; to include details.
+                  No custom specifications added yet. Click &quot;Add Property&quot; to include
+                  details.
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -935,18 +875,14 @@ export default function UpdateListingModal({
                       <input
                         type="text"
                         value={spec.key}
-                        onChange={(e) =>
-                          handleSpecChange(spec.id, "key", e.target.value)
-                        }
+                        onChange={(e) => handleSpecChange(spec.id, "key", e.target.value)}
                         placeholder="Feature name (e.g. Engine)"
                         className="flex-1 bg-[#1C1C1C] border border-[#333333] rounded-lg px-3 py-2 text-xs text-gray-100 focus:outline-none focus:border-[#EAB308]"
                       />
                       <input
                         type="text"
                         value={spec.value}
-                        onChange={(e) =>
-                          handleSpecChange(spec.id, "value", e.target.value)
-                        }
+                        onChange={(e) => handleSpecChange(spec.id, "value", e.target.value)}
                         placeholder="Value (e.g. V8 Twin-Turbo)"
                         className="flex-1 bg-[#1C1C1C] border border-[#333333] rounded-lg px-3 py-2 text-xs text-gray-100 focus:outline-none focus:border-[#EAB308]"
                       />
@@ -983,10 +919,11 @@ export default function UpdateListingModal({
                     handleFilesUpload(files);
                   }
                 }}
-                className={`border-2 border-dashed rounded-2xl p-6 text-center transition-colors ${isDragging
-                  ? "border-[#EAB308] bg-[#EAB308]/5"
-                  : "border-[#333333] bg-[#111111] hover:border-[#555]"
-                  }`}
+                className={`border-2 border-dashed rounded-2xl p-6 text-center transition-colors ${
+                  isDragging
+                    ? "border-[#EAB308] bg-[#EAB308]/5"
+                    : "border-[#333333] bg-[#111111] hover:border-[#555]"
+                }`}
               >
                 <input
                   type="file"

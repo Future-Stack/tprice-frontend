@@ -29,7 +29,7 @@ apiClient.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error),
+  (error) => Promise.reject(error)
 );
 
 // Response Interceptor: Global Error & 401 Token Refresh Handling
@@ -55,11 +55,7 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (
-      error.response?.status === 401 &&
-      originalRequest &&
-      !originalRequest._retry
-    ) {
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
       const requestUrl = originalRequest.url || "";
       if (
         requestUrl.includes("/auth/login") ||
@@ -111,7 +107,7 @@ apiClient.interceptors.response.use(
               Authorization: `Bearer ${refreshToken}`,
               accept: "*/*",
             },
-          },
+          }
         );
 
         const resData = refreshResponse.data?.data || refreshResponse.data;
@@ -121,9 +117,7 @@ apiClient.interceptors.response.use(
           resData?.access_token ||
           refreshResponse.data?.accessToken;
         const newRefreshToken =
-          resData?.refreshToken ||
-          resData?.refresh_token ||
-          refreshResponse.data?.refreshToken;
+          resData?.refreshToken || resData?.refresh_token || refreshResponse.data?.refreshToken;
         const user = resData?.user || refreshResponse.data?.user;
 
         if (accessToken) {
@@ -151,7 +145,7 @@ apiClient.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  },
+  }
 );
 
 export default apiClient;

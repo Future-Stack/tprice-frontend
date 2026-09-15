@@ -17,10 +17,7 @@ import {
   Trash2,
 } from "lucide-react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
-import {
-  useAdminReviewsQuery,
-  useDeleteAdminReviewMutation,
-} from "@/hooks/useReviews";
+import { useAdminReviewsQuery, useDeleteAdminReviewMutation } from "@/hooks/useReviews";
 import { ReviewItem } from "@/lib/api/reviews";
 import ReviewDetailModal from "./ReviewDetailModal";
 import DeleteReviewModal from "./DeleteReviewModal";
@@ -131,11 +128,7 @@ export default function AdminReviewsPage() {
       }
       setReviewToDelete(null);
     } catch (err: any) {
-      toast.error(
-        err?.response?.data?.message ||
-          err?.message ||
-          "Failed to delete review",
-      );
+      toast.error(err?.response?.data?.message || err?.message || "Failed to delete review");
     }
   };
 
@@ -193,9 +186,7 @@ export default function AdminReviewsPage() {
             className="p-2.5 bg-[#141416] border border-[#262626] rounded-xl text-gray-400 hover:text-white hover:border-primary/40 transition-colors cursor-pointer"
             title="Refresh reviews list"
           >
-            <RefreshCw
-              className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`}
-            />
+            <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`} />
           </button>
         </div>
       </div>
@@ -235,10 +226,7 @@ export default function AdminReviewsPage() {
                   <TableSkeleton />
                 ) : isError ? (
                   <tr>
-                    <td
-                      colSpan={7}
-                      className="px-6 py-16 text-center text-red-400"
-                    >
+                    <td colSpan={7} className="px-6 py-16 text-center text-red-400">
                       Failed to load reviews. {(error as Error)?.message}
                     </td>
                   </tr>
@@ -247,9 +235,7 @@ export default function AdminReviewsPage() {
                     <td colSpan={7} className="px-6 py-16 text-center">
                       <div className="max-w-md mx-auto space-y-3">
                         <MessageSquare className="w-10 h-10 text-gray-600 mx-auto" />
-                        <p className="text-base font-semibold text-gray-300">
-                          No reviews found
-                        </p>
+                        <p className="text-base font-semibold text-gray-300">No reviews found</p>
                         <p className="text-xs text-gray-500">
                           There are currently no reviews submitted.
                         </p>
@@ -283,9 +269,7 @@ export default function AdminReviewsPage() {
                               {review.reviewerName}
                             </span>
                             <div className="flex items-center gap-2 text-[11px] text-gray-400">
-                              {review.reviewerTitle && (
-                                <span>{review.reviewerTitle}</span>
-                              )}
+                              {review.reviewerTitle && <span>{review.reviewerTitle}</span>}
                               {review.reviewerLocation && (
                                 <span className="flex items-center gap-0.5 text-gray-500">
                                   <MapPin className="w-3 h-3 text-primary/70" />
@@ -318,16 +302,13 @@ export default function AdminReviewsPage() {
 
                       {/* Content */}
                       <td className="px-6 py-5 text-xs text-gray-300 max-w-xs">
-                        <p className="line-clamp-2 italic">
-                          &quot;{review.content}&quot;
-                        </p>
+                        <p className="line-clamp-2 italic">&quot;{review.content}&quot;</p>
                       </td>
 
                       {/* Highlight Tags */}
                       <td className="px-6 py-5">
                         <div className="flex flex-wrap gap-1.5 max-w-xs">
-                          {review.highlightTags &&
-                          review.highlightTags.length > 0 ? (
+                          {review.highlightTags && review.highlightTags.length > 0 ? (
                             review.highlightTags.map((tag, idx) => (
                               <span
                                 key={idx}
@@ -338,9 +319,7 @@ export default function AdminReviewsPage() {
                               </span>
                             ))
                           ) : (
-                            <span className="text-gray-600 italic text-xs">
-                              None
-                            </span>
+                            <span className="text-gray-600 italic text-xs">None</span>
                           )}
                         </div>
                       </td>
@@ -417,16 +396,12 @@ export default function AdminReviewsPage() {
             <div className="px-6 py-4 bg-[#141416] border-t border-[#262626] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
               <div>
                 Showing{" "}
-                <span className="font-semibold text-white">
-                  {(meta.page - 1) * meta.limit + 1}
-                </span>{" "}
+                <span className="font-semibold text-white">{(meta.page - 1) * meta.limit + 1}</span>{" "}
                 to{" "}
                 <span className="font-semibold text-white">
                   {Math.min(meta.page * meta.limit, meta.total)}
                 </span>{" "}
-                of{" "}
-                <span className="font-semibold text-white">{meta.total}</span>{" "}
-                reviews
+                of <span className="font-semibold text-white">{meta.total}</span> reviews
               </div>
 
               {/* Page Buttons */}
@@ -440,21 +415,19 @@ export default function AdminReviewsPage() {
                   <span className="hidden sm:inline">Previous</span>
                 </button>
 
-                {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map(
-                  (pageNum) => (
-                    <button
-                      key={pageNum}
-                      onClick={() => handlePageChange(pageNum)}
-                      className={`w-8 h-8 rounded-lg border font-semibold text-xs transition-all cursor-pointer ${
-                        pageNum === meta.page
-                          ? "bg-primary text-black border-primary font-bold shadow-[0_2px_10px_rgba(231,143,35,0.3)]"
-                          : "bg-[#1A1A1C] border-[#262626] text-gray-300 hover:text-white hover:border-primary/40"
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  ),
-                )}
+                {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    onClick={() => handlePageChange(pageNum)}
+                    className={`w-8 h-8 rounded-lg border font-semibold text-xs transition-all cursor-pointer ${
+                      pageNum === meta.page
+                        ? "bg-primary text-black border-primary font-bold shadow-[0_2px_10px_rgba(231,143,35,0.3)]"
+                        : "bg-[#1A1A1C] border-[#262626] text-gray-300 hover:text-white hover:border-primary/40"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
 
                 <button
                   onClick={() => handlePageChange(meta.page + 1)}
@@ -482,7 +455,9 @@ export default function AdminReviewsPage() {
             setIsModalOpen(false);
           }
         }}
-        isDeleting={deleteReviewMutation.isPending && deleteReviewMutation.variables === selectedReview?.id}
+        isDeleting={
+          deleteReviewMutation.isPending && deleteReviewMutation.variables === selectedReview?.id
+        }
       />
 
       {/* Delete Confirmation Modal */}

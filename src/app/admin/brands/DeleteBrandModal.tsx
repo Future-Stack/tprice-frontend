@@ -83,9 +83,7 @@ export default function DeleteBrandModal({
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <h4 className="font-semibold text-sm text-white line-clamp-1">
-              {brand.name}
-            </h4>
+            <h4 className="font-semibold text-sm text-white line-clamp-1">{brand.name}</h4>
             <p className="text-xs text-gray-400 uppercase tracking-wider mt-0.5 flex flex-wrap items-center gap-1.5">
               <span>{brand._count?.listings ?? 0} listings</span>
               {brand.category && (
@@ -103,7 +101,9 @@ export default function DeleteBrandModal({
 
         {/* Warning Message */}
         <p className="text-sm text-gray-300 leading-relaxed">
-          Are you sure you want to permanently delete the brand <strong className="text-white">&quot;{brand.name}&quot;</strong>? This will permanently delete the brand and may affect any listings associated with it.
+          Are you sure you want to permanently delete the brand{" "}
+          <strong className="text-white">&quot;{brand.name}&quot;</strong>? This will permanently
+          delete the brand and may affect any listings associated with it.
         </p>
 
         {/* Footer Actions */}

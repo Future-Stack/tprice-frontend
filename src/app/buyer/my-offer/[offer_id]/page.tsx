@@ -44,8 +44,7 @@ import { OfferDetailItem } from "@/lib/api/offers";
 
 /* ─── Helper Functions ─── */
 const formatPrice = (priceStr?: string | number | null) => {
-  if (priceStr === undefined || priceStr === null || priceStr === "")
-    return "$0";
+  if (priceStr === undefined || priceStr === null || priceStr === "") return "$0";
   const num = typeof priceStr === "number" ? priceStr : parseFloat(priceStr);
   if (isNaN(num)) return `${priceStr}`;
 
@@ -75,11 +74,7 @@ interface CounterOfferModalProps {
   offer: OfferDetailItem | null;
 }
 
-const CounterOfferModal = ({
-  isOpen,
-  onClose,
-  offer,
-}: CounterOfferModalProps) => {
+const CounterOfferModal = ({ isOpen, onClose, offer }: CounterOfferModalProps) => {
   const [counterAmount, setCounterAmount] = useState("");
   const [note, setNote] = useState("");
   const [isClosing, setIsClosing] = useState(false);
@@ -144,9 +139,7 @@ const CounterOfferModal = ({
         }`}
       >
         <div className="flex items-center justify-between">
-          <h3 className="text-xl font-bold font-clash text-white">
-            Send Counter Offer
-          </h3>
+          <h3 className="text-xl font-bold font-clash text-white">Send Counter Offer</h3>
           <button
             onClick={handleClose}
             className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-colors"
@@ -265,9 +258,7 @@ const OfferDetails = () => {
     limit: 10,
   });
   const dealsList = dealsResponse?.data || [];
-  const matchedDeal = dealsList.find(
-    (d) => d.offerId === offerId || d.id === offerId,
-  );
+  const matchedDeal = dealsList.find((d) => d.offerId === offerId || d.id === offerId);
   const targetDealId = matchedDeal?.id || offer?.deal?.id || offer?.id || "";
 
   const { data: dealDetail } = useDealDetailQuery(targetDealId);
@@ -332,12 +323,9 @@ const OfferDetails = () => {
     return (
       <div className="min-h-screen bg-black text-white p-6 font-inter flex flex-col items-center justify-center space-y-4">
         <AlertCircle className="w-12 h-12 text-red-500" />
-        <h2 className="text-2xl font-bold font-clash">
-          Failed to load offer details
-        </h2>
+        <h2 className="text-2xl font-bold font-clash">Failed to load offer details</h2>
         <p className="text-gray-400 text-sm max-w-md text-center">
-          {(error as any)?.message ||
-            "The requested offer detail could not be loaded."}
+          {(error as any)?.message || "The requested offer detail could not be loaded."}
         </p>
         <button
           onClick={() => refetch()}
@@ -357,10 +345,7 @@ const OfferDetails = () => {
   const allowCounterOffers = listing?.allowCounterOffers ?? false;
   const isFixedWithCounter = saleType === "FIXED_PRICE" && allowCounterOffers;
   const statusUpper = (offer.status || "").toUpperCase();
-  const isAccepted =
-    statusUpper === "ACCEPTED" ||
-    Boolean(offer?.deal) ||
-    Boolean(matchedDeal);
+  const isAccepted = statusUpper === "ACCEPTED" || Boolean(offer?.deal) || Boolean(matchedDeal);
   const isTerminalStatus =
     statusUpper === "ACCEPTED" ||
     statusUpper === "REJECTED" ||
@@ -379,8 +364,7 @@ const OfferDetails = () => {
   const sellerName = seller
     ? `${seller.firstName || ""} ${seller.lastName || ""}`.trim() || "Dealer"
     : "Dealer";
-  const sellerAvatar =
-    seller?.avatarUrl || "https://i.pravatar.cc/150?u=seller";
+  const sellerAvatar = seller?.avatarUrl || "https://i.pravatar.cc/150?u=seller";
 
   const formattedHistories = histories.map((h) => {
     const isBuyer = h.senderId === offer.buyerId;
@@ -406,10 +390,7 @@ const OfferDetails = () => {
     ...((dealDetail as any)?.messages || []),
   ];
 
-  const rawDealMessagesList = [
-    ...embeddedDealMessages,
-    ...(dealMessages || []),
-  ];
+  const rawDealMessagesList = [...embeddedDealMessages, ...(dealMessages || [])];
 
   const uniqueMessagesMap = new Map<string, DealMessage>();
   rawDealMessagesList.forEach((m) => {
@@ -423,12 +404,9 @@ const OfferDetails = () => {
     const isBuyer = m.senderId === offer.buyerId || m.sender?.role === "BUYER";
     const senderFirstName =
       m.sender?.firstName ||
-      (isBuyer
-        ? offer.buyer?.firstName || "Buyer"
-        : seller?.firstName || "Seller");
+      (isBuyer ? offer.buyer?.firstName || "Buyer" : seller?.firstName || "Seller");
     const senderLastName =
-      m.sender?.lastName ||
-      (isBuyer ? offer.buyer?.lastName || "" : seller?.lastName || "");
+      m.sender?.lastName || (isBuyer ? offer.buyer?.lastName || "" : seller?.lastName || "");
     const senderFullName = `${senderFirstName} ${senderLastName}`.trim();
     const senderRole = m.sender?.role || (isBuyer ? "BUYER" : "SELLER");
 
@@ -438,9 +416,7 @@ const OfferDetails = () => {
       senderId: m.senderId,
       senderName: senderFullName,
       senderRole: senderRole,
-      senderAvatar:
-        m.sender?.avatarUrl ||
-        (isBuyer ? offer.buyer?.avatarUrl : sellerAvatar),
+      senderAvatar: m.sender?.avatarUrl || (isBuyer ? offer.buyer?.avatarUrl : sellerAvatar),
       text: m.message,
       amount: undefined as string | undefined,
       action: undefined as string | undefined,
@@ -448,11 +424,8 @@ const OfferDetails = () => {
     };
   });
 
-  const combinedTimeline = [
-    ...formattedHistories,
-    ...formattedDealMessages,
-  ].sort(
-    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+  const combinedTimeline = [...formattedHistories, ...formattedDealMessages].sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
   );
 
   const handleAccept = () => {
@@ -489,10 +462,7 @@ const OfferDetails = () => {
       <div className="w-full space-y-8">
         {/* Breadcrumbs */}
         <div className="flex items-center gap-2 text-white/60 text-sm md:text-[32px] font-medium font-clash">
-          <Link
-            href="/buyer/my-offer"
-            className="hover:text-white transition-colors"
-          >
+          <Link href="/buyer/my-offer" className="hover:text-white transition-colors">
             My Offers
           </Link>
           <ChevronRight size={16} />
@@ -514,17 +484,10 @@ const OfferDetails = () => {
                   <div className="bg-[#111113] rounded-2xl border border-white/5 p-4 flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
                       <div className="relative w-10 h-10 rounded-full overflow-hidden border border-white/10">
-                        <Image
-                          src={sellerAvatar}
-                          alt={sellerName}
-                          fill
-                          className="object-cover"
-                        />
+                        <Image src={sellerAvatar} alt={sellerName} fill className="object-cover" />
                       </div>
                       <div>
-                        <div className="font-bold text-sm text-white/90">
-                          {sellerName}
-                        </div>
+                        <div className="font-bold text-sm text-white/90">{sellerName}</div>
                         <div className="text-[10px] text-green-500/80 flex items-center gap-1">
                           <Check size={10} /> Verified Dealer
                         </div>
@@ -551,9 +514,7 @@ const OfferDetails = () => {
                         </div>
                         <div className="flex text-[32px] md:text-[40px] font-black text-[#D4AF37] leading-none tracking-tight">
                           <DollarSign />
-                          {formatPrice(
-                            offer.currentAmount || offer.initialAmount,
-                          )}
+                          {formatPrice(offer.currentAmount || offer.initialAmount)}
                         </div>
                         {listing?.askingPrice && (
                           <div className="text-[11px] font-bold text-gray-500 mt-1 uppercase tracking-wider">
@@ -573,21 +534,15 @@ const OfferDetails = () => {
                         </span>
                       </div>
                       <div className="flex justify-between text-[11px] font-medium">
-                        <span className="text-gray-500 uppercase tracking-widest">
-                          Offer ID
-                        </span>
-                        <span className="text-white/80 font-mono tracking-normal">
-                          {offer.id}
-                        </span>
+                        <span className="text-gray-500 uppercase tracking-widest">Offer ID</span>
+                        <span className="text-white/80 font-mono tracking-normal">{offer.id}</span>
                       </div>
                       {listing?.askingPrice && (
                         <div className="flex justify-between text-[11px] font-medium">
                           <span className="text-gray-500 uppercase tracking-widest">
                             Listed Price
                           </span>
-                          <span className="text-white/80">
-                            {formatPrice(listing.askingPrice)}
-                          </span>
+                          <span className="text-white/80">{formatPrice(listing.askingPrice)}</span>
                         </div>
                       )}
                     </div>
@@ -641,9 +596,7 @@ const OfferDetails = () => {
                         className="w-full py-4.5 bg-[#D4AF37] hover:bg-[#c4a132] disabled:opacity-50 text-black font-bold text-xs uppercase tracking-[0.15em] rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
                       >
                         <Handshake size={18} />
-                        {acceptOfferMutation.isPending
-                          ? "Accepting..."
-                          : "Accept offer"}
+                        {acceptOfferMutation.isPending ? "Accepting..." : "Accept offer"}
                       </button>
                     )}
 
@@ -667,15 +620,9 @@ const OfferDetails = () => {
                         >
                           <X
                             size={16}
-                            className={
-                              withdrawOfferMutation.isPending
-                                ? "animate-spin"
-                                : ""
-                            }
+                            className={withdrawOfferMutation.isPending ? "animate-spin" : ""}
                           />
-                          {withdrawOfferMutation.isPending
-                            ? "Withdrawing..."
-                            : "Withdraw Offer"}
+                          {withdrawOfferMutation.isPending ? "Withdrawing..." : "Withdraw Offer"}
                         </button>
                       )}
                   </div>
@@ -709,14 +656,12 @@ const OfferDetails = () => {
                       {combinedTimeline.length === 0 ? (
                         <div className="text-center py-8 text-gray-500 text-sm flex flex-col items-center gap-2">
                           <MessageSquare size={24} className="text-gray-600" />
-                          No conversation messages recorded yet. Start the
-                          conversation below.
+                          No conversation messages recorded yet. Start the conversation below.
                         </div>
                       ) : (
                         combinedTimeline.map((item) => {
                           const isSelf =
-                            item.senderId === offer.buyerId ||
-                            item.senderRole === "BUYER";
+                            item.senderId === offer.buyerId || item.senderRole === "BUYER";
                           return (
                             <div
                               key={item.id}
@@ -748,9 +693,7 @@ const OfferDetails = () => {
                                     </span>
                                   )}
                                 </div>
-                                <p className="whitespace-pre-wrap">
-                                  {item.text}
-                                </p>
+                                <p className="whitespace-pre-wrap">{item.text}</p>
                                 <div className="text-[10px] text-gray-500 mt-2.5 uppercase tracking-tight flex items-center justify-between">
                                   <span>{formatDate(item.createdAt)}</span>
                                   {item.type === "history" && item.action && (
@@ -774,10 +717,7 @@ const OfferDetails = () => {
                         value={messageInput}
                         onChange={(e) => setMessageInput(e.target.value)}
                         onKeyDown={(e) => {
-                          if (
-                            e.key === "Enter" &&
-                            !sendDealMessageMutation.isPending
-                          ) {
+                          if (e.key === "Enter" && !sendDealMessageMutation.isPending) {
                             e.preventDefault();
                             handleSendMessage();
                           }
@@ -786,10 +726,7 @@ const OfferDetails = () => {
                       />
                       <button
                         onClick={handleSendMessage}
-                        disabled={
-                          sendDealMessageMutation.isPending ||
-                          !messageInput.trim()
-                        }
+                        disabled={sendDealMessageMutation.isPending || !messageInput.trim()}
                         className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-lg bg-[#D4AF37] text-black flex items-center justify-center hover:bg-[#c4a132] disabled:opacity-50 transition-colors"
                       >
                         {sendDealMessageMutation.isPending ? (
@@ -813,9 +750,7 @@ const OfferDetails = () => {
                 {(isAccepted || Boolean(offer?.deal)) && (
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <h2 className="text-2xl font-semibold font-clash">
-                        Deal Stage
-                      </h2>
+                      <h2 className="text-2xl font-semibold font-clash">Deal Stage</h2>
                       {currentStage && (
                         <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] font-bold uppercase tracking-wider text-white/80">
                           <span
@@ -823,10 +758,10 @@ const OfferDetails = () => {
                               currentStage === "COMPLETED"
                                 ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"
                                 : currentStage === "CANCELLED"
-                                ? "bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.5)]"
-                                : currentStage === "FLAGGED"
-                                ? "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)]"
-                                : "bg-[#D4AF37]"
+                                  ? "bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.5)]"
+                                  : currentStage === "FLAGGED"
+                                    ? "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)]"
+                                    : "bg-[#D4AF37]"
                             }`}
                           />
                           {currentStage}
@@ -840,8 +775,7 @@ const OfferDetails = () => {
                         <button
                           onClick={() => handleUpdateStage("COMPLETED")}
                           disabled={
-                            updateDealStageMutation.isPending ||
-                            currentStage === "COMPLETED"
+                            updateDealStageMutation.isPending || currentStage === "COMPLETED"
                           }
                           title="Mark deal as COMPLETED"
                           className={`py-3.5 px-2 rounded-xl text-xs font-bold uppercase tracking-wider flex flex-col items-center justify-center gap-2 transition-all border ${
@@ -862,8 +796,7 @@ const OfferDetails = () => {
                         <button
                           onClick={() => handleUpdateStage("CANCELLED")}
                           disabled={
-                            updateDealStageMutation.isPending ||
-                            currentStage === "CANCELLED"
+                            updateDealStageMutation.isPending || currentStage === "CANCELLED"
                           }
                           title="Mark deal as CANCELLED"
                           className={`py-3.5 px-2 rounded-xl text-xs font-bold uppercase tracking-wider flex flex-col items-center justify-center gap-2 transition-all border ${
@@ -883,10 +816,7 @@ const OfferDetails = () => {
                         {/* FLAGGED Button */}
                         <button
                           onClick={() => handleUpdateStage("FLAGGED")}
-                          disabled={
-                            updateDealStageMutation.isPending ||
-                            currentStage === "FLAGGED"
-                          }
+                          disabled={updateDealStageMutation.isPending || currentStage === "FLAGGED"}
                           title="Mark deal as FLAGGED"
                           className={`py-3.5 px-2 rounded-xl text-xs font-bold uppercase tracking-wider flex flex-col items-center justify-center gap-2 transition-all border ${
                             currentStage === "FLAGGED"
@@ -908,9 +838,7 @@ const OfferDetails = () => {
 
                 {/* Order History */}
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-semibold font-clash">
-                    Order History
-                  </h2>
+                  <h2 className="text-2xl font-semibold font-clash">Order History</h2>
                   <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[11px] font-bold text-white/60 cursor-pointer hover:text-white transition-colors">
                     recent <ChevronDown size={14} />
                   </div>
@@ -938,9 +866,7 @@ const OfferDetails = () => {
                                 <Circle
                                   size={10}
                                   fill={isBuyer ? "#3B82F6" : "#D4AF37"}
-                                  className={
-                                    isBuyer ? "text-blue-500" : "text-[#D4AF37]"
-                                  }
+                                  className={isBuyer ? "text-blue-500" : "text-[#D4AF37]"}
                                 />
                               </div>
 

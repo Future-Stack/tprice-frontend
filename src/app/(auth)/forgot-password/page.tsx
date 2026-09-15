@@ -120,15 +120,10 @@ export default function ForgotPasswordPage() {
                   <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                   Back to login
                 </Link>
-                <h4 className="text-[#D4AF37] text-[14px] font-bold  mb-4">
-                  Reset Password
-                </h4>
-                <h2 className="text-4xl font-cormorant text-white mb-2">
-                  Forgot Password
-                </h2>
+                <h4 className="text-[#D4AF37] text-[14px] font-bold  mb-4">Reset Password</h4>
+                <h2 className="text-4xl font-cormorant text-white mb-2">Forgot Password</h2>
                 <p className="text-white/40 text-sm">
-                  Enter your email address and we&apos;ll send you a link to
-                  reset your password.
+                  Enter your email address and we&apos;ll send you a link to reset your password.
                 </p>
               </div>
 
@@ -152,9 +147,7 @@ export default function ForgotPasswordPage() {
                     }`}
                   />
                   {error && (
-                    <p className="text-red-400 text-xs mt-1 font-medium font-sans">
-                      {error}
-                    </p>
+                    <p className="text-red-400 text-xs mt-1 font-medium font-sans">{error}</p>
                   )}
                 </div>
 
@@ -190,14 +183,11 @@ export default function ForgotPasswordPage() {
                 </div>
               </div>
 
-              <h2 className="text-3xl font-serif text-white mb-4">
-                Check your email
-              </h2>
+              <h2 className="text-3xl font-serif text-white mb-4">Check your email</h2>
               <p className="text-white/60 text-sm mb-8 leading-relaxed">
                 We have sent a password reset link to{" "}
-                <strong className="text-white font-medium">{email}</strong>.
-                Please check your inbox and follow the instructions to reset
-                your password.
+                <strong className="text-white font-medium">{email}</strong>. Please check your inbox
+                and follow the instructions to reset your password.
               </p>
 
               <div className="space-y-4">

@@ -96,9 +96,7 @@ export default function EventDetailsPage() {
               <h1 className="text-4xl md:text-[48px] font-cormorant font-medium mb-4">
                 {event.title}
               </h1>
-              <p className="text-white/60 text-lg max-w-2xl  ">
-                The World&apos;s Premier Event
-              </p>
+              <p className="text-white/60 text-lg max-w-2xl  ">The World&apos;s Premier Event</p>
             </div>
 
             <div className="flex flex-wrap gap-8 py-6 border-y border-white/10 mt-8">
@@ -140,9 +138,7 @@ export default function EventDetailsPage() {
                   {event.title}
                 </h2>
                 <div className="prose prose-invert prose-p:text-white/60 prose-p:leading-relaxed max-w-none">
-                  <p className="text-[24px] font-normal text-[#9C9C9C]">
-                    {event.description}
-                  </p>
+                  <p className="text-[24px] font-normal text-[#9C9C9C]">{event.description}</p>
                 </div>
               </div>
             </div>
@@ -185,9 +181,7 @@ export default function EventDetailsPage() {
                       <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest mb-1">
                         Location
                       </p>
-                      <p className="text-sm text-white/80 italic">
-                        {event.location}
-                      </p>
+                      <p className="text-sm text-white/80 italic">{event.location}</p>
                     </div>
                   </div>
 
@@ -199,9 +193,7 @@ export default function EventDetailsPage() {
                       <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest mb-1">
                         Access
                       </p>
-                      <p className="text-sm text-[#4ADE80] font-bold">
-                        {event.status}
-                      </p>
+                      <p className="text-sm text-[#4ADE80] font-bold">{event.status}</p>
                     </div>
                   </div>
                 </div>

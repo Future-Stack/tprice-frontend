@@ -25,10 +25,7 @@ export const DEALS_QUERY_KEYS = {
 /**
  * React Query hook to fetch user deals (Buyer/Seller) with caching and pagination
  */
-export const useDealsQuery = (
-  params?: GetDealsParams,
-  options?: { enabled?: boolean }
-) => {
+export const useDealsQuery = (params?: GetDealsParams, options?: { enabled?: boolean }) => {
   return useQuery<GetDealsResponse>({
     queryKey: DEALS_QUERY_KEYS.list(params),
     queryFn: () => getDealsApi(params),
@@ -119,15 +116,12 @@ export const useSendDealMessageMutation = () => {
       };
 
       if (previousMessages) {
-        queryClient.setQueryData<DealMessage[]>(
-          DEALS_QUERY_KEYS.messages(dealId),
-          [...previousMessages, optimisticMsg]
-        );
+        queryClient.setQueryData<DealMessage[]>(DEALS_QUERY_KEYS.messages(dealId), [
+          ...previousMessages,
+          optimisticMsg,
+        ]);
       } else {
-        queryClient.setQueryData<DealMessage[]>(
-          DEALS_QUERY_KEYS.messages(dealId),
-          [optimisticMsg]
-        );
+        queryClient.setQueryData<DealMessage[]>(DEALS_QUERY_KEYS.messages(dealId), [optimisticMsg]);
       }
 
       return { previousMessages };
@@ -139,8 +133,7 @@ export const useSendDealMessageMutation = () => {
           context.previousMessages
         );
       }
-      const errMsg =
-        err?.response?.data?.message || err?.message || "Failed to send message";
+      const errMsg = err?.response?.data?.message || err?.message || "Failed to send message";
       toast.error(errMsg);
     },
     onSuccess: (data, variables) => {
@@ -164,11 +157,7 @@ export const useSendDealMessageMutation = () => {
 export const useUpdateDealStageMutation = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<
-    DealItem,
-    Error,
-    { dealId: string; payload: UpdateDealStagePayload }
-  >({
+  return useMutation<DealItem, Error, { dealId: string; payload: UpdateDealStagePayload }>({
     mutationFn: ({ dealId, payload }) => updateDealStageApi(dealId, payload),
     onSuccess: (data, variables) => {
       toast.success(`Deal stage updated to ${variables.payload.stage}`);
@@ -176,12 +165,8 @@ export const useUpdateDealStageMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["offers"] });
     },
     onError: (err: any) => {
-      const errMsg =
-        err?.response?.data?.message || err?.message || "Failed to update deal stage";
+      const errMsg = err?.response?.data?.message || err?.message || "Failed to update deal stage";
       toast.error(errMsg);
     },
   });
 };
-
-
-

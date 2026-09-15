@@ -72,7 +72,8 @@ export default function SavedItems() {
           {meta && meta.totalPages > 1 && (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-10 pt-6 border-t border-[#2C2C2E]">
               <p className="text-xs text-gray-400">
-                Showing <span className="font-bold text-white">{(meta.page - 1) * meta.limit + 1}</span> to{" "}
+                Showing{" "}
+                <span className="font-bold text-white">{(meta.page - 1) * meta.limit + 1}</span> to{" "}
                 <span className="font-bold text-white">
                   {Math.min(meta.page * meta.limit, meta.total)}
                 </span>{" "}
@@ -127,7 +128,8 @@ export default function SavedItems() {
             </div>
             <h3 className="text-xl font-clash font-medium text-white mb-2">No Saved Items Yet</h3>
             <p className="text-sm text-gray-400 mb-6 max-w-md mx-auto">
-              You haven't saved any listings to your favorites yet. Explore the marketplace and save items to view them here.
+              You haven't saved any listings to your favorites yet. Explore the marketplace and save
+              items to view them here.
             </p>
             <Link
               href="/buyer/marketplace"
@@ -190,8 +192,7 @@ function SavedItemCard({ item }: { item: ListingItem }) {
   const badgeText = isAuction ? "Auction" : "Buy Now";
 
   const location =
-    [item.locationCity, item.locationCountry].filter(Boolean).join(", ") ||
-    "Worldwide";
+    [item.locationCity, item.locationCountry].filter(Boolean).join(", ") || "Worldwide";
 
   const rawPrice = item.askingPrice || item.startingBid;
   const priceVal = rawPrice ? Number(rawPrice) : 0;
@@ -256,7 +257,8 @@ function SavedItemCard({ item }: { item: ListingItem }) {
           {item.title}
         </h4>
         <div className="flex items-center text-[11px] sm:text-xs text-gray-400 mb-6">
-          <MapPin className="w-3.5 h-3.5 mr-1.5 shrink-0" /> <span className="truncate">{location}</span>
+          <MapPin className="w-3.5 h-3.5 mr-1.5 shrink-0" />{" "}
+          <span className="truncate">{location}</span>
         </div>
 
         {/* Price and Button section at bottom */}
@@ -278,4 +280,3 @@ function SavedItemCard({ item }: { item: ListingItem }) {
     </div>
   );
 }
-

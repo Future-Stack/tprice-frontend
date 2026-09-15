@@ -4,15 +4,15 @@ import React, { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { 
-  CheckCircle2, 
-  ArrowRight, 
-  Copy, 
-  Check, 
-  Home, 
-  ShoppingBag, 
+import {
+  CheckCircle2,
+  ArrowRight,
+  Copy,
+  Check,
+  Home,
+  ShoppingBag,
   Receipt,
-  HelpCircle
+  HelpCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -20,11 +20,14 @@ function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const [copied, setCopied] = useState(false);
 
-  const sessionId = searchParams.get("session_id") || searchParams.get("reference") || searchParams.get("tx_ref");
+  const sessionId =
+    searchParams.get("session_id") || searchParams.get("reference") || searchParams.get("tx_ref");
   const amount = searchParams.get("amount");
-  
-  const referenceId = sessionId 
-    ? (sessionId.length > 22 ? `${sessionId.slice(0, 18)}...` : sessionId) 
+
+  const referenceId = sessionId
+    ? sessionId.length > 22
+      ? `${sessionId.slice(0, 18)}...`
+      : sessionId
     : `TRX-${Math.floor(100000 + Math.random() * 900000)}`;
 
   const handleCopy = () => {
@@ -81,7 +84,8 @@ function PaymentSuccessContent() {
           transition={{ delay: 0.3 }}
           className="text-white/60 text-sm sm:text-base max-w-md mx-auto mb-8 leading-relaxed"
         >
-          Your transaction has completed successfully. A confirmation email with details has been sent to your inbox.
+          Your transaction has completed successfully. A confirmation email with details has been
+          sent to your inbox.
         </motion.p>
 
         {/* Transaction Summary Card */}
@@ -103,7 +107,11 @@ function PaymentSuccessContent() {
                 className="text-white/40 hover:text-white transition-colors p-1 rounded hover:bg-white/10"
                 title="Copy Reference"
               >
-                {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                {copied ? (
+                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                ) : (
+                  <Copy className="w-3.5 h-3.5" />
+                )}
               </button>
             </div>
           </div>
@@ -111,7 +119,9 @@ function PaymentSuccessContent() {
           {amount && (
             <div className="flex items-center justify-between text-xs sm:text-sm pt-2 border-t border-white/[0.06]">
               <span className="text-white/40">Amount Paid</span>
-              <span className="font-semibold text-white text-base">${Number(amount).toLocaleString()}</span>
+              <span className="font-semibold text-white text-base">
+                ${Number(amount).toLocaleString()}
+              </span>
             </div>
           )}
 
@@ -170,11 +180,13 @@ function PaymentSuccessContent() {
 export default function PaymentSuccessPage() {
   return (
     <section className="min-h-[85vh] bg-black flex items-center justify-center relative overflow-hidden py-12">
-      <Suspense fallback={
-        <div className="flex items-center justify-center text-white/50 text-sm">
-          Loading payment confirmation...
-        </div>
-      }>
+      <Suspense
+        fallback={
+          <div className="flex items-center justify-center text-white/50 text-sm">
+            Loading payment confirmation...
+          </div>
+        }
+      >
         <PaymentSuccessContent />
       </Suspense>
     </section>

@@ -16,8 +16,7 @@ import {
 
 export const MEDIA_QUERY_KEYS = {
   all: ["media"] as const,
-  landingMedia: (params: GetLandingMediaParams) =>
-    ["media", "landing-media", params] as const,
+  landingMedia: (params: GetLandingMediaParams) => ["media", "landing-media", params] as const,
 };
 
 /**
@@ -34,17 +33,14 @@ export const useUploadMediaMutation = () => {
  */
 export const useUploadMultipleMediaMutation = () => {
   return useMutation<MediaUploadResponse[], Error, UploadMultipleMediaParams>({
-    mutationFn: (params: UploadMultipleMediaParams) =>
-      uploadMultipleMediaApi(params),
+    mutationFn: (params: UploadMultipleMediaParams) => uploadMultipleMediaApi(params),
   });
 };
 
 /**
  * Custom React Query hook for fetching paginated landing media with smooth pagination transitions
  */
-export const useLandingMediaQuery = (
-  params: GetLandingMediaParams = { page: 1, limit: 10 }
-) => {
+export const useLandingMediaQuery = (params: GetLandingMediaParams = { page: 1, limit: 10 }) => {
   return useQuery<LandingMediaResponse>({
     queryKey: MEDIA_QUERY_KEYS.landingMedia(params),
     queryFn: () => getLandingMediaApi(params),
@@ -80,6 +76,3 @@ export const useDeleteLandingMediaMutation = () => {
     },
   });
 };
-
-
-

@@ -88,9 +88,7 @@ export default function RejectListingModal({
             />
           </div>
           <div className="min-w-0 flex-1">
-            <h4 className="font-semibold text-sm text-white line-clamp-1">
-              {listing.title}
-            </h4>
+            <h4 className="font-semibold text-sm text-white line-clamp-1">{listing.title}</h4>
             <p className="text-xs text-gray-400 capitalize">
               {listing.category} • {listing.brand || "Listing"}
             </p>

@@ -129,12 +129,8 @@ const SellerListing = () => {
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
-  const [editingListing, setEditingListing] = useState<ListingItem | null>(
-    null,
-  );
-  const [deletingListing, setDeletingListing] = useState<ListingItem | null>(
-    null,
-  );
+  const [editingListing, setEditingListing] = useState<ListingItem | null>(null);
+  const [deletingListing, setDeletingListing] = useState<ListingItem | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const debouncedSearch = useDebounce(searchQuery, 400);
@@ -181,9 +177,7 @@ const SellerListing = () => {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <AnimationWrapper type="fade-down">
-          <h1 className="text-4xl font-medium font-clash tracking-tight text-white">
-            My Listings
-          </h1>
+          <h1 className="text-4xl font-medium font-clash tracking-tight text-white">My Listings</h1>
         </AnimationWrapper>
 
         <AnimationWrapper type="fade-down" delay={0.1}>
@@ -219,17 +213,11 @@ const SellerListing = () => {
                 className="flex items-center gap-2 px-6 py-2.5 border border-primary/60 text-primary rounded-xl hover:bg-[#E78F23]/10 transition-all duration-300 font-medium whitespace-nowrap cursor-pointer"
                 title="Refresh listings"
               >
-                <RefreshCw
-                  className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`}
-                />
+                <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`} />
                 <span>Refresh</span>
               </button>
               <span className="text-gray-400 font-medium text-sm whitespace-nowrap">
-                Showing{" "}
-                <span className="text-white font-bold text-lg">
-                  {meta.total}
-                </span>{" "}
-                items
+                Showing <span className="text-white font-bold text-lg">{meta.total}</span> items
               </span>
             </div>
           </div>
@@ -273,9 +261,7 @@ const SellerListing = () => {
                       <td colSpan={6} className="px-8 py-16 text-center">
                         <div className="max-w-md mx-auto space-y-3">
                           <PackageOpen className="w-12 h-12 text-gray-600 mx-auto" />
-                          <p className="text-lg font-bold text-gray-300">
-                            No listings found
-                          </p>
+                          <p className="text-lg font-bold text-gray-300">No listings found</p>
                           <p className="text-sm text-gray-500">
                             {searchQuery
                               ? `No listings match your search "${searchQuery}"`
@@ -332,7 +318,7 @@ const SellerListing = () => {
                           <td className="px-8 py-6">
                             <span
                               className={`px-4 py-1.5 text-[11px] font-bold rounded-full border tracking-wide inline-block ${getStatusStyles(
-                                item.status,
+                                item.status
                               )}`}
                             >
                               {formatStatusLabel(item.status)}
@@ -356,15 +342,11 @@ const SellerListing = () => {
                               </button>
                               <button
                                 onClick={() => setDeletingListing(item)}
-                                disabled={
-                                  deleteListingMutation.isPending &&
-                                  deletingId === item.id
-                                }
+                                disabled={deleteListingMutation.isPending && deletingId === item.id}
                                 className="px-3.5 py-2 bg-rose-500/10 hover:bg-rose-600 text-rose-500 hover:text-white border border-rose-500/30 font-bold text-xs rounded-xl transition-all duration-300 flex items-center gap-1.5 cursor-pointer shadow-sm hover:scale-105 disabled:opacity-50"
                                 title="Delete listing"
                               >
-                                {deleteListingMutation.isPending &&
-                                deletingId === item.id ? (
+                                {deleteListingMutation.isPending && deletingId === item.id ? (
                                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
                                 ) : (
                                   <Trash2 className="w-3.5 h-3.5" />
@@ -386,15 +368,12 @@ const SellerListing = () => {
               <div className="px-8 py-5 border-t border-[#1F1F1F] bg-[#0A0A0A] flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-400">
                 <div>
                   Showing{" "}
-                  <span className="font-bold text-white">
-                    {(meta.page - 1) * meta.limit + 1}
-                  </span>{" "}
+                  <span className="font-bold text-white">{(meta.page - 1) * meta.limit + 1}</span>{" "}
                   to{" "}
                   <span className="font-bold text-white">
                     {Math.min(meta.page * meta.limit, meta.total)}
                   </span>{" "}
-                  of <span className="font-bold text-white">{meta.total}</span>{" "}
-                  items
+                  of <span className="font-bold text-white">{meta.total}</span> items
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -408,10 +387,7 @@ const SellerListing = () => {
                   </button>
 
                   <div className="flex items-center gap-1.5">
-                    {Array.from(
-                      { length: meta.totalPages },
-                      (_, i) => i + 1,
-                    ).map((pageNum) => (
+                    {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((pageNum) => (
                       <button
                         key={pageNum}
                         onClick={() => handlePageChange(pageNum)}

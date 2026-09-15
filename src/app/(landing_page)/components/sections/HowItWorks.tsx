@@ -81,8 +81,7 @@ export default function HowItWorks() {
                     className="relative w-31 h-31 rounded-full flex items-center justify-center overflow-hidden shadow-2xl transition-transform duration-500 group-hover:scale-105 border border-white/5"
                     style={{
                       borderRadius: "50%",
-                      background:
-                        "linear-gradient(180deg, #8D815E 0%, #2F260D 100%)",
+                      background: "linear-gradient(180deg, #8D815E 0%, #2F260D 100%)",
                     }}
                   >
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.15)_0%,transparent_70%)]" />

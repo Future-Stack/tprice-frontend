@@ -17,38 +17,25 @@ import {
 
 export * from "@/lib/types/auth";
 
-export const registerApi = async (
-  payload: RegisterPayload,
-): Promise<RegisterResponse> => {
-  const response = await apiClient.post<RegisterResponse>(
-    "/auth/register",
-    payload,
-  );
+export const registerApi = async (payload: RegisterPayload): Promise<RegisterResponse> => {
+  const response = await apiClient.post<RegisterResponse>("/auth/register", payload);
   return response.data;
 };
 
-export const loginApi = async (
-  payload: LoginPayload,
-): Promise<LoginResponse> => {
+export const loginApi = async (payload: LoginPayload): Promise<LoginResponse> => {
   const response = await apiClient.post<LoginResponse>("/auth/login", payload);
   return response.data;
 };
 
-export const refreshTokenApi = async (
-  payload: RefreshPayload,
-): Promise<RefreshResponse> => {
+export const refreshTokenApi = async (payload: RefreshPayload): Promise<RefreshResponse> => {
   const baseURL = "https://api.exoticworldinc.com/api/v1";
-  const response = await axios.post<RefreshResponse>(
-    `${baseURL}/auth/refresh`,
-    payload,
-    {
-      withCredentials: true,
-      headers: {
-        "Content-Type": "application/json",
-        accept: "*/*",
-      },
+  const response = await axios.post<RefreshResponse>(`${baseURL}/auth/refresh`, payload, {
+    withCredentials: true,
+    headers: {
+      "Content-Type": "application/json",
+      accept: "*/*",
     },
-  );
+  });
   return response.data;
 };
 
@@ -72,7 +59,7 @@ export const decodeJwtUser = (token: string): User | null => {
       atob(base64)
         .split("")
         .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-        .join(""),
+        .join("")
     );
     const payload = JSON.parse(jsonPayload);
     if (payload && (payload.sub || payload.id || payload.email)) {
@@ -82,9 +69,7 @@ export const decodeJwtUser = (token: string): User | null => {
         role: payload.role || "BUYER",
         firstName: payload.firstName,
         lastName: payload.lastName,
-        name:
-          payload.name ||
-          (payload.email ? payload.email.split("@")[0] : "User"),
+        name: payload.name || (payload.email ? payload.email.split("@")[0] : "User"),
       };
     }
   } catch {
@@ -99,11 +84,7 @@ export const getMeApi = async (): Promise<User> => {
     const resData = response.data;
     if (resData && typeof resData === "object") {
       const extracted =
-        resData.data?.user ||
-        resData.user ||
-        resData.data ||
-        resData.result ||
-        resData;
+        resData.data?.user || resData.user || resData.data || resData.result || resData;
       if (extracted && typeof extracted === "object") {
         return extracted;
       }
@@ -125,9 +106,7 @@ export const getMeApi = async (): Promise<User> => {
   }
 };
 
-export const updateMeApi = async (
-  payload: UpdateProfilePayload,
-): Promise<User> => {
+export const updateMeApi = async (payload: UpdateProfilePayload): Promise<User> => {
   const response = await apiClient.patch<User>("/users/me", payload);
   return response.data;
 };
@@ -143,11 +122,11 @@ export interface ChangePasswordResponse {
 }
 
 export const changePasswordApi = async (
-  payload: ChangePasswordPayload,
+  payload: ChangePasswordPayload
 ): Promise<ChangePasswordResponse> => {
   const response = await apiClient.patch<ChangePasswordResponse>(
     "/users/me/change-password",
-    payload,
+    payload
   );
   return response.data;
 };
@@ -178,8 +157,7 @@ export const getUserSessionsApi = async (): Promise<UserSession[]> => {
   } catch (error: any) {
     if (error.response?.status === 404) {
       try {
-        const fallbackRes =
-          await apiClient.get<UserSession[]>("/auth/sessions");
+        const fallbackRes = await apiClient.get<UserSession[]>("/auth/sessions");
         return fallbackRes.data;
       } catch {
         const fallbackRes2 = await apiClient.get<UserSession[]>("/sessions");
@@ -190,24 +168,22 @@ export const getUserSessionsApi = async (): Promise<UserSession[]> => {
   }
 };
 
-export const revokeUserSessionApi = async (
-  sessionId: string,
-): Promise<RevokeSessionResponse> => {
+export const revokeUserSessionApi = async (sessionId: string): Promise<RevokeSessionResponse> => {
   try {
     const response = await apiClient.delete<RevokeSessionResponse>(
-      `/users/me/sessions/${sessionId}`,
+      `/users/me/sessions/${sessionId}`
     );
     return response.data;
   } catch (error: any) {
     if (error.response?.status === 404) {
       try {
         const fallbackRes = await apiClient.delete<RevokeSessionResponse>(
-          `/auth/sessions/${sessionId}`,
+          `/auth/sessions/${sessionId}`
         );
         return fallbackRes.data;
       } catch {
         const fallbackRes2 = await apiClient.delete<RevokeSessionResponse>(
-          `/sessions/${sessionId}`,
+          `/sessions/${sessionId}`
         );
         return fallbackRes2.data;
       }
@@ -217,21 +193,15 @@ export const revokeUserSessionApi = async (
 };
 
 export const forgotPasswordApi = async (
-  payload: ForgotPasswordPayload,
+  payload: ForgotPasswordPayload
 ): Promise<ForgotPasswordResponse> => {
-  const response = await apiClient.post<ForgotPasswordResponse>(
-    "/auth/forgot-password",
-    payload,
-  );
+  const response = await apiClient.post<ForgotPasswordResponse>("/auth/forgot-password", payload);
   return response.data;
 };
 
 export const resetPasswordApi = async (
-  payload: ResetPasswordPayload,
+  payload: ResetPasswordPayload
 ): Promise<ResetPasswordResponse> => {
-  const response = await apiClient.post<ResetPasswordResponse>(
-    "/auth/reset-password",
-    payload,
-  );
+  const response = await apiClient.post<ResetPasswordResponse>("/auth/reset-password", payload);
   return response.data;
 };

@@ -13,10 +13,18 @@ interface UpdateUserStatusModalProps {
 }
 
 const ROLES = [
-  { value: "BUYER", label: "Buyer", color: "text-emerald-400 border-emerald-500/30 bg-emerald-500/10" },
+  {
+    value: "BUYER",
+    label: "Buyer",
+    color: "text-emerald-400 border-emerald-500/30 bg-emerald-500/10",
+  },
   { value: "SELLER", label: "Seller", color: "text-blue-400 border-blue-500/30 bg-blue-500/10" },
   { value: "DEALER", label: "Dealer", color: "text-amber-400 border-amber-500/30 bg-amber-500/10" },
-  { value: "ADMIN", label: "Admin", color: "text-purple-400 border-purple-500/30 bg-purple-500/10" },
+  {
+    value: "ADMIN",
+    label: "Admin",
+    color: "text-purple-400 border-purple-500/30 bg-purple-500/10",
+  },
 ];
 
 export default function UpdateUserStatusModal({
@@ -111,9 +119,7 @@ export default function UpdateUserStatusModal({
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* User Role Selection */}
           <div>
-            <label className="block text-xs font-semibold text-gray-300 mb-2">
-              User Role
-            </label>
+            <label className="block text-xs font-semibold text-gray-300 mb-2">User Role</label>
             <div className="grid grid-cols-2 gap-2.5">
               {ROLES.map((r) => {
                 const isSelected = role === r.value;

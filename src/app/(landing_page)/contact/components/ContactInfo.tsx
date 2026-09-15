@@ -17,16 +17,10 @@ export default function ContactInfo() {
 
   const email = contactInfo?.supportEmail || "Tyler@exoticworld.store";
   const phone = contactInfo?.supportPhone || "+1 949-880-6490";
-  const address =
-    contactInfo?.address ||
-    "19200 Von Karman Ave Irvine, CA 92612 United States";
+  const address = contactInfo?.address || "19200 Von Karman Ave Irvine, CA 92612 United States";
   const mapEmbedUrl = contactInfo?.mapEmbedUrl || DEFAULT_MAP_EMBED;
 
-  const formatHour = (
-    hourStr?: string,
-    defaultLabel?: string,
-    defaultValue?: string,
-  ) => {
+  const formatHour = (hourStr?: string, defaultLabel?: string, defaultValue?: string) => {
     if (!hourStr) return { label: defaultLabel, value: defaultValue };
     if (hourStr.includes(":")) {
       const colonIdx = hourStr.indexOf(":");
@@ -40,18 +34,14 @@ export default function ContactInfo() {
   const weekday = formatHour(
     contactInfo?.officeHours?.weekday,
     "Monday - Friday",
-    "9:00 AM - 6:00 PM CET",
+    "9:00 AM - 6:00 PM CET"
   );
   const saturday = formatHour(
     contactInfo?.officeHours?.saturday,
     "Saturday",
-    "10:00 AM - 4:00 PM CET",
+    "10:00 AM - 4:00 PM CET"
   );
-  const sunday = formatHour(
-    contactInfo?.officeHours?.sunday,
-    "Sunday",
-    "By Appointment Only",
-  );
+  const sunday = formatHour(contactInfo?.officeHours?.sunday, "Sunday", "By Appointment Only");
 
   return (
     <motion.div
@@ -72,9 +62,7 @@ export default function ContactInfo() {
         />
         <div className="absolute top-4 left-4">
           <a
-            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-              address,
-            )}`}
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block bg-white/10 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-widest px-4 py-2 border border-white/20 rounded-sm hover:bg-white/20 transition-all"
@@ -121,9 +109,7 @@ export default function ContactInfo() {
               <p className="text-primary text-[10px] font-bold uppercase tracking-widest mb-1">
                 Headquarters
               </p>
-              <p className="text-white/60 text-sm italic leading-relaxed">
-                {address}
-              </p>
+              <p className="text-white/60 text-sm italic leading-relaxed">{address}</p>
             </div>
           </div>
         </div>

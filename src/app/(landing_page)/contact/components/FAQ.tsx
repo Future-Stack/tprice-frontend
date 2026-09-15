@@ -7,24 +7,29 @@ import { ChevronDown } from "lucide-react";
 const FAQ_ITEMS = [
   {
     question: "How do I become a VIP Buyer",
-    answer: "To become a VIP buyer, you need to apply through our verification process. Once approved, you gain access to exclusive assets, dedicated account support, and early access to new listings."
+    answer:
+      "To become a VIP buyer, you need to apply through our verification process. Once approved, you gain access to exclusive assets, dedicated account support, and early access to new listings.",
   },
   {
     question: "How do I list my assets for sale",
-    answer: "Listing your assets is simple. Submit your asset details for valuation and vetting. Our experts will verify the provenance and authenticity before the listing goes live to our elite network."
+    answer:
+      "Listing your assets is simple. Submit your asset details for valuation and vetting. Our experts will verify the provenance and authenticity before the listing goes live to our elite network.",
   },
   {
     question: "What is the verification process like",
-    answer: "We perform a rigorous 15-point check on every asset, including background checks on ownership history, physical inspection, and documentation verification to ensure maximum trust."
+    answer:
+      "We perform a rigorous 15-point check on every asset, including background checks on ownership history, physical inspection, and documentation verification to ensure maximum trust.",
   },
   {
     question: "Are transactions secure and private",
-    answer: "Absolutely. We use end-to-end encrypted communications and secure escrow services for all high-value transactions, ensuring complete privacy and security for both parties."
+    answer:
+      "Absolutely. We use end-to-end encrypted communications and secure escrow services for all high-value transactions, ensuring complete privacy and security for both parties.",
   },
   {
     question: "Do you offer international shipping and logistics",
-    answer: "Yes, we have specialized logistics partners who handle global transportation for cars, yachts, and jets, including temporary storage and customs clearance."
-  }
+    answer:
+      "Yes, we have specialized logistics partners who handle global transportation for cars, yachts, and jets, including temporary storage and customs clearance.",
+  },
 ];
 
 export default function FAQ() {
@@ -69,7 +74,9 @@ export default function FAQ() {
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
                 className="w-full flex items-center justify-between p-6 text-left hover:bg-white/5 transition-colors group"
               >
-                <span className={`text-lg font-medium transition-colors ${openIndex === i ? "text-primary" : "text-white/80"}`}>
+                <span
+                  className={`text-lg font-medium transition-colors ${openIndex === i ? "text-primary" : "text-white/80"}`}
+                >
                   {item.question}
                 </span>
                 <ChevronDown

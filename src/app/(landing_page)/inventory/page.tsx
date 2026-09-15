@@ -52,18 +52,17 @@ export default function MarketplacePage() {
   ]);
 
   // React Query hook to fetch listings from GET /api/v1/listings
-  const { data, isLoading, isFetching, isError, error, refetch } =
-    useListingsQuery({
-      category: category !== "ALL" ? category : undefined,
-      brand: brands.length > 0 ? brands[0] : undefined,
-      minPrice: debouncedMinPrice > 0 ? debouncedMinPrice : undefined,
-      maxPrice: debouncedMaxPrice < 20000000 ? debouncedMaxPrice : undefined,
-      buildYear: debouncedMinYear > 1990 ? debouncedMinYear : undefined,
-      search: debouncedSearch.trim() || undefined,
-      sortBy: sortBy,
-      page: page,
-      limit: limit,
-    });
+  const { data, isLoading, isFetching, isError, error, refetch } = useListingsQuery({
+    category: category !== "ALL" ? category : undefined,
+    brand: brands.length > 0 ? brands[0] : undefined,
+    minPrice: debouncedMinPrice > 0 ? debouncedMinPrice : undefined,
+    maxPrice: debouncedMaxPrice < 20000000 ? debouncedMaxPrice : undefined,
+    buildYear: debouncedMinYear > 1990 ? debouncedMinYear : undefined,
+    search: debouncedSearch.trim() || undefined,
+    sortBy: sortBy,
+    page: page,
+    limit: limit,
+  });
 
   const listings = data?.data || [];
   const meta = data?.meta;
@@ -161,15 +160,8 @@ export default function MarketplacePage() {
                 {meta && meta.totalPages > 1 && (
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-14 pt-8 border-t border-white/5">
                     <p className="text-xs text-white/40 font-light">
-                      Showing{" "}
-                      <span className="font-semibold text-white">
-                        {listings.length}
-                      </span>{" "}
-                      of{" "}
-                      <span className="font-semibold text-white">
-                        {meta.total}
-                      </span>{" "}
-                      luxury assets
+                      Showing <span className="font-semibold text-white">{listings.length}</span> of{" "}
+                      <span className="font-semibold text-white">{meta.total}</span> luxury assets
                     </p>
                     <div className="flex items-center gap-2">
                       <button
@@ -186,9 +178,7 @@ export default function MarketplacePage() {
                       </span>
 
                       <button
-                        onClick={() =>
-                          handlePageChange(Math.min(page + 1, meta.totalPages))
-                        }
+                        onClick={() => handlePageChange(Math.min(page + 1, meta.totalPages))}
                         disabled={page >= meta.totalPages || isFetching}
                         className="p-2.5 rounded-md bg-[#111111] border border-white/10 text-white disabled:opacity-30 disabled:cursor-not-allowed hover:border-primary/50 transition-colors"
                         title="Next Page"
@@ -214,8 +204,8 @@ export default function MarketplacePage() {
                     No matching luxury assets found
                   </h3>
                   <p className="text-white/40 text-sm font-light max-w-md mx-auto mb-6">
-                    We couldn&apos;t find any assets matching your current
-                    search and filter criteria. Try adjusting your filters.
+                    We couldn&apos;t find any assets matching your current search and filter
+                    criteria. Try adjusting your filters.
                   </p>
                   <button
                     onClick={handleClearFilters}

@@ -21,10 +21,7 @@ export const MODELS_QUERY_KEYS = {
 /**
  * Hook to fetch paginated models with TanStack Query caching
  */
-export const useGetModelsQuery = (
-  params?: GetModelsParams,
-  options?: { enabled?: boolean },
-) => {
+export const useGetModelsQuery = (params?: GetModelsParams, options?: { enabled?: boolean }) => {
   return useQuery<ModelsResponse>({
     queryKey: MODELS_QUERY_KEYS.list(params),
     queryFn: () => getModelsApi(params),
@@ -65,8 +62,7 @@ export const useCreateModelMutation = () => {
 export const useUpdateModelMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateModelInput }) =>
-      updateModelApi(id, data),
+    mutationFn: ({ id, data }: { id: string; data: UpdateModelInput }) => updateModelApi(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: MODELS_QUERY_KEYS.all });
     },

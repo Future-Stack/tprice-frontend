@@ -1,13 +1,7 @@
 "use client";
 
 import React from "react";
-import {
-  Search,
-  ChevronDown,
-  SlidersHorizontal,
-  ListFilter,
-  X,
-} from "lucide-react";
+import { Search, ChevronDown, SlidersHorizontal, ListFilter, X } from "lucide-react";
 
 interface SearchBarProps {
   search: string;

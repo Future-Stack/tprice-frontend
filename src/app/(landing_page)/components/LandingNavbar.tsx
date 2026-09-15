@@ -4,14 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Menu,
-  X,
-  ChevronDown,
-  LayoutDashboard,
-  LogOut,
-  Loader2,
-} from "lucide-react";
+import { Menu, X, ChevronDown, LayoutDashboard, LogOut, Loader2 } from "lucide-react";
 import { useAuthStore, User } from "@/lib/store/useAuthStore";
 import { useLogoutMutation, useGetMeQuery } from "@/hooks/useAuth";
 import Image from "next/image";
@@ -57,11 +50,7 @@ export default function LandingNavbar() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
-  const {
-    user: storeUser,
-    token: storeToken,
-    isAuthenticated,
-  } = useAuthStore();
+  const { user: storeUser, token: storeToken, isAuthenticated } = useAuthStore();
   const logoutMutation = useLogoutMutation();
 
   useEffect(() => {
@@ -69,8 +58,9 @@ export default function LandingNavbar() {
   }, []);
 
   // Fetch user profile via TanStack Query
-  const { data: userProfile, isLoading: isUserLoading } =
-    useGetMeQuery(mounted && (isAuthenticated || !!storeToken));
+  const { data: userProfile, isLoading: isUserLoading } = useGetMeQuery(
+    mounted && (isAuthenticated || !!storeToken)
+  );
 
   const user = userProfile || storeUser;
   const isLoading = isUserLoading && mounted && !user;
@@ -91,10 +81,7 @@ export default function LandingNavbar() {
   // Close user dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setUserDropdownOpen(false);
       }
     };
@@ -146,19 +133,14 @@ export default function LandingNavbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-100 transition-all duration-300 bg-black ${scrolled ? "bg-black/80 backdrop-blur-lg py-4" : "bg-black py-6"
-        }`}
+      className={`fixed top-0 left-0 right-0 z-100 transition-all duration-300 bg-black ${
+        scrolled ? "bg-black/80 backdrop-blur-lg py-4" : "bg-black py-6"
+      }`}
     >
       <div className="container mx-auto px-6 md:px-0 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <Image
-            src="/logo.svg"
-            alt="Logo"
-            className="w-full"
-            width={40}
-            height={40}
-          />
+          <Image src="/logo.svg" alt="Logo" className="w-full" width={40} height={40} />
         </Link>
 
         {/* Desktop Links */}
@@ -179,17 +161,17 @@ export default function LandingNavbar() {
                 <div className="flex items-center gap-1.5 cursor-pointer">
                   <Link
                     href={currentHref}
-                    className={`text-sm font-montserrat font-normal transition-colors hover:text-land ${isActive ? "text-primary" : "text-white/80"
-                      }`}
+                    className={`text-sm font-montserrat font-normal transition-colors hover:text-land ${
+                      isActive ? "text-primary" : "text-white/80"
+                    }`}
                   >
                     {displayName}
                   </Link>
                   {link.subLinks && (
                     <ChevronDown
-                      className={`w-4 h-4 transition-transform duration-300 font-montserrat ${activeDropdown === link.name
-                        ? "rotate-180 text-primary"
-                        : "text-white/40"
-                        }`}
+                      className={`w-4 h-4 transition-transform duration-300 font-montserrat ${
+                        activeDropdown === link.name ? "rotate-180 text-primary" : "text-white/40"
+                      }`}
                     />
                   )}
                 </div>
@@ -209,10 +191,11 @@ export default function LandingNavbar() {
                             <Link
                               key={sub.name}
                               href={sub.href}
-                              className={`block px-4 py-3 text-sm font-montserrat font-normal rounded-sm transition-all hover:bg-primary hover:text-black ${pathname === sub.href
-                                ? "bg-primary/10 text-primary"
-                                : "text-white/70"
-                                }`}
+                              className={`block px-4 py-3 text-sm font-montserrat font-normal rounded-sm transition-all hover:bg-primary hover:text-black ${
+                                pathname === sub.href
+                                  ? "bg-primary/10 text-primary"
+                                  : "text-white/70"
+                              }`}
                             >
                               {sub.name}
                             </Link>
@@ -286,8 +269,9 @@ export default function LandingNavbar() {
                 </div>
 
                 <ChevronDown
-                  className={`w-4 h-4 text-white/50 transition-transform duration-300 group-hover:text-white ${userDropdownOpen ? "rotate-180 text-primary" : ""
-                    }`}
+                  className={`w-4 h-4 text-white/50 transition-transform duration-300 group-hover:text-white ${
+                    userDropdownOpen ? "rotate-180 text-primary" : ""
+                  }`}
                 />
               </button>
 
@@ -377,10 +361,7 @@ export default function LandingNavbar() {
         </div>
 
         {/* Mobile Toggle */}
-        <button
-          className="lg:hidden text-white"
-          onClick={() => setIsOpen(!isOpen)}
-        >
+        <button className="lg:hidden text-white" onClick={() => setIsOpen(!isOpen)}>
           {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
@@ -402,10 +383,9 @@ export default function LandingNavbar() {
                     <div className="flex items-center justify-between">
                       <Link
                         href={currentHref}
-                        className={`text-lg font-medium transition-colors ${pathname === currentHref
-                          ? "text-primary"
-                          : "text-white/90"
-                          }`}
+                        className={`text-lg font-medium transition-colors ${
+                          pathname === currentHref ? "text-primary" : "text-white/90"
+                        }`}
                         onClick={() => !link.subLinks && setIsOpen(false)}
                       >
                         {link.name}
@@ -413,15 +393,14 @@ export default function LandingNavbar() {
                       {link.subLinks && (
                         <button
                           onClick={() =>
-                            setActiveDropdown(
-                              activeDropdown === link.name ? null : link.name,
-                            )
+                            setActiveDropdown(activeDropdown === link.name ? null : link.name)
                           }
                           className="p-2 text-white/40"
                         >
                           <ChevronDown
-                            className={`w-5 h-5 transition-transform ${activeDropdown === link.name ? "rotate-180" : ""
-                              }`}
+                            className={`w-5 h-5 transition-transform ${
+                              activeDropdown === link.name ? "rotate-180" : ""
+                            }`}
                           />
                         </button>
                       )}
@@ -437,10 +416,9 @@ export default function LandingNavbar() {
                           <Link
                             key={sub.name}
                             href={sub.href}
-                            className={`text-base font-medium transition-colors ${pathname === sub.href
-                              ? "text-primary"
-                              : "text-white/60"
-                              }`}
+                            className={`text-base font-medium transition-colors ${
+                              pathname === sub.href ? "text-primary" : "text-white/60"
+                            }`}
                             onClick={() => setIsOpen(false)}
                           >
                             {sub.name}
@@ -501,9 +479,7 @@ export default function LandingNavbar() {
                       <h4 className="text-base font-semibold text-white font-montserrat truncate">
                         {getUserDisplayName(user)}
                       </h4>
-                      <p className="text-xs text-white/50 font-montserrat truncate">
-                        {user.email}
-                      </p>
+                      <p className="text-xs text-white/50 font-montserrat truncate">{user.email}</p>
                       <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-bold tracking-wider text-primary uppercase bg-primary/10 border border-primary/20 rounded-full">
                         {user.role || "BUYER"}
                       </span>

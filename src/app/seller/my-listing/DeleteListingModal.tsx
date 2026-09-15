@@ -69,18 +69,10 @@ export default function DeleteListingModal({
         {/* Listing preview card */}
         <div className="flex items-center gap-4 p-3 bg.121212 bg-[#121212] border border-[#2D2D2D] rounded-2xl">
           <div className="relative w-16 h-12 rounded-xl overflow-hidden border border-[#2D2D2D] bg-[#1A1A1A] shrink-0">
-            <Image
-              src={mainImage}
-              alt={listing.title}
-              fill
-              className="object-cover"
-              unoptimized
-            />
+            <Image src={mainImage} alt={listing.title} fill className="object-cover" unoptimized />
           </div>
           <div className="min-w-0 flex-1">
-            <h4 className="font-bold text-sm text-white line-clamp-1">
-              {listing.title}
-            </h4>
+            <h4 className="font-bold text-sm text-white line-clamp-1">{listing.title}</h4>
             <p className="text-xs text-gray-400 capitalize mt-0.5">
               {listing.category} {listing.subCategory ? `• ${listing.subCategory}` : ""}
             </p>
@@ -89,7 +81,9 @@ export default function DeleteListingModal({
 
         {/* Warning text */}
         <p className="text-sm text-gray-300 leading-relaxed">
-          Are you sure you want to permanently remove <strong className="text-white">&quot;{listing.title}&quot;</strong> from your listings? It will no longer appear on the marketplace.
+          Are you sure you want to permanently remove{" "}
+          <strong className="text-white">&quot;{listing.title}&quot;</strong> from your listings? It
+          will no longer appear on the marketplace.
         </p>
 
         {/* Action buttons */}

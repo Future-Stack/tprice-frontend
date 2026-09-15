@@ -103,9 +103,7 @@ export default function BuyerSidebar({
         <nav className="flex-1 px-4 space-y-2 mt-4">
           {navItems.map((item) => {
             const isActive =
-              item.href === "/buyer"
-                ? pathname === "/buyer"
-                : pathname.startsWith(item.href);
+              item.href === "/buyer" ? pathname === "/buyer" : pathname.startsWith(item.href);
 
             return (
               <Link
@@ -186,9 +184,7 @@ export default function BuyerSidebar({
             >
               <X className="w-3.5 h-3.5" />
             </button>
-            <h3 className="font-bold text-lg mb-1.5 font-clash">
-              Upgrade to VIP!
-            </h3>
+            <h3 className="font-bold text-lg mb-1.5 font-clash">Upgrade to VIP!</h3>
             <p className="text-[11px] text-white/90 mb-5 leading-relaxed">
               Unlock Premium Features And Offers
             </p>

@@ -3,12 +3,7 @@
 import { motion, Variants } from "framer-motion";
 import { ReactNode } from "react";
 
-type AnimType =
-  | "fade-up"
-  | "fade-down"
-  | "fade-left"
-  | "fade-right"
-  | "zoom";
+type AnimType = "fade-up" | "fade-down" | "fade-left" | "fade-right" | "zoom";
 
 interface Props {
   children: ReactNode;
@@ -17,12 +12,7 @@ interface Props {
   delay?: number;
 }
 
-const AnimationWrapper = ({
-  children,
-  type = "fade-up",
-  duration = 0.6,
-  delay = 0,
-}: Props) => {
+const AnimationWrapper = ({ children, type = "fade-up", duration = 0.6, delay = 0 }: Props) => {
   const variants: Record<AnimType, Variants> = {
     "fade-up": {
       hidden: { opacity: 0, y: 40 },

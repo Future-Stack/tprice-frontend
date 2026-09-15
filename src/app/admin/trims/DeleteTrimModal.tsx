@@ -1,16 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import {
-  AlertTriangle,
-  Trash2,
-  X,
-  Loader2,
-  Layers,
-  Car,
-  Award,
-  Calendar,
-} from "lucide-react";
+import { AlertTriangle, Trash2, X, Loader2, Layers, Car, Award, Calendar } from "lucide-react";
 import { TrimItem } from "@/lib/api/trims";
 
 interface DeleteTrimModalProps {
@@ -58,9 +49,7 @@ export default function DeleteTrimModal({
               <AlertTriangle className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white font-clash">
-                Delete Trim
-              </h3>
+              <h3 className="text-lg font-bold text-white font-clash">Delete Trim</h3>
               <p className="text-xs text-gray-400">This action cannot be undone</p>
             </div>
           </div>
@@ -80,9 +69,7 @@ export default function DeleteTrimModal({
             <Layers className="w-6 h-6" />
           </div>
           <div className="min-w-0 flex-1">
-            <h4 className="font-bold text-sm text-white line-clamp-1">
-              {trim.name}
-            </h4>
+            <h4 className="font-bold text-sm text-white line-clamp-1">{trim.name}</h4>
             <div className="text-xs text-gray-400 mt-0.5 flex flex-wrap items-center gap-1.5 font-sans">
               {trim.model && (
                 <span className="flex items-center gap-1 text-gray-300">
@@ -114,9 +101,8 @@ export default function DeleteTrimModal({
         {/* Warning Message */}
         <p className="text-sm text-gray-300 leading-relaxed">
           Are you sure you want to permanently delete the trim{" "}
-          <strong className="text-white">&quot;{trim.name}&quot;</strong>? This
-          will remove all associated trim configuration and vehicle listing
-          bindings.
+          <strong className="text-white">&quot;{trim.name}&quot;</strong>? This will remove all
+          associated trim configuration and vehicle listing bindings.
         </p>
 
         {/* Footer Actions */}

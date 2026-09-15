@@ -1,8 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import {
-  getSellerDashboardApi,
-  SellerDashboardResponse,
-} from "@/lib/api/sellerDashboard";
+import { getSellerDashboardApi, SellerDashboardResponse } from "@/lib/api/sellerDashboard";
 
 export const SELLER_DASHBOARD_QUERY_KEYS = {
   dashboard: ["seller", "dashboard"] as const,

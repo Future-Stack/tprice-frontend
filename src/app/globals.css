@@ -12,15 +12,14 @@
   --color-primary: var(--primary);
   --shadow-custom:
     50px 0 40px 0 rgba(212, 175, 55, 0), 50px 0 40px 0 rgba(212, 175, 55, 0.01),
-    9px 0 40px 0 rgba(212, 175, 55, 0.05),
-    35px 0 166px 0 rgba(212, 175, 55, 0.02),
+    9px 0 40px 0 rgba(212, 175, 55, 0.05), 35px 0 166px 0 rgba(212, 175, 55, 0.02),
     -3px 0 43.6px 0 rgba(212, 175, 55, 0.01);
   /* --shadow-custom: 213px 0 59px 0 rgba(143, 96, 36, 0.00), 136px 0 54px 0 rgba(143, 96, 36, 0.01), 77px 0 46px 0 rgba(143, 96, 36, 0.05), 34px 0 34px 0 rgba(143, 96, 36, 0.09), 9px 0 19px 0 rgba(143, 96, 36, 0.10); */
 
   --shadow-card:
     0 66px 19px 0 rgba(178, 114, 31, 0), 0 42px 17px 0 rgba(178, 114, 31, 0.01),
-    0 24px 14px 0 rgba(178, 114, 31, 0.05),
-    0 11px 11px 0 rgba(178, 114, 31, 0.09), 0 3px 6px 0 rgba(178, 114, 31, 0.1);
+    0 24px 14px 0 rgba(178, 114, 31, 0.05), 0 11px 11px 0 rgba(178, 114, 31, 0.09),
+    0 3px 6px 0 rgba(178, 114, 31, 0.1);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
   --font-cormorant: var(--font-cormorant);
@@ -71,8 +70,8 @@
   --background: #000000;
   --foreground: #252525;
   --land: #ffc61f;
-  --primary: #D4AF37;
-  --primary: #D4AF37;
+  --primary: #d4af37;
+  --primary: #d4af37;
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);

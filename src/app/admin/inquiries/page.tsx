@@ -23,10 +23,7 @@ import {
   useAdminContactInquiriesQuery,
   useUpdateAdminContactInquiryMutation,
 } from "@/hooks/useContact";
-import {
-  ContactInquiryItem,
-  UpdateContactInquiryPayload,
-} from "@/lib/api/contact";
+import { ContactInquiryItem, UpdateContactInquiryPayload } from "@/lib/api/contact";
 import InquiryDetailModal from "./InquiryDetailModal";
 import UpdateInquiryModal from "./UpdateInquiryModal";
 import { toast } from "sonner";
@@ -124,8 +121,7 @@ export default function AdminInquiriesPage() {
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
-  const [selectedInquiry, setSelectedInquiry] =
-    useState<ContactInquiryItem | null>(null);
+  const [selectedInquiry, setSelectedInquiry] = useState<ContactInquiryItem | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   const [selectedInquiryForUpdate, setSelectedInquiryForUpdate] =
@@ -185,27 +181,18 @@ export default function AdminInquiriesPage() {
     setIsUpdateModalOpen(true);
   };
 
-  const handleUpdateInquiry = async (
-    id: string,
-    payload: UpdateContactInquiryPayload,
-  ) => {
+  const handleUpdateInquiry = async (id: string, payload: UpdateContactInquiryPayload) => {
     try {
       await updateMutation.mutateAsync({ id, payload });
       toast.success("Inquiry updated successfully");
       setIsUpdateModalOpen(false);
       setSelectedInquiryForUpdate(null);
     } catch (err: any) {
-      toast.error(
-        err?.response?.data?.message ||
-          err?.message ||
-          "Failed to update inquiry",
-      );
+      toast.error(err?.response?.data?.message || err?.message || "Failed to update inquiry");
     }
   };
 
-  const newCount = rawInquiries.filter(
-    (i) => i.status?.toUpperCase() === "NEW",
-  ).length;
+  const newCount = rawInquiries.filter((i) => i.status?.toUpperCase() === "NEW").length;
 
   return (
     <div className="min-h-screen text-white font-sans pb-12">
@@ -213,9 +200,7 @@ export default function AdminInquiriesPage() {
       <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <AnimationWrapper type="fade-down" duration={0.5}>
           <div>
-            <h1 className="text-3xl font-bold font-montserrat  ">
-              Inquiries Management
-            </h1>
+            <h1 className="text-3xl font-bold font-montserrat  ">Inquiries Management</h1>
             <p className="text-gray-400 text-sm mt-1">
               View and manage customer contact messages and inquiries
             </p>
@@ -275,9 +260,7 @@ export default function AdminInquiriesPage() {
               className="p-2.5 bg-[#141416] border border-[#262626] rounded-xl text-gray-400 hover:text-white hover:border-primary/40 transition-colors cursor-pointer"
               title="Refresh list"
             >
-              <RefreshCw
-                className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`}
-              />
+              <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`} />
             </button>
           </div>
         </div>
@@ -318,10 +301,7 @@ export default function AdminInquiriesPage() {
                   <TableSkeleton />
                 ) : isError ? (
                   <tr>
-                    <td
-                      colSpan={7}
-                      className="px-6 py-16 text-center text-red-400"
-                    >
+                    <td colSpan={7} className="px-6 py-16 text-center text-red-400">
                       Failed to load inquiries. {(error as Error)?.message}
                     </td>
                   </tr>
@@ -330,9 +310,7 @@ export default function AdminInquiriesPage() {
                     <td colSpan={7} className="px-6 py-16 text-center">
                       <div className="max-w-md mx-auto space-y-3">
                         <Inbox className="w-10 h-10 text-gray-600 mx-auto" />
-                        <p className="text-base font-semibold text-gray-300">
-                          No inquiries found
-                        </p>
+                        <p className="text-base font-semibold text-gray-300">No inquiries found</p>
                         <p className="text-xs text-gray-500">
                           {search || statusFilter !== "ALL"
                             ? "No contact inquiries match your filter criteria."
@@ -351,9 +329,7 @@ export default function AdminInquiriesPage() {
                       <td className="px-6 py-5">
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-xs shrink-0">
-                            {inquiry.fullName
-                              ? inquiry.fullName.charAt(0).toUpperCase()
-                              : "U"}
+                            {inquiry.fullName ? inquiry.fullName.charAt(0).toUpperCase() : "U"}
                           </div>
                           <div>
                             <span className="font-semibold text-sm text-gray-100 group-hover:text-primary transition-colors block">
@@ -400,9 +376,7 @@ export default function AdminInquiriesPage() {
                       </td>
 
                       {/* Status */}
-                      <td className="px-6 py-5">
-                        {getStatusBadge(inquiry.status)}
-                      </td>
+                      <td className="px-6 py-5">{getStatusBadge(inquiry.status)}</td>
 
                       {/* Created At */}
                       <td className="px-6 py-5 text-xs text-gray-400">
@@ -444,16 +418,12 @@ export default function AdminInquiriesPage() {
             <div className="px-6 py-4 bg-[#141416] border-t border-[#262626] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
               <div>
                 Showing{" "}
-                <span className="font-semibold text-white">
-                  {(meta.page - 1) * meta.limit + 1}
-                </span>{" "}
+                <span className="font-semibold text-white">{(meta.page - 1) * meta.limit + 1}</span>{" "}
                 to{" "}
                 <span className="font-semibold text-white">
                   {Math.min(meta.page * meta.limit, meta.total)}
                 </span>{" "}
-                of{" "}
-                <span className="font-semibold text-white">{meta.total}</span>{" "}
-                inquiries
+                of <span className="font-semibold text-white">{meta.total}</span> inquiries
               </div>
 
               {/* Page Navigation Buttons */}
@@ -467,21 +437,19 @@ export default function AdminInquiriesPage() {
                   <span className="hidden sm:inline">Previous</span>
                 </button>
 
-                {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map(
-                  (pageNum) => (
-                    <button
-                      key={pageNum}
-                      onClick={() => handlePageChange(pageNum)}
-                      className={`w-8 h-8 rounded-lg border font-semibold text-xs transition-all cursor-pointer ${
-                        pageNum === meta.page
-                          ? "bg-primary text-black border-primary font-bold shadow-[0_2px_10px_rgba(231,143,35,0.3)]"
-                          : "bg-[#1A1A1C] border-[#262626] text-gray-300 hover:text-white hover:border-primary/40"
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  ),
-                )}
+                {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    onClick={() => handlePageChange(pageNum)}
+                    className={`w-8 h-8 rounded-lg border font-semibold text-xs transition-all cursor-pointer ${
+                      pageNum === meta.page
+                        ? "bg-primary text-black border-primary font-bold shadow-[0_2px_10px_rgba(231,143,35,0.3)]"
+                        : "bg-[#1A1A1C] border-[#262626] text-gray-300 hover:text-white hover:border-primary/40"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
 
                 <button
                   onClick={() => handlePageChange(meta.page + 1)}

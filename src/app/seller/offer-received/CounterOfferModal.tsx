@@ -61,8 +61,7 @@ export default function CounterOfferModal({
   if (!isOpen || !offer) return null;
 
   const currency = offer.listing?.currency || "USD";
-  const listingTitle =
-    offer.listing?.title || `Listing #${offer.listingId.slice(0, 8)}`;
+  const listingTitle = offer.listing?.title || `Listing #${offer.listingId.slice(0, 8)}`;
   const currentOfferFormatted = formatCurrency(offer.currentAmount, currency);
   const askingPriceFormatted = offer.listing?.askingPrice
     ? formatCurrency(offer.listing.askingPrice, currency)
@@ -115,12 +114,8 @@ export default function CounterOfferModal({
               <RefreshCcw className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-xl font-bold font-montserrat text-white">
-                Send Counter Offer
-              </h3>
-              <p className="text-xs text-gray-400">
-                Propose a new price and note to the buyer
-              </p>
+              <h3 className="text-xl font-bold font-montserrat text-white">Send Counter Offer</h3>
+              <p className="text-xs text-gray-400">Propose a new price and note to the buyer</p>
             </div>
           </div>
           <button
@@ -137,18 +132,10 @@ export default function CounterOfferModal({
         <div className="p-4 bg-white/2 border border-white/5 rounded-xl space-y-4">
           <div className="flex items-center gap-3">
             <div className="relative w-14 h-12 rounded-lg overflow-hidden border border-white/10 bg-[#18181b] shrink-0">
-              <Image
-                src={mainImage}
-                alt={listingTitle}
-                fill
-                className="object-cover"
-                unoptimized
-              />
+              <Image src={mainImage} alt={listingTitle} fill className="object-cover" unoptimized />
             </div>
             <div className="min-w-0 flex-1">
-              <h4 className="font-bold text-sm text-white truncate">
-                {listingTitle}
-              </h4>
+              <h4 className="font-bold text-sm text-white truncate">{listingTitle}</h4>
               <p className="text-xs text-gray-400">
                 Negotiation Round {(offer.roundsCount || 0) + 1}
               </p>
@@ -157,20 +144,12 @@ export default function CounterOfferModal({
 
           <div className="grid grid-cols-2 gap-3 pt-3 border-t border-white/5 text-xs">
             <div className="bg-[#18181b] p-3 rounded-lg border border-white/5">
-              <span className="text-gray-400 block mb-1">
-                Buyer&apos;s Latest Offer
-              </span>
-              <span className="text-base font-extrabold text-white">
-                {currentOfferFormatted}
-              </span>
+              <span className="text-gray-400 block mb-1">Buyer&apos;s Latest Offer</span>
+              <span className="text-base font-extrabold text-white">{currentOfferFormatted}</span>
             </div>
             <div className="bg-[#18181b] p-3 rounded-lg border border-white/5">
-              <span className="text-gray-400 block mb-1">
-                Your Asking Price
-              </span>
-              <span className="text-base font-extrabold text-primary">
-                {askingPriceFormatted}
-              </span>
+              <span className="text-gray-400 block mb-1">Your Asking Price</span>
+              <span className="text-base font-extrabold text-primary">{askingPriceFormatted}</span>
             </div>
           </div>
         </div>
@@ -201,8 +180,7 @@ export default function CounterOfferModal({
 
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-gray-300 mb-2">
-              Note / Message{" "}
-              <span className="text-gray-500 font-normal">(Optional)</span>
+              Note / Message <span className="text-gray-500 font-normal">(Optional)</span>
             </label>
             <textarea
               rows={3}

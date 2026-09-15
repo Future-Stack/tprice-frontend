@@ -37,21 +37,14 @@ export interface GetNotificationsParams {
 export const getNotificationsApi = async (
   params?: GetNotificationsParams
 ): Promise<GetNotificationsResponse> => {
-  const response = await apiClient.get<GetNotificationsResponse>(
-    "/notifications",
-    { params }
-  );
+  const response = await apiClient.get<GetNotificationsResponse>("/notifications", { params });
   return response.data;
 };
 
 /**
  * Mark a single notification as read
  */
-export const markNotificationAsReadApi = async (
-  id: string
-): Promise<NotificationItem> => {
-  const response = await apiClient.patch<NotificationItem>(
-    `/notifications/${id}/read`
-  );
+export const markNotificationAsReadApi = async (id: string): Promise<NotificationItem> => {
+  const response = await apiClient.patch<NotificationItem>(`/notifications/${id}/read`);
   return response.data;
 };

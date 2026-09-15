@@ -49,8 +49,7 @@ const getRoleBadge = (role: string) => {
     case "ADMIN":
       return {
         label: "ADMIN",
-        className:
-          "bg-purple-500/10 text-purple-400 border border-purple-500/20",
+        className: "bg-purple-500/10 text-purple-400 border border-purple-500/20",
       };
     case "DEALER":
       return {
@@ -66,8 +65,7 @@ const getRoleBadge = (role: string) => {
     default:
       return {
         label: "BUYER",
-        className:
-          "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
+        className: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
       };
   }
 };
@@ -153,9 +151,7 @@ export default function AdminUsersPage() {
     setIsUpdateModalOpen(true);
   };
 
-  const handleConfirmStatusUpdate = async (
-    payload: UpdateUserStatusPayload,
-  ) => {
+  const handleConfirmStatusUpdate = async (payload: UpdateUserStatusPayload) => {
     if (!selectedUser) return;
     try {
       await updateStatusMutation.mutateAsync({
@@ -163,15 +159,14 @@ export default function AdminUsersPage() {
         payload,
       });
       toast.success(
-        `Updated status for ${selectedUser.firstName || selectedUser.email} successfully.`,
+        `Updated status for ${selectedUser.firstName || selectedUser.email} successfully.`
       );
       setIsUpdateModalOpen(false);
       setSelectedUser(null);
     } catch (err) {
       const error = err as { response?: { data?: { message?: string } } };
       toast.error(
-        error?.response?.data?.message ||
-        "Failed to update user status. Please try again.",
+        error?.response?.data?.message || "Failed to update user status. Please try again."
       );
     }
   };
@@ -180,16 +175,11 @@ export default function AdminUsersPage() {
     if (!userToDelete) return;
     try {
       await deleteUserMutation.mutateAsync(userToDelete.id);
-      toast.success(
-        `Deleted user ${userToDelete.firstName || userToDelete.email} successfully.`
-      );
+      toast.success(`Deleted user ${userToDelete.firstName || userToDelete.email} successfully.`);
       setUserToDelete(null);
     } catch (err) {
       const error = err as { response?: { data?: { message?: string } } };
-      toast.error(
-        error?.response?.data?.message ||
-        "Failed to delete user. Please try again."
-      );
+      toast.error(error?.response?.data?.message || "Failed to delete user. Please try again.");
     }
   };
 
@@ -210,14 +200,11 @@ export default function AdminUsersPage() {
                 className="p-1.5 text-gray-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
                 title="Refresh users"
               >
-                <RefreshCw
-                  className={`w-4 h-4 ${isFetching ? "animate-spin text-primary" : ""}`}
-                />
+                <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin text-primary" : ""}`} />
               </button>
             </h1>
             <p className="text-sm text-gray-400 mt-1">
-              Manage platform members, roles, verification status, and VIP
-              privileges
+              Manage platform members, roles, verification status, and VIP privileges
             </p>
           </div>
         </AnimationWrapper>
@@ -234,10 +221,11 @@ export default function AdminUsersPage() {
                 <button
                   key={tab}
                   onClick={() => handleRoleChange(tab)}
-                  className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${isActive
-                    ? "bg-primary text-white shadow-[0_4px_15px_rgba(231,143,35,0.3)]"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
-                    }`}
+                  className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                    isActive
+                      ? "bg-primary text-white shadow-[0_4px_15px_rgba(231,143,35,0.3)]"
+                      : "text-gray-400 hover:text-white hover:bg-white/5"
+                  }`}
                 >
                   {tab}
                 </button>
@@ -294,9 +282,7 @@ export default function AdminUsersPage() {
                     <td colSpan={6} className="px-6 py-12 text-center">
                       <div className="flex flex-col items-center justify-center text-gray-400 space-y-3">
                         <ShieldAlert className="w-10 h-10 text-red-400" />
-                        <p className="text-sm font-semibold">
-                          Failed to load user data
-                        </p>
+                        <p className="text-sm font-semibold">Failed to load user data</p>
                         <button
                           onClick={() => refetch()}
                           className="px-4 py-2 bg-primary/10 border border-primary/30 text-primary text-xs font-semibold rounded-xl hover:bg-primary hover:text-white transition-all cursor-pointer"
@@ -311,9 +297,7 @@ export default function AdminUsersPage() {
                     <td colSpan={6} className="px-6 py-12 text-center">
                       <div className="flex flex-col items-center justify-center text-gray-400 space-y-2">
                         <UsersIcon className="w-10 h-10 text-gray-600 mb-1" />
-                        <p className="text-sm font-semibold text-gray-300">
-                          No users found
-                        </p>
+                        <p className="text-sm font-semibold text-gray-300">No users found</p>
                         <p className="text-xs text-gray-500">
                           Try adjusting your role filter or search query.
                         </p>
@@ -352,13 +336,9 @@ export default function AdminUsersPage() {
                               <h4 className="font-semibold text-sm text-white group-hover:text-primary transition-colors truncate">
                                 {fullName}
                               </h4>
-                              <p className="text-xs text-gray-400 truncate">
-                                {user.email}
-                              </p>
+                              <p className="text-xs text-gray-400 truncate">{user.email}</p>
                               {user.phone && (
-                                <p className="text-[11px] text-gray-500 mt-0.5">
-                                  {user.phone}
-                                </p>
+                                <p className="text-[11px] text-gray-500 mt-0.5">{user.phone}</p>
                               )}
                               {user.dealerProfile?.companyName && (
                                 <span className="inline-block mt-1 text-[10px] px-2 py-0.5 bg-white/5 border border-white/10 rounded text-gray-300 font-medium">
@@ -384,16 +364,16 @@ export default function AdminUsersPage() {
                         <td className="px-6 py-5">
                           <div className="flex items-center justify-center gap-2 flex-wrap">
                             <span
-                              className={`px-3 py-1 rounded-full text-[11px] font-medium flex items-center gap-1.5 ${user.isVerified
-                                ? "bg-green-500/10 text-green-500 border border-green-500/20"
-                                : "bg-yellow-500/10 text-yellow-500 border border-yellow-500/20"
-                                }`}
+                              className={`px-3 py-1 rounded-full text-[11px] font-medium flex items-center gap-1.5 ${
+                                user.isVerified
+                                  ? "bg-green-500/10 text-green-500 border border-green-500/20"
+                                  : "bg-yellow-500/10 text-yellow-500 border border-yellow-500/20"
+                              }`}
                             >
                               <span
-                                className={`w-1.5 h-1.5 rounded-full ${user.isVerified
-                                  ? "bg-green-500"
-                                  : "bg-yellow-500"
-                                  }`}
+                                className={`w-1.5 h-1.5 rounded-full ${
+                                  user.isVerified ? "bg-green-500" : "bg-yellow-500"
+                                }`}
                               />
                               {user.isVerified ? "Verified" : "Unverified"}
                             </span>
@@ -411,23 +391,18 @@ export default function AdminUsersPage() {
                           {user._count ? (
                             <div className="flex justify-center gap-3 text-[11px]">
                               <span title="Listings">
-                                📦{" "}
-                                <strong className="text-gray-200">
-                                  {user._count.listings}
-                                </strong>
+                                📦 <strong className="text-gray-200">{user._count.listings}</strong>
                               </span>
                               <span title="Offers">
                                 💬{" "}
                                 <strong className="text-gray-200">
-                                  {user._count.offersAsBuyer +
-                                    user._count.offersAsSeller}
+                                  {user._count.offersAsBuyer + user._count.offersAsSeller}
                                 </strong>
                               </span>
                               <span title="Deals">
                                 🤝{" "}
                                 <strong className="text-gray-200">
-                                  {user._count.dealsAsBuyer +
-                                    user._count.dealsAsSeller}
+                                  {user._count.dealsAsBuyer + user._count.dealsAsSeller}
                                 </strong>
                               </span>
                             </div>
@@ -477,11 +452,8 @@ export default function AdminUsersPage() {
                   <strong className="text-white">
                     {Math.min((page - 1) * limit + 1, meta.total)}
                   </strong>{" "}
-                  to{" "}
-                  <strong className="text-white">
-                    {Math.min(page * limit, meta.total)}
-                  </strong>{" "}
-                  of <strong className="text-white">{meta.total}</strong> users
+                  to <strong className="text-white">{Math.min(page * limit, meta.total)}</strong> of{" "}
+                  <strong className="text-white">{meta.total}</strong> users
                 </span>
 
                 <div className="flex items-center gap-2 text-xs text-gray-400">
@@ -529,10 +501,11 @@ export default function AdminUsersPage() {
                       <button
                         key={pageNum}
                         onClick={() => setPage(pageNum)}
-                        className={`w-8 h-8 rounded-xl text-xs font-semibold transition-all cursor-pointer ${isActive
-                          ? "bg-primary text-white shadow-[0_2px_10px_rgba(231,143,35,0.4)]"
-                          : "text-gray-400 hover:text-white hover:bg-white/5"
-                          }`}
+                        className={`w-8 h-8 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                          isActive
+                            ? "bg-primary text-white shadow-[0_2px_10px_rgba(231,143,35,0.4)]"
+                            : "text-gray-400 hover:text-white hover:bg-white/5"
+                        }`}
                       >
                         {pageNum}
                       </button>

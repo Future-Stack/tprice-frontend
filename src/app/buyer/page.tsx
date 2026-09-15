@@ -13,16 +13,12 @@ import {
   RefreshCw,
   Clock,
   ArrowUpRight,
-  ExternalLink
+  ExternalLink,
 } from "lucide-react";
 
 import AnimationWrapper from "../components/AnimationWrapper";
 import { useBuyerDashboardQuery } from "@/hooks/useBuyerDashboard";
-import {
-  BuyerActiveBid,
-  BuyerRecentActivity,
-  BuyerSavedItem
-} from "@/lib/api/buyerDashboard";
+import { BuyerActiveBid, BuyerRecentActivity, BuyerSavedItem } from "@/lib/api/buyerDashboard";
 
 /* ─── Helper Functions ─── */
 const formatCurrency = (amount?: number | string, currency = "USD") => {
@@ -236,9 +232,7 @@ export default function Home() {
                       <div className="flex justify-between text-[13px] mt-2">
                         <span className="text-gray-400 font-medium">
                           Your bid:{" "}
-                          <strong className="text-white">
-                            {formatCurrency(bid.yourBid)}
-                          </strong>
+                          <strong className="text-white">{formatCurrency(bid.yourBid)}</strong>
                         </span>
                         <span className="text-gray-400 font-medium">
                           Current highest:{" "}
@@ -285,9 +279,7 @@ export default function Home() {
                         <h4 className="font-medium text-gray-200 m-0 text-[15px] truncate">
                           {act.title}
                         </h4>
-                        <p className="text-[13px] text-gray-400 mt-1 line-clamp-2">
-                          {act.message}
-                        </p>
+                        <p className="text-[13px] text-gray-400 mt-1 line-clamp-2">{act.message}</p>
                         <p className="text-[11px] text-gray-500 mt-1.5 font-medium flex items-center gap-1">
                           <Clock className="w-3 h-3" /> {formatTimeAgo(act.createdAt)}
                         </p>
@@ -356,9 +348,9 @@ export default function Home() {
               const primaryImage =
                 item.media?.[0]?.url ||
                 "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&q=80&w=800";
-              const locationText = [item.locationCity, item.locationCountry]
-                .filter(Boolean)
-                .join(", ") || "Location N/A";
+              const locationText =
+                [item.locationCity, item.locationCountry].filter(Boolean).join(", ") ||
+                "Location N/A";
 
               return (
                 <AnimationWrapper
@@ -537,7 +529,10 @@ function BuyerDashboardSkeleton() {
           <div className="h-6 w-36 bg-[#2C2C2E]/80 rounded-md"></div>
           <div className="space-y-6">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="flex justify-between items-center border-b border-[#2C2C2E]/40 pb-5">
+              <div
+                key={i}
+                className="flex justify-between items-center border-b border-[#2C2C2E]/40 pb-5"
+              >
                 <div className="space-y-2 flex-1 pr-4">
                   <div className="h-5 w-3/4 bg-[#2C2C2E]/70 rounded-md"></div>
                   <div className="h-3.5 w-full bg-[#2C2C2E]/40 rounded-md"></div>
@@ -558,7 +553,10 @@ function BuyerDashboardSkeleton() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-[#1C1C1E] border border-[#2C2C2E]/40 rounded-[8px] overflow-hidden space-y-4 pb-5">
+            <div
+              key={i}
+              className="bg-[#1C1C1E] border border-[#2C2C2E]/40 rounded-[8px] overflow-hidden space-y-4 pb-5"
+            >
               <div className="h-[200px] bg-[#2C2C2E]/60 w-full"></div>
               <div className="p-4 space-y-3">
                 <div className="flex justify-between">

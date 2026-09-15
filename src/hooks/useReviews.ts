@@ -76,17 +76,10 @@ export const useCreateReviewMutation = () => {
 export const useUpdateReviewMutation = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<
-    ReviewItem,
-    Error,
-    { id: string; payload: UpdateReviewPayload }
-  >({
+  return useMutation<ReviewItem, Error, { id: string; payload: UpdateReviewPayload }>({
     mutationFn: ({ id, payload }) => updateReviewApi(id, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: REVIEWS_QUERY_KEYS.all });
     },
   });
 };
-
-
-

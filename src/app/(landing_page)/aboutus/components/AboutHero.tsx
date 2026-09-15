@@ -52,10 +52,9 @@ export default function AboutHero() {
               transition={{ duration: 0.8, delay: 0.4 }}
               className="text-white/80 text-lg md:text-[24px]   font-montserrat"
             >
-              ExoticWorld was born from a simple belief: the world&apos;s most
-              extraordinary assets deserve an extraordinary platform. We built
-              the ecosystem that ultra-high-net-worth individuals have always
-              deserved.
+              ExoticWorld was born from a simple belief: the world&apos;s most extraordinary assets
+              deserve an extraordinary platform. We built the ecosystem that ultra-high-net-worth
+              individuals have always deserved.
             </motion.p>
           </div>
         </div>
@@ -72,9 +71,7 @@ export default function AboutHero() {
               transition={{ duration: 0.6, delay: 0.6 + i * 0.1 }}
               className="py-8 md:py-12 text-center"
             >
-              <h3 className="text-3xl md:text-4xl font-bold text-primary mb-2">
-                {stat.value}
-              </h3>
+              <h3 className="text-3xl md:text-4xl font-bold text-primary mb-2">{stat.value}</h3>
               <p className="text-white/50 text-xs font-medium uppercase tracking-[0.2em]">
                 {stat.label}
               </p>

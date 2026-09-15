@@ -1,16 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import {
-  User,
-  Shield,
-  Camera,
-  Mail,
-  Phone,
-  Loader2,
-  Eye,
-  EyeOff,
-} from "lucide-react";
+import { User, Shield, Camera, Mail, Phone, Loader2, Eye, EyeOff } from "lucide-react";
 import AnimationWrapper from "../../components/AnimationWrapper";
 import {
   useGetMeQuery,
@@ -38,7 +29,7 @@ export default function SellerSettings() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [avatarPreview, setAvatarPreview] = useState(
-    "https://community.softr.io/uploads/db9110/original/2X/7/74e6e7e382d0ff5d7773ca9a87e6f6f8817a68a6.jpeg",
+    "https://community.softr.io/uploads/db9110/original/2X/7/74e6e7e382d0ff5d7773ca9a87e6f6f8817a68a6.jpeg"
   );
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
@@ -181,9 +172,7 @@ export default function SellerSettings() {
                       : "text-gray-500 group-hover:text-gray-400"
                   }`}
                 />
-                <span className="font-medium text-[15px] whitespace-nowrap">
-                  {tab.label}
-                </span>
+                <span className="font-medium text-[15px] whitespace-nowrap">{tab.label}</span>
                 {activeTab === tab.id && (
                   <div className="hidden lg:block ml-auto w-1 h-4 bg-primary rounded-full scale-y-125" />
                 )}
@@ -193,12 +182,7 @@ export default function SellerSettings() {
         </AnimationWrapper>
 
         {/* Content Area */}
-        <AnimationWrapper
-          key={activeTab}
-          type="fade-up"
-          duration={0.6}
-          delay={0.1}
-        >
+        <AnimationWrapper key={activeTab} type="fade-up" duration={0.6} delay={0.1}>
           <div className="bg-[#1C1C1E] rounded-3xl border border-[#2C2C2E] overflow-hidden shadow-2xl relative">
             {/* Glow Effect */}
             <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-primary/5 blur-[100px] pointer-events-none rounded-full" />
@@ -207,9 +191,7 @@ export default function SellerSettings() {
               {activeTab === "profile" && (
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                   <div className="mb-8 font-clash">
-                    <h3 className="text-2xl font-medium text-white">
-                      Personal Information
-                    </h3>
+                    <h3 className="text-2xl font-medium text-white">Personal Information</h3>
                     <div className="h-0.5 bg-linear-to-r from-[#2C2C2E] to-transparent mt-4 w-full" />
                   </div>
 
@@ -264,9 +246,7 @@ export default function SellerSettings() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-7">
                       {/* First Name */}
                       <div className="space-y-2.5">
-                        <label className="text-sm font-medium text-gray-400 ml-1">
-                          First Name
-                        </label>
+                        <label className="text-sm font-medium text-gray-400 ml-1">First Name</label>
                         <input
                           type="text"
                           required
@@ -279,9 +259,7 @@ export default function SellerSettings() {
 
                       {/* Last Name */}
                       <div className="space-y-2.5">
-                        <label className="text-sm font-medium text-gray-400 ml-1">
-                          Last Name
-                        </label>
+                        <label className="text-sm font-medium text-gray-400 ml-1">Last Name</label>
                         <input
                           type="text"
                           required
@@ -350,9 +328,7 @@ export default function SellerSettings() {
               {activeTab === "security" && (
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                   <div className="mb-8 font-clash">
-                    <h3 className="text-2xl font-medium text-white">
-                      Change Password
-                    </h3>
+                    <h3 className="text-2xl font-medium text-white">Change Password</h3>
                     <div className="h-0.5 bg-linear-to-r from-[#2C2C2E] to-transparent mt-4 w-full" />
                   </div>
 

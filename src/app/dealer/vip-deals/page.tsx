@@ -24,7 +24,8 @@ interface Asset {
 const assets: Asset[] = [
   {
     id: 1,
-    image: "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&q=80&w=800",
+    image:
+      "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&q=80&w=800",
     title: "Ferrari 488 Spider",
     location: "Monaco",
     price: "$295,000",
@@ -36,7 +37,8 @@ const assets: Asset[] = [
   },
   {
     id: 2,
-    image: "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?auto=format&fit=crop&q=80&w=800",
+    image:
+      "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?auto=format&fit=crop&q=80&w=800",
     title: "Azimut Grande 27M",
     location: "Monaco",
     price: "$295,000",
@@ -48,7 +50,8 @@ const assets: Asset[] = [
   },
   {
     id: 3,
-    image: "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?auto=format&fit=crop&q=80&w=800",
+    image:
+      "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?auto=format&fit=crop&q=80&w=800",
     title: "Rolex Daytona 116S",
     location: "Monaco",
     price: "$295,000",
@@ -60,7 +63,8 @@ const assets: Asset[] = [
   },
   {
     id: 4,
-    image: "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?auto=format&fit=crop&q=80&w=800",
+    image:
+      "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?auto=format&fit=crop&q=80&w=800",
     title: "Azimut Grande 27M",
     location: "Monaco",
     price: "$295,000",
@@ -72,7 +76,8 @@ const assets: Asset[] = [
   },
   {
     id: 5,
-    image: "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?auto=format&fit=crop&q=80&w=800",
+    image:
+      "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?auto=format&fit=crop&q=80&w=800",
     title: "Rolex Daytona 116S",
     location: "Monaco",
     price: "$295,000",
@@ -84,7 +89,8 @@ const assets: Asset[] = [
   },
   {
     id: 6,
-    image: "https://images.unsplash.com/photo-1540962351504-03099e0a754b?auto=format&fit=crop&q=80&w=800",
+    image:
+      "https://images.unsplash.com/photo-1540962351504-03099e0a754b?auto=format&fit=crop&q=80&w=800",
     title: "Gulfstream G650ER",
     location: "Monaco",
     price: "$295,000",
@@ -96,7 +102,8 @@ const assets: Asset[] = [
   },
   {
     id: 7,
-    image: "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&q=80&w=800",
+    image:
+      "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&q=80&w=800",
     title: "Ferrari 488 Spider",
     location: "Monaco",
     price: "$295,000",
@@ -108,7 +115,8 @@ const assets: Asset[] = [
   },
   {
     id: 8,
-    image: "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?auto=format&fit=crop&q=80&w=800",
+    image:
+      "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?auto=format&fit=crop&q=80&w=800",
     title: "Rolex Daytona 116S",
     location: "Monaco",
     price: "$295,000",
@@ -120,7 +128,8 @@ const assets: Asset[] = [
   },
   {
     id: 9,
-    image: "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?auto=format&fit=crop&q=80&w=800",
+    image:
+      "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?auto=format&fit=crop&q=80&w=800",
     title: "Azimut Grande 27M",
     location: "Monaco",
     price: "$295,000",
@@ -132,7 +141,8 @@ const assets: Asset[] = [
   },
   {
     id: 10,
-    image: "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?auto=format&fit=crop&q=80&w=800",
+    image:
+      "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?auto=format&fit=crop&q=80&w=800",
     title: "Azimut Grande 27M",
     location: "Monaco",
     price: "$295,000",
@@ -144,7 +154,8 @@ const assets: Asset[] = [
   },
   {
     id: 11,
-    image: "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?auto=format&fit=crop&q=80&w=800",
+    image:
+      "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?auto=format&fit=crop&q=80&w=800",
     title: "Rolex Daytona 116S",
     location: "Monaco",
     price: "$295,000",
@@ -156,7 +167,8 @@ const assets: Asset[] = [
   },
   {
     id: 12,
-    image: "https://images.unsplash.com/photo-1540962351504-03099e0a754b?auto=format&fit=crop&q=80&w=800",
+    image:
+      "https://images.unsplash.com/photo-1540962351504-03099e0a754b?auto=format&fit=crop&q=80&w=800",
     title: "Gulfstream G650ER",
     location: "Monaco",
     price: "$295,000",
@@ -180,7 +192,7 @@ export default function VIPDeals() {
     yearFrom: "2005",
     yearTo: "2024",
     priceMin: 12000,
-    priceMax: 500000
+    priceMax: 500000,
   });
 
   // Draft filters (for sidebar inputs)
@@ -197,7 +209,7 @@ export default function VIPDeals() {
       yearFrom: "2005",
       yearTo: "2024",
       priceMin: 12000,
-      priceMax: 500000
+      priceMax: 500000,
     };
     setDraftFilters(resetValues);
     setAppliedFilters(resetValues);
@@ -212,8 +224,11 @@ export default function VIPDeals() {
     const categoryMatch = activeCategory === "All" || asset.category === activeCategory;
     const typeMatch = appliedFilters.type === "All" || asset.type === appliedFilters.type;
     const modelMatch = appliedFilters.model === "All" || asset.model === appliedFilters.model;
-    const yearMatch = (asset.year || 0) >= parseInt(appliedFilters.yearFrom) && (asset.year || 0) <= parseInt(appliedFilters.yearTo);
-    const priceMatch = asset.priceValue >= appliedFilters.priceMin && asset.priceValue <= appliedFilters.priceMax;
+    const yearMatch =
+      (asset.year || 0) >= parseInt(appliedFilters.yearFrom) &&
+      (asset.year || 0) <= parseInt(appliedFilters.yearTo);
+    const priceMatch =
+      asset.priceValue >= appliedFilters.priceMin && asset.priceValue <= appliedFilters.priceMax;
 
     return categoryMatch && typeMatch && modelMatch && yearMatch && priceMatch;
   });
@@ -224,9 +239,7 @@ export default function VIPDeals() {
       <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-6 lg:mb-10">
         <AnimationWrapper type="fade-down" duration={0.5}>
           <div>
-            <h2 className="text-2xl sm:text-3xl font-clash font-medium tracking-wide">
-              VIP Deals
-            </h2>
+            <h2 className="text-2xl sm:text-3xl font-clash font-medium tracking-wide">VIP Deals</h2>
             <p className="text-white text-xs sm:text-sm mt-1 sm:mt-2 font-medium">
               Exclusive off-market listings available only to VIP members
             </p>
@@ -234,7 +247,7 @@ export default function VIPDeals() {
         </AnimationWrapper>
 
         {/* Category Tabs - hidden on mobile, scrollable on small, normal on lg+ */}
-        <AnimationWrapper type="fade-down" duration={0.5} delay={0.1} >
+        <AnimationWrapper type="fade-down" duration={0.5} delay={0.1}>
           <div className="overflow-x-auto pb-1 -mx-4 px-4 lg:mx-0 lg:px-0">
             <div className="flex items-center gap-1.5 bg-[#18181A] border border-[#2C2C2E] rounded-full p-1.5 w-max">
               {categories.map((cat) => (
@@ -242,9 +255,10 @@ export default function VIPDeals() {
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
                   className={`px-4 sm:px-5 py-2 rounded-full text-[11px] sm:text-[13px] font-medium transition-all duration-200 whitespace-nowrap
-                    ${activeCategory === cat
-                      ? "bg-[#E78F23] text-white shadow-[0_2px_12px_rgba(231,143,35,0.4)]"
-                      : "text-gray-400 hover:text-white hover:bg-white/5"
+                    ${
+                      activeCategory === cat
+                        ? "bg-[#E78F23] text-white shadow-[0_2px_12px_rgba(231,143,35,0.4)]"
+                        : "text-gray-400 hover:text-white hover:bg-white/5"
                     }`}
                 >
                   {cat}
@@ -319,7 +333,12 @@ export default function VIPDeals() {
         <div className="flex-1 min-w-0">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {filteredAssets.map((asset, index) => (
-              <AnimationWrapper key={asset.id} type="fade-up" duration={0.5} delay={0.05 * (index % 3)}>
+              <AnimationWrapper
+                key={asset.id}
+                type="fade-up"
+                duration={0.5}
+                delay={0.05 * (index % 3)}
+              >
                 <Link href={`/buyer/vip-deals/${asset.id}`}>
                   <MarketplaceCard asset={asset} />
                 </Link>
@@ -385,10 +404,11 @@ function FilterSidebar({
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`text-left px-3 sm:px-4 py-2 rounded-lg text-sm transition-all ${activeCategory === cat
-                ? "bg-[#2C2C2E] text-white font-medium"
-                : "text-gray-500 hover:text-gray-300"
-                }`}
+              className={`text-left px-3 sm:px-4 py-2 rounded-lg text-sm transition-all ${
+                activeCategory === cat
+                  ? "bg-[#2C2C2E] text-white font-medium"
+                  : "text-gray-500 hover:text-gray-300"
+              }`}
             >
               {cat}
             </button>
@@ -419,7 +439,9 @@ function FilterSidebar({
           <input
             type="text"
             value={draftFilters.yearFrom}
-            onChange={(e) => setDraftFilters((prev: any) => ({ ...prev, yearFrom: e.target.value }))}
+            onChange={(e) =>
+              setDraftFilters((prev: any) => ({ ...prev, yearFrom: e.target.value }))
+            }
             className="w-full bg-transparent border border-[#E78F23]/20 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-white focus:outline-none focus:border-[#E78F23] transition-colors"
             placeholder="2005"
           />

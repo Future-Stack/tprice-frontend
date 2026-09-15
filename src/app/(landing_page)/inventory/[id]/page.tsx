@@ -12,11 +12,7 @@ import {
   useSaveListingMutation,
   useSavedListingsQuery,
 } from "@/hooks/useListings";
-import {
-  useOffersQuery,
-  useCreateOfferMutation,
-  useCounterOfferMutation,
-} from "@/hooks/useOffers";
+import { useOffersQuery, useCreateOfferMutation, useCounterOfferMutation } from "@/hooks/useOffers";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 import {
   MapPin,
@@ -63,11 +59,7 @@ function formatSpecValue(key: string, val: any): string {
   const lowerKey = key.toLowerCase();
   if (typeof val === "number") {
     if (lowerKey.includes("mileage")) return `${val.toLocaleString()} mi`;
-    if (
-      lowerKey.includes("horsepower") ||
-      lowerKey.includes("power") ||
-      lowerKey === "hp"
-    )
+    if (lowerKey.includes("horsepower") || lowerKey.includes("power") || lowerKey === "hp")
       return `${val.toLocaleString()} hp`;
     if (lowerKey.includes("sqft") || lowerKey.includes("squarefeet"))
       return `${val.toLocaleString()} sq ft`;
@@ -75,8 +67,7 @@ function formatSpecValue(key: string, val: any): string {
   }
 
   const strVal = String(val);
-  if (lowerKey.includes("mileage") && !strVal.toLowerCase().includes("mi"))
-    return `${strVal} mi`;
+  if (lowerKey.includes("mileage") && !strVal.toLowerCase().includes("mi")) return `${strVal} mi`;
   if (
     (lowerKey.includes("horsepower") || lowerKey.includes("power")) &&
     !strVal.toLowerCase().includes("hp")
@@ -99,37 +90,28 @@ export default function InventoryDetailsPage() {
 
   const listingId = Array.isArray(id) ? id[0] : id;
 
-  const {
-    data: item,
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useListingByIdQuery(listingId || "");
+  const { data: item, isLoading, isError, error, refetch } = useListingByIdQuery(listingId || "");
 
   const saveMutation = useSaveListingMutation();
   const createOfferMutation = useCreateOfferMutation();
   const counterOfferMutation = useCounterOfferMutation();
 
   const token =
-    Cookies.get("accessToken") ||
-    Cookies.get("token") ||
-    useAuthStore((state) => state.token);
+    Cookies.get("accessToken") || Cookies.get("token") || useAuthStore((state) => state.token);
 
   const { data: savedResponse } = useSavedListingsQuery(
     { page: 1, limit: 100 },
-    { enabled: Boolean(token) },
+    { enabled: Boolean(token) }
   );
 
   const { data: offersResponse, isLoading: isOffersLoading } = useOffersQuery(
     { limit: 100 },
-    { enabled: Boolean(token) },
+    { enabled: Boolean(token) }
   );
 
   const existingOffer = offersResponse?.data?.find(
     (off) =>
-      String(off.listingId) === String(item?.id) ||
-      String(off.listing?.id) === String(item?.id),
+      String(off.listingId) === String(item?.id) || String(off.listing?.id) === String(item?.id)
   );
 
   // Modal States
@@ -146,10 +128,8 @@ export default function InventoryDetailsPage() {
   const [counterNote, setCounterNote] = useState<string>("");
 
   const isSavedInListings =
-    savedResponse?.data?.some((savedItem) => savedItem.id === item?.id) ??
-    false;
-  const isSaved =
-    item?.isSaved !== undefined ? item.isSaved : isSavedInListings;
+    savedResponse?.data?.some((savedItem) => savedItem.id === item?.id) ?? false;
+  const isSaved = item?.isSaved !== undefined ? item.isSaved : isSavedInListings;
 
   const handleToggleSave = () => {
     if (!item?.id) return;
@@ -172,9 +152,7 @@ export default function InventoryDetailsPage() {
         <AnimationWrapper type="zoom">
           <div className="bg-[#0A0A0A] border border-red-500/20 p-8 md:p-12 rounded-sm max-w-md w-full shadow-2xl">
             <AlertTriangle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-            <h2 className="text-2xl font-serif mb-2 text-white">
-              Asset Not Found
-            </h2>
+            <h2 className="text-2xl font-serif mb-2 text-white">Asset Not Found</h2>
             <p className="text-white/50 text-sm mb-6 leading-relaxed">
               {(error as any)?.response?.data?.message ||
                 "The requested luxury listing could not be retrieved or has been removed."}
@@ -269,17 +247,13 @@ export default function InventoryDetailsPage() {
 
   // Price formatting
   const numericPrice = item.askingPrice ? Number(item.askingPrice) : 0;
-  const currencySymbol =
-    item.currency === "USD" || !item.currency ? "$" : `${item.currency} `;
+  const currencySymbol = item.currency === "USD" || !item.currency ? "$" : `${item.currency} `;
   const formattedPrice =
-    numericPrice > 0
-      ? `${currencySymbol}${numericPrice.toLocaleString()}`
-      : "Price on Request";
+    numericPrice > 0 ? `${currencySymbol}${numericPrice.toLocaleString()}` : "Price on Request";
 
   // Location & Owner text
   const locationText =
-    [item.locationCity, item.locationCountry].filter(Boolean).join(", ") ||
-    "Worldwide Collection";
+    [item.locationCity, item.locationCountry].filter(Boolean).join(", ") || "Worldwide Collection";
 
   const ownerName = item.owner
     ? `${item.owner.firstName} ${item.owner.lastName}`
@@ -309,9 +283,7 @@ export default function InventoryDetailsPage() {
   const highestBidVal = (() => {
     if (item.highestBid === null || item.highestBid === undefined) return null;
     if (typeof item.highestBid === "object") {
-      const num = Number(
-        (item.highestBid as any).amount ?? (item.highestBid as any).price,
-      );
+      const num = Number((item.highestBid as any).amount ?? (item.highestBid as any).price);
       return !isNaN(num) && num > 0 ? num : null;
     }
     const num = Number(item.highestBid);
@@ -358,9 +330,7 @@ export default function InventoryDetailsPage() {
 
     const currentMin = highestBidVal ?? startingBidVal ?? 0;
     if (currentMin > 0 && numericAmount < currentMin) {
-      toast.error(
-        `Your bid must be at least ${currencySymbol}${currentMin.toLocaleString()}`,
-      );
+      toast.error(`Your bid must be at least ${currencySymbol}${currentMin.toLocaleString()}`);
       return;
     }
 
@@ -374,13 +344,9 @@ export default function InventoryDetailsPage() {
         onSuccess: () => {
           setIsBidModalOpen(false);
           refetch();
-          toast.success(
-            existingOffer
-              ? "Bid increased successfully!"
-              : "Bid placed successfully!",
-          );
+          toast.success(existingOffer ? "Bid increased successfully!" : "Bid placed successfully!");
         },
-      },
+      }
     );
   };
 
@@ -391,9 +357,7 @@ export default function InventoryDetailsPage() {
     }
     const initialPrice = numericPrice > 0 ? numericPrice : 0;
     setOfferAmount(initialPrice > 0 ? String(initialPrice) : "");
-    setOfferNote(
-      "Ready to proceed with immediate concierge escrow acquisition.",
-    );
+    setOfferNote("Ready to proceed with immediate concierge escrow acquisition.");
     setIsOfferModalOpen(true);
   };
 
@@ -417,7 +381,7 @@ export default function InventoryDetailsPage() {
           setIsOfferModalOpen(false);
           refetch();
         },
-      },
+      }
     );
   };
 
@@ -432,9 +396,7 @@ export default function InventoryDetailsPage() {
         ? Math.round(numericPrice * 0.95)
         : 0;
     setCounterAmount(initialPrice > 0 ? String(initialPrice) : "");
-    setCounterNote(
-      "Counter offer proposed for expedited purchase agreement.",
-    );
+    setCounterNote("Counter offer proposed for expedited purchase agreement.");
     setIsCounterModalOpen(true);
   };
 
@@ -461,7 +423,7 @@ export default function InventoryDetailsPage() {
             setIsCounterModalOpen(false);
             refetch();
           },
-        },
+        }
       );
     } else {
       createOfferMutation.mutate(
@@ -476,7 +438,7 @@ export default function InventoryDetailsPage() {
             refetch();
             toast.success("Counter offer submitted successfully!");
           },
-        },
+        }
       );
     }
   };
@@ -487,9 +449,7 @@ export default function InventoryDetailsPage() {
       ? [...item.media]
           .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
           .map((m) => ({
-            type: (m.type?.toLowerCase() === "video" ? "video" : "image") as
-              | "video"
-              | "image",
+            type: (m.type?.toLowerCase() === "video" ? "video" : "image") as "video" | "image",
             url: m.url,
           }))
       : [
@@ -548,8 +508,7 @@ export default function InventoryDetailsPage() {
                         <div className="flex items-center gap-1.5 text-xs text-white/30">
                           <Eye size={14} />
                           <span>
-                            {item.viewsCount}{" "}
-                            {item.viewsCount === 1 ? "view" : "views"}
+                            {item.viewsCount} {item.viewsCount === 1 ? "view" : "views"}
                           </span>
                         </div>
                       )}
@@ -562,9 +521,7 @@ export default function InventoryDetailsPage() {
 
                   <div className="flex flex-col items-end gap-2">
                     <span className="px-3 py-1 bg-white/5 border border-white/10 text-[10px] text-white/70 uppercase tracking-widest rounded-sm font-semibold">
-                      {item.saleType
-                        ? item.saleType.replace(/_/g, " ")
-                        : item.status || "LIVE"}
+                      {item.saleType ? item.saleType.replace(/_/g, " ") : item.status || "LIVE"}
                     </span>
                     {item.allowCounterOffers && (
                       <span className="text-[10px] text-emerald-400/80 font-medium tracking-wide">
@@ -621,9 +578,7 @@ export default function InventoryDetailsPage() {
                       </div>
                     )}
                     <div>
-                      <h4 className="text-lg font-serif text-white leading-tight">
-                        {ownerName}
-                      </h4>
+                      <h4 className="text-lg font-serif text-white leading-tight">{ownerName}</h4>
                       <p className="text-[10px] text-white/40 uppercase tracking-widest">
                         {item.owner?.role || "Verified Dealer"}
                       </p>
@@ -656,8 +611,8 @@ export default function InventoryDetailsPage() {
                   </div>
 
                   <p className="text-white/50 text-xs leading-relaxed italic pt-1">
-                    Premier luxury asset offering verified provenance and
-                    immediate concierge acquisition.
+                    Premier luxury asset offering verified provenance and immediate concierge
+                    acquisition.
                   </p>
                 </div>
 
@@ -672,8 +627,7 @@ export default function InventoryDetailsPage() {
                         </span>
                         {totalBidsCountVal !== null && totalBidsCountVal > 0 ? (
                           <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-sm border border-emerald-500/20 font-medium">
-                            {totalBidsCountVal}{" "}
-                            {totalBidsCountVal === 1 ? "bid" : "bids"}
+                            {totalBidsCountVal} {totalBidsCountVal === 1 ? "bid" : "bids"}
                           </span>
                         ) : (
                           <span className="text-[10px] text-white/40 bg-white/5 px-2 py-0.5 rounded-sm font-medium">
@@ -704,13 +658,9 @@ export default function InventoryDetailsPage() {
                     {isOffersLoading ? (
                       <div className="w-full h-12 bg-white/5 border border-white/10 rounded-sm animate-pulse" />
                     ) : existingOffer &&
-                      [
-                        "PENDING",
-                        "LEADING",
-                        "OUTBID",
-                        "COUNTERED",
-                        "ACCEPTED",
-                      ].includes((existingOffer.status || "").toUpperCase()) ? (
+                      ["PENDING", "LEADING", "OUTBID", "COUNTERED", "ACCEPTED"].includes(
+                        (existingOffer.status || "").toUpperCase()
+                      ) ? (
                       <button
                         onClick={handleOpenPlaceBidModal}
                         className="w-full py-4 bg-[#D4AF37]/15 border border-[#D4AF37] text-[#D4AF37] font-bold text-sm uppercase tracking-widest hover:bg-[#D4AF37]/25 transition-all cursor-pointer flex items-center justify-center gap-2 rounded-sm active:scale-[0.99]"
@@ -718,8 +668,7 @@ export default function InventoryDetailsPage() {
                         <Gavel size={16} />
                         Increase Bid ($
                         {Number(
-                          existingOffer.currentAmount ||
-                            existingOffer.initialAmount,
+                          existingOffer.currentAmount || existingOffer.initialAmount
                         ).toLocaleString()}
                         )
                       </button>
@@ -742,7 +691,7 @@ export default function InventoryDetailsPage() {
                       <div className="w-full h-12 bg-white/5 border border-white/10 rounded-sm animate-pulse" />
                     ) : existingOffer &&
                       ["PENDING", "COUNTERED", "ACCEPTED"].includes(
-                        (existingOffer.status || "").toUpperCase(),
+                        (existingOffer.status || "").toUpperCase()
                       ) ? (
                       <button
                         onClick={handleOpenSendOfferModal}
@@ -751,8 +700,7 @@ export default function InventoryDetailsPage() {
                         <Clock size={16} />
                         Offer Sent ($
                         {Number(
-                          existingOffer.currentAmount ||
-                            existingOffer.initialAmount,
+                          existingOffer.currentAmount || existingOffer.initialAmount
                         ).toLocaleString()}
                         )
                       </button>
@@ -809,18 +757,11 @@ export default function InventoryDetailsPage() {
                 <div className="pt-6 border-t border-white/5 space-y-4">
                   <div className="flex items-center gap-4 text-white/40 hover:text-white transition-colors cursor-pointer group">
                     <Wrench size={16} className="group-hover:text-[#D4AF37]" />
-                    <span className="text-xs uppercase tracking-widest">
-                      Certified Inspection
-                    </span>
+                    <span className="text-xs uppercase tracking-widest">Certified Inspection</span>
                   </div>
                   <div className="flex items-center gap-4 text-white/40 hover:text-white transition-colors cursor-pointer group">
-                    <ShieldCheck
-                      size={16}
-                      className="group-hover:text-[#D4AF37]"
-                    />
-                    <span className="text-xs uppercase tracking-widest">
-                      Warranty & Provenance
-                    </span>
+                    <ShieldCheck size={16} className="group-hover:text-[#D4AF37]" />
+                    <span className="text-xs uppercase tracking-widest">Warranty & Provenance</span>
                   </div>
                 </div>
               </div>
@@ -834,10 +775,7 @@ export default function InventoryDetailsPage() {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
           onClick={(e) => {
-            if (
-              e.target === e.currentTarget &&
-              !createOfferMutation.isPending
-            ) {
+            if (e.target === e.currentTarget && !createOfferMutation.isPending) {
               setIsBidModalOpen(false);
             }
           }}
@@ -899,33 +837,21 @@ export default function InventoryDetailsPage() {
                       <>
                         <button
                           type="button"
-                          onClick={() =>
-                            setBidAmount(
-                              String(Math.round(highestBidVal * 1.05)),
-                            )
-                          }
+                          onClick={() => setBidAmount(String(Math.round(highestBidVal * 1.05)))}
                           className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-sm text-white/70 transition-colors"
                         >
                           +5%
                         </button>
                         <button
                           type="button"
-                          onClick={() =>
-                            setBidAmount(
-                              String(Math.round(highestBidVal * 1.1)),
-                            )
-                          }
+                          onClick={() => setBidAmount(String(Math.round(highestBidVal * 1.1)))}
                           className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-sm text-white/70 transition-colors"
                         >
                           +10%
                         </button>
                         <button
                           type="button"
-                          onClick={() =>
-                            setBidAmount(
-                              String(Math.round(highestBidVal * 1.15)),
-                            )
-                          }
+                          onClick={() => setBidAmount(String(Math.round(highestBidVal * 1.15)))}
                           className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-sm text-white/70 transition-colors"
                         >
                           +15%
@@ -954,9 +880,7 @@ export default function InventoryDetailsPage() {
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-white/70 mb-2">
                   Bidder Notes / Terms{" "}
-                  <span className="text-white/40 font-normal lowercase">
-                    (optional)
-                  </span>
+                  <span className="text-white/40 font-normal lowercase">(optional)</span>
                 </label>
                 <textarea
                   rows={2}
@@ -1003,10 +927,7 @@ export default function InventoryDetailsPage() {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
           onClick={(e) => {
-            if (
-              e.target === e.currentTarget &&
-              !createOfferMutation.isPending
-            ) {
+            if (e.target === e.currentTarget && !createOfferMutation.isPending) {
               setIsOfferModalOpen(false);
             }
           }}
@@ -1047,9 +968,7 @@ export default function InventoryDetailsPage() {
                 </h4>
                 <p className="text-xs text-white/50 mt-0.5">
                   Asking Price:{" "}
-                  <span className="text-[#D4AF37] font-semibold">
-                    {formattedPrice}
-                  </span>
+                  <span className="text-[#D4AF37] font-semibold">{formattedPrice}</span>
                 </p>
               </div>
             </div>
@@ -1073,22 +992,14 @@ export default function InventoryDetailsPage() {
                       </button>
                       <button
                         type="button"
-                        onClick={() =>
-                          setOfferAmount(
-                            String(Math.round(numericPrice * 0.95)),
-                          )
-                        }
+                        onClick={() => setOfferAmount(String(Math.round(numericPrice * 0.95)))}
                         className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-sm text-white/70 transition-colors"
                       >
                         -5%
                       </button>
                       <button
                         type="button"
-                        onClick={() =>
-                          setOfferAmount(
-                            String(Math.round(numericPrice * 0.9)),
-                          )
-                        }
+                        onClick={() => setOfferAmount(String(Math.round(numericPrice * 0.9)))}
                         className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-sm text-white/70 transition-colors"
                       >
                         -10%
@@ -1116,9 +1027,7 @@ export default function InventoryDetailsPage() {
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-white/70 mb-2">
                   Offer Terms / Notes{" "}
-                  <span className="text-white/40 font-normal lowercase">
-                    (optional)
-                  </span>
+                  <span className="text-white/40 font-normal lowercase">(optional)</span>
                 </label>
                 <textarea
                   rows={2}
@@ -1185,10 +1094,7 @@ export default function InventoryDetailsPage() {
               </div>
               <button
                 onClick={() => setIsCounterModalOpen(false)}
-                disabled={
-                  counterOfferMutation.isPending ||
-                  createOfferMutation.isPending
-                }
+                disabled={counterOfferMutation.isPending || createOfferMutation.isPending}
                 className="w-8 h-8 rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-colors cursor-pointer disabled:opacity-50"
               >
                 <X className="w-4 h-4" />
@@ -1243,9 +1149,7 @@ export default function InventoryDetailsPage() {
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-white/70 mb-2">
                   Counter Terms / Notes{" "}
-                  <span className="text-white/40 font-normal lowercase">
-                    (optional)
-                  </span>
+                  <span className="text-white/40 font-normal lowercase">(optional)</span>
                 </label>
                 <textarea
                   rows={2}
@@ -1260,24 +1164,17 @@ export default function InventoryDetailsPage() {
                 <button
                   type="button"
                   onClick={() => setIsCounterModalOpen(false)}
-                  disabled={
-                    counterOfferMutation.isPending ||
-                    createOfferMutation.isPending
-                  }
+                  disabled={counterOfferMutation.isPending || createOfferMutation.isPending}
                   className="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs uppercase tracking-widest rounded-sm transition-all cursor-pointer disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  disabled={
-                    counterOfferMutation.isPending ||
-                    createOfferMutation.isPending
-                  }
+                  disabled={counterOfferMutation.isPending || createOfferMutation.isPending}
                   className="flex-1 py-3 bg-[#D4AF37] hover:bg-[#B8962E] text-black font-bold text-xs uppercase tracking-widest rounded-sm transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  {counterOfferMutation.isPending ||
-                  createOfferMutation.isPending ? (
+                  {counterOfferMutation.isPending || createOfferMutation.isPending ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
                       Submitting...
@@ -1308,9 +1205,7 @@ function QuickSpecBox({
     <div className="bg-[#0A0A0A] border border-white/5 p-6 rounded-sm space-y-4 hover:border-[#D4AF37]/30 transition-all group">
       <div className="flex justify-center">{icon}</div>
       <div className="text-center space-y-1">
-        <div className="text-white/30 text-[10px] uppercase tracking-widest font-bold">
-          {label}
-        </div>
+        <div className="text-white/30 text-[10px] uppercase tracking-widest font-bold">{label}</div>
         <div
           className="text-white text-sm font-bold group-hover:text-white transition-colors truncate"
           title={value}
@@ -1392,10 +1287,7 @@ function InventoryDetailsSkeleton() {
               <div className="h-6 w-40 bg-white/10 rounded-sm pb-4 border-b border-white/5" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-4">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <div
-                    key={i}
-                    className="flex justify-between items-center gap-4"
-                  >
+                  <div key={i} className="flex justify-between items-center gap-4">
                     <div className="w-24 h-4 bg-white/10 rounded" />
                     <div className="flex-1 border-b border-dotted border-white/10" />
                     <div className="w-28 h-4 bg-white/10 rounded" />

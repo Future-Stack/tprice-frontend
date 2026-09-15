@@ -79,9 +79,7 @@ export default function BuyerReviewsPage() {
     if (user) {
       if (!reviewerName) {
         const name =
-          user.fullName ||
-          [user.firstName, user.lastName].filter(Boolean).join(" ") ||
-          "";
+          user.fullName || [user.firstName, user.lastName].filter(Boolean).join(" ") || "";
         if (name) setReviewerName(name);
       }
       if (!avatarUrl && user.avatarUrl) {
@@ -91,9 +89,7 @@ export default function BuyerReviewsPage() {
   }, [user]);
 
   // Handle avatar upload
-  const handleAvatarFileChange = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleAvatarFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -110,9 +106,7 @@ export default function BuyerReviewsPage() {
       setAvatarUrl(res.url);
       toast.success("Avatar image uploaded successfully!");
     } catch (err: any) {
-      toast.error(
-        err.response?.data?.message || "Failed to upload avatar image",
-      );
+      toast.error(err.response?.data?.message || "Failed to upload avatar image");
     }
   };
 
@@ -174,9 +168,7 @@ export default function BuyerReviewsPage() {
         highlightTags: highlightTags.length > 0 ? highlightTags : undefined,
       });
 
-      toast.success(
-        "Thank you! Your VIP review has been submitted successfully.",
-      );
+      toast.success("Thank you! Your VIP review has been submitted successfully.");
 
       // Reset form
       setContent("");
@@ -184,10 +176,7 @@ export default function BuyerReviewsPage() {
       setHighlightTags([]);
       setIsFormOpen(false);
     } catch (err: any) {
-      toast.error(
-        err.response?.data?.message ||
-          "Failed to submit review. Please try again.",
-      );
+      toast.error(err.response?.data?.message || "Failed to submit review. Please try again.");
     }
   };
 
@@ -216,23 +205,21 @@ export default function BuyerReviewsPage() {
             </div>
 
             <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#E78F23]/10 border border-[#E78F23]/30 rounded-full text-xs font-semibold text-primary mb-4">
-              <Crown className="w-3.5 h-3.5" fill="currentColor" /> VIP
-              Membership Required
+              <Crown className="w-3.5 h-3.5" fill="currentColor" /> VIP Membership Required
             </div>
 
             <h2 className="text-2xl sm:text-3xl font-clash font-semibold text-white mb-3">
               VIP Review Access Restricted
             </h2>
             <p className="text-gray-400 text-sm max-w-xl mx-auto mb-8 leading-relaxed">
-              The Reviews section is exclusively reserved for VIP Members of
-              ExoticWorld. Upgrade your account to leave official member reviews
-              and gain access to luxury off-market deals.
+              The Reviews section is exclusively reserved for VIP Members of ExoticWorld. Upgrade
+              your account to leave official member reviews and gain access to luxury off-market
+              deals.
             </p>
 
             <Link href="/buyer/settings">
               <button className="px-6 py-3 bg-primary hover:bg-primary text-black font-semibold text-sm rounded-xl transition-all shadow-lg shadow-[#E78F23]/20 flex items-center gap-2 mx-auto cursor-pointer">
-                Upgrade to VIP Membership{" "}
-                <Crown className="w-4 h-4" fill="currentColor" />
+                Upgrade to VIP Membership <Crown className="w-4 h-4" fill="currentColor" />
               </button>
             </Link>
           </div>
@@ -258,8 +245,8 @@ export default function BuyerReviewsPage() {
               VIP Member Reviews
             </h2>
             <p className="text-gray-400 text-xs sm:text-sm mt-1">
-              Share your prestigious experience and view verified feedback from
-              our VIP global network
+              Share your prestigious experience and view verified feedback from our VIP global
+              network
             </p>
           </div>
         </AnimationWrapper>
@@ -293,12 +280,9 @@ export default function BuyerReviewsPage() {
                 <MessageSquareQuote className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-lg font-clash font-semibold text-white">
-                  Write a VIP Review
-                </h3>
+                <h3 className="text-lg font-clash font-semibold text-white">Write a VIP Review</h3>
                 <p className="text-gray-400 text-xs">
-                  Your review will be shared with the ExoticWorld community upon
-                  approval
+                  Your review will be shared with the ExoticWorld community upon approval
                 </p>
               </div>
             </div>
@@ -391,11 +375,7 @@ export default function BuyerReviewsPage() {
                     <div className="flex-1 space-y-2">
                       <label className="inline-flex items-center gap-2 px-4 py-2 bg-[#18181A] hover:bg-[#2C2C2E] border border-[#2C2C2E] text-white text-xs font-medium rounded-xl cursor-pointer transition-colors">
                         <Upload className="w-3.5 h-3.5 text-primary" />
-                        <span>
-                          {uploadMutation.isPending
-                            ? "Uploading..."
-                            : "Upload Avatar"}
-                        </span>
+                        <span>{uploadMutation.isPending ? "Uploading..." : "Upload Avatar"}</span>
                         <input
                           type="file"
                           accept="image/*"
@@ -404,9 +384,7 @@ export default function BuyerReviewsPage() {
                           className="hidden"
                         />
                       </label>
-                      <p className="text-[11px] text-gray-500">
-                        Or enter direct image URL below:
-                      </p>
+                      <p className="text-[11px] text-gray-500">Or enter direct image URL below:</p>
                       <input
                         type="url"
                         value={avatarUrl}
@@ -437,9 +415,7 @@ export default function BuyerReviewsPage() {
                         >
                           <Star
                             className={`w-7 h-7 transition-colors ${
-                              isFilled
-                                ? "text-primary fill-primary"
-                                : "text-gray-600"
+                              isFilled ? "text-primary fill-primary" : "text-gray-600"
                             }`}
                           />
                         </button>
@@ -466,9 +442,7 @@ export default function BuyerReviewsPage() {
                   <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider">
                     Review Content <span className="text-primary">*</span>
                   </label>
-                  <span className="text-[11px] text-gray-500">
-                    {content.length} characters
-                  </span>
+                  <span className="text-[11px] text-gray-500">{content.length} characters</span>
                 </div>
                 <textarea
                   rows={4}
@@ -531,9 +505,7 @@ export default function BuyerReviewsPage() {
 
                 {/* Quick Add Tag Suggestions */}
                 <div className="mt-3">
-                  <span className="text-[11px] text-gray-500 mr-2">
-                    Quick suggestions:
-                  </span>
+                  <span className="text-[11px] text-gray-500 mr-2">Quick suggestions:</span>
                   <div className="inline-flex flex-wrap gap-1.5 mt-1">
                     {RECOMMENDED_TAGS.map((recTag) => {
                       const isAdded = highlightTags.includes(recTag);
@@ -593,9 +565,7 @@ export default function BuyerReviewsPage() {
           <h3 className="text-lg font-clash font-semibold text-white flex items-center gap-2">
             Published Member Reviews
           </h3>
-          <span className="text-xs text-gray-400">
-            Total {reviewsList.length} verified reviews
-          </span>
+          <span className="text-xs text-gray-400">Total {reviewsList.length} verified reviews</span>
         </div>
 
         {/* Loading Skeleton */}
@@ -615,9 +585,7 @@ export default function BuyerReviewsPage() {
           <AnimationWrapper type="zoom" duration={0.4}>
             <div className="p-12 text-center bg-[#1C1C1E] border border-[#2C2C2E] rounded-2xl">
               <MessageSquareQuote className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-              <p className="text-white font-medium text-base mb-1">
-                No VIP reviews yet
-              </p>
+              <p className="text-white font-medium text-base mb-1">No VIP reviews yet</p>
               <p className="text-gray-400 text-xs max-w-md mx-auto mb-5">
                 Be the first VIP member to submit a review for ExoticWorld.
               </p>
@@ -638,10 +606,7 @@ export default function BuyerReviewsPage() {
                 duration={0.4}
                 delay={0.05 * (index % 4)}
               >
-                <ReviewCard
-                  review={review}
-                  onEdit={(rev) => setEditingReview(rev)}
-                />
+                <ReviewCard review={review} onEdit={(rev) => setEditingReview(rev)} />
               </AnimationWrapper>
             ))}
           </div>
@@ -696,9 +661,7 @@ function UpdateReviewModal({
 
   if (!isOpen || !review) return null;
 
-  const handleAvatarFileChange = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleAvatarFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -715,9 +678,7 @@ function UpdateReviewModal({
       setAvatarUrl(res.url);
       toast.success("Avatar image uploaded successfully!");
     } catch (err: any) {
-      toast.error(
-        err.response?.data?.message || "Failed to upload avatar image",
-      );
+      toast.error(err.response?.data?.message || "Failed to upload avatar image");
     }
   };
 
@@ -782,10 +743,7 @@ function UpdateReviewModal({
       toast.success("VIP review updated successfully!");
       onClose();
     } catch (err: any) {
-      toast.error(
-        err.response?.data?.message ||
-          "Failed to update review. Please try again.",
-      );
+      toast.error(err.response?.data?.message || "Failed to update review. Please try again.");
     }
   };
 
@@ -798,9 +756,7 @@ function UpdateReviewModal({
               <Edit3 className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-lg font-clash font-semibold text-white">
-                Update VIP Review
-              </h3>
+              <h3 className="text-lg font-clash font-semibold text-white">Update VIP Review</h3>
               <p className="text-gray-400 text-xs">
                 Modify your review details, rating, or highlight tags
               </p>
@@ -900,11 +856,7 @@ function UpdateReviewModal({
                 <div className="flex-1 space-y-2">
                   <label className="inline-flex items-center gap-2 px-4 py-2 bg-[#18181A] hover:bg-[#2C2C2E] border border-[#2C2C2E] text-white text-xs font-medium rounded-xl cursor-pointer transition-colors">
                     <Upload className="w-3.5 h-3.5 text-primary" />
-                    <span>
-                      {uploadMutation.isPending
-                        ? "Uploading..."
-                        : "Upload New Avatar"}
-                    </span>
+                    <span>{uploadMutation.isPending ? "Uploading..." : "Upload New Avatar"}</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -942,9 +894,7 @@ function UpdateReviewModal({
                     >
                       <Star
                         className={`w-6 h-6 transition-colors ${
-                          isFilled
-                            ? "text-primary fill-primary"
-                            : "text-gray-600"
+                          isFilled ? "text-primary fill-primary" : "text-gray-600"
                         }`}
                       />
                     </button>
@@ -960,9 +910,7 @@ function UpdateReviewModal({
               <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider">
                 Review Content <span className="text-primary">*</span>
               </label>
-              <span className="text-[11px] text-gray-500">
-                {content.length} characters
-              </span>
+              <span className="text-[11px] text-gray-500">{content.length} characters</span>
             </div>
             <textarea
               rows={4}
@@ -1022,9 +970,7 @@ function UpdateReviewModal({
 
             {/* Quick Add Tag Suggestions */}
             <div className="mt-3">
-              <span className="text-[11px] text-gray-500 mr-2">
-                Quick suggestions:
-              </span>
+              <span className="text-[11px] text-gray-500 mr-2">Quick suggestions:</span>
               <div className="inline-flex flex-wrap gap-1.5 mt-1">
                 {RECOMMENDED_TAGS.map((recTag) => {
                   const isAdded = highlightTags.includes(recTag);
@@ -1097,15 +1043,11 @@ function ReviewCard({
               <Star
                 key={i}
                 className={`w-4 h-4 ${
-                  i < (review.rating || 5)
-                    ? "text-primary fill-primary"
-                    : "text-gray-600"
+                  i < (review.rating || 5) ? "text-primary fill-primary" : "text-gray-600"
                 }`}
               />
             ))}
-            <span className="ml-2 text-xs font-semibold text-white">
-              {review.rating}.0
-            </span>
+            <span className="ml-2 text-xs font-semibold text-white">{review.rating}.0</span>
           </div>
 
           <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#E78F23]/10 text-primary border border-[#E78F23]/25 flex items-center gap-1">
@@ -1153,12 +1095,8 @@ function ReviewCard({
         </div>
 
         <div className="flex-1 min-w-0">
-          <h4 className="text-sm font-semibold text-white truncate">
-            {review.reviewerName}
-          </h4>
-          <p className="text-xs text-gray-400 truncate">
-            {review.reviewerTitle}
-          </p>
+          <h4 className="text-sm font-semibold text-white truncate">{review.reviewerName}</h4>
+          <p className="text-xs text-gray-400 truncate">{review.reviewerTitle}</p>
         </div>
 
         <div className="flex items-center gap-1 text-xs text-gray-400 bg-[#18181A] px-2.5 py-1 rounded-lg border border-[#2C2C2E]">

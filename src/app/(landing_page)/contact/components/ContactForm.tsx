@@ -18,9 +18,7 @@ export default function ContactForm() {
 
   const { mutate: submitInquiry, isPending } = useContactInquiryMutation();
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -76,9 +74,7 @@ export default function ContactForm() {
       >
         <div className="flex flex-col h-full space-y-6">
           <div>
-            <h2 className="text-xl md:text-2xl font-serif text-white mb-1">
-              Send a Message
-            </h2>
+            <h2 className="text-xl md:text-2xl font-serif text-white mb-1">Send a Message</h2>
             <p className="text-white/40 text-[12px]">
               All inquiries are handled with complete confidentiality.
             </p>
@@ -205,7 +201,8 @@ export default function ContactForm() {
                   Inquiry Sent Successfully!
                 </h3>
                 <p className="text-white/60 text-xs sm:text-sm leading-relaxed max-w-xs mx-auto">
-                  Thank you for reaching out. We have received your message and our team will get back to you as soon as possible.
+                  Thank you for reaching out. We have received your message and our team will get
+                  back to you as soon as possible.
                 </p>
               </div>
 

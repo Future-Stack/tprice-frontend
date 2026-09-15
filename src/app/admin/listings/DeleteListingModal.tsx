@@ -55,17 +55,10 @@ export default function DeleteListingModal({
         {/* Listing preview card */}
         <div className="flex items-center gap-4 p-3 bg-[#1A1A1C] border border-[#262626] rounded-xl">
           <div className="relative w-16 h-12 rounded-lg overflow-hidden border border-[#262626] bg-[#111] shrink-0">
-            <Image
-              src={mainImage}
-              alt={listing.title}
-              fill
-              className="object-cover"
-            />
+            <Image src={mainImage} alt={listing.title} fill className="object-cover" />
           </div>
           <div className="min-w-0 flex-1">
-            <h4 className="font-semibold text-sm text-white line-clamp-1">
-              {listing.title}
-            </h4>
+            <h4 className="font-semibold text-sm text-white line-clamp-1">{listing.title}</h4>
             <p className="text-xs text-gray-400 capitalize">
               {listing.category} • {listing.brand || "Listing"}
             </p>
@@ -74,7 +67,9 @@ export default function DeleteListingModal({
 
         {/* Warning text */}
         <p className="text-xs text-gray-300 leading-relaxed">
-          Are you sure you want to permanently remove <strong className="text-white">&quot;{listing.title}&quot;</strong> from the marketplace? Associated data will be purged.
+          Are you sure you want to permanently remove{" "}
+          <strong className="text-white">&quot;{listing.title}&quot;</strong> from the marketplace?
+          Associated data will be purged.
         </p>
 
         {/* Action buttons */}

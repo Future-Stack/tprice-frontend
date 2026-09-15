@@ -118,7 +118,7 @@ export default function AdminEventsPage() {
     return list.filter(
       (event) =>
         (event.title || "").toLowerCase().includes(query) ||
-        (event.location || "").toLowerCase().includes(query),
+        (event.location || "").toLowerCase().includes(query)
     );
   }, [data?.data, searchQuery]);
   const meta = data?.meta;
@@ -143,7 +143,7 @@ export default function AdminEventsPage() {
       try {
         await deleteEventMutation.mutateAsync(id);
         toast.success("Event deleted successfully");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         toast.error(err?.response?.data?.message || "Failed to delete event");
       }
@@ -156,9 +156,7 @@ export default function AdminEventsPage() {
       <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <AnimationWrapper type="fade-down" duration={0.5}>
           <div>
-            <h1 className="text-3xl font-bold font-montserrat">
-              Events Management
-            </h1>
+            <h1 className="text-3xl font-bold font-montserrat">Events Management</h1>
             <p className="text-gray-400 text-sm">
               Monitor, create, and manage all luxury platform events
             </p>
@@ -184,10 +182,11 @@ export default function AdminEventsPage() {
               <button
                 key={cat.value}
                 onClick={() => handleCategoryChange(cat.value)}
-                className={`pb-4 text-sm font-medium transition-all relative whitespace-nowrap cursor-pointer ${activeCategory === cat.value
-                  ? "text-white font-semibold"
-                  : "text-gray-500 hover:text-gray-300"
-                  }`}
+                className={`pb-4 text-sm font-medium transition-all relative whitespace-nowrap cursor-pointer ${
+                  activeCategory === cat.value
+                    ? "text-white font-semibold"
+                    : "text-gray-500 hover:text-gray-300"
+                }`}
               >
                 {cat.label}
                 {activeCategory === cat.value && (
@@ -223,11 +222,7 @@ export default function AdminEventsPage() {
                 className="bg-[#141416] border border-[#262626] rounded-xl px-4 py-2.5 text-xs text-gray-300 focus:outline-none focus:border-primary/60 transition-colors cursor-pointer appearance-none pr-8"
               >
                 {STATUS_OPTIONS.map((st) => (
-                  <option
-                    key={st.value}
-                    value={st.value}
-                    className="bg-[#141416] text-white"
-                  >
+                  <option key={st.value} value={st.value} className="bg-[#141416] text-white">
                     {st.label}
                   </option>
                 ))}
@@ -283,9 +278,7 @@ export default function AdminEventsPage() {
                     <td colSpan={7} className="px-6 py-16 text-center">
                       <div className="max-w-md mx-auto space-y-3">
                         <Calendar className="w-10 h-10 text-gray-600 mx-auto" />
-                        <p className="text-base font-semibold text-gray-300">
-                          No events found
-                        </p>
+                        <p className="text-base font-semibold text-gray-300">No events found</p>
                         <p className="text-xs text-gray-500">
                           There are no events matching your current filters.
                         </p>
@@ -303,15 +296,11 @@ export default function AdminEventsPage() {
                         <div className="flex items-center gap-4">
                           <div className="relative w-20 h-14 rounded-lg overflow-hidden border border-[#262626] bg-[#1A1A1A] shrink-0">
                             <img
-                              src={
-                                event.coverImageUrl ||
-                                "/images/landing/hero-car.png"
-                              }
+                              src={event.coverImageUrl || "/images/landing/hero-car.png"}
                               alt={event.title}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                               onError={(e) => {
-                                (e.target as HTMLImageElement).src =
-                                  "/images/landing/hero-car.png";
+                                (e.target as HTMLImageElement).src = "/images/landing/hero-car.png";
                               }}
                             />
                           </div>
@@ -352,14 +341,15 @@ export default function AdminEventsPage() {
                       {/* Status Badge */}
                       <td className="px-6 py-5">
                         <span
-                          className={`inline-flex px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${event.status === "UPCOMING"
-                            ? "bg-green-500/10 text-green-400 border border-green-500/20"
-                            : event.status === "ONGOING"
-                              ? "bg-yellow-500/10 text-primary border border-primary/20"
-                              : event.status === "CANCELLED"
-                                ? "bg-red-500/10 text-red-400 border border-red-500/20"
-                                : "bg-gray-500/10 text-gray-400 border border-gray-500/20"
-                            }`}
+                          className={`inline-flex px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${
+                            event.status === "UPCOMING"
+                              ? "bg-green-500/10 text-green-400 border border-green-500/20"
+                              : event.status === "ONGOING"
+                                ? "bg-yellow-500/10 text-primary border border-primary/20"
+                                : event.status === "CANCELLED"
+                                  ? "bg-red-500/10 text-red-400 border border-red-500/20"
+                                  : "bg-gray-500/10 text-gray-400 border border-gray-500/20"
+                          }`}
                         >
                           {event.status}
                         </span>
@@ -414,12 +404,7 @@ export default function AdminEventsPage() {
 
                 <div className="flex items-center gap-1 px-2">
                   {Array.from({ length: meta.totalPages }, (_, i) => i + 1)
-                    .filter(
-                      (p) =>
-                        p === 1 ||
-                        p === meta.totalPages ||
-                        Math.abs(p - meta.page) <= 1,
-                    )
+                    .filter((p) => p === 1 || p === meta.totalPages || Math.abs(p - meta.page) <= 1)
                     .map((p, idx, arr) => (
                       <React.Fragment key={p}>
                         {idx > 0 && arr[idx - 1] !== p - 1 && (
@@ -427,10 +412,11 @@ export default function AdminEventsPage() {
                         )}
                         <button
                           onClick={() => setPage(p)}
-                          className={`w-7 h-7 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${page === p
-                            ? "bg-primary text-black"
-                            : "bg-[#1C1C1E] text-gray-400 hover:text-white border border-[#262626]"
-                            }`}
+                          className={`w-7 h-7 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${
+                            page === p
+                              ? "bg-primary text-black"
+                              : "bg-[#1C1C1E] text-gray-400 hover:text-white border border-[#262626]"
+                          }`}
                         >
                           {p}
                         </button>
@@ -439,9 +425,7 @@ export default function AdminEventsPage() {
                 </div>
 
                 <button
-                  onClick={() =>
-                    setPage((prev) => Math.min(prev + 1, meta.totalPages))
-                  }
+                  onClick={() => setPage((prev) => Math.min(prev + 1, meta.totalPages))}
                   disabled={page >= meta.totalPages || isLoading}
                   className="px-3 py-1.5 bg-[#1C1C1E] border border-[#262626] rounded-lg hover:bg-white/5 text-gray-300 disabled:opacity-40 disabled:hover:bg-transparent cursor-pointer disabled:cursor-not-allowed flex items-center gap-1 transition-colors"
                 >
@@ -454,10 +438,7 @@ export default function AdminEventsPage() {
       </AnimationWrapper>
 
       {/* Create Event Modal */}
-      <CreateEventModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-      />
+      <CreateEventModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
 
       {/* Edit Event Modal */}
       <EditEventModal

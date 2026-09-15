@@ -2,15 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import {
-  Bell,
-  ChevronDown,
-  Check,
-  RefreshCcw,
-  X,
-  Send,
-  TrendingUp
-} from "lucide-react";
+import { Bell, ChevronDown, Check, RefreshCcw, X, Send, TrendingUp } from "lucide-react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
 
 const Messages = () => {
@@ -96,7 +88,9 @@ const Messages = () => {
           {/* Left Sidebar - Menu List */}
           <div className="lg:col-span-3 flex flex-col h-[500px] lg:h-full border border-white/5 lg:border-y-0 lg:border-l-0 lg:border-r rounded-2xl lg:rounded-none p-4 lg:p-0 lg:pr-4 space-y-6 bg-[#0F0F11] lg:bg-transparent">
             <div className="flex items-center justify-between lg:block">
-              <h1 className="text-2xl md:text-[32px] font-medium tracking-tight lg:mb-6">Messages</h1>
+              <h1 className="text-2xl md:text-[32px] font-medium tracking-tight lg:mb-6">
+                Messages
+              </h1>
               <button className="px-4 py-2 lg:px-5 lg:py-2.5 rounded-lg border border-[#D4AF37]/30 text-[#D4AF37] text-xs lg:text-sm font-medium hover:bg-[#D4AF37]/10 transition-colors">
                 Message list
               </button>
@@ -108,18 +102,14 @@ const Messages = () => {
                   key={chat.id}
                   onClick={() => setActiveChat(chat.id)}
                   className={`p-4 rounded-2xl cursor-pointer transition-all ${
-                    activeChat === chat.id
-                      ? "bg-white/10"
-                      : "bg-transparent hover:bg-white/5"
+                    activeChat === chat.id ? "bg-white/10" : "bg-transparent hover:bg-white/5"
                   }`}
                 >
                   <div className="flex justify-between items-start mb-1">
                     <span className="font-semibold text-white/90">{chat.name}</span>
                     <span className="text-[10px] text-gray-500">{chat.time}</span>
                   </div>
-                  <div className="text-[11px] text-gray-500 mb-2 truncate">
-                    {chat.car}
-                  </div>
+                  <div className="text-[11px] text-gray-500 mb-2 truncate">{chat.car}</div>
                   <div className="flex items-start gap-2 mb-3">
                     {chat.isOffer && (
                       <div className="mt-1 w-3 h-3 rounded-full bg-[#D4AF37] flex items-center justify-center shrink-0">
@@ -145,8 +135,12 @@ const Messages = () => {
             {/* Header */}
             <div className="flex items-center justify-between p-4 md:p-6 border-b border-white/5">
               <div className="flex flex-col">
-                <span className="text-lg md:text-xl font-semibold mb-1 truncate max-w-[150px] md:max-w-[300px]">Marcus Chen</span>
-                <span className="text-[10px] md:text-xs text-gray-500 truncate max-w-[150px] md:max-w-none">2024 Porsche 911 Turbo S</span>
+                <span className="text-lg md:text-xl font-semibold mb-1 truncate max-w-[150px] md:max-w-[300px]">
+                  Marcus Chen
+                </span>
+                <span className="text-[10px] md:text-xs text-gray-500 truncate max-w-[150px] md:max-w-none">
+                  2024 Porsche 911 Turbo S
+                </span>
               </div>
               <div className="flex items-center gap-3 md:gap-6">
                 <div className="hidden md:flex items-center gap-2">
@@ -219,22 +213,20 @@ const Messages = () => {
 
               {/* Title */}
               <h2 className="text-xl font-medium tracking-tight mt-6 mb-8">
-                2024 Porsche 911<br />Turbo S
+                2024 Porsche 911
+                <br />
+                Turbo S
               </h2>
 
               {/* Offer Info */}
               <div className="bg-[#111113] rounded-2xl border border-white/5 p-6 mb-6">
-                <div className="text-[11px] font-bold text-gray-500 mb-1">
-                  Current Offer
-                </div>
+                <div className="text-[11px] font-bold text-gray-500 mb-1">Current Offer</div>
                 <div className="text-[40px] font-black text-[#D4AF37] leading-none mb-6">
                   480,000
                 </div>
 
                 <div className="pt-6 border-t border-white/5 flex flex-col gap-3">
-                  <div className="text-[11px] font-bold text-gray-500">
-                    Deal Stage
-                  </div>
+                  <div className="text-[11px] font-bold text-gray-500">Deal Stage</div>
                   <div className="flex flex-wrap items-center gap-3">
                     <span className="bg-green-500/10 text-green-500 border border-green-500/20 px-3 py-1 rounded-full text-xs font-medium">
                       Negotiation

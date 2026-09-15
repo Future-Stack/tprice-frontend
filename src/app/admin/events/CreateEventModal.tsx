@@ -105,8 +105,7 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
         toast.success("Image uploaded successfully!");
       }
     } catch (err: any) {
-      const errMsg =
-        err?.response?.data?.message || err?.message || "Failed to upload image";
+      const errMsg = err?.response?.data?.message || err?.message || "Failed to upload image";
       toast.error(errMsg);
     }
   };
@@ -147,7 +146,12 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.title.trim() || !formData.description.trim() || !selectedDate || !formData.location.trim()) {
+    if (
+      !formData.title.trim() ||
+      !formData.description.trim() ||
+      !selectedDate ||
+      !formData.location.trim()
+    ) {
       toast.error("Please fill in all required fields.");
       return;
     }
@@ -180,8 +184,7 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
       setSelectedDate(null);
       onClose();
     } catch (err: any) {
-      const errMsg =
-        err?.response?.data?.message || err?.message || "Failed to create event";
+      const errMsg = err?.response?.data?.message || err?.message || "Failed to create event";
       toast.error(errMsg);
     }
   };
@@ -229,7 +232,8 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
           {/* Category */}
           <div>
             <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <Tag className="w-3.5 h-3.5 text-primary" /> Category <span className="text-primary">*</span>
+              <Tag className="w-3.5 h-3.5 text-primary" /> Category{" "}
+              <span className="text-primary">*</span>
             </label>
             <select
               name="category"
@@ -249,7 +253,8 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-primary" /> Event Date & Time <span className="text-primary">*</span>
+                <Calendar className="w-3.5 h-3.5 text-primary" /> Event Date & Time{" "}
+                <span className="text-primary">*</span>
               </label>
               <DatePicker
                 selected={selectedDate}
@@ -269,7 +274,8 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
 
             <div>
               <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-primary" /> Location <span className="text-primary">*</span>
+                <MapPin className="w-3.5 h-3.5 text-primary" /> Location{" "}
+                <span className="text-primary">*</span>
               </label>
               <input
                 type="text"
@@ -294,20 +300,20 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
                 <button
                   type="button"
                   onClick={() => setInputMode("upload")}
-                  className={`px-2.5 py-1 rounded-md transition-colors font-medium cursor-pointer ${inputMode === "upload"
-                    ? "bg-primary text-black"
-                    : "text-gray-400 hover:text-white"
-                    }`}
+                  className={`px-2.5 py-1 rounded-md transition-colors font-medium cursor-pointer ${
+                    inputMode === "upload"
+                      ? "bg-primary text-black"
+                      : "text-gray-400 hover:text-white"
+                  }`}
                 >
                   Upload File
                 </button>
                 <button
                   type="button"
                   onClick={() => setInputMode("url")}
-                  className={`px-2.5 py-1 rounded-md transition-colors font-medium cursor-pointer ${inputMode === "url"
-                    ? "bg-primary text-black"
-                    : "text-gray-400 hover:text-white"
-                    }`}
+                  className={`px-2.5 py-1 rounded-md transition-colors font-medium cursor-pointer ${
+                    inputMode === "url" ? "bg-primary text-black" : "text-gray-400 hover:text-white"
+                  }`}
                 >
                   Image URL
                 </button>
@@ -354,10 +360,11 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
                     onDragLeave={handleDragLeave}
                     onDrop={handleDrop}
                     onClick={() => fileInputRef.current?.click()}
-                    className={`relative border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${isDragging
-                      ? "border-primary bg-primary/10"
-                      : "border-[#262626] hover:border-primary/50 bg-[#0E0E10] hover:bg-[#121215]"
-                      }`}
+                    className={`relative border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
+                      isDragging
+                        ? "border-primary bg-primary/10"
+                        : "border-[#262626] hover:border-primary/50 bg-[#0E0E10] hover:bg-[#121215]"
+                    }`}
                   >
                     <input
                       ref={fileInputRef}
@@ -370,7 +377,9 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
                     {uploadMediaMutation.isPending ? (
                       <div className="flex flex-col items-center justify-center py-3 space-y-2">
                         <Loader2 className="w-8 h-8 text-primary animate-spin" />
-                        <p className="text-xs font-medium text-primary">Uploading image to cloud...</p>
+                        <p className="text-xs font-medium text-primary">
+                          Uploading image to cloud...
+                        </p>
                         <p className="text-[10px] text-gray-500">Please wait a moment</p>
                       </div>
                     ) : (
@@ -421,7 +430,8 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
           {/* Description */}
           <div>
             <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <FileText className="w-3.5 h-3.5 text-primary" /> Description <span className="text-primary">*</span>
+              <FileText className="w-3.5 h-3.5 text-primary" /> Description{" "}
+              <span className="text-primary">*</span>
             </label>
             <textarea
               name="description"

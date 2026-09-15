@@ -26,15 +26,10 @@ interface EditBrandModalProps {
   brand: Brand | null;
 }
 
-export default function EditBrandModal({
-  isOpen,
-  onClose,
-  brand,
-}: EditBrandModalProps) {
+export default function EditBrandModal({ isOpen, onClose, brand }: EditBrandModalProps) {
   const updateBrandMutation = useUpdateBrandMutation();
   const uploadMediaMutation = useUploadMediaMutation();
-  const { data: categoriesResponse, isLoading: isCategoriesLoading } =
-    useGetCategoryQuery();
+  const { data: categoriesResponse, isLoading: isCategoriesLoading } = useGetCategoryQuery();
   const categories = Array.isArray(categoriesResponse)
     ? categoriesResponse
     : categoriesResponse?.data || [];
@@ -66,9 +61,7 @@ export default function EditBrandModal({
   if (!isOpen || !brand) return null;
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -96,8 +89,7 @@ export default function EditBrandModal({
         toast.success("Brand logo uploaded successfully!");
       }
     } catch (err: any) {
-      const errMsg =
-        err?.response?.data?.message || err?.message || "Failed to upload logo";
+      const errMsg = err?.response?.data?.message || err?.message || "Failed to upload logo";
       toast.error(errMsg);
     }
   };
@@ -163,8 +155,7 @@ export default function EditBrandModal({
       toast.success("Brand updated successfully!");
       onClose();
     } catch (err: any) {
-      const errMsg =
-        err?.response?.data?.message || err?.message || "Failed to update brand";
+      const errMsg = err?.response?.data?.message || err?.message || "Failed to update brand";
       toast.error(errMsg);
     }
   };
@@ -196,7 +187,8 @@ export default function EditBrandModal({
           {/* Brand Name */}
           <div>
             <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <Tag className="w-3.5 h-3.5 text-primary" /> Brand Name <span className="text-primary">*</span>
+              <Tag className="w-3.5 h-3.5 text-primary" /> Brand Name{" "}
+              <span className="text-primary">*</span>
             </label>
             <input
               type="text"
@@ -288,9 +280,7 @@ export default function EditBrandModal({
                   type="button"
                   onClick={() => setInputMode("url")}
                   className={`px-2.5 py-1 rounded-md transition-colors font-medium cursor-pointer ${
-                    inputMode === "url"
-                      ? "bg-primary text-black"
-                      : "text-gray-400 hover:text-white"
+                    inputMode === "url" ? "bg-primary text-black" : "text-gray-400 hover:text-white"
                   }`}
                 >
                   Image URL

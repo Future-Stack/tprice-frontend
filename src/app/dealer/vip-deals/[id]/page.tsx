@@ -27,10 +27,7 @@ import { useAuthStore } from "@/lib/store/useAuthStore";
 import { ListingItem } from "@/lib/api/listings";
 
 /* ─── Helpers ─── */
-const formatPrice = (
-  amount: string | number | null | undefined,
-  currency: string = "USD",
-) => {
+const formatPrice = (amount: string | number | null | undefined, currency: string = "USD") => {
   if (!amount) return "Price on Request";
   const num = typeof amount === "string" ? parseFloat(amount) : amount;
   if (isNaN(num) || num === 0) return "Price on Request";
@@ -143,12 +140,7 @@ const getSpecItems = (listing: ListingItem) => {
   ]);
 
   Object.entries(specs).forEach(([key, val]) => {
-    if (
-      !knownKeys.has(key) &&
-      val !== null &&
-      val !== undefined &&
-      val !== ""
-    ) {
+    if (!knownKeys.has(key) && val !== null && val !== undefined && val !== "") {
       const formattedLabel = key
         .replace(/([A-Z])/g, " $1")
         .toUpperCase()
@@ -171,13 +163,7 @@ export default function VIPDetailsPage() {
   const isDealerPath = pathname?.startsWith("/dealer");
   const backLink = isDealerPath ? "/dealer/vip-deals" : "/buyer/vip-deals";
 
-  const {
-    data: product,
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useListingByIdQuery(idOrSlug);
+  const { data: product, isLoading, isError, error, refetch } = useListingByIdQuery(idOrSlug);
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [inclFees, setInclFees] = useState(true);
@@ -186,20 +172,16 @@ export default function VIPDetailsPage() {
 
   const saveMutation = useSaveListingMutation();
   const token =
-    Cookies.get("accessToken") ||
-    Cookies.get("token") ||
-    useAuthStore((state) => state.token);
+    Cookies.get("accessToken") || Cookies.get("token") || useAuthStore((state) => state.token);
 
   const { data: savedResponse } = useSavedListingsQuery(
     { page: 1, limit: 100 },
-    { enabled: Boolean(token) },
+    { enabled: Boolean(token) }
   );
 
   const isSavedInListings =
-    savedResponse?.data?.some((savedItem) => savedItem.id === product?.id) ??
-    false;
-  const isSaved =
-    product?.isSaved !== undefined ? product.isSaved : isSavedInListings;
+    savedResponse?.data?.some((savedItem) => savedItem.id === product?.id) ?? false;
+  const isSaved = product?.isSaved !== undefined ? product.isSaved : isSavedInListings;
 
   const handleToggleSave = (e?: React.MouseEvent) => {
     if (e) {
@@ -281,9 +263,8 @@ export default function VIPDetailsPage() {
 
   // Location string
   const locationText =
-    [product.locationCity, product.locationCountry]
-      .filter(Boolean)
-      .join(", ") || "Location on Request";
+    [product.locationCity, product.locationCountry].filter(Boolean).join(", ") ||
+    "Location on Request";
 
   // Badge label
   const badgeLabel = product.isOffMarket
@@ -293,20 +274,13 @@ export default function VIPDetailsPage() {
       : product.category || "VIP ASSET";
 
   // Price formatting
-  const rawPriceNum = parseFloat(
-    product.askingPrice || product.startingBid || "0",
-  );
-  const formattedPrice = formatPrice(
-    product.askingPrice || product.startingBid,
-    product.currency,
-  );
-  const currentBidLabel =
-    product.saleType === "AUCTION" ? "CURRENT BID" : "ASKING PRICE";
+  const rawPriceNum = parseFloat(product.askingPrice || product.startingBid || "0");
+  const formattedPrice = formatPrice(product.askingPrice || product.startingBid, product.currency);
+  const currentBidLabel = product.saleType === "AUCTION" ? "CURRENT BID" : "ASKING PRICE";
 
   // Seller mapping
   const sellerName = product.owner
-    ? `${product.owner.firstName || ""} ${product.owner.lastName || ""}`.trim() ||
-      "Verified Dealer"
+    ? `${product.owner.firstName || ""} ${product.owner.lastName || ""}`.trim() || "Verified Dealer"
     : "Monaco Exotics";
   const sellerBadge = product.owner?.isVerified
     ? "Verified Premium Dealer"
@@ -338,9 +312,7 @@ export default function VIPDetailsPage() {
       <div className="flex items-start justify-between mb-10">
         <AnimationWrapper type="fade-down" duration={0.5}>
           <div>
-            <h2 className="text-[40px] font-clash font-semibold">
-              Exclusive Collection
-            </h2>
+            <h2 className="text-[40px] font-clash font-semibold">Exclusive Collection</h2>
             <p className="text-white text-[20px] mt-1 font-medium">
               Discover the world&apos;s finest assets available for acquisition.
             </p>
@@ -376,16 +348,11 @@ export default function VIPDetailsPage() {
                 <button
                   onClick={handleToggleSave}
                   className={`w-10 h-10 bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center transition-colors border border-white/10 ${
-                    isSaved
-                      ? "text-red-500"
-                      : "text-white/80 hover:text-red-400"
+                    isSaved ? "text-red-500" : "text-white/80 hover:text-red-400"
                   }`}
                   title={isSaved ? "Remove from Saved" : "Save Listing"}
                 >
-                  <Heart
-                    className="w-4.5 h-4.5"
-                    fill={isSaved ? "currentColor" : "none"}
-                  />
+                  <Heart className="w-4.5 h-4.5" fill={isSaved ? "currentColor" : "none"} />
                 </button>
                 <button
                   onClick={handleShare}
@@ -408,12 +375,7 @@ export default function VIPDetailsPage() {
           {productImages.length > 1 && (
             <div className="flex flex-wrap gap-3 mt-4">
               {productImages.map((img, idx) => (
-                <AnimationWrapper
-                  key={idx}
-                  type="fade-up"
-                  duration={0.4}
-                  delay={0.15 + idx * 0.05}
-                >
+                <AnimationWrapper key={idx} type="fade-up" duration={0.4} delay={0.15 + idx * 0.05}>
                   <button
                     onClick={() => setSelectedImage(idx)}
                     className={`relative w-25 h-18 rounded-xl overflow-hidden border-2 transition-all duration-200 shrink-0 ${
@@ -470,9 +432,7 @@ export default function VIPDetailsPage() {
                   <p className="text-[11px] text-gray-500 uppercase tracking-[0.15em] font-semibold mb-1">
                     {currentBidLabel}
                   </p>
-                  <p className="text-3xl font-inter font-medium text-[#E78F23]">
-                    {formattedPrice}
-                  </p>
+                  <p className="text-3xl font-inter font-medium text-[#E78F23]">{formattedPrice}</p>
                 </div>
               </AnimationWrapper>
 
@@ -502,30 +462,18 @@ export default function VIPDetailsPage() {
                 <div className="border border-[#2C2C2E] rounded-2xl p-6 bg-white/2">
                   <div className="flex items-center gap-2.5 mb-5">
                     <Info className="w-4 h-4 text-[#E78F23]" />
-                    <h4 className="text-sm font-semibold text-white">
-                      Key Specifications
-                    </h4>
+                    <h4 className="text-sm font-semibold text-white">Key Specifications</h4>
                   </div>
 
                   <div className="grid grid-cols-2 gap-y-5 gap-x-4">
                     {specItems.length > 0 ? (
                       specItems.map((item, idx) => (
-                        <SpecItem
-                          key={idx}
-                          label={item.label}
-                          value={item.value}
-                        />
+                        <SpecItem key={idx} label={item.label} value={item.value} />
                       ))
                     ) : (
                       <>
-                        <SpecItem
-                          label="YEAR"
-                          value={String(product.buildYear || 2023)}
-                        />
-                        <SpecItem
-                          label="CATEGORY"
-                          value={product.category || "VIP Asset"}
-                        />
+                        <SpecItem label="YEAR" value={String(product.buildYear || 2023)} />
+                        <SpecItem label="CATEGORY" value={product.category || "VIP Asset"} />
                         <SpecItem label="CONDITION" value="Pristine" />
                       </>
                     )}
@@ -536,9 +484,7 @@ export default function VIPDetailsPage() {
               {/* Seller Information */}
               <AnimationWrapper type="fade-left" duration={0.5} delay={0.3}>
                 <div className="bg-[#161618] border border-[#2C2C2E] rounded-2xl p-6">
-                  <h4 className="text-sm font-semibold mb-5 text-white">
-                    Seller Information
-                  </h4>
+                  <h4 className="text-sm font-semibold mb-5 text-white">Seller Information</h4>
                   <div className="flex items-center gap-4">
                     {product.owner?.avatarUrl ? (
                       <img
@@ -552,9 +498,7 @@ export default function VIPDetailsPage() {
                       </div>
                     )}
                     <div>
-                      <p className="font-semibold text-[15px] text-white">
-                        {sellerName}
-                      </p>
+                      <p className="font-semibold text-[15px] text-white">{sellerName}</p>
                       <p className="text-xs text-green-400/90 flex items-center gap-1.5 mt-1 font-medium">
                         <BadgeCheck className="w-3.5 h-3.5" />
                         {sellerBadge}
@@ -573,9 +517,7 @@ export default function VIPDetailsPage() {
                   <span className="inline-block bg-[#E78F23]/20 text-[#E78F23] text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-wider mb-3">
                     {badgeLabel}
                   </span>
-                  <h2 className="text-3xl font-clash font-semibold text-white">
-                    {product.title}
-                  </h2>
+                  <h2 className="text-3xl font-clash font-semibold text-white">{product.title}</h2>
                   <div className="flex items-center gap-2 mt-1.5 text-gray-500 text-sm">
                     <MapPin className="w-3.5 h-3.5" />
                     <span>{locationText}</span>
@@ -612,33 +554,25 @@ export default function VIPDetailsPage() {
                   <div className="space-y-4">
                     <div className="flex justify-between items-center text-sm tracking-tight">
                       <span className="text-gray-400">Current Price</span>
-                      <span className="text-white font-medium">
-                        {formattedPrice}
-                      </span>
+                      <span className="text-white font-medium">{formattedPrice}</span>
                     </div>
                     <div className="flex justify-between items-center text-sm tracking-tight">
                       <div className="flex items-center gap-1.5">
                         <span className="text-gray-400">VIP Fee (1.5%)</span>
                         <Info className="w-3.5 h-3.5 text-gray-600" />
                       </div>
-                      <span className="text-white font-medium">
-                        {formattedVipFee}
-                      </span>
+                      <span className="text-white font-medium">{formattedVipFee}</span>
                     </div>
                   </div>
 
                   <div className="pt-6 border-t border-white/5">
                     <div className="flex justify-between items-start">
-                      <span className="text-sm font-medium text-gray-400 mt-1">
-                        Total Payable
-                      </span>
+                      <span className="text-sm font-medium text-gray-400 mt-1">Total Payable</span>
                       <div className="text-right">
                         <p className="text-[32px] font-clash font-medium text-[#E78F23] leading-none mb-1 tracking-tight">
                           {formattedTotalPayable}
                         </p>
-                        <p className="text-[11px] text-gray-500">
-                          Asking: {formattedPrice}
-                        </p>
+                        <p className="text-[11px] text-gray-500">Asking: {formattedPrice}</p>
                       </div>
                     </div>
                   </div>
@@ -656,16 +590,11 @@ export default function VIPDetailsPage() {
               <AnimationWrapper type="fade-up" duration={0.5} delay={0.2}>
                 <div className="grid grid-cols-2 gap-3">
                   {specItems.slice(0, 4).map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="bg-[#161618] rounded-xl p-4 border border-white/3"
-                    >
+                    <div key={idx} className="bg-[#161618] rounded-xl p-4 border border-white/3">
                       <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">
                         {item.label}
                       </p>
-                      <p className="text-[15px] font-medium text-white truncate">
-                        {item.value}
-                      </p>
+                      <p className="text-[15px] font-medium text-white truncate">{item.value}</p>
                     </div>
                   ))}
                   {specItems.length < 4 && (
@@ -712,9 +641,7 @@ export default function VIPDetailsPage() {
                 <div className="space-y-3 pt-2">
                   <button
                     onClick={() => {
-                      toast.success(
-                        "Your bid has been submitted successfully to the seller!",
-                      );
+                      toast.success("Your bid has been submitted successfully to the seller!");
                     }}
                     className="w-full py-4.5 bg-[#E78F23] hover:brightness-110 text-black text-sm font-bold rounded-xl transition-all shadow-[0_10px_30px_rgba(231,143,35,0.2)] active:scale-[0.98]"
                   >

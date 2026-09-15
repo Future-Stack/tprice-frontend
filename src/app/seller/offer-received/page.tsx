@@ -14,11 +14,7 @@ import {
   ChevronRight,
   Loader2,
 } from "lucide-react";
-import {
-  useOffersQuery,
-  useAcceptOfferMutation,
-  useRejectOfferMutation,
-} from "@/hooks/useOffers";
+import { useOffersQuery, useAcceptOfferMutation, useRejectOfferMutation } from "@/hooks/useOffers";
 import CounterOfferModal from "./CounterOfferModal";
 import { OfferItem } from "@/lib/api/offers";
 
@@ -73,14 +69,11 @@ const formatTimeAgo = (dateString?: string) => {
     const diffInMinutes = Math.floor(diffInSeconds / 60);
     if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
     const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24)
-      return `${diffInHours} hour${diffInHours > 1 ? "s" : ""} ago`;
+    if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? "s" : ""} ago`;
     const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7)
-      return `${diffInDays} day${diffInDays > 1 ? "s" : ""} ago`;
+    if (diffInDays < 7) return `${diffInDays} day${diffInDays > 1 ? "s" : ""} ago`;
     const diffInWeeks = Math.floor(diffInDays / 7);
-    if (diffInWeeks < 4)
-      return `${diffInWeeks} week${diffInWeeks > 1 ? "s" : ""} ago`;
+    if (diffInWeeks < 4) return `${diffInWeeks} week${diffInWeeks > 1 ? "s" : ""} ago`;
 
     return date.toLocaleDateString("en-US", {
       month: "short",
@@ -163,8 +156,7 @@ function OfferReceieved() {
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [counterModalOpen, setCounterModalOpen] = useState(false);
-  const [selectedCounterOffer, setSelectedCounterOffer] =
-    useState<OfferItem | null>(null);
+  const [selectedCounterOffer, setSelectedCounterOffer] = useState<OfferItem | null>(null);
   const limit = 10;
 
   const { data, isLoading, isError, refetch } = useOffersQuery({
@@ -261,16 +253,10 @@ function OfferReceieved() {
             {/* Empty State */}
             {!isLoading && !isError && offers.length === 0 && (
               <div className="p-16 text-center text-gray-400">
-                <PackageOpen
-                  size={48}
-                  className="mx-auto mb-4 text-gray-600 stroke-[1.5]"
-                />
-                <h3 className="text-xl font-medium text-white mb-1">
-                  No Offers Received Yet
-                </h3>
+                <PackageOpen size={48} className="mx-auto mb-4 text-gray-600 stroke-[1.5]" />
+                <h3 className="text-xl font-medium text-white mb-1">No Offers Received Yet</h3>
                 <p className="text-sm text-gray-500">
-                  When buyers make offers on your listings, they will appear
-                  here.
+                  When buyers make offers on your listings, they will appear here.
                 </p>
               </div>
             )}
@@ -280,8 +266,7 @@ function OfferReceieved() {
               <div className="divide-y divide-white/5">
                 {offers.map((offer) => {
                   const itemTitle =
-                    offer.listing?.title ||
-                    `Listing #${offer.listingId.slice(0, 8)}`;
+                    offer.listing?.title || `Listing #${offer.listingId.slice(0, 8)}`;
                   const detailsText = offer.listing?.askingPrice
                     ? `Asking Price: ${formatCurrency(offer.listing.askingPrice, offer.listing.currency || "USD")}`
                     : `Initial Offer: ${formatCurrency(offer.initialAmount)}`;
@@ -290,24 +275,19 @@ function OfferReceieved() {
                       .filter(Boolean)
                       .join(" ")
                       .trim() || "Buyer";
-                  const buyerInitial = (
-                    offer.buyer?.firstName ||
-                    offer.buyer?.lastName ||
-                    "B"
-                  )
+                  const buyerInitial = (offer.buyer?.firstName || offer.buyer?.lastName || "B")
                     .charAt(0)
                     .toUpperCase();
                   const timeAgo = formatTimeAgo(offer.createdAt);
                   const formattedAmount = formatCurrency(
                     offer.currentAmount,
-                    offer.listing?.currency || "USD",
+                    offer.listing?.currency || "USD"
                   );
                   const isPending =
                     offer.status?.toUpperCase() === "PENDING" ||
                     offer.status?.toUpperCase() === "ACTION REQUIRED" ||
                     offer.status?.toUpperCase() === "COUNTERED";
-                  const allowCounterOffers =
-                    offer.listing?.allowCounterOffers === true;
+                  const allowCounterOffers = offer.listing?.allowCounterOffers === true;
 
                   return (
                     <div
@@ -340,9 +320,7 @@ function OfferReceieved() {
                           <div className="text-base font-semibold text-white truncate">
                             {buyerName}
                           </div>
-                          <div className="text-xs text-gray-500 font-medium">
-                            {timeAgo}
-                          </div>
+                          <div className="text-xs text-gray-500 font-medium">{timeAgo}</div>
                         </div>
 
                         {/* Amount */}
@@ -367,18 +345,11 @@ function OfferReceieved() {
                                 className="flex items-center gap-1.5 text-sm font-bold text-green-500 hover:text-green-400 transition-all hover:scale-105 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                               >
                                 {acceptingId === offer.id ? (
-                                  <Loader2
-                                    size={16}
-                                    className="animate-spin text-green-500"
-                                  />
+                                  <Loader2 size={16} className="animate-spin text-green-500" />
                                 ) : (
                                   <Check size={16} strokeWidth={3} />
                                 )}
-                                <span>
-                                  {acceptingId === offer.id
-                                    ? "Accepting..."
-                                    : "Accept"}
-                                </span>
+                                <span>{acceptingId === offer.id ? "Accepting..." : "Accept"}</span>
                               </button>
                               {allowCounterOffers && (
                                 <button
@@ -394,25 +365,15 @@ function OfferReceieved() {
                               )}
                               <button
                                 onClick={() => handleReject(offer.id)}
-                                disabled={
-                                  acceptingId === offer.id ||
-                                  rejectingId === offer.id
-                                }
+                                disabled={acceptingId === offer.id || rejectingId === offer.id}
                                 className="flex items-center gap-1.5 text-sm font-bold text-red-500 hover:text-red-400 transition-all hover:scale-105 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                               >
                                 {rejectingId === offer.id ? (
-                                  <Loader2
-                                    size={16}
-                                    className="animate-spin text-red-500"
-                                  />
+                                  <Loader2 size={16} className="animate-spin text-red-500" />
                                 ) : (
                                   <X size={16} strokeWidth={3} />
                                 )}
-                                <span>
-                                  {rejectingId === offer.id
-                                    ? "Rejecting..."
-                                    : "Reject"}
-                                </span>
+                                <span>{rejectingId === offer.id ? "Rejecting..." : "Reject"}</span>
                               </button>
                             </div>
                           )}
@@ -437,9 +398,7 @@ function OfferReceieved() {
                             <h3 className="font-bold text-xl text-white group-hover/row:text-primary transition-colors">
                               {itemTitle}
                             </h3>
-                            <p className="text-sm text-gray-500 italic">
-                              {detailsText}
-                            </p>
+                            <p className="text-sm text-gray-500 italic">{detailsText}</p>
                           </div>
                           <div className="text-2xl font-black text-primary tracking-tighter">
                             {formattedAmount}
@@ -452,9 +411,7 @@ function OfferReceieved() {
                               {buyerInitial}
                             </div>
                             <div className="space-y-0.5">
-                              <div className="text-sm font-bold text-white">
-                                {buyerName}
-                              </div>
+                              <div className="text-sm font-bold text-white">{buyerName}</div>
                               <div className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
                                 {timeAgo}
                               </div>
@@ -468,9 +425,7 @@ function OfferReceieved() {
                             {isPending && (
                               <div
                                 className={`grid ${
-                                  allowCounterOffers
-                                    ? "grid-cols-3"
-                                    : "grid-cols-2"
+                                  allowCounterOffers ? "grid-cols-3" : "grid-cols-2"
                                 } gap-3`}
                               >
                                 <button
@@ -479,17 +434,12 @@ function OfferReceieved() {
                                   className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-green-500 transition-active active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                   {acceptingId === offer.id ? (
-                                    <Loader2
-                                      size={20}
-                                      className="animate-spin text-green-500"
-                                    />
+                                    <Loader2 size={20} className="animate-spin text-green-500" />
                                   ) : (
                                     <Check size={20} strokeWidth={3} />
                                   )}
                                   <span className="text-[10px] font-black uppercase tracking-widest">
-                                    {acceptingId === offer.id
-                                      ? "Accepting..."
-                                      : "Accept"}
+                                    {acceptingId === offer.id ? "Accepting..." : "Accept"}
                                   </span>
                                 </button>
                                 {allowCounterOffers && (
@@ -509,24 +459,16 @@ function OfferReceieved() {
                                 )}
                                 <button
                                   onClick={() => handleReject(offer.id)}
-                                  disabled={
-                                    acceptingId === offer.id ||
-                                    rejectingId === offer.id
-                                  }
+                                  disabled={acceptingId === offer.id || rejectingId === offer.id}
                                   className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 transition-active active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                   {rejectingId === offer.id ? (
-                                    <Loader2
-                                      size={20}
-                                      className="animate-spin text-red-500"
-                                    />
+                                    <Loader2 size={20} className="animate-spin text-red-500" />
                                   ) : (
                                     <X size={20} strokeWidth={3} />
                                   )}
                                   <span className="text-[10px] font-black uppercase tracking-widest">
-                                    {rejectingId === offer.id
-                                      ? "Rejecting..."
-                                      : "Reject"}
+                                    {rejectingId === offer.id ? "Rejecting..." : "Reject"}
                                   </span>
                                 </button>
                               </div>
@@ -552,15 +494,12 @@ function OfferReceieved() {
               <div className="px-8 py-5 border-t border-white/5 bg-white/2 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-400">
                 <div>
                   Showing{" "}
-                  <span className="font-bold text-white">
-                    {(meta.page - 1) * meta.limit + 1}
-                  </span>{" "}
+                  <span className="font-bold text-white">{(meta.page - 1) * meta.limit + 1}</span>{" "}
                   to{" "}
                   <span className="font-bold text-white">
                     {Math.min(meta.page * meta.limit, meta.total)}
                   </span>{" "}
-                  of <span className="font-bold text-white">{meta.total}</span>{" "}
-                  offers
+                  of <span className="font-bold text-white">{meta.total}</span> offers
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -574,10 +513,7 @@ function OfferReceieved() {
                   </button>
 
                   <div className="flex items-center gap-1.5">
-                    {Array.from(
-                      { length: meta.totalPages },
-                      (_, i) => i + 1,
-                    ).map((pageNum) => (
+                    {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((pageNum) => (
                       <button
                         key={pageNum}
                         onClick={() => handlePageChange(pageNum)}

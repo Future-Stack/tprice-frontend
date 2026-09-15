@@ -165,9 +165,7 @@ export default function ListingPage() {
               <h1 className="text-2xl md:text-[28px] font-semibold text-gray-100">
                 Assigned Listings
               </h1>
-              <p className="text-gray-400 text-sm">
-                Listings you are currently managing
-              </p>
+              <p className="text-gray-400 text-sm">Listings you are currently managing</p>
             </div>
 
             <button
@@ -258,10 +256,8 @@ export default function ListingPage() {
                   item.media?.[0]?.url ||
                   "https://images.unsplash.com/photo-1555099962-4199c345e5dd?q=80&w=2670&auto=format&fit=crop";
                 const location =
-                  [item.locationCity, item.locationCountry].filter(Boolean).join(", ") ||
-                  "Monaco";
-                const isItemDeleting =
-                  deleteListingMutation.isPending && deletingId === item.id;
+                  [item.locationCity, item.locationCountry].filter(Boolean).join(", ") || "Monaco";
+                const isItemDeleting = deleteListingMutation.isPending && deletingId === item.id;
 
                 return (
                   <div
@@ -271,7 +267,10 @@ export default function ListingPage() {
                     }`}
                   >
                     {/* Image Section */}
-                    <Link href={`/dealer/deals/${item.id}`} className="relative aspect-16/11 w-full bg-[#111] overflow-hidden block">
+                    <Link
+                      href={`/dealer/deals/${item.id}`}
+                      className="relative aspect-16/11 w-full bg-[#111] overflow-hidden block"
+                    >
                       <Image
                         src={imageUrl}
                         alt={item.title}
@@ -383,9 +382,7 @@ export default function ListingPage() {
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4 px-6 bg-[#1C1C1C] border border-[#2A2A2A] rounded-xl text-sm text-gray-400">
               <div>
                 Showing{" "}
-                <span className="font-semibold text-white">
-                  {(meta.page - 1) * meta.limit + 1}
-                </span>{" "}
+                <span className="font-semibold text-white">{(meta.page - 1) * meta.limit + 1}</span>{" "}
                 to{" "}
                 <span className="font-semibold text-white">
                   {Math.min(meta.page * meta.limit, meta.total)}
@@ -404,21 +401,19 @@ export default function ListingPage() {
                 </button>
 
                 <div className="flex items-center gap-1.5">
-                  {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map(
-                    (pageNum) => (
-                      <button
-                        key={pageNum}
-                        onClick={() => handlePageChange(pageNum)}
-                        className={`w-8 h-8 rounded-lg border font-semibold text-xs transition-colors cursor-pointer ${
-                          pageNum === meta.page
-                            ? "bg-[#EAB308] text-black border-[#EAB308] font-bold"
-                            : "bg-[#111] border-[#333] text-gray-400 hover:text-white hover:border-[#EAB308]/40"
-                        }`}
-                      >
-                        {pageNum}
-                      </button>
-                    )
-                  )}
+                  {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((pageNum) => (
+                    <button
+                      key={pageNum}
+                      onClick={() => handlePageChange(pageNum)}
+                      className={`w-8 h-8 rounded-lg border font-semibold text-xs transition-colors cursor-pointer ${
+                        pageNum === meta.page
+                          ? "bg-[#EAB308] text-black border-[#EAB308] font-bold"
+                          : "bg-[#111] border-[#333] text-gray-400 hover:text-white hover:border-[#EAB308]/40"
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  ))}
                 </div>
 
                 <button

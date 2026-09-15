@@ -45,9 +45,7 @@ export interface GetReviewsResponse {
 /**
  * Submit a new VIP review
  */
-export const createReviewApi = async (
-  payload: CreateReviewPayload
-): Promise<ReviewItem> => {
+export const createReviewApi = async (payload: CreateReviewPayload): Promise<ReviewItem> => {
   const response = await apiClient.post<ReviewItem>("/reviews", payload);
   return response.data;
 };
@@ -55,9 +53,7 @@ export const createReviewApi = async (
 /**
  * Fetch reviews list
  */
-export const getReviewsApi = async (
-  params: GetReviewsParams = {}
-): Promise<GetReviewsResponse> => {
+export const getReviewsApi = async (params: GetReviewsParams = {}): Promise<GetReviewsResponse> => {
   const response = await apiClient.get<GetReviewsResponse>("/reviews", {
     params,
   });
@@ -103,6 +99,3 @@ export const updateReviewApi = async (
   const response = await apiClient.patch<ReviewItem>(`/reviews/${id}`, payload);
   return response.data;
 };
-
-
-

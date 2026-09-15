@@ -164,14 +164,11 @@ const formatTimeAgo = (dateString?: string) => {
     const diffInMinutes = Math.floor(diffInSeconds / 60);
     if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
     const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24)
-      return `${diffInHours} hour${diffInHours > 1 ? "s" : ""} ago`;
+    if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? "s" : ""} ago`;
     const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7)
-      return `${diffInDays} day${diffInDays > 1 ? "s" : ""} ago`;
+    if (diffInDays < 7) return `${diffInDays} day${diffInDays > 1 ? "s" : ""} ago`;
     const diffInWeeks = Math.floor(diffInDays / 7);
-    if (diffInWeeks < 4)
-      return `${diffInWeeks} week${diffInWeeks > 1 ? "s" : ""} ago`;
+    if (diffInWeeks < 4) return `${diffInWeeks} week${diffInWeeks > 1 ? "s" : ""} ago`;
 
     return date.toLocaleDateString("en-US", {
       month: "short",
@@ -206,10 +203,7 @@ const OfferDetailSkeleton = () => (
     {/* Stat Cards Grid Skeleton */}
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
       {[1, 2, 3, 4].map((i) => (
-        <div
-          key={i}
-          className="p-6 rounded-2xl bg-[#111113] border border-white/5 space-y-3"
-        >
+        <div key={i} className="p-6 rounded-2xl bg-[#111113] border border-white/5 space-y-3">
           <div className="h-4 bg-white/5 rounded-md w-1/2" />
           <div className="h-8 bg-white/10 rounded-lg w-3/4" />
           <div className="h-3 bg-white/5 rounded-md w-2/3" />
@@ -231,10 +225,7 @@ const OfferDetailSkeleton = () => (
           <div className="h-6 bg-white/10 rounded-md w-1/3" />
           <div className="space-y-4 pt-2">
             {[1, 2].map((j) => (
-              <div
-                key={j}
-                className="p-5 rounded-xl bg-white/2 border border-white/5 space-y-3"
-              >
+              <div key={j} className="p-5 rounded-xl bg-white/2 border border-white/5 space-y-3">
                 <div className="flex justify-between items-center">
                   <div className="h-5 bg-white/10 rounded-md w-36" />
                   <div className="h-5 bg-white/10 rounded-md w-24" />
@@ -283,18 +274,11 @@ export default function OfferDetailsPage() {
   const [messageInput, setMessageInput] = useState("");
   const chatScrollRef = React.useRef<HTMLDivElement>(null);
 
-  const {
-    data: offer,
-    isLoading,
-    isError,
-    refetch,
-  } = useOfferDetailQuery(offerId);
+  const { data: offer, isLoading, isError, refetch } = useOfferDetailQuery(offerId);
 
   const { data: dealsResponse } = useDealsQuery({ page: 1, limit: 10 });
   const dealsList = dealsResponse?.data || [];
-  const matchedDeal = dealsList.find(
-    (d) => d.offerId === offerId || d.id === offerId,
-  );
+  const matchedDeal = dealsList.find((d) => d.offerId === offerId || d.id === offerId);
   const targetDealId = matchedDeal?.id || offer?.deal?.id || offer?.id || "";
 
   const { data: dealDetail } = useDealDetailQuery(targetDealId);
@@ -392,14 +376,11 @@ export default function OfferDetailsPage() {
     return (
       <div className="w-full max-w-4xl mx-auto py-16 px-4 text-center">
         <div className="p-10 rounded-2xl bg-[#111113] border border-white/5 shadow-2xl space-y-5">
-          <AlertCircle
-            size={56}
-            className="mx-auto text-rose-500 stroke-[1.5]"
-          />
+          <AlertCircle size={56} className="mx-auto text-rose-500 stroke-[1.5]" />
           <h2 className="text-2xl font-bold text-white">Offer Not Found</h2>
           <p className="text-gray-400 max-w-md mx-auto text-sm">
-            We couldn't load the details for this offer. It may have been
-            deleted or the URL might be invalid.
+            We couldn't load the details for this offer. It may have been deleted or the URL might
+            be invalid.
           </p>
           <div className="flex items-center justify-center gap-4 pt-2">
             <Link
@@ -435,19 +416,13 @@ export default function OfferDetailsPage() {
     : "N/A";
 
   const buyerName =
-    [offer.buyer?.firstName, offer.buyer?.lastName]
-      .filter(Boolean)
-      .join(" ")
-      .trim() || "Buyer";
+    [offer.buyer?.firstName, offer.buyer?.lastName].filter(Boolean).join(" ").trim() || "Buyer";
   const buyerInitial = (offer.buyer?.firstName || offer.buyer?.lastName || "B")
     .charAt(0)
     .toUpperCase();
 
   const sellerName =
-    [offer.seller?.firstName, offer.seller?.lastName]
-      .filter(Boolean)
-      .join(" ")
-      .trim() || "Seller";
+    [offer.seller?.firstName, offer.seller?.lastName].filter(Boolean).join(" ").trim() || "Seller";
 
   // Calculate difference relative to asking price
   let priceDiffPercent: number | null = null;
@@ -466,10 +441,7 @@ export default function OfferDetailsPage() {
     ...((dealDetail as any)?.messages || []),
   ];
 
-  const rawDealMessagesList = [
-    ...embeddedDealMessages,
-    ...(dealMessages || []),
-  ];
+  const rawDealMessagesList = [...embeddedDealMessages, ...(dealMessages || [])];
 
   const uniqueMessagesMap = new Map<string, DealMessage>();
   rawDealMessagesList.forEach((m) => {
@@ -480,16 +452,12 @@ export default function OfferDetailsPage() {
   const combinedDealMessages = Array.from(uniqueMessagesMap.values());
 
   const formattedDealMessages = combinedDealMessages.map((m) => {
-    const isSeller =
-      m.senderId === offer.sellerId || m.sender?.role === "SELLER";
+    const isSeller = m.senderId === offer.sellerId || m.sender?.role === "SELLER";
     const senderFirstName =
       m.sender?.firstName ||
-      (isSeller
-        ? offer.seller?.firstName || "Seller"
-        : offer.buyer?.firstName || "Buyer");
+      (isSeller ? offer.seller?.firstName || "Seller" : offer.buyer?.firstName || "Buyer");
     const senderLastName =
-      m.sender?.lastName ||
-      (isSeller ? offer.seller?.lastName || "" : offer.buyer?.lastName || "");
+      m.sender?.lastName || (isSeller ? offer.seller?.lastName || "" : offer.buyer?.lastName || "");
     const senderFullName = `${senderFirstName} ${senderLastName}`.trim();
     const senderRole = m.sender?.role || (isSeller ? "SELLER" : "BUYER");
 
@@ -500,8 +468,7 @@ export default function OfferDetailsPage() {
       senderName: senderFullName,
       senderRole: senderRole,
       senderAvatar:
-        m.sender?.avatarUrl ||
-        (isSeller ? offer.seller?.avatarUrl : offer.buyer?.avatarUrl),
+        m.sender?.avatarUrl || (isSeller ? offer.seller?.avatarUrl : offer.buyer?.avatarUrl),
       text: m.message,
       amount: undefined as string | undefined,
       action: undefined as string | undefined,
@@ -527,11 +494,8 @@ export default function OfferDetailsPage() {
     };
   });
 
-  const combinedTimeline = [
-    ...formattedHistories,
-    ...formattedDealMessages,
-  ].sort(
-    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+  const combinedTimeline = [...formattedHistories, ...formattedDealMessages].sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
   );
 
   const handleSendMessage = async () => {
@@ -661,9 +625,7 @@ export default function OfferDetailsPage() {
                 }`}
               >
                 <span>
-                  {priceDiffPercent >= 0
-                    ? `+${priceDiffPercent}%`
-                    : `${priceDiffPercent}%`}
+                  {priceDiffPercent >= 0 ? `+${priceDiffPercent}%` : `${priceDiffPercent}%`}
                 </span>
                 <span className="text-gray-500">vs asking price</span>
               </p>
@@ -721,17 +683,11 @@ export default function OfferDetailsPage() {
 
               <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5 text-sm">
                 <div>
-                  <span className="text-gray-500 text-xs block mb-1">
-                    Asking Price
-                  </span>
-                  <span className="font-bold text-white">
-                    {formattedAskingPrice}
-                  </span>
+                  <span className="text-gray-500 text-xs block mb-1">Asking Price</span>
+                  <span className="font-bold text-white">{formattedAskingPrice}</span>
                 </div>
                 <div>
-                  <span className="text-gray-500 text-xs block mb-1">
-                    Currency
-                  </span>
+                  <span className="text-gray-500 text-xs block mb-1">Currency</span>
                   <span className="font-bold text-white">{currency}</span>
                 </div>
               </div>
@@ -790,9 +746,7 @@ export default function OfferDetailsPage() {
                         <div className="bg-white/2 border border-white/5 hover:border-white/10 rounded-xl p-5 transition-all space-y-3">
                           <div className="flex flex-wrap items-center justify-between gap-2">
                             <div className="flex items-center gap-2">
-                              <span className="font-bold text-white text-sm">
-                                {senderName}
-                              </span>
+                              <span className="font-bold text-white text-sm">{senderName}</span>
                               <span className="text-[10px] font-semibold text-gray-400 bg-white/5 px-2 py-0.5 rounded">
                                 {isBuyerSender ? "Buyer" : "Seller"}
                               </span>
@@ -801,9 +755,7 @@ export default function OfferDetailsPage() {
                           </div>
 
                           <div className="flex items-baseline gap-2">
-                            <span className="text-xs text-gray-400">
-                              Proposed Amount:
-                            </span>
+                            <span className="text-xs text-gray-400">Proposed Amount:</span>
                             <span className="text-xl font-black text-primary tracking-tight">
                               {formatCurrency(item.amount, currency)}
                             </span>
@@ -811,10 +763,7 @@ export default function OfferDetailsPage() {
 
                           {item.note && (
                             <div className="bg-[#18181b] border border-white/5 rounded-lg p-3 text-xs text-gray-300 italic flex items-start gap-2.5">
-                              <MessageSquare
-                                size={14}
-                                className="text-primary shrink-0 mt-0.5"
-                              />
+                              <MessageSquare size={14} className="text-primary shrink-0 mt-0.5" />
                               <span>"{item.note}"</span>
                             </div>
                           )}
@@ -822,8 +771,7 @@ export default function OfferDetailsPage() {
                           <div className="text-[11px] text-gray-500 pt-1 flex items-center gap-1.5">
                             <Clock size={12} />
                             <span>
-                              {formatDate(item.createdAt)} (
-                              {formatTimeAgo(item.createdAt)})
+                              {formatDate(item.createdAt)} ({formatTimeAgo(item.createdAt)})
                             </span>
                           </div>
                         </div>
@@ -844,33 +792,23 @@ export default function OfferDetailsPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
                   <div>
-                    <span className="text-gray-500 text-xs block mb-1">
-                      Agreed Price
-                    </span>
+                    <span className="text-gray-500 text-xs block mb-1">Agreed Price</span>
                     <span className="text-2xl font-black text-emerald-400">
                       {formatCurrency(offer.deal.agreedPrice, currency)}
                     </span>
                   </div>
                   <div>
-                    <span className="text-gray-500 text-xs block mb-1">
-                      Stage
-                    </span>
+                    <span className="text-gray-500 text-xs block mb-1">Stage</span>
                     <span className="inline-block px-3 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-xs font-bold uppercase">
                       {currentStage || offer.deal.stage}
                     </span>
                   </div>
                   <div>
-                    <span className="text-gray-500 text-xs block mb-1">
-                      Deal ID
-                    </span>
-                    <span className="font-mono text-xs text-gray-300">
-                      {offer.deal.id}
-                    </span>
+                    <span className="text-gray-500 text-xs block mb-1">Deal ID</span>
+                    <span className="font-mono text-xs text-gray-300">{offer.deal.id}</span>
                   </div>
                   <div>
-                    <span className="text-gray-500 text-xs block mb-1">
-                      Created Date
-                    </span>
+                    <span className="text-gray-500 text-xs block mb-1">Created Date</span>
                     <span className="text-xs text-gray-300">
                       {formatDate(offer.deal.createdAt)}
                     </span>
@@ -904,20 +842,16 @@ export default function OfferDetailsPage() {
                 >
                   {combinedTimeline.length === 0 ? (
                     <div className="text-center py-10 text-gray-500 text-sm flex flex-col items-center gap-2">
-                      <MessageSquare
-                        size={28}
-                        className="text-gray-600 stroke-[1.5]"
-                      />
+                      <MessageSquare size={28} className="text-gray-600 stroke-[1.5]" />
                       <span>
-                        No conversation messages recorded yet. Send a message
-                        below to communicate with the buyer.
+                        No conversation messages recorded yet. Send a message below to communicate
+                        with the buyer.
                       </span>
                     </div>
                   ) : (
                     combinedTimeline.map((item) => {
                       const isSelf =
-                        item.senderId === offer.sellerId ||
-                        item.senderRole === "SELLER";
+                        item.senderId === offer.sellerId || item.senderRole === "SELLER";
                       return (
                         <div
                           key={item.id}
@@ -983,17 +917,11 @@ export default function OfferDetailsPage() {
                     />
                     <button
                       onClick={handleSendMessage}
-                      disabled={
-                        sendDealMessageMutation.isPending ||
-                        !messageInput.trim()
-                      }
+                      disabled={sendDealMessageMutation.isPending || !messageInput.trim()}
                       className="absolute right-2 p-2 rounded-lg bg-[#E78F23] hover:bg-[#E78F23]/90 text-black font-bold disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
                     >
                       {sendDealMessageMutation.isPending ? (
-                        <Loader2
-                          size={16}
-                          className="animate-spin text-black"
-                        />
+                        <Loader2 size={16} className="animate-spin text-black" />
                       ) : (
                         <Send size={16} />
                       )}
@@ -1020,10 +948,10 @@ export default function OfferDetailsPage() {
                         currentStage === "COMPLETED"
                           ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/25 shadow-[0_0_12px_rgba(16,185,129,0.15)]"
                           : currentStage === "CANCELLED"
-                          ? "bg-rose-500/10 text-rose-400 border-rose-500/25 shadow-[0_0_12px_rgba(244,63,94,0.15)]"
-                          : currentStage === "FLAGGED"
-                          ? "bg-amber-500/10 text-amber-400 border-amber-500/25 shadow-[0_0_12px_rgba(245,158,11,0.15)]"
-                          : "bg-gray-500/10 text-gray-400 border-gray-500/25"
+                            ? "bg-rose-500/10 text-rose-400 border-rose-500/25 shadow-[0_0_12px_rgba(244,63,94,0.15)]"
+                            : currentStage === "FLAGGED"
+                              ? "bg-amber-500/10 text-amber-400 border-amber-500/25 shadow-[0_0_12px_rgba(245,158,11,0.15)]"
+                              : "bg-gray-500/10 text-gray-400 border-gray-500/25"
                       }`}
                     >
                       <span
@@ -1031,10 +959,10 @@ export default function OfferDetailsPage() {
                           currentStage === "COMPLETED"
                             ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)] animate-pulse"
                             : currentStage === "CANCELLED"
-                            ? "bg-rose-400 shadow-[0_0_8px_rgba(248,113,113,0.5)]"
-                            : currentStage === "FLAGGED"
-                            ? "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)] animate-pulse"
-                            : "bg-gray-400"
+                              ? "bg-rose-400 shadow-[0_0_8px_rgba(248,113,113,0.5)]"
+                              : currentStage === "FLAGGED"
+                                ? "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)] animate-pulse"
+                                : "bg-gray-400"
                         }`}
                       />
                       {currentStage}
@@ -1051,10 +979,7 @@ export default function OfferDetailsPage() {
                   <button
                     type="button"
                     onClick={() => handleUpdateStage("COMPLETED")}
-                    disabled={
-                      updateDealStageMutation.isPending ||
-                      currentStage === "COMPLETED"
-                    }
+                    disabled={updateDealStageMutation.isPending || currentStage === "COMPLETED"}
                     title="Mark deal as COMPLETED"
                     className={`py-3.5 px-2 rounded-xl text-xs font-bold uppercase tracking-wider flex flex-col items-center justify-center gap-2 transition-all border ${
                       currentStage === "COMPLETED"
@@ -1074,10 +999,7 @@ export default function OfferDetailsPage() {
                   <button
                     type="button"
                     onClick={() => handleUpdateStage("CANCELLED")}
-                    disabled={
-                      updateDealStageMutation.isPending ||
-                      currentStage === "CANCELLED"
-                    }
+                    disabled={updateDealStageMutation.isPending || currentStage === "CANCELLED"}
                     title="Mark deal as CANCELLED"
                     className={`py-3.5 px-2 rounded-xl text-xs font-bold uppercase tracking-wider flex flex-col items-center justify-center gap-2 transition-all border ${
                       currentStage === "CANCELLED"
@@ -1097,10 +1019,7 @@ export default function OfferDetailsPage() {
                   <button
                     type="button"
                     onClick={() => handleUpdateStage("FLAGGED")}
-                    disabled={
-                      updateDealStageMutation.isPending ||
-                      currentStage === "FLAGGED"
-                    }
+                    disabled={updateDealStageMutation.isPending || currentStage === "FLAGGED"}
                     title="Mark deal as FLAGGED"
                     className={`py-3.5 px-2 rounded-xl text-xs font-bold uppercase tracking-wider flex flex-col items-center justify-center gap-2 transition-all border ${
                       currentStage === "FLAGGED"
@@ -1130,14 +1049,10 @@ export default function OfferDetailsPage() {
                   {buyerInitial}
                 </div>
                 <div className="space-y-1 overflow-hidden">
-                  <h4 className="font-bold text-lg text-white truncate">
-                    {buyerName}
-                  </h4>
+                  <h4 className="font-bold text-lg text-white truncate">{buyerName}</h4>
                   <div className="flex items-center gap-2">
                     <ShieldCheck size={14} className="text-emerald-400" />
-                    <span className="text-xs text-gray-400">
-                      Verified Buyer
-                    </span>
+                    <span className="text-xs text-gray-400">Verified Buyer</span>
                   </div>
                   <p className="text-[11px] font-mono text-gray-500 truncate">
                     ID: {offer.buyerId}
@@ -1155,9 +1070,7 @@ export default function OfferDetailsPage() {
 
               <div className="space-y-2">
                 <h4 className="font-bold text-base text-white">{sellerName}</h4>
-                <p className="text-[11px] font-mono text-gray-500">
-                  ID: {offer.sellerId}
-                </p>
+                <p className="text-[11px] font-mono text-gray-500">ID: {offer.sellerId}</p>
               </div>
             </div>
           </div>

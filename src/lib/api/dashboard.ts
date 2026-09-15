@@ -127,8 +127,6 @@ export interface AdminDashboardOverviewResponse {
  * Fetch Admin Dashboard Overview metrics, pending approvals, dealers, activities, and active deals.
  */
 export const getAdminDashboardOverviewApi = async (): Promise<AdminDashboardOverviewResponse> => {
-  const response = await apiClient.get<AdminDashboardOverviewResponse>(
-    "/admin/dashboard/overview"
-  );
+  const response = await apiClient.get<AdminDashboardOverviewResponse>("/admin/dashboard/overview");
   return response.data;
 };

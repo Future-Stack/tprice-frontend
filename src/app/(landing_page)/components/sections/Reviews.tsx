@@ -24,12 +24,9 @@ export default function Reviews() {
   const currentReview = reviews[currentActiveIndex];
 
   const next = () => setActiveIndex((prev) => (prev + 1) % reviews.length);
-  const prev = () =>
-    setActiveIndex((prev) => (prev - 1 + reviews.length) % reviews.length);
+  const prev = () => setActiveIndex((prev) => (prev - 1 + reviews.length) % reviews.length);
 
-  const handleImageError = (
-    e: React.SyntheticEvent<HTMLImageElement, Event>,
-  ) => {
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     e.currentTarget.src = DEFAULT_AVATAR;
   };
 
@@ -37,9 +34,7 @@ export default function Reviews() {
     if (review.highlightTags && review.highlightTags.length > 0) {
       return review.highlightTags.join(" • ");
     }
-    const parts = [review.reviewerTitle, review.reviewerLocation].filter(
-      Boolean,
-    );
+    const parts = [review.reviewerTitle, review.reviewerLocation].filter(Boolean);
     if (parts.length > 0) {
       return parts.join(" • ").toUpperCase();
     }
@@ -47,9 +42,7 @@ export default function Reviews() {
   };
 
   const getRoleText = (review: ReviewItem) => {
-    const parts = [review.reviewerTitle, review.reviewerLocation].filter(
-      Boolean,
-    );
+    const parts = [review.reviewerTitle, review.reviewerLocation].filter(Boolean);
     return parts.length > 0 ? parts.join(", ") : "VIP Member";
   };
 
@@ -80,13 +73,8 @@ export default function Reviews() {
           <ReviewsSkeleton />
         ) : reviews.length === 0 ? (
           <div className=" text-center py-12 px-6 bg-[#1A1A1A] rounded-2xl border border-white/10">
-            <Quote
-              className="w-12 h-12 text-primary/30 mx-auto mb-4"
-              strokeWidth={1}
-            />
-            <h3 className="text-white text-lg font-serif mb-2">
-              No VIP Reviews Yet
-            </h3>
+            <Quote className="w-12 h-12 text-primary/30 mx-auto mb-4" strokeWidth={1} />
+            <h3 className="text-white text-lg font-serif mb-2">No VIP Reviews Yet</h3>
             <p className="text-white/40 text-xs">
               Check back soon for verified reviews from our VIP global network.
             </p>
@@ -104,13 +92,7 @@ export default function Reviews() {
               <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none" />
 
               <div className="flex flex-col items-center text-center relative z-10 px-12 md:px-24">
-                <Image
-                  src="/quote.svg"
-                  alt="quote"
-                  width={64}
-                  height={64}
-                  className="mb-4"
-                />
+                <Image src="/quote.svg" alt="quote" width={64} height={64} className="mb-4" />
                 {/* Rating Stars */}
                 <div className="flex gap-1 mb-10">
                   {[...Array(5)].map((_, i) => (

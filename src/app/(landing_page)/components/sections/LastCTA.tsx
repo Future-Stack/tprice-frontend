@@ -10,13 +10,7 @@ export default function LastCTA() {
     <section className="relative h-225 w-full overflow-hidden flex flex-col justify-end pb-32 items-center text-center px-6 mt-20">
       {/* Background Video */}
       <div className="absolute inset-0 z-0">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="w-full h-full object-cover"
-        >
+        <video autoPlay muted loop playsInline className="w-full h-full object-cover">
           <source src="/video/footer.mp4" type="video/mp4" />
         </video>
         {/* Aggressive Dark Gradient for Premium Feel */}

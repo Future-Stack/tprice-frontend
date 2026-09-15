@@ -45,21 +45,10 @@ interface SortableMediaCardProps {
   onSetCover: (index: number) => void;
 }
 
-function SortableMediaCard({
-  item,
-  index,
-  isCover,
-  onRemove,
-  onSetCover,
-}: SortableMediaCardProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: item.id });
+function SortableMediaCard({ item, index, isCover, onRemove, onSetCover }: SortableMediaCardProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: item.id,
+  });
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
@@ -153,7 +142,7 @@ export default function SortableMediaGallery({
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    }),
+    })
   );
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -182,9 +171,7 @@ export default function SortableMediaGallery({
     setActiveId(null);
   };
 
-  const activeItem = activeId
-    ? mediaList.find((item) => item.id === activeId)
-    : null;
+  const activeItem = activeId ? mediaList.find((item) => item.id === activeId) : null;
 
   return (
     <DndContext
@@ -194,15 +181,11 @@ export default function SortableMediaGallery({
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
     >
-      <SortableContext
-        items={mediaList.map((m) => m.id)}
-        strategy={rectSortingStrategy}
-      >
+      <SortableContext items={mediaList.map((m) => m.id)} strategy={rectSortingStrategy}>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {mediaList.map((item, idx) => {
             const isCover =
-              Boolean(item.isCover) ||
-              (mediaList.every((x) => !x.isCover) && idx === 0);
+              Boolean(item.isCover) || (mediaList.every((x) => !x.isCover) && idx === 0);
 
             return (
               <SortableMediaCard
@@ -221,14 +204,9 @@ export default function SortableMediaGallery({
       <DragOverlay dropAnimation={{ duration: 250, easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)" }}>
         {activeItem ? (
           <div className="aspect-square rounded-xl border-2 border-primary bg-[#1c1c1e] overflow-hidden shadow-2xl scale-105 rotate-1 ring-4 ring-primary/20 pointer-events-none">
-            <img
-              src={activeItem.url}
-              alt="Dragging"
-              className="w-full h-full object-cover"
-            />
+            <img src={activeItem.url} alt="Dragging" className="w-full h-full object-cover" />
             <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/90 backdrop-blur-md rounded-md text-[10px] text-primary font-mono font-bold border border-primary/30 flex items-center gap-1">
-              <GripVertical className="w-3 h-3 text-primary" />
-              #{activeItem.displayOrder}
+              <GripVertical className="w-3 h-3 text-primary" />#{activeItem.displayOrder}
             </div>
             {Boolean(activeItem.isCover) && (
               <div className="absolute bottom-2 left-2">

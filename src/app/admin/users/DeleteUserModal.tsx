@@ -89,12 +89,8 @@ export default function DeleteUserModal({
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <h4 className="font-semibold text-sm text-white line-clamp-1">
-              {fullName}
-            </h4>
-            <p className="text-xs text-gray-400 truncate mt-0.5">
-              {user.email}
-            </p>
+            <h4 className="font-semibold text-sm text-white line-clamp-1">{fullName}</h4>
+            <p className="text-xs text-gray-400 truncate mt-0.5">{user.email}</p>
             <p className="text-[10px] text-gray-500 uppercase tracking-wider mt-0.5">
               Role: {user.role} • {user.isVerified ? "Verified" : "Unverified"}
             </p>
@@ -103,7 +99,9 @@ export default function DeleteUserModal({
 
         {/* Warning Message */}
         <p className="text-sm text-gray-300 leading-relaxed">
-          Are you sure you want to permanently delete the user <strong className="text-white">&quot;{fullName}&quot;</strong>? This will permanently delete the user and may affect any listings or deals associated with them.
+          Are you sure you want to permanently delete the user{" "}
+          <strong className="text-white">&quot;{fullName}&quot;</strong>? This will permanently
+          delete the user and may affect any listings or deals associated with them.
         </p>
 
         {/* Footer Actions */}

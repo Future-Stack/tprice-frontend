@@ -19,7 +19,9 @@ export default function ProductTabs({ activeTab, setActiveTab }: ProductTabsProp
           onClick={() => setActiveTab(tab)}
           className="relative py-2 text-sm font-medium transition-colors cursor-pointer"
         >
-          <span className={`${activeTab === tab ? "text-primary" : "text-white/40 hover:text-white"}`}>
+          <span
+            className={`${activeTab === tab ? "text-primary" : "text-white/40 hover:text-white"}`}
+          >
             {tab}
           </span>
           {activeTab === tab && (

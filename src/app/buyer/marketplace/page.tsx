@@ -84,19 +84,18 @@ export default function MarketplacePage() {
   const debouncedPriceMax = useDebounce(priceMax, 400);
 
   // Fetch listings using React Query
-  const { data, isLoading, isError, error, refetch, isFetching } =
-    useListingsQuery({
-      category: activeCategory,
-      search: debouncedSearch || undefined,
-      locationCity: debouncedCity || undefined,
-      locationCountry: debouncedCountry || undefined,
-      buildYear: debouncedBuildYear ? Number(debouncedBuildYear) : undefined,
-      minPrice: debouncedPriceMin > 0 ? debouncedPriceMin : undefined,
-      maxPrice: debouncedPriceMax < 100000000 ? debouncedPriceMax : undefined,
-      sortBy: sortBy,
-      page: page,
-      limit: limit,
-    });
+  const { data, isLoading, isError, error, refetch, isFetching } = useListingsQuery({
+    category: activeCategory,
+    search: debouncedSearch || undefined,
+    locationCity: debouncedCity || undefined,
+    locationCountry: debouncedCountry || undefined,
+    buildYear: debouncedBuildYear ? Number(debouncedBuildYear) : undefined,
+    minPrice: debouncedPriceMin > 0 ? debouncedPriceMin : undefined,
+    maxPrice: debouncedPriceMax < 100000000 ? debouncedPriceMax : undefined,
+    sortBy: sortBy,
+    page: page,
+    limit: limit,
+  });
 
   const listings = data?.data || [];
   const meta = data?.meta;
@@ -128,8 +127,7 @@ export default function MarketplacePage() {
               Exclusive Collection
             </h2>
             <p className="text-gray-400 text-xs sm:text-sm mt-1 sm:mt-2 font-medium">
-              Discover the world&apos;s finest luxury assets available for
-              acquisition.
+              Discover the world&apos;s finest luxury assets available for acquisition.
             </p>
           </div>
         </AnimationWrapper>
@@ -208,11 +206,7 @@ export default function MarketplacePage() {
                 className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-lg pl-3 pr-8 py-2 text-xs font-medium text-white appearance-none cursor-pointer focus:outline-none focus:border-primary"
               >
                 {SORT_OPTIONS.map((opt) => (
-                  <option
-                    key={opt.value}
-                    value={opt.value}
-                    className="bg-[#1C1C1E] text-white"
-                  >
+                  <option key={opt.value} value={opt.value} className="bg-[#1C1C1E] text-white">
                     {opt.label}
                   </option>
                 ))}
@@ -272,9 +266,7 @@ export default function MarketplacePage() {
             />
             <div className="absolute right-0 top-0 h-full w-full max-w-[340px] bg-[#1C1C1E] shadow-2xl overflow-y-auto">
               <div className="sticky top-0 bg-[#1C1C1E] p-4 border-b border-[#2C2C2E] flex items-center justify-between z-10">
-                <h3 className="text-lg font-semibold text-white">
-                  Filter Listings
-                </h3>
+                <h3 className="text-lg font-semibold text-white">Filter Listings</h3>
                 <button
                   onClick={() => setIsFilterOpen(false)}
                   className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5"
@@ -328,9 +320,7 @@ export default function MarketplacePage() {
           {isError && (
             <div className="bg-[#2A1616] border border-red-500/30 rounded-2xl p-6 mb-8 text-center">
               <AlertTriangle className="w-10 h-10 text-red-400 mx-auto mb-3" />
-              <h3 className="text-lg font-semibold text-white mb-1">
-                Failed to load listings
-              </h3>
+              <h3 className="text-lg font-semibold text-white mb-1">Failed to load listings</h3>
               <p className="text-sm text-gray-400 mb-4">
                 {(error as any)?.response?.data?.message ||
                   error?.message ||
@@ -370,15 +360,8 @@ export default function MarketplacePage() {
               {meta && meta.totalPages > 1 && (
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-10 pt-6 border-t border-[#2C2C2E]">
                   <p className="text-xs text-gray-400">
-                    Showing{" "}
-                    <span className="font-semibold text-white">
-                      {listings.length}
-                    </span>{" "}
-                    of{" "}
-                    <span className="font-semibold text-white">
-                      {meta.total}
-                    </span>{" "}
-                    listings
+                    Showing <span className="font-semibold text-white">{listings.length}</span> of{" "}
+                    <span className="font-semibold text-white">{meta.total}</span> listings
                   </p>
                   <div className="flex items-center gap-2">
                     <button
@@ -392,9 +375,7 @@ export default function MarketplacePage() {
                       Page {page} of {meta.totalPages}
                     </span>
                     <button
-                      onClick={() =>
-                        setPage((p) => Math.min(p + 1, meta.totalPages))
-                      }
+                      onClick={() => setPage((p) => Math.min(p + 1, meta.totalPages))}
                       disabled={page >= meta.totalPages || isFetching}
                       className="p-2 rounded-lg bg-[#1C1C1E] border border-[#2C2C2E] text-white disabled:opacity-40 disabled:cursor-not-allowed hover:border-[#E78F23] transition-colors"
                     >
@@ -412,12 +393,10 @@ export default function MarketplacePage() {
                   <div className="w-16 h-16 rounded-full bg-[#2C2C2E] flex items-center justify-center mb-4">
                     <Search className="w-8 h-8 text-gray-400" />
                   </div>
-                  <h3 className="text-lg font-semibold text-white">
-                    No listings found
-                  </h3>
+                  <h3 className="text-lg font-semibold text-white">No listings found</h3>
                   <p className="text-sm text-gray-400 mt-1 max-w-sm">
-                    We couldn&apos;t find any assets matching your active filter
-                    criteria. Try adjusting your filters or search term.
+                    We couldn&apos;t find any assets matching your active filter criteria. Try
+                    adjusting your filters or search term.
                   </p>
                   <button
                     onClick={handleResetFilters}
@@ -476,9 +455,7 @@ function FilterSidebar({
     <div className="bg-[#1C1C1E] border border-[#2C2C2E] rounded-2xl p-5 sm:p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="text-base sm:text-lg font-semibold text-white">
-          Filter Listings
-        </h3>
+        <h3 className="text-base sm:text-lg font-semibold text-white">Filter Listings</h3>
         <button
           onClick={handleResetFilters}
           className="text-primary text-xs sm:text-sm font-medium hover:underline flex items-center gap-1"
@@ -557,9 +534,7 @@ function FilterSidebar({
 
         <div className="grid grid-cols-2 gap-2 mb-4">
           <div>
-            <span className="text-[10px] text-gray-500 block mb-1">
-              Min Price
-            </span>
+            <span className="text-[10px] text-gray-500 block mb-1">Min Price</span>
             <input
               type="number"
               value={priceMin || ""}
@@ -569,15 +544,11 @@ function FilterSidebar({
             />
           </div>
           <div>
-            <span className="text-[10px] text-gray-500 block mb-1">
-              Max Price
-            </span>
+            <span className="text-[10px] text-gray-500 block mb-1">Max Price</span>
             <input
               type="number"
               value={priceMax >= 100000000 ? "" : priceMax}
-              onChange={(e) =>
-                setPriceMax(e.target.value ? Number(e.target.value) : 100000000)
-              }
+              onChange={(e) => setPriceMax(e.target.value ? Number(e.target.value) : 100000000)}
               placeholder="Max"
               className="w-full bg-[#18181A] border border-[#2C2C2E] rounded-lg px-3 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-primary"
             />
@@ -595,11 +566,7 @@ function FilterSidebar({
         </div>
         <div className="flex justify-between text-[11px] text-gray-400 font-medium">
           <span>${priceMin.toLocaleString()}</span>
-          <span>
-            {priceMax >= 100000000
-              ? "Any Max"
-              : `$${priceMax.toLocaleString()}`}
-          </span>
+          <span>{priceMax >= 100000000 ? "Any Max" : `$${priceMax.toLocaleString()}`}</span>
         </div>
       </div>
     </div>
@@ -637,13 +604,11 @@ function ListingsSkeleton() {
 function MarketplaceCard({ asset }: { asset: ListingItem }) {
   const saveMutation = useSaveListingMutation();
   const token =
-    Cookies.get("accessToken") ||
-    Cookies.get("token") ||
-    useAuthStore((state) => state.token);
+    Cookies.get("accessToken") || Cookies.get("token") || useAuthStore((state) => state.token);
 
   const { data: savedResponse } = useSavedListingsQuery(
     { page: 1, limit: 100 },
-    { enabled: Boolean(token) },
+    { enabled: Boolean(token) }
   );
 
   const isSavedInListings = useMemo(() => {
@@ -651,8 +616,7 @@ function MarketplaceCard({ asset }: { asset: ListingItem }) {
     return savedResponse.data.some((savedItem) => savedItem.id === asset.id);
   }, [savedResponse, asset.id]);
 
-  const isSaved =
-    asset.isSaved !== undefined ? asset.isSaved : isSavedInListings;
+  const isSaved = asset.isSaved !== undefined ? asset.isSaved : isSavedInListings;
 
   const handleToggleSave = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -673,8 +637,7 @@ function MarketplaceCard({ asset }: { asset: ListingItem }) {
     : "Price on Request";
 
   const locationText =
-    [asset.locationCity, asset.locationCountry].filter(Boolean).join(", ") ||
-    "Worldwide";
+    [asset.locationCity, asset.locationCountry].filter(Boolean).join(", ") || "Worldwide";
 
   return (
     <div className="bg-[#1C1C1E] rounded-xl border border-[#2C2C2E] overflow-hidden group hover:border-primary/40 transition-all duration-300 shadow-xl hover:shadow-[#E78F23]/5 flex flex-col h-full">

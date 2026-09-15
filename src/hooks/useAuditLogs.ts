@@ -1,9 +1,5 @@
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import {
-  getAuditLogsApi,
-  GetAuditLogsParams,
-  AuditLogsResponse,
-} from "@/lib/api/auditLogs";
+import { getAuditLogsApi, GetAuditLogsParams, AuditLogsResponse } from "@/lib/api/auditLogs";
 
 export const AUDIT_LOGS_QUERY_KEYS = {
   all: ["audit-logs"] as const,
@@ -13,9 +9,7 @@ export const AUDIT_LOGS_QUERY_KEYS = {
 /**
  * Custom React Query hook for fetching audit logs with pagination & filtering
  */
-export const useAuditLogsQuery = (
-  params: GetAuditLogsParams = { page: 1, limit: 20 }
-) => {
+export const useAuditLogsQuery = (params: GetAuditLogsParams = { page: 1, limit: 20 }) => {
   return useQuery<AuditLogsResponse>({
     queryKey: AUDIT_LOGS_QUERY_KEYS.list(params),
     queryFn: () => getAuditLogsApi(params),

@@ -113,12 +113,8 @@ export default function AdminDealers() {
                   >
                     <td className="px-6 py-6">
                       <div>
-                        <div className="font-medium text-sm text-gray-200">
-                          {dealer.name}
-                        </div>
-                        <div className="text-xs text-gray-500 mt-1">
-                          {dealer.email}
-                        </div>
+                        <div className="font-medium text-sm text-gray-200">{dealer.name}</div>
+                        <div className="text-xs text-gray-500 mt-1">{dealer.email}</div>
                       </div>
                     </td>
                     <td className="px-6 py-6 border-l border-[#1A1A1A]/50">
@@ -132,9 +128,7 @@ export default function AdminDealers() {
                         >
                           <span
                             className={`w-1.5 h-1.5 rounded-full ${
-                              dealer.status === "Active"
-                                ? "bg-green-500"
-                                : "bg-red-500"
+                              dealer.status === "Active" ? "bg-green-500" : "bg-red-500"
                             }`}
                           />
                           {dealer.status}
@@ -154,7 +148,7 @@ export default function AdminDealers() {
                       {dealer.lastActive}
                     </td>
                     <td className="px-6 py-6 text-right">
-                      <button 
+                      <button
                         onClick={() => handleManageClick(dealer)}
                         className="px-5 py-2 border border-yellow-500/60 rounded-lg text-xs font-semibold text-gray-200 hover:bg-yellow-500 hover:text-black transition-all active:scale-95 shadow-[0_0_15px_rgba(234,179,8,0.1)] hover:shadow-[0_0_20px_rgba(234,179,8,0.3)]"
                       >
@@ -169,7 +163,7 @@ export default function AdminDealers() {
         </div>
       </AnimationWrapper>
       {/* Dealer Detail Modal */}
-      <DealerDetailModal 
+      <DealerDetailModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         dealer={selectedDealer}

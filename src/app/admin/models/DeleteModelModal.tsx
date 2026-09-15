@@ -49,9 +49,7 @@ export default function DeleteModelModal({
               <AlertTriangle className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white font-clash">
-                Delete Model
-              </h3>
+              <h3 className="text-lg font-bold text-white font-clash">Delete Model</h3>
               <p className="text-xs text-gray-400">This action cannot be undone</p>
             </div>
           </div>
@@ -83,9 +81,7 @@ export default function DeleteModelModal({
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <h4 className="font-bold text-sm text-white line-clamp-1">
-              {model.name}
-            </h4>
+            <h4 className="font-bold text-sm text-white line-clamp-1">{model.name}</h4>
             <div className="text-xs text-gray-400 mt-0.5 flex flex-wrap items-center gap-1.5 font-sans">
               {model.brand && (
                 <span className="flex items-center gap-1 text-gray-300">
@@ -103,17 +99,15 @@ export default function DeleteModelModal({
                 </>
               )}
             </div>
-            <p className="text-[11px] text-gray-500 font-mono mt-0.5">
-              /{model.slug}
-            </p>
+            <p className="text-[11px] text-gray-500 font-mono mt-0.5">/{model.slug}</p>
           </div>
         </div>
 
         {/* Warning Message */}
         <p className="text-sm text-gray-300 leading-relaxed">
           Are you sure you want to permanently delete the model{" "}
-          <strong className="text-white">&quot;{model.name}&quot;</strong>? This
-          will remove all associated model metadata and trim references.
+          <strong className="text-white">&quot;{model.name}&quot;</strong>? This will remove all
+          associated model metadata and trim references.
         </p>
 
         {/* Footer Actions */}

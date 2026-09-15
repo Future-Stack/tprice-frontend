@@ -1,5 +1,19 @@
 import {
-  Gauge, Cog, Calendar, Ruler, Home, Zap, Plane, Users, Wind, MapPin, Package, FileText, History, Move, Ship
+  Gauge,
+  Cog,
+  Calendar,
+  Ruler,
+  Home,
+  Zap,
+  Plane,
+  Users,
+  Wind,
+  MapPin,
+  Package,
+  FileText,
+  History,
+  Move,
+  Ship,
 } from "lucide-react";
 
 export interface MediaItem {
@@ -51,12 +65,16 @@ export const DEMO_ITEMS: MarketplaceItem[] = [
     image: "/images/landing/hero-car.png",
     media: [
       { type: "video", url: "/video/footer.mp4", thumbnail: "/images/landing/hero-car.png" },
-      { type: "image", url: "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?auto=format&fit=crop&q=80&w=1000" },
+      {
+        type: "image",
+        url: "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?auto=format&fit=crop&q=80&w=1000",
+      },
     ],
     type: "VIP",
     createdAt: "2026-04-10",
     dealerName: "Elite Motors Collection",
-    description: "The Bugatti Chiron Is One Of The World’s Most Exclusive And Powerful Hyper Cars...",
+    description:
+      "The Bugatti Chiron Is One Of The World’s Most Exclusive And Powerful Hyper Cars...",
     specs: [
       { label: "9 2,500 kms", value: "9 2,500 kms", icon: Gauge },
       { label: "Diesel", value: "Diesel", icon: Wind },
@@ -65,7 +83,7 @@ export const DEMO_ITEMS: MarketplaceItem[] = [
     ],
     detailedSpecs: [],
     history: [],
-    documents: []
+    documents: [],
   },
   {
     id: 2,
@@ -91,7 +109,7 @@ export const DEMO_ITEMS: MarketplaceItem[] = [
     ],
     detailedSpecs: [],
     history: [],
-    documents: []
+    documents: [],
   },
   {
     id: 3,
@@ -117,7 +135,7 @@ export const DEMO_ITEMS: MarketplaceItem[] = [
     ],
     detailedSpecs: [],
     history: [],
-    documents: []
+    documents: [],
   },
   {
     id: 4,
@@ -143,7 +161,7 @@ export const DEMO_ITEMS: MarketplaceItem[] = [
     ],
     detailedSpecs: [],
     history: [],
-    documents: []
+    documents: [],
   },
   {
     id: 5,
@@ -169,7 +187,7 @@ export const DEMO_ITEMS: MarketplaceItem[] = [
     ],
     detailedSpecs: [],
     history: [],
-    documents: []
+    documents: [],
   },
   {
     id: 6,
@@ -195,7 +213,7 @@ export const DEMO_ITEMS: MarketplaceItem[] = [
     ],
     detailedSpecs: [],
     history: [],
-    documents: []
+    documents: [],
   },
   {
     id: 7,
@@ -221,6 +239,6 @@ export const DEMO_ITEMS: MarketplaceItem[] = [
     ],
     detailedSpecs: [],
     history: [],
-    documents: []
-  }
+    documents: [],
+  },
 ];

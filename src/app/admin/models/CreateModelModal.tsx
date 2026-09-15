@@ -1,15 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  X,
-  Car,
-  Award,
-  Sparkles,
-  Loader2,
-  FolderTree,
-  CheckCircle2,
-} from "lucide-react";
+import { X, Car, Award, Sparkles, Loader2, FolderTree, CheckCircle2 } from "lucide-react";
 import { useCreateModelMutation } from "@/hooks/useModels";
 import { useGetBrandsQuery } from "@/hooks/useBrands";
 import { toast } from "sonner";
@@ -57,9 +49,7 @@ export default function CreateModelModal({
 
   if (!isOpen) return null;
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -92,8 +82,7 @@ export default function CreateModelModal({
       });
       onClose();
     } catch (err: any) {
-      const errMsg =
-        err?.response?.data?.message || err?.message || "Failed to create model";
+      const errMsg = err?.response?.data?.message || err?.message || "Failed to create model";
       toast.error(errMsg);
     }
   };
@@ -118,12 +107,8 @@ export default function CreateModelModal({
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white font-clash">
-                Create Model
-              </h2>
-              <p className="text-xs text-gray-400">
-                Add a new vehicle model to a luxury brand
-              </p>
+              <h2 className="text-xl font-bold text-white font-clash">Create Model</h2>
+              <p className="text-xs text-gray-400">Add a new vehicle model to a luxury brand</p>
             </div>
           </div>
           <button
@@ -203,9 +188,7 @@ export default function CreateModelModal({
                   )}
                 </div>
                 <div>
-                  <span className="font-semibold text-white">
-                    {selectedBrand.name}
-                  </span>
+                  <span className="font-semibold text-white">{selectedBrand.name}</span>
                   {selectedBrand.category && (
                     <span className="text-gray-400 ml-1.5 font-normal">
                       ({selectedBrand.category.name})

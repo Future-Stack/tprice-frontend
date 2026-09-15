@@ -64,9 +64,7 @@ export interface UpdateBrandInput {
 /**
  * Fetch paginated brands from GET /brands
  */
-export const getBrandsApi = async (
-  params?: GetBrandsParams,
-): Promise<BrandsResponse> => {
+export const getBrandsApi = async (params?: GetBrandsParams): Promise<BrandsResponse> => {
   const queryParams: Record<string, any> = {};
 
   if (params) {
@@ -89,9 +87,7 @@ export const getBrandsApi = async (
 /**
  * Create a brand via POST /brands
  */
-export const createBrandApi = async (
-  data: CreateBrandInput,
-): Promise<Brand> => {
+export const createBrandApi = async (data: CreateBrandInput): Promise<Brand> => {
   const response = await apiClient.post<Brand>("/brands", data);
   return response.data;
 };
@@ -99,10 +95,7 @@ export const createBrandApi = async (
 /**
  * Update a brand via PATCH /brands/:id
  */
-export const updateBrandApi = async (
-  id: string,
-  data: UpdateBrandInput,
-): Promise<Brand> => {
+export const updateBrandApi = async (id: string, data: UpdateBrandInput): Promise<Brand> => {
   const response = await apiClient.patch<Brand>(`/brands/${id}`, data);
   return response.data;
 };

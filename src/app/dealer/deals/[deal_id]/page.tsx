@@ -162,19 +162,18 @@ const DealDetails = () => {
   return (
     <div className="min-h-screen bg-black text-white font-inter">
       <div className="w-full space-y-8">
-
         {/* Breadcrumbs */}
         <div className="flex items-center gap-2 text-white/60 text-sm md:text-[32px] font-medium font-clash">
-          <Link href="/dealer/deals" className="hover:text-white transition-colors">Active Deals</Link>
+          <Link href="/dealer/deals" className="hover:text-white transition-colors">
+            Active Deals
+          </Link>
           <ChevronRight size={16} />
           <span className="text-white">Negotiation Details</span>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-
           {/* Left & Middle Container */}
           <div className="lg:col-span-8 space-y-8">
-
             <div className="grid grid-cols-1 md:grid-cols-11 gap-8">
               {/* Left Column (Seller & Summary) */}
               <div className="md:col-span-5 space-y-6">
@@ -187,7 +186,12 @@ const DealDetails = () => {
                   <div className="bg-[#111113] rounded-2xl border border-white/5 p-4 flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
                       <div className="relative w-10 h-10 rounded-full overflow-hidden border border-white/10">
-                        <Image src={offer.seller.avatar} alt={offer.seller.name} fill className="object-cover" />
+                        <Image
+                          src={offer.seller.avatar}
+                          alt={offer.seller.name}
+                          fill
+                          className="object-cover"
+                        />
                       </div>
                       <div>
                         <div className="font-bold text-sm text-white/90">{offer.seller.name}</div>
@@ -198,17 +202,23 @@ const DealDetails = () => {
                     </div>
                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
                       <div className="w-2.5 h-2.5 rounded-full bg-[#E78F23] shadow-[0_0_8px_rgba(231,143,35,0.5)]" />
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-white/80">Negotiation</span>
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-white/80">
+                        Negotiation
+                      </span>
                     </div>
                   </div>
 
                   {/* Deal Summary Card */}
                   <div className="bg-[#111113] rounded-3xl border border-white/5 p-6 md:p-8 space-y-8 mb-3">
-                    <div className="text-[11px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-4">Deal Summary</div>
+                    <div className="text-[11px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-4">
+                      Deal Summary
+                    </div>
 
                     <div className="flex justify-between items-end">
                       <div>
-                        <div className="text-[11px] font-bold text-gray-400 mb-1">Current Offer</div>
+                        <div className="text-[11px] font-bold text-gray-400 mb-1">
+                          Current Offer
+                        </div>
                         <div className="text-[32px] md:text-[40px] font-black text-[#D4AF37] leading-none tracking-tight">
                           {offer.summary.currentOffer}
                         </div>
@@ -220,7 +230,9 @@ const DealDetails = () => {
 
                     <div className="space-y-4 pt-4 border-t border-white/5">
                       <div className="flex justify-between text-[11px] font-medium">
-                        <span className="text-gray-500 uppercase tracking-widest">Last Updated</span>
+                        <span className="text-gray-500 uppercase tracking-widest">
+                          Last Updated
+                        </span>
                         <span className="text-white/80">{offer.summary.lastUpdated}</span>
                       </div>
                       <div className="flex justify-between text-[11px] font-medium">
@@ -228,7 +240,9 @@ const DealDetails = () => {
                         <span className="text-white/80 font-mono tracking-normal">{offer.id}</span>
                       </div>
                       <div className="flex justify-between text-[11px] font-medium">
-                        <span className="text-gray-500 uppercase tracking-widest">Listed Price</span>
+                        <span className="text-gray-500 uppercase tracking-widest">
+                          Listed Price
+                        </span>
                         <span className="text-white/80">{offer.summary.listedPrice}</span>
                       </div>
                     </div>
@@ -240,9 +254,12 @@ const DealDetails = () => {
                       <Info size={12} className="text-black font-bold" />
                     </div>
                     <div className="space-y-1">
-                      <div className="text-[11px] font-bold text-[#E78F23] uppercase tracking-wider">Smart Insight</div>
+                      <div className="text-[11px] font-bold text-[#E78F23] uppercase tracking-wider">
+                        Smart Insight
+                      </div>
                       <p className="text-[11px] leading-relaxed text-[#E78F23]/90">
-                        Buyer increased offer twice — likely serious. Response time averaging 2 hours
+                        Buyer increased offer twice — likely serious. Response time averaging 2
+                        hours
                       </p>
                     </div>
                   </div>
@@ -312,8 +329,8 @@ const DealDetails = () => {
                         const senderName = isSelf
                           ? "You"
                           : msg.sender
-                          ? `${msg.sender.firstName || "Buyer"} ${msg.sender.lastName || ""}`.trim()
-                          : "Buyer";
+                            ? `${msg.sender.firstName || "Buyer"} ${msg.sender.lastName || ""}`.trim()
+                            : "Buyer";
 
                         return (
                           <div
@@ -375,8 +392,6 @@ const DealDetails = () => {
             </AnimationWrapper>
           </div>
 
-
-
           {/* Right Column (Order History) */}
           <div className="lg:col-span-4">
             <AnimationWrapper type="fade-left">
@@ -398,29 +413,38 @@ const DealDetails = () => {
                       {offer.history.map((item) => (
                         <div
                           key={item.id}
-                          className={`relative group p-5 rounded-2xl border transition-all duration-300 ${item.active
-                            ? 'bg-white/5 border-[#D4AF37]/30 ring-1 ring-[#D4AF37]/20'
-                            : 'bg-white/2 border-white/5 hover:bg-white/5'
-                            }`}
+                          className={`relative group p-5 rounded-2xl border transition-all duration-300 ${
+                            item.active
+                              ? "bg-white/5 border-[#D4AF37]/30 ring-1 ring-[#D4AF37]/20"
+                              : "bg-white/2 border-white/5 hover:bg-white/5"
+                          }`}
                         >
                           <div className="flex items-center gap-5">
                             {/* Dot / Indicator */}
                             <div className="relative">
                               <Circle
                                 size={10}
-                                fill={item.color === 'blue' ? '#3B82F6' : '#D4AF37'}
-                                className={item.color === 'blue' ? 'text-blue-500' : 'text-[#D4AF37]'}
+                                fill={item.color === "blue" ? "#3B82F6" : "#D4AF37"}
+                                className={
+                                  item.color === "blue" ? "text-blue-500" : "text-[#D4AF37]"
+                                }
                               />
                             </div>
 
                             <div className="grow flex justify-between items-start">
                               <div className="space-y-1">
-                                <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{item.type}</div>
+                                <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                                  {item.type}
+                                </div>
                                 <div className="font-bold text-sm text-white/90">{item.entity}</div>
-                                <div className="text-[10px] text-gray-500 font-medium">{item.date}</div>
+                                <div className="text-[10px] text-gray-500 font-medium">
+                                  {item.date}
+                                </div>
                               </div>
                               <div className="text-right">
-                                <div className={`text-lg md:text-xl font-black tracking-tight ${item.active ? 'text-white' : 'text-white/80'}`}>
+                                <div
+                                  className={`text-lg md:text-xl font-black tracking-tight ${item.active ? "text-white" : "text-white/80"}`}
+                                >
                                   {item.amount}
                                 </div>
                               </div>
@@ -436,7 +460,6 @@ const DealDetails = () => {
               </div>
             </AnimationWrapper>
           </div>
-
         </div>
       </div>
     </div>

@@ -26,7 +26,8 @@ export const DEMO_SERVICES: ServiceItem[] = [
     title: "Interior Designer at Rolex",
     rating: 5,
     reviews: 120,
-    description: "John Whitson founded his eponymous atelier in Paris after a decade at the world's most prestigious design houses. Her philosophy centers on the marriage of classic French elegance with contemporary aesthetics.",
+    description:
+      "John Whitson founded his eponymous atelier in Paris after a decade at the world's most prestigious design houses. Her philosophy centers on the marriage of classic French elegance with contemporary aesthetics.",
     category: "Interior Designers",
     tags: ["RESIDENTIAL DESIGN", "SUPER YACHT INTERIOR"],
     experience: "18+ years experience",
@@ -43,15 +44,15 @@ export const DEMO_SERVICES: ServiceItem[] = [
       "Art & Antiques Curation",
       "Bespoke Furniture Commissioning",
       "Lighting Design",
-      "Project Management"
+      "Project Management",
     ],
     portfolioImages: [
       "/images/services/interior-1.png",
       "/images/services/interior-2.png",
       "/images/services/interior-3.png",
       "/images/services/interior-1.png",
-      "/images/services/interior-2.png"
-    ]
+      "/images/services/interior-2.png",
+    ],
   },
   {
     id: 2,
@@ -59,7 +60,8 @@ export const DEMO_SERVICES: ServiceItem[] = [
     title: "Yacht Service Provider Toyota",
     rating: 5,
     reviews: 120,
-    description: "Captain Cameron Williamson founded her eponymous atelier in Paris after a decade at the world's most prestigious design houses. Her philosophy centers on the marriage of classic French elegance with contemporary aesthetics.",
+    description:
+      "Captain Cameron Williamson founded her eponymous atelier in Paris after a decade at the world's most prestigious design houses. Her philosophy centers on the marriage of classic French elegance with contemporary aesthetics.",
     category: "Yacht Services",
     tags: ["YACHT MANAGEMENT", "SKY TRAVEL PROVISION"],
     experience: "5 years experience",
@@ -75,14 +77,14 @@ export const DEMO_SERVICES: ServiceItem[] = [
       "Crew Placement",
       "Charter Brokerage",
       "Refit Supervision",
-      "Operational Logistics"
+      "Operational Logistics",
     ],
     portfolioImages: [
       "/images/services/yacht-1.png",
       "/images/services/yacht-2.png",
       "/images/services/yacht-1.png",
-      "/images/services/yacht-2.png"
-    ]
+      "/images/services/yacht-2.png",
+    ],
   },
   {
     id: 3,
@@ -90,7 +92,8 @@ export const DEMO_SERVICES: ServiceItem[] = [
     title: "Interior Designer at Rolex",
     rating: 5,
     reviews: 120,
-    description: "John Whitson founded his eponymous atelier in Paris after a decade at the world's most prestigious design houses. Her philosophy centers on the marriage of classic French elegance with contemporary aesthetics.",
+    description:
+      "John Whitson founded his eponymous atelier in Paris after a decade at the world's most prestigious design houses. Her philosophy centers on the marriage of classic French elegance with contemporary aesthetics.",
     category: "Interior Designers",
     tags: ["RESIDENTIAL DESIGN", "SUPER YACHT INTERIOR"],
     experience: "18+ years experience",
@@ -102,7 +105,7 @@ export const DEMO_SERVICES: ServiceItem[] = [
     countries: 10,
     awards: 15,
     servicesOffered: ["Full Interior Design & Concept", "Lighting Design", "Project Management"],
-    portfolioImages: ["/images/services/interior-2.png"]
+    portfolioImages: ["/images/services/interior-2.png"],
   },
   {
     id: 4,
@@ -110,7 +113,8 @@ export const DEMO_SERVICES: ServiceItem[] = [
     title: "Interior Designer at Rolex",
     rating: 5,
     reviews: 120,
-    description: "John Whitson founded his eponymous atelier in Paris after a decade at the world's most prestigious design houses. Her philosophy centers on the marriage of classic French elegance with contemporary aesthetics.",
+    description:
+      "John Whitson founded his eponymous atelier in Paris after a decade at the world's most prestigious design houses. Her philosophy centers on the marriage of classic French elegance with contemporary aesthetics.",
     category: "Aviation Services",
     tags: ["RESIDENTIAL DESIGN", "SUPER YACHT INTERIOR"],
     experience: "14+ years experience",
@@ -122,7 +126,7 @@ export const DEMO_SERVICES: ServiceItem[] = [
     countries: 35,
     awards: 8,
     servicesOffered: ["Aircraft Acquisition", "Maintenance Coordination", "Crew Management"],
-    portfolioImages: ["/images/services/aviation-1.png"]
+    portfolioImages: ["/images/services/aviation-1.png"],
   },
   {
     id: 5,
@@ -130,7 +134,8 @@ export const DEMO_SERVICES: ServiceItem[] = [
     title: "Yacht Service Provider Toyota",
     rating: 5,
     reviews: 120,
-    description: "Captain Cameron Williamson founded her eponymous atelier in Paris after a decade at the world's most prestigious design houses. Her philosophy centers on the marriage of classic French elegance with contemporary aesthetics.",
+    description:
+      "Captain Cameron Williamson founded her eponymous atelier in Paris after a decade at the world's most prestigious design houses. Her philosophy centers on the marriage of classic French elegance with contemporary aesthetics.",
     category: "Yacht Services",
     tags: ["YACHT MANAGEMENT", "SKY TRAVEL PROVISION"],
     experience: "5 years experience",
@@ -142,7 +147,7 @@ export const DEMO_SERVICES: ServiceItem[] = [
     countries: 12,
     awards: 5,
     servicesOffered: ["Yacht Management", "Refit Supervision"],
-    portfolioImages: ["/images/services/yacht-2.png"]
+    portfolioImages: ["/images/services/yacht-2.png"],
   },
   {
     id: 6,
@@ -150,7 +155,8 @@ export const DEMO_SERVICES: ServiceItem[] = [
     title: "Interior Designer at Rolex",
     rating: 5,
     reviews: 120,
-    description: "John Whitson founded his eponymous atelier in Paris after a decade at the world's most prestigious design houses. Her philosophy centers on the marriage of classic French elegance with contemporary aesthetics.",
+    description:
+      "John Whitson founded his eponymous atelier in Paris after a decade at the world's most prestigious design houses. Her philosophy centers on the marriage of classic French elegance with contemporary aesthetics.",
     category: "Interior Designers",
     tags: ["RESIDENTIAL DESIGN", "SUPER YACHT INTERIOR"],
     experience: "18+ years experience",
@@ -161,7 +167,11 @@ export const DEMO_SERVICES: ServiceItem[] = [
     projects: 55,
     countries: 22,
     awards: 30,
-    servicesOffered: ["Full Interior Design & Concept", "Superyacht Cabin Design", "Bespoke Furniture Commissioning"],
-    portfolioImages: ["/images/services/interior-3.png"]
-  }
+    servicesOffered: [
+      "Full Interior Design & Concept",
+      "Superyacht Cabin Design",
+      "Bespoke Furniture Commissioning",
+    ],
+    portfolioImages: ["/images/services/interior-3.png"],
+  },
 ];

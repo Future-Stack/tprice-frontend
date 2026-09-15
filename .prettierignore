@@ -1,0 +1,11 @@
+node_modules
+.next
+out
+build
+coverage
+dist
+package-lock.json
+public
+*.min.js
+*.min.css
+.DS_Store

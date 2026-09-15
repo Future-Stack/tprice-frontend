@@ -18,10 +18,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useLogoutMutation } from "@/hooks/useAuth";
 import { useAuthStore } from "@/lib/store/useAuthStore";
-import {
-  useNotificationsQuery,
-  useMarkNotificationAsReadMutation,
-} from "@/hooks/useNotifications";
+import { useNotificationsQuery, useMarkNotificationAsReadMutation } from "@/hooks/useNotifications";
 import { NotificationItem } from "@/lib/api/notifications";
 import Image from "next/image";
 
@@ -58,8 +55,10 @@ export default function Topbar({
   const { user } = useAuthStore();
 
   // Notifications API query & mutation
-  const { data: notificationsData, isLoading: isNotificationsLoading } =
-    useNotificationsQuery({ page, limit: 10 });
+  const { data: notificationsData, isLoading: isNotificationsLoading } = useNotificationsQuery({
+    page,
+    limit: 10,
+  });
   const markAsReadMutation = useMarkNotificationAsReadMutation();
 
   const notifications = notificationsData?.data || [];
@@ -93,16 +92,10 @@ export default function Topbar({
   // Close dropdowns when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
       }
-      if (
-        notificationRef.current &&
-        !notificationRef.current.contains(event.target as Node)
-      ) {
+      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
         setIsNotificationOpen(false);
       }
     }
@@ -172,9 +165,7 @@ export default function Topbar({
                 {/* Header */}
                 <div className="flex items-center justify-between px-3 py-2 border-b border-white/5 mb-2">
                   <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-semibold text-white">
-                      Notifications
-                    </h3>
+                    <h3 className="text-sm font-semibold text-white">Notifications</h3>
                     {unreadCount > 0 && (
                       <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#E78F23]/20 text-[#E78F23] border border-[#E78F23]/30">
                         {unreadCount} new
@@ -196,9 +187,7 @@ export default function Topbar({
                   ) : notifications.length === 0 ? (
                     <div className="py-10 flex flex-col items-center justify-center gap-2 text-gray-500">
                       <Inbox className="w-8 h-8 stroke-[1.5]" />
-                      <p className="text-xs font-medium">
-                        No notifications yet
-                      </p>
+                      <p className="text-xs font-medium">No notifications yet</p>
                     </div>
                   ) : (
                     notifications.map((item) => (
@@ -214,9 +203,7 @@ export default function Topbar({
                         {/* Icon Badge */}
                         <div
                           className={`p-2 rounded-lg shrink-0 ${
-                            !item.isRead
-                              ? "bg-[#E78F23]/20"
-                              : "bg-white/5 text-gray-400"
+                            !item.isRead ? "bg-[#E78F23]/20" : "bg-white/5 text-gray-400"
                           }`}
                         >
                           {getNotificationIcon(item.type)}
@@ -270,12 +257,8 @@ export default function Topbar({
                       Page {meta.page} of {meta.totalPages}
                     </span>
                     <button
-                      disabled={
-                        page >= meta.totalPages || isNotificationsLoading
-                      }
-                      onClick={() =>
-                        setPage((p) => Math.min(meta.totalPages, p + 1))
-                      }
+                      disabled={page >= meta.totalPages || isNotificationsLoading}
+                      onClick={() => setPage((p) => Math.min(meta.totalPages, p + 1))}
                       className="px-2 py-1 rounded bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                     >
                       Next
@@ -290,10 +273,7 @@ export default function Topbar({
         <div className="hidden sm:block w-px h-8 bg-[#2C2C2E]"></div>
 
         {/* profile button */}
-        <div
-          className="relative border border-primary rounded-full p-1"
-          ref={dropdownRef}
-        >
+        <div className="relative border border-primary rounded-full p-1" ref={dropdownRef}>
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="flex items-center gap-2 lg:gap-3 hover:opacity-80 transition-opacity cursor-pointer"
@@ -333,9 +313,7 @@ export default function Topbar({
               >
                 <div className="px-4 py-3 border-b border-white/5 mb-1">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-xs text-gray-500 font-medium">
-                      Signed in as
-                    </p>
+                    <p className="text-xs text-gray-500 font-medium">Signed in as</p>
                     {user?.role && (
                       <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#E78F23]/20 text-[#E78F23] border border-[#E78F23]/30 uppercase">
                         {user.role}
@@ -385,9 +363,7 @@ export default function Topbar({
                       <p className="text-sm font-medium leading-none">
                         {logoutMutation.isPending ? "Logging out..." : "Logout"}
                       </p>
-                      <p className="text-[10px] text-red-500/50 mt-1">
-                        Exit application
-                      </p>
+                      <p className="text-[10px] text-red-500/50 mt-1">Exit application</p>
                     </div>
                   </button>
                 </div>

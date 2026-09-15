@@ -1,14 +1,7 @@
- "use client";
+"use client";
 
 import React, { useState } from "react";
-import {
-  MapPin,
-  Info,
-  BadgeCheck,
-  ArrowUpRight,
-  Share2,
-  Eye,
-} from "lucide-react";
+import { MapPin, Info, BadgeCheck, ArrowUpRight, Share2, Eye } from "lucide-react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
 
 /* ─── Mock Data (unchanged) ─── */
@@ -17,7 +10,8 @@ const categories = ["All", "Cars", "Yachts", "Aviation", "Real Estate", "Watches
 const bids = [
   {
     id: 1,
-    image: "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?auto=format&fit=crop&q=80&w=100",
+    image:
+      "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?auto=format&fit=crop&q=80&w=100",
     title: "Patek Philippe Nautilus 5711",
     yourBid: "$373,000",
     highestBid: "$373,000",
@@ -28,22 +22,23 @@ const bids = [
       currentBid: "$372,000",
       vipFee: "$5,580",
       totalPayable: "$377,580",
-      askingPrice: "$389,000"
+      askingPrice: "$389,000",
     },
     specs: [
       { label: "Case", value: "Stainless Steel" },
       { label: "Movement", value: "Automatic" },
       { label: "Size", value: "40mm" },
-      { label: "Year", value: "2021" }
+      { label: "Year", value: "2021" },
     ],
     seller: {
       name: "Luxury Watch Co",
-      initial: "L"
-    }
+      initial: "L",
+    },
   },
   {
     id: 2,
-    image: "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&q=80&w=100",
+    image:
+      "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&q=80&w=100",
     title: "Ferrari 488 Spider",
     yourBid: "$175,000",
     highestBid: "$178,000",
@@ -54,22 +49,23 @@ const bids = [
       currentBid: "$175,000",
       vipFee: "$2,625",
       totalPayable: "$177,625",
-      askingPrice: "$180,000"
+      askingPrice: "$180,000",
     },
     specs: [
       { label: "Mileage", value: "1,200 mi" },
       { label: "Engine", value: "3.9L V8 Twin-Turbo" },
       { label: "Power", value: "661 HP" },
-      { label: "0-60", value: "2.9s" }
+      { label: "0-60", value: "2.9s" },
     ],
     seller: {
       name: "Monaco Prestige Motors",
-      initial: "M"
-    }
+      initial: "M",
+    },
   },
   {
     id: 3,
-    image: "https://images.unsplash.com/photo-1540962351504-03099e0a754b?auto=format&fit=crop&q=80&w=100",
+    image:
+      "https://images.unsplash.com/photo-1540962351504-03099e0a754b?auto=format&fit=crop&q=80&w=100",
     title: "Lamborghini Revuelto",
     yourBid: "$585,000",
     highestBid: "$585,000",
@@ -80,19 +76,19 @@ const bids = [
       currentBid: "$585,000",
       vipFee: "$8,775",
       totalPayable: "$593,775",
-      askingPrice: "$600,000"
+      askingPrice: "$600,000",
     },
     specs: [
       { label: "Mileage", value: "500 mi" },
       { label: "Engine", value: "6.5L V12 Hybrid" },
       { label: "Power", value: "1001 HP" },
-      { label: "0-60", value: "2.5s" }
+      { label: "0-60", value: "2.5s" },
     ],
     seller: {
       name: "Dubai Exotics",
-      initial: "D"
-    }
-  }
+      initial: "D",
+    },
+  },
 ];
 
 export default function MyBidsPage() {
@@ -122,7 +118,7 @@ export default function MyBidsPage() {
         </AnimationWrapper>
 
         {/* Category Tabs – scrollable on mobile */}
-        <AnimationWrapper type="fade-down" duration={0.5} delay={0.1} >
+        <AnimationWrapper type="fade-down" duration={0.5} delay={0.1}>
           <div className="overflow-x-auto pb-1 -mx-4 px-4 lg:mx-0 lg:px-0">
             <div className="flex items-center gap-1.5 bg-[#18181A] border border-[#2C2C2E] rounded-full p-1.5 w-max">
               {categories.map((cat) => (
@@ -130,9 +126,10 @@ export default function MyBidsPage() {
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
                   className={`px-4 sm:px-5 py-2 rounded-full text-[11px] sm:text-[13px] font-medium transition-all duration-200 whitespace-nowrap
-                    ${activeCategory === cat
-                      ? "bg-[#E78F23] text-white shadow-[0_2px_12px_rgba(231,143,35,0.4)]"
-                      : "text-gray-400 hover:text-white hover:bg-white/5"
+                    ${
+                      activeCategory === cat
+                        ? "bg-[#E78F23] text-white shadow-[0_2px_12px_rgba(231,143,35,0.4)]"
+                        : "text-gray-400 hover:text-white hover:bg-white/5"
                     }`}
                 >
                   {cat}
@@ -151,7 +148,9 @@ export default function MyBidsPage() {
           <div className="hidden sm:grid grid-cols-[1fr_repeat(3,100px)_150px] gap-4 mb-6 px-4">
             <span className="text-xs font-bold text-white uppercase tracking-wider">Item</span>
             <span className="text-xs font-bold text-white uppercase tracking-wider">Your Bid</span>
-            <span className="text-xs font-bold text-white uppercase tracking-wider">Highest Bid</span>
+            <span className="text-xs font-bold text-white uppercase tracking-wider">
+              Highest Bid
+            </span>
             <span className="text-xs font-bold text-white uppercase tracking-wider">Status</span>
             <span></span>
           </div>
@@ -169,15 +168,20 @@ export default function MyBidsPage() {
                   <div
                     onClick={() => setSelectedBidId(bid.id)}
                     className={`grid grid-cols-[1fr_repeat(3,100px)_150px] items-center gap-4 p-4 rounded-xl border transition-all cursor-pointer group
-                      ${selectedBidId === bid.id
-                        ? "bg-white/5 border-[#E78F23]/20 shadow-lg shadow-black/20"
-                        : "bg-[#161618] border-[#2C2C2E] hover:border-white/10"
+                      ${
+                        selectedBidId === bid.id
+                          ? "bg-white/5 border-[#E78F23]/20 shadow-lg shadow-black/20"
+                          : "bg-[#161618] border-[#2C2C2E] hover:border-white/10"
                       }`}
                   >
                     {/* Item */}
                     <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                       <div className="w-10 h-8 sm:w-12 sm:h-10 rounded-lg overflow-hidden bg-black shrink-0 border border-white/5">
-                        <img src={bid.image} alt={bid.title} className="w-full h-full object-cover" />
+                        <img
+                          src={bid.image}
+                          alt={bid.title}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
                       <span className="text-sm font-medium text-gray-300 group-hover:text-white transition-colors truncate">
                         {bid.title}
@@ -192,10 +196,17 @@ export default function MyBidsPage() {
 
                     {/* Status */}
                     <div>
-                      <span className={`text-xs font-bold uppercase tracking-wide
-                        ${bid.status === "Leading" ? "text-emerald-500" :
-                          bid.status === "Won" ? "text-[#E78F23]" : "text-red-500"}
-                      `}>
+                      <span
+                        className={`text-xs font-bold uppercase tracking-wide
+                        ${
+                          bid.status === "Leading"
+                            ? "text-emerald-500"
+                            : bid.status === "Won"
+                              ? "text-[#E78F23]"
+                              : "text-red-500"
+                        }
+                      `}
+                      >
                         {bid.status}
                       </span>
                     </div>
@@ -239,14 +250,20 @@ export default function MyBidsPage() {
               {/* Price Summary Card */}
               <div className="bg-[#111111] border border-[#222222] rounded-2xl p-5 sm:p-6 space-y-5 sm:space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                  <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Price Summary</span>
+                  <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
+                    Price Summary
+                  </span>
                   <div className="flex items-center gap-2 sm:gap-3">
-                    <span className="text-[10px] text-gray-500 font-medium tracking-wide">Show total incl. fees</span>
+                    <span className="text-[10px] text-gray-500 font-medium tracking-wide">
+                      Show total incl. fees
+                    </span>
                     <button
                       onClick={() => setInclFees(!inclFees)}
-                      className={`w-9 sm:w-10 h-5 sm:h-5.5 rounded-full relative transition-all duration-300 ${inclFees ? 'bg-white' : 'bg-[#2C2C2E]'}`}
+                      className={`w-9 sm:w-10 h-5 sm:h-5.5 rounded-full relative transition-all duration-300 ${inclFees ? "bg-white" : "bg-[#2C2C2E]"}`}
                     >
-                      <div className={`absolute top-0.5 sm:top-1 w-4 h-4 sm:w-3.5 sm:h-3.5 rounded-full transition-all duration-300 ${inclFees ? 'left-5 sm:left-5.5 bg-black' : 'left-0.5 sm:left-1 bg-white'}`} />
+                      <div
+                        className={`absolute top-0.5 sm:top-1 w-4 h-4 sm:w-3.5 sm:h-3.5 rounded-full transition-all duration-300 ${inclFees ? "left-5 sm:left-5.5 bg-black" : "left-0.5 sm:left-1 bg-white"}`}
+                      />
                     </button>
                   </div>
                 </div>
@@ -254,14 +271,18 @@ export default function MyBidsPage() {
                 <div className="space-y-4">
                   <div className="flex justify-between items-center text-sm tracking-tight">
                     <span className="text-gray-400">Current Bid</span>
-                    <span className="text-white font-medium">{selectedBid.priceSummary.currentBid}</span>
+                    <span className="text-white font-medium">
+                      {selectedBid.priceSummary.currentBid}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center text-sm tracking-tight">
                     <div className="flex items-center gap-1.5">
                       <span className="text-gray-400">VIP Fee (1.5%)</span>
                       <Info className="w-3.5 h-3.5 text-gray-600" />
                     </div>
-                    <span className="text-white font-medium">{selectedBid.priceSummary.vipFee}</span>
+                    <span className="text-white font-medium">
+                      {selectedBid.priceSummary.vipFee}
+                    </span>
                   </div>
                 </div>
 
@@ -269,15 +290,21 @@ export default function MyBidsPage() {
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                     <span className="text-sm font-medium text-gray-400">Total Payable</span>
                     <div className="text-left sm:text-right">
-                      <p className="text-2xl sm:text-3xl lg:text-[32px] font-clash font-medium text-[#E78F23] leading-none mb-1 tracking-tight">{selectedBid.priceSummary.totalPayable}</p>
-                      <p className="text-[11px] text-gray-500">Asking: {selectedBid.priceSummary.askingPrice}</p>
+                      <p className="text-2xl sm:text-3xl lg:text-[32px] font-clash font-medium text-[#E78F23] leading-none mb-1 tracking-tight">
+                        {selectedBid.priceSummary.totalPayable}
+                      </p>
+                      <p className="text-[11px] text-gray-500">
+                        Asking: {selectedBid.priceSummary.askingPrice}
+                      </p>
                     </div>
                   </div>
                 </div>
 
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#E78F23]/10 rounded-full border border-[#E78F23]/20">
                   <div className="w-1.5 h-1.5 bg-[#E78F23] rounded-full shadow-[0_0_8px_rgba(231,143,35,0.6)]" />
-                  <span className="text-[9px] text-[#E78F23] font-bold uppercase tracking-widest">VIP reduced fee applied</span>
+                  <span className="text-[9px] text-[#E78F23] font-bold uppercase tracking-widest">
+                    VIP reduced fee applied
+                  </span>
                 </div>
               </div>
 
@@ -285,8 +312,12 @@ export default function MyBidsPage() {
               <div className="grid grid-cols-2 gap-3">
                 {selectedBid.specs.map((spec, i) => (
                   <div key={i} className="bg-[#161618] rounded-xl p-3 sm:p-4 border border-white/5">
-                    <p className="text-[9px] sm:text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">{spec.label}</p>
-                    <p className="text-sm sm:text-[15px] font-medium text-white truncate">{spec.value}</p>
+                    <p className="text-[9px] sm:text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">
+                      {spec.label}
+                    </p>
+                    <p className="text-sm sm:text-[15px] font-medium text-white truncate">
+                      {spec.value}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -297,7 +328,9 @@ export default function MyBidsPage() {
                   {selectedBid.seller.initial}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-white leading-none mb-1 truncate">{selectedBid.seller.name}</p>
+                  <p className="text-sm font-semibold text-white leading-none mb-1 truncate">
+                    {selectedBid.seller.name}
+                  </p>
                   <p className="text-[11px] text-green-500/80 flex items-center gap-1.5 font-medium">
                     <BadgeCheck className="w-3 h-3 shrink-0" />
                     <span className="truncate">Verified Dealer</span>

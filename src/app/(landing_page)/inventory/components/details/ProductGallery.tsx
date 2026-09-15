@@ -41,7 +41,7 @@ export default function ProductGallery({ media }: ProductGalleryProps) {
         }
       } catch (error) {
         // Ignore AbortError as it's common when switching slides quickly with AnimatePresence
-        if (error instanceof Error && error.name !== 'AbortError') {
+        if (error instanceof Error && error.name !== "AbortError") {
           console.error("Video playback failed:", error);
         }
         setIsPlaying(false);
@@ -99,11 +99,7 @@ export default function ProductGallery({ media }: ProductGalleryProps) {
                 Your browser does not support the video tag.
               </video>
             ) : (
-              <img
-                src={currentMedia.url}
-                className="w-full h-full object-cover"
-                alt="Product"
-              />
+              <img src={currentMedia.url} className="w-full h-full object-cover" alt="Product" />
             )}
           </motion.div>
         </AnimatePresence>
@@ -152,8 +148,11 @@ export default function ProductGallery({ media }: ProductGalleryProps) {
           <button
             key={idx}
             onClick={() => setCurrentIndex(idx)}
-            className={`relative min-w-30 md:min-w-40 h-20 md:h-28 rounded-sm overflow-hidden border-2 transition-all cursor-pointer ${currentIndex === idx ? "border-[#D4AF37] scale-105" : "border-transparent opacity-60 hover:opacity-100"
-              }`}
+            className={`relative min-w-30 md:min-w-40 h-20 md:h-28 rounded-sm overflow-hidden border-2 transition-all cursor-pointer ${
+              currentIndex === idx
+                ? "border-[#D4AF37] scale-105"
+                : "border-transparent opacity-60 hover:opacity-100"
+            }`}
           >
             <img
               src={item.thumbnail || item.url}
@@ -171,4 +170,3 @@ export default function ProductGallery({ media }: ProductGalleryProps) {
     </div>
   );
 }
-

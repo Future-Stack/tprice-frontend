@@ -71,9 +71,7 @@ export default function ReviewDetailModal({
 
           <div className="space-y-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-xl font-bold text-white font-clash">
-                {review.reviewerName}
-              </h3>
+              <h3 className="text-xl font-bold text-white font-clash">{review.reviewerName}</h3>
               {review.isFeatured && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary border border-primary/30">
                   <Award className="w-3 h-3" />
@@ -89,9 +87,7 @@ export default function ReviewDetailModal({
             </div>
 
             {review.reviewerTitle && (
-              <p className="text-sm font-medium text-gray-300">
-                {review.reviewerTitle}
-              </p>
+              <p className="text-sm font-medium text-gray-300">{review.reviewerTitle}</p>
             )}
 
             {review.reviewerLocation && (
@@ -115,15 +111,11 @@ export default function ReviewDetailModal({
                 <Star
                   key={i}
                   className={`w-5 h-5 ${
-                    i < review.rating
-                      ? "text-yellow-400 fill-yellow-400"
-                      : "text-gray-600"
+                    i < review.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-600"
                   }`}
                 />
               ))}
-              <span className="ml-2 text-sm font-bold text-white">
-                {review.rating}.0 / 5.0
-              </span>
+              <span className="ml-2 text-sm font-bold text-white">{review.rating}.0 / 5.0</span>
             </div>
           </div>
 
@@ -168,9 +160,7 @@ export default function ReviewDetailModal({
             </div>
             <div>
               <span className="text-gray-500 block mb-1">Review ID</span>
-              <span className="text-gray-400 font-mono text-[11px] break-all">
-                {review.id}
-              </span>
+              <span className="text-gray-400 font-mono text-[11px] break-all">{review.id}</span>
             </div>
           </div>
         </div>

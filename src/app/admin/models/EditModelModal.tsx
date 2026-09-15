@@ -1,14 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  X,
-  Car,
-  Award,
-  Pencil,
-  Loader2,
-  CheckCircle2,
-} from "lucide-react";
+import { X, Car, Award, Pencil, Loader2, CheckCircle2 } from "lucide-react";
 import { useUpdateModelMutation } from "@/hooks/useModels";
 import { useGetBrandsQuery } from "@/hooks/useBrands";
 import { ModelItem } from "@/lib/api/models";
@@ -20,11 +13,7 @@ interface EditModelModalProps {
   model: ModelItem | null;
 }
 
-export default function EditModelModal({
-  isOpen,
-  onClose,
-  model,
-}: EditModelModalProps) {
+export default function EditModelModal({ isOpen, onClose, model }: EditModelModalProps) {
   const updateModelMutation = useUpdateModelMutation();
 
   const [formData, setFormData] = useState({
@@ -58,9 +47,7 @@ export default function EditModelModal({
 
   if (!isOpen || !model) return null;
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -86,8 +73,7 @@ export default function EditModelModal({
       toast.success(`Model "${formData.name.trim()}" updated successfully!`);
       onClose();
     } catch (err: any) {
-      const errMsg =
-        err?.response?.data?.message || err?.message || "Failed to update model";
+      const errMsg = err?.response?.data?.message || err?.message || "Failed to update model";
       toast.error(errMsg);
     }
   };
@@ -112,12 +98,8 @@ export default function EditModelModal({
               <Pencil className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white font-clash">
-                Edit Model
-              </h2>
-              <p className="text-xs text-gray-400">
-                Update model name and attributes
-              </p>
+              <h2 className="text-xl font-bold text-white font-clash">Edit Model</h2>
+              <p className="text-xs text-gray-400">Update model name and attributes</p>
             </div>
           </div>
           <button
@@ -199,9 +181,7 @@ export default function EditModelModal({
                   )}
                 </div>
                 <div>
-                  <span className="font-semibold text-white">
-                    {selectedBrand.name}
-                  </span>
+                  <span className="font-semibold text-white">{selectedBrand.name}</span>
                   {selectedBrand.category && (
                     <span className="text-gray-400 ml-1.5 font-normal">
                       ({selectedBrand.category.name})

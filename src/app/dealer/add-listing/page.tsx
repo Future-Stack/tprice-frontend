@@ -32,10 +32,7 @@ import { useGetBrandsQuery } from "@/hooks/useBrands";
 import { useGetModelsQuery } from "@/hooks/useModels";
 import { useGetTrimsQuery } from "@/hooks/useTrims";
 import { useUploadMultipleMediaMutation } from "@/hooks/useMedia";
-import {
-  useCreateListingMutation,
-  useFeaturedStatusQuery,
-} from "@/hooks/useListings";
+import { useCreateListingMutation, useFeaturedStatusQuery } from "@/hooks/useListings";
 import { CreateListingInput } from "@/lib/api/listings";
 import { useCreateCheckoutSessionMutation } from "@/hooks/usePayments";
 import { useDecodeVinMutation } from "@/hooks/useVehicles";
@@ -43,9 +40,7 @@ import { getPaymentReturnUrl } from "@/lib/api/payments";
 import { toast } from "sonner";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import SortableMediaGallery, {
-  UploadedMediaItem,
-} from "@/components/SortableMediaGallery";
+import SortableMediaGallery, { UploadedMediaItem } from "@/components/SortableMediaGallery";
 
 const steps = ["Basic Info", "Specifications", "Media", "Pricing", "Review"];
 
@@ -74,62 +69,51 @@ export default function AddListing() {
   const [vin, setVin] = useState("");
 
   // Queries & Mutations
-  const { data: categoriesResponse, isLoading: isLoadingCategories } =
-    useGetCategoriesQuery({ limit: 100 });
+  const { data: categoriesResponse, isLoading: isLoadingCategories } = useGetCategoriesQuery({
+    limit: 100,
+  });
   const categoriesList = categoriesResponse?.data || [];
 
   // Selected Category & dynamic Brand query
   const selectedCategory = categoriesList.find(
-    (cat) => cat.name === category || cat.id === category,
+    (cat) => cat.name === category || cat.id === category
   );
   const selectedCategoryId = selectedCategory?.id;
 
   const { data: brandsResponse, isLoading: isLoadingBrands } = useGetBrandsQuery(
-    selectedCategoryId
-      ? { categoryId: selectedCategoryId, limit: 100 }
-      : undefined,
+    selectedCategoryId ? { categoryId: selectedCategoryId, limit: 100 } : undefined,
     {
       enabled: Boolean(selectedCategoryId),
-    },
+    }
   );
   const brandsList = selectedCategoryId ? brandsResponse?.data || [] : [];
 
   // Selected Brand & dynamic Model query
-  const selectedBrand = brandsList.find(
-    (b) => b.name === brand || b.id === brand,
-  );
+  const selectedBrand = brandsList.find((b) => b.name === brand || b.id === brand);
   const selectedBrandId = selectedBrand?.id;
 
   const { data: modelsResponse, isLoading: isLoadingModels } = useGetModelsQuery(
-    selectedBrandId
-      ? { brandId: selectedBrandId, limit: 100 }
-      : undefined,
+    selectedBrandId ? { brandId: selectedBrandId, limit: 100 } : undefined,
     {
       enabled: Boolean(selectedBrandId),
-    },
+    }
   );
   const modelsList = selectedBrandId ? modelsResponse?.data || [] : [];
 
   // Selected Model & dynamic Trim query
-  const selectedModel = modelsList.find(
-    (m) => m.name === model || m.id === model,
-  );
+  const selectedModel = modelsList.find((m) => m.name === model || m.id === model);
   const selectedModelId = selectedModel?.id;
 
   const { data: trimsResponse, isLoading: isLoadingTrims } = useGetTrimsQuery(
-    selectedModelId
-      ? { modelId: selectedModelId, limit: 100 }
-      : undefined,
+    selectedModelId ? { modelId: selectedModelId, limit: 100 } : undefined,
     {
       enabled: Boolean(selectedModelId),
-    },
+    }
   );
   const trimsList = selectedModelId ? trimsResponse?.data || [] : [];
 
   // Selected Trim
-  const selectedTrim = trimsList.find(
-    (t) => t.name === trim || t.id === trim,
-  );
+  const selectedTrim = trimsList.find((t) => t.name === trim || t.id === trim);
   const selectedTrimId = selectedTrim?.id;
 
   const { data: featuredStatus } = useFeaturedStatusQuery();
@@ -150,9 +134,9 @@ export default function AddListing() {
   const [isDragging, setIsDragging] = useState(false);
 
   // Pricing & Sale Type
-  const [saleType, setSaleType] = useState<
-    "FIXED_PRICE" | "AUCTION" | "PRIVATE_SALE"
-  >("FIXED_PRICE");
+  const [saleType, setSaleType] = useState<"FIXED_PRICE" | "AUCTION" | "PRIVATE_SALE">(
+    "FIXED_PRICE"
+  );
   const [askingPrice, setAskingPrice] = useState<string>("625000");
   const [startingBid, setStartingBid] = useState<string>("500000");
   const [auctionEndsAt, setAuctionEndsAt] = useState<string>(() => {
@@ -164,25 +148,16 @@ export default function AddListing() {
   const [allowCounterOffers, setAllowCounterOffers] = useState(true);
 
   // Plan Selection
-  const [selectedPlan, setSelectedPlan] = useState<"standard" | "featured">(
-    "standard",
-  );
+  const [selectedPlan, setSelectedPlan] = useState<"standard" | "featured">("standard");
 
   // Dynamic Specification handlers
   const handleAddSpecRow = () => {
-    setSpecifications((prev) => [
-      ...prev,
-      { id: Date.now().toString(), key: "", value: "" },
-    ]);
+    setSpecifications((prev) => [...prev, { id: Date.now().toString(), key: "", value: "" }]);
   };
 
-  const handleSpecChange = (
-    id: string,
-    field: "key" | "value",
-    val: string,
-  ) => {
+  const handleSpecChange = (id: string, field: "key" | "value", val: string) => {
     setSpecifications((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, [field]: val } : item)),
+      prev.map((item) => (item.id === id ? { ...item, [field]: val } : item))
     );
   };
 
@@ -237,11 +212,9 @@ export default function AddListing() {
       if (data.model) addSpec("model", data.model);
       if (data.trim) addSpec("trim", data.trim);
       if (data.bodyClass) addSpec("bodyClass", data.bodyClass);
-      if (data.engineDisplacementL)
-        addSpec("engineDisplacementL", data.engineDisplacementL);
+      if (data.engineDisplacementL) addSpec("engineDisplacementL", data.engineDisplacementL);
       if (data.engineCylinders) addSpec("engineCylinders", data.engineCylinders);
-      if (data.engineHorsepower)
-        addSpec("engineHorsepower", data.engineHorsepower);
+      if (data.engineHorsepower) addSpec("engineHorsepower", data.engineHorsepower);
       if (data.fuelType) addSpec("fuelType", data.fuelType);
       if (data.manufacturer) addSpec("manufacturer", data.manufacturer);
       if (data.vehicleType) addSpec("vehicleType", data.vehicleType);
@@ -277,7 +250,7 @@ export default function AddListing() {
       }
       if (data.make && !brand) {
         const matchedBrand = brandsList.find(
-          (b: any) => b.name.toLowerCase() === data.make?.toLowerCase(),
+          (b: any) => b.name.toLowerCase() === data.make?.toLowerCase()
         );
         if (matchedBrand) {
           setBrand(matchedBrand.name);
@@ -290,12 +263,7 @@ export default function AddListing() {
         setTrim(data.trim);
       }
       if (!title && (data.make || data.model)) {
-        const generatedTitle = [
-          data.year,
-          data.make,
-          data.model,
-          data.trim,
-        ]
+        const generatedTitle = [data.year, data.make, data.model, data.trim]
           .filter(Boolean)
           .join(" ");
         if (generatedTitle) {
@@ -303,9 +271,7 @@ export default function AddListing() {
         }
       }
 
-      toast.success(
-        `VIN decoded successfully! ${newSpecs.length} specifications populated.`,
-      );
+      toast.success(`VIN decoded successfully! ${newSpecs.length} specifications populated.`);
     } catch (err: any) {
       const errMsg =
         err?.response?.data?.message ||
@@ -362,14 +328,11 @@ export default function AddListing() {
         toast.success(
           res.length === 1
             ? "Image uploaded successfully!"
-            : `${res.length} images uploaded successfully!`,
+            : `${res.length} images uploaded successfully!`
         );
       }
     } catch (err: any) {
-      const errMsg =
-        err?.response?.data?.message ||
-        err?.message ||
-        "Failed to upload image(s).";
+      const errMsg = err?.response?.data?.message || err?.message || "Failed to upload image(s).";
       toast.error(errMsg);
     }
   };
@@ -411,7 +374,7 @@ export default function AddListing() {
       prev.map((item, idx) => ({
         ...item,
         isCover: idx === index,
-      })),
+      }))
     );
     toast.success("Cover photo updated!");
   };
@@ -441,10 +404,7 @@ export default function AddListing() {
       }
     }
     if (currentStep === 3) {
-      if (
-        saleType === "FIXED_PRICE" &&
-        (!askingPrice || Number(askingPrice) <= 0)
-      ) {
+      if (saleType === "FIXED_PRICE" && (!askingPrice || Number(askingPrice) <= 0)) {
         toast.error("Please enter a valid asking price.");
         return false;
       }
@@ -506,9 +466,7 @@ export default function AddListing() {
     });
 
     const specificationsJson =
-      Object.keys(specsObject).length > 0
-        ? JSON.stringify(specsObject)
-        : undefined;
+      Object.keys(specsObject).length > 0 ? JSON.stringify(specsObject) : undefined;
 
     const askingPriceNum = askingPrice
       ? Number(askingPrice)
@@ -523,13 +481,10 @@ export default function AddListing() {
       modelId: selectedModelId || undefined,
       trimId: selectedTrimId || undefined,
       saleType,
-      allowCounterOffers:
-        saleType === "FIXED_PRICE" ? allowCounterOffers : false,
+      allowCounterOffers: saleType === "FIXED_PRICE" ? allowCounterOffers : false,
       askingPrice: askingPriceNum,
-      startingBid:
-        saleType === "AUCTION" && startingBid ? Number(startingBid) : undefined,
-      auctionEndsAt:
-        saleType === "AUCTION" && auctionEndsAt ? auctionEndsAt : undefined,
+      startingBid: saleType === "AUCTION" && startingBid ? Number(startingBid) : undefined,
+      auctionEndsAt: saleType === "AUCTION" && auctionEndsAt ? auctionEndsAt : undefined,
       currency: currency || "USD",
       isOffMarket,
       locationCity: locationCity.trim() || undefined,
@@ -540,9 +495,7 @@ export default function AddListing() {
         url: m.url,
         type: m.type || "IMAGE",
         displayOrder: idx + 1,
-        isCover: Boolean(
-          m.isCover || (mediaList.every((x) => !x.isCover) && idx === 0),
-        ),
+        isCover: Boolean(m.isCover || (mediaList.every((x) => !x.isCover) && idx === 0)),
       })),
     };
 
@@ -556,9 +509,7 @@ export default function AddListing() {
 
       if (!hasActiveSubscription && selectedPlan === "featured") {
         if (!createdListingId) {
-          toast.error(
-            "Listing created, but listing ID was not returned for checkout.",
-          );
+          toast.error("Listing created, but listing ID was not returned for checkout.");
           router.push("/dealer/listing");
           return;
         }
@@ -581,15 +532,13 @@ export default function AddListing() {
 
           if (checkoutUrl) {
             toast.success(
-              "Listing created! Redirecting to Stripe checkout for VIP Featured promotion...",
+              "Listing created! Redirecting to Stripe checkout for VIP Featured promotion..."
             );
             window.location.assign(checkoutUrl);
             return;
           } else {
             console.error("No checkoutUrl in response:", checkoutRes);
-            toast.error(
-              "Checkout session created, but no checkout URL was returned.",
-            );
+            toast.error("Checkout session created, but no checkout URL was returned.");
           }
         } catch (paymentErr: any) {
           console.error("Checkout session error:", paymentErr);
@@ -656,9 +605,7 @@ export default function AddListing() {
                     className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-primary/60 transition-colors appearance-none cursor-pointer"
                   >
                     <option value="">
-                      {isLoadingCategories
-                        ? "Loading categories..."
-                        : "Select Category"}
+                      {isLoadingCategories ? "Loading categories..." : "Select Category"}
                     </option>
                     {categoriesList.map((cat) => (
                       <option key={cat.id} value={cat.name}>
@@ -674,8 +621,7 @@ export default function AddListing() {
 
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <Briefcase className="w-3.5 h-3.5 text-primary" /> Brand /
-                  Manufacturer
+                  <Briefcase className="w-3.5 h-3.5 text-primary" /> Brand / Manufacturer
                 </label>
                 <div className="relative">
                   <select
@@ -800,11 +746,7 @@ export default function AddListing() {
               <input
                 type="number"
                 value={buildYear}
-                onChange={(e) =>
-                  setBuildYear(
-                    e.target.value ? parseInt(e.target.value, 10) : "",
-                  )
-                }
+                onChange={(e) => setBuildYear(e.target.value ? parseInt(e.target.value, 10) : "")}
                 placeholder="e.g. 2024"
                 className="w-full bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/60 transition-colors shadow-inner"
               />
@@ -842,9 +784,7 @@ export default function AddListing() {
             {/* Off Market Toggle */}
             <div className="flex items-center justify-between p-4 bg-[#1c1c1e] border border-[#2C2C2E] rounded-xl">
               <div>
-                <p className="text-sm font-semibold text-white">
-                  Private Off-Market Listing
-                </p>
+                <p className="text-sm font-semibold text-white">Private Off-Market Listing</p>
                 <p className="text-xs text-gray-400">
                   Keep this listing visible only to verified VIP buyers
                 </p>
@@ -869,7 +809,8 @@ export default function AddListing() {
                   <Sparkles className="w-5 h-5 text-primary" /> Vehicle Specifications
                 </h3>
                 <p className="text-xs text-gray-400 mt-1">
-                  Enter VIN to auto-populate all vehicle specifications, or add custom key-value pairs manually.
+                  Enter VIN to auto-populate all vehicle specifications, or add custom key-value
+                  pairs manually.
                 </p>
               </div>
 
@@ -900,9 +841,7 @@ export default function AddListing() {
                 <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
                   <Search className="w-3.5 h-3.5 text-primary" /> VIN Decoder
                 </label>
-                <span className="text-[11px] text-gray-400">
-                  Auto-decode 17-digit VIN
-                </span>
+                <span className="text-[11px] text-gray-400">Auto-decode 17-digit VIN</span>
               </div>
 
               <div className="flex flex-col sm:flex-row items-stretch gap-2.5">
@@ -983,11 +922,10 @@ export default function AddListing() {
               {specifications.length === 0 ? (
                 <div className="p-8 text-center border-2 border-dashed border-[#2C2C2E] rounded-xl bg-[#1c1c1e]/50">
                   <AlertCircle className="w-8 h-8 text-gray-500 mx-auto mb-2" />
-                  <p className="text-sm font-medium text-gray-400">
-                    No specifications added yet
-                  </p>
+                  <p className="text-sm font-medium text-gray-400">No specifications added yet</p>
                   <p className="text-xs text-gray-600 mt-0.5">
-                    Decode a VIN above or click &quot;Add Field&quot; to manually enter specifications.
+                    Decode a VIN above or click &quot;Add Field&quot; to manually enter
+                    specifications.
                   </p>
                 </div>
               ) : (
@@ -1004,9 +942,7 @@ export default function AddListing() {
                         <input
                           type="text"
                           value={item.key}
-                          onChange={(e) =>
-                            handleSpecChange(item.id, "key", e.target.value)
-                          }
+                          onChange={(e) => handleSpecChange(item.id, "key", e.target.value)}
                           placeholder="Key (e.g. horsepower)"
                           className="w-full bg-[#111113] border border-[#2C2C2E] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/60 transition-colors font-mono"
                         />
@@ -1015,9 +951,7 @@ export default function AddListing() {
                         <input
                           type="text"
                           value={item.value}
-                          onChange={(e) =>
-                            handleSpecChange(item.id, "value", e.target.value)
-                          }
+                          onChange={(e) => handleSpecChange(item.id, "value", e.target.value)}
                           placeholder="Value (e.g. 986)"
                           className="w-full bg-[#111113] border border-[#2C2C2E] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/60 transition-colors"
                         />
@@ -1118,15 +1052,14 @@ export default function AddListing() {
                 </label>
                 {mediaList.length > 0 && (
                   <span className="text-[11px] text-gray-500 flex items-center gap-1">
-                    <GripVertical className="w-3.5 h-3.5 text-primary" /> Drag & drop photos to reorder
+                    <GripVertical className="w-3.5 h-3.5 text-primary" /> Drag & drop photos to
+                    reorder
                   </span>
                 )}
               </div>
 
               {mediaList.length === 0 ? (
-                <p className="text-xs text-gray-500 italic">
-                  No images uploaded yet.
-                </p>
+                <p className="text-xs text-gray-500 italic">No images uploaded yet.</p>
               ) : (
                 <SortableMediaGallery
                   mediaList={mediaList}
@@ -1143,8 +1076,7 @@ export default function AddListing() {
         return (
           <div className="space-y-8">
             <h3 className="text-xl font-clash font-medium text-white flex items-center gap-2 mb-4">
-              <DollarSign className="w-5 h-5 text-primary" /> Pricing & Sale
-              Type
+              <DollarSign className="w-5 h-5 text-primary" /> Pricing & Sale Type
             </h3>
 
             {/* Sale Type Cards */}
@@ -1221,8 +1153,7 @@ export default function AddListing() {
                 <>
                   <div className="space-y-2">
                     <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider">
-                      Starting Bid ({currency}){" "}
-                      <span className="text-primary">*</span>
+                      Starting Bid ({currency}) <span className="text-primary">*</span>
                     </label>
                     <div className="relative">
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-sm">
@@ -1241,12 +1172,10 @@ export default function AddListing() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5 text-primary" /> Auction
-                        Ends At <span className="text-primary">*</span>
+                        <Clock className="w-3.5 h-3.5 text-primary" /> Auction Ends At{" "}
+                        <span className="text-primary">*</span>
                       </label>
-                      <span className="text-[11px] text-gray-400">
-                        Max 7 days from today
-                      </span>
+                      <span className="text-[11px] text-gray-400">Max 7 days from today</span>
                     </div>
                     <DatePicker
                       selected={auctionEndsAt ? new Date(auctionEndsAt) : null}
@@ -1305,8 +1234,7 @@ export default function AddListing() {
                 Review & Confirm Listing
               </h3>
               <p className="text-gray-400 text-xs max-w-md mx-auto">
-                Review listing details and choose visibility package before
-                submission.
+                Review listing details and choose visibility package before submission.
               </p>
             </div>
 
@@ -1332,9 +1260,7 @@ export default function AddListing() {
                     </h4>
                     <p className="text-xs text-gray-400 truncate">
                       Category:{" "}
-                      <span className="text-primary font-semibold">
-                        {category || "Unassigned"}
-                      </span>{" "}
+                      <span className="text-primary font-semibold">{category || "Unassigned"}</span>{" "}
                       {brand && `• Brand: ${brand}`}
                       {model && ` • Model: ${model}`}
                       {trim && ` • Trim: ${trim}`}
@@ -1342,8 +1268,7 @@ export default function AddListing() {
                   </div>
                 </div>
                 <span className="px-3 py-1 bg-primary/10 border border-primary/20 text-primary text-xs font-bold rounded-lg shrink-0">
-                  {currency}{" "}
-                  {askingPrice ? Number(askingPrice).toLocaleString() : "0"}
+                  {currency} {askingPrice ? Number(askingPrice).toLocaleString() : "0"}
                 </span>
               </div>
 
@@ -1354,9 +1279,7 @@ export default function AddListing() {
                 </div>
                 <div>
                   <span className="text-gray-500 block">Build Year</span>
-                  <span className="text-white font-semibold">
-                    {buildYear || "N/A"}
-                  </span>
+                  <span className="text-white font-semibold">{buildYear || "N/A"}</span>
                 </div>
                 <div>
                   <span className="text-gray-500 block">Specifications</span>
@@ -1366,9 +1289,7 @@ export default function AddListing() {
                 </div>
                 <div>
                   <span className="text-gray-500 block">Uploaded Media</span>
-                  <span className="text-white font-semibold">
-                    {mediaList.length} files
-                  </span>
+                  <span className="text-white font-semibold">{mediaList.length} files</span>
                 </div>
               </div>
             </div>
@@ -1388,9 +1309,7 @@ export default function AddListing() {
                   <div className="flex items-start gap-4">
                     <div
                       className={`mt-1 transition-colors ${
-                        selectedPlan === "standard"
-                          ? "text-primary"
-                          : "text-gray-600"
+                        selectedPlan === "standard" ? "text-primary" : "text-gray-600"
                       }`}
                     >
                       {selectedPlan === "standard" ? (
@@ -1422,9 +1341,7 @@ export default function AddListing() {
                   <div className="flex items-start gap-4">
                     <div
                       className={`mt-1 transition-colors ${
-                        selectedPlan === "featured"
-                          ? "text-primary"
-                          : "text-gray-600"
+                        selectedPlan === "featured" ? "text-primary" : "text-gray-600"
                       }`}
                     >
                       {selectedPlan === "featured" ? (
@@ -1487,9 +1404,7 @@ export default function AddListing() {
                 <span
                   key={step}
                   className={`transition-colors duration-300 cursor-default ${
-                    index <= currentStep
-                      ? "text-primary font-semibold"
-                      : "text-gray-500"
+                    index <= currentStep ? "text-primary font-semibold" : "text-gray-500"
                   }`}
                 >
                   {index + 1}. {step}
@@ -1536,8 +1451,7 @@ export default function AddListing() {
                 }
                 className="flex items-center gap-2 px-8 py-3 bg-primary text-[#111113] rounded-xl text-sm font-bold hover:bg-yellow-400 transition-all duration-300 shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer active:scale-95 ml-auto"
               >
-                {createListingMutation.isPending ||
-                createCheckoutMutation.isPending ? (
+                {createListingMutation.isPending || createCheckoutMutation.isPending ? (
                   <>
                     <Loader2 className="w-4 h-4 text-black animate-spin" />
                     {!hasActiveSubscription && selectedPlan === "featured"

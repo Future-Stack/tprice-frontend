@@ -71,27 +71,22 @@ export default function DeleteListingModal({
         {/* Listing preview card */}
         <div className="flex items-center gap-4 p-3 bg-[#111111] border border-[#2A2A2A] rounded-xl">
           <div className="relative w-16 h-12 rounded-lg overflow-hidden border border-[#2A2A2A] bg-[#1C1C1C] shrink-0">
-            <Image
-              src={mainImage}
-              alt={listing.title}
-              fill
-              className="object-cover"
-              unoptimized
-            />
+            <Image src={mainImage} alt={listing.title} fill className="object-cover" unoptimized />
           </div>
           <div className="min-w-0 flex-1">
-            <h4 className="font-semibold text-sm text-gray-100 line-clamp-1">
-              {listing.title}
-            </h4>
+            <h4 className="font-semibold text-sm text-gray-100 line-clamp-1">{listing.title}</h4>
             <p className="text-xs text-gray-400 capitalize mt-0.5">
-              {listing.category || "Listing"} {listing.subCategory ? `• ${listing.subCategory}` : ""}
+              {listing.category || "Listing"}{" "}
+              {listing.subCategory ? `• ${listing.subCategory}` : ""}
             </p>
           </div>
         </div>
 
         {/* Warning message */}
         <p className="text-sm text-gray-300 leading-relaxed">
-          Are you sure you want to permanently delete <strong className="text-white">&quot;{listing.title}&quot;</strong>? It will be removed from your dashboard and the marketplace.
+          Are you sure you want to permanently delete{" "}
+          <strong className="text-white">&quot;{listing.title}&quot;</strong>? It will be removed
+          from your dashboard and the marketplace.
         </p>
 
         {/* Action buttons */}

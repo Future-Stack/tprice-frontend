@@ -50,9 +50,7 @@ const DealDetailModal = ({ isOpen, onClose, deal }: DealDetailModalProps) => {
     : deal.dealer || "Unknown Dealer";
 
   const offerPrice =
-    deal.agreedPrice !== undefined
-      ? formatPrice(deal.agreedPrice)
-      : deal.offer || "$0";
+    deal.agreedPrice !== undefined ? formatPrice(deal.agreedPrice) : deal.offer || "$0";
 
   const createdTime = formatDate(deal.createdAt);
   const updatedTime = formatDate(deal.updatedAt);
@@ -95,9 +93,7 @@ const DealDetailModal = ({ isOpen, onClose, deal }: DealDetailModalProps) => {
                   <p className="text-[10px] font-bold text-yellow-500 uppercase tracking-widest mb-2">
                     Current Offer
                   </p>
-                  <p className="text-3xl font-bold text-white tracking-tight">
-                    {offerPrice}
-                  </p>
+                  <p className="text-3xl font-bold text-white tracking-tight">{offerPrice}</p>
                 </div>
 
                 {/* Listing Title if available */}
@@ -106,9 +102,7 @@ const DealDetailModal = ({ isOpen, onClose, deal }: DealDetailModalProps) => {
                     <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">
                       Listing
                     </p>
-                    <p className="text-sm font-medium text-white truncate">
-                      {deal.listing.title}
-                    </p>
+                    <p className="text-sm font-medium text-white truncate">{deal.listing.title}</p>
                   </div>
                 )}
 
@@ -134,9 +128,7 @@ const DealDetailModal = ({ isOpen, onClose, deal }: DealDetailModalProps) => {
                     <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">
                       Stage
                     </p>
-                    <p className="text-sm font-medium text-white">
-                      {deal.stage || "NEGOTIATION"}
-                    </p>
+                    <p className="text-sm font-medium text-white">{deal.stage || "NEGOTIATION"}</p>
                   </div>
                   <div className="bg-[#161616] border border-[#262626] rounded-xl p-4">
                     <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">
@@ -156,20 +148,12 @@ const DealDetailModal = ({ isOpen, onClose, deal }: DealDetailModalProps) => {
                   <div className="absolute left-[31px] top-8 bottom-8 w-[1px] bg-[#262626]" />
                   <div className="space-y-8 relative">
                     {timeline.map((item, index) => (
-                      <div
-                        key={index}
-                        className="flex gap-4 items-start translate-x-1"
-                      >
+                      <div key={index} className="flex gap-4 items-start translate-x-1">
                         <div className="relative z-10 w-3 h-3 rounded-full bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.8)] mt-1.5" />
                         <div>
-                          <p className="text-sm font-medium text-white mb-1">
-                            {item.title}
-                          </p>
+                          <p className="text-sm font-medium text-white mb-1">{item.title}</p>
                           <p className="text-[10px] text-gray-500 uppercase tracking-widest">
-                            {item.date}{" "}
-                            {item.time && (
-                              <span className="ml-2">{item.time}</span>
-                            )}
+                            {item.date} {item.time && <span className="ml-2">{item.time}</span>}
                           </p>
                         </div>
                       </div>

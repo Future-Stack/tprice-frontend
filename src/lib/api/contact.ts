@@ -71,10 +71,7 @@ export interface UpdateContactInquiryPayload {
 export const createContactInquiryApi = async (
   payload: ContactInquiryPayload
 ): Promise<ContactInquiryResponse> => {
-  const response = await apiClient.post<ContactInquiryResponse>(
-    "/contact/inquiries",
-    payload
-  );
+  const response = await apiClient.post<ContactInquiryResponse>("/contact/inquiries", payload);
   return response.data;
 };
 
@@ -82,9 +79,9 @@ export const createContactInquiryApi = async (
  * Fetch public contact information
  */
 export const getContactInfoApi = async (): Promise<ContactInfoResponse> => {
-  const response = await apiClient.get<
-    ContactInfoResponse | { data: ContactInfoResponse }
-  >("/contact/info");
+  const response = await apiClient.get<ContactInfoResponse | { data: ContactInfoResponse }>(
+    "/contact/info"
+  );
   if (response.data && "data" in response.data && response.data.data) {
     return response.data.data;
   }
@@ -97,10 +94,9 @@ export const getContactInfoApi = async (): Promise<ContactInfoResponse> => {
 export const getAdminContactInquiriesApi = async (
   params: GetContactInquiriesParams = { page: 1, limit: 10 }
 ): Promise<ContactInquiriesResponse> => {
-  const response = await apiClient.get<ContactInquiriesResponse>(
-    "/admin/contact/inquiries",
-    { params }
-  );
+  const response = await apiClient.get<ContactInquiriesResponse>("/admin/contact/inquiries", {
+    params,
+  });
   return response.data;
 };
 
@@ -111,14 +107,12 @@ export const updateAdminContactInquiryApi = async (
   id: string,
   payload: UpdateContactInquiryPayload
 ): Promise<ContactInquiryItem> => {
-  const response = await apiClient.patch<
-    ContactInquiryItem | { data: ContactInquiryItem }
-  >(`/admin/contact/inquiries/${id}`, payload);
+  const response = await apiClient.patch<ContactInquiryItem | { data: ContactInquiryItem }>(
+    `/admin/contact/inquiries/${id}`,
+    payload
+  );
   if (response.data && "data" in response.data && response.data.data) {
     return response.data.data;
   }
   return response.data as ContactInquiryItem;
 };
-
-
-

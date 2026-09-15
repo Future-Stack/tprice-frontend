@@ -16,7 +16,11 @@ import {
   Lock,
 } from "lucide-react";
 import AnimationWrapper from "../../components/AnimationWrapper";
-import { useGetMeQuery, useUpdateProfileMutation, useChangePasswordMutation } from "@/hooks/useAuth";
+import {
+  useGetMeQuery,
+  useUpdateProfileMutation,
+  useChangePasswordMutation,
+} from "@/hooks/useAuth";
 import { uploadMediaApi } from "@/lib/api/media";
 import { toast } from "sonner";
 
@@ -180,14 +184,18 @@ export default function DealerAccount() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`shrink-0 lg:w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group ${activeTab === tab.id
-                  ? "bg-[#1C1C1E] border border-[#2C2C2E] text-primary shadow-lg"
-                  : "text-gray-400 hover:text-gray-200 hover:bg-[#1C1C1E]/50 border border-transparent"
-                  }`}
+                className={`shrink-0 lg:w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group ${
+                  activeTab === tab.id
+                    ? "bg-[#1C1C1E] border border-[#2C2C2E] text-primary shadow-lg"
+                    : "text-gray-400 hover:text-gray-200 hover:bg-[#1C1C1E]/50 border border-transparent"
+                }`}
               >
                 <tab.icon
-                  className={`w-5 h-5 ${activeTab === tab.id ? "text-primary" : "text-gray-500 group-hover:text-gray-400"
-                    }`}
+                  className={`w-5 h-5 ${
+                    activeTab === tab.id
+                      ? "text-primary"
+                      : "text-gray-500 group-hover:text-gray-400"
+                  }`}
                 />
                 <span className="font-medium text-[15px] whitespace-nowrap">{tab.label}</span>
                 {activeTab === tab.id && (
@@ -499,7 +507,8 @@ export default function DealerAccount() {
                   </div>
                   <h4 className="text-xl font-medium text-white mb-2">Notification Preferences</h4>
                   <p className="text-gray-400 max-w-sm text-sm">
-                    Manage how you receive alerts, trade notifications, and updates regarding your dealer account.
+                    Manage how you receive alerts, trade notifications, and updates regarding your
+                    dealer account.
                   </p>
                 </div>
               )}
@@ -510,4 +519,3 @@ export default function DealerAccount() {
     </div>
   );
 }
-

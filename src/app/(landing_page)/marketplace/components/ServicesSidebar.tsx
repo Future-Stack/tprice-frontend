@@ -28,7 +28,9 @@ export default function ServicesSidebar({
   const content = (
     <div className="w-full lg:w-72">
       <div className="bg-[#1A1A1A] border border-white/5 rounded-2xl p-6">
-        <h3 className="text-white text-lg font-serif mb-6 border-b border-white/5 pb-4">Category</h3>
+        <h3 className="text-white text-lg font-serif mb-6 border-b border-white/5 pb-4">
+          Category
+        </h3>
         <div className="flex flex-col gap-2">
           {CATEGORIES.map((cat) => (
             <button
@@ -56,13 +58,8 @@ export default function ServicesSidebar({
     return (
       <div className="fixed inset-0 z-[100] bg-black bg-opacity-90 p-8 flex flex-col lg:hidden">
         <div className="flex justify-between items-center mb-10">
-          <h2 className="text-2xl font-serif text-white uppercase tracking-widest">
-            Filters
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-white/50 hover:text-white text-xl"
-          >
+          <h2 className="text-2xl font-serif text-white uppercase tracking-widest">Filters</h2>
+          <button onClick={onClose} className="text-white/50 hover:text-white text-xl">
             ✕
           </button>
         </div>

@@ -76,9 +76,7 @@ export interface UpdateTrimInput {
 /**
  * Fetch paginated trims from GET /trims
  */
-export const getTrimsApi = async (
-  params?: GetTrimsParams,
-): Promise<TrimsResponse> => {
+export const getTrimsApi = async (params?: GetTrimsParams): Promise<TrimsResponse> => {
   const queryParams: Record<string, any> = {};
 
   if (params) {
@@ -109,9 +107,7 @@ export const getTrimByIdApi = async (id: string): Promise<TrimItem> => {
 /**
  * Create a new trim via POST /trims
  */
-export const createTrimApi = async (
-  data: CreateTrimInput,
-): Promise<TrimItem> => {
+export const createTrimApi = async (data: CreateTrimInput): Promise<TrimItem> => {
   const response = await apiClient.post<TrimItem>("/trims", data);
   return response.data;
 };
@@ -119,10 +115,7 @@ export const createTrimApi = async (
 /**
  * Update an existing trim via PATCH /trims/:id
  */
-export const updateTrimApi = async (
-  id: string,
-  data: UpdateTrimInput,
-): Promise<TrimItem> => {
+export const updateTrimApi = async (id: string, data: UpdateTrimInput): Promise<TrimItem> => {
   const response = await apiClient.patch<TrimItem>(`/trims/${id}`, data);
   return response.data;
 };

@@ -1,14 +1,14 @@
-import React from 'react'
-import Hero from './components/sections/Hero'
-import Categories from './components/sections/Categories'
-import FeaturedProducts from './components/sections/FeaturedProducts'
-import Events from './components/sections/Events'
-import Partners from './components/sections/Partners'
-import Trust from './components/sections/Trust'
-import HowItWorks from './components/sections/HowItWorks'
-import Reviews from './components/sections/Reviews'
-import LastCTA from './components/sections/LastCTA'
-import ScrollToTop from './components/ScrollToTop'
+import React from "react";
+import Hero from "./components/sections/Hero";
+import Categories from "./components/sections/Categories";
+import FeaturedProducts from "./components/sections/FeaturedProducts";
+import Events from "./components/sections/Events";
+import Partners from "./components/sections/Partners";
+import Trust from "./components/sections/Trust";
+import HowItWorks from "./components/sections/HowItWorks";
+import Reviews from "./components/sections/Reviews";
+import LastCTA from "./components/sections/LastCTA";
+import ScrollToTop from "./components/ScrollToTop";
 
 export default function Main() {
   return (
@@ -43,5 +43,5 @@ export default function Main() {
       {/* Scroll to Top Button */}
       <ScrollToTop />
     </div>
-  )
+  );
 }

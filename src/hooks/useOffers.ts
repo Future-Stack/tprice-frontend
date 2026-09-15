@@ -32,10 +32,7 @@ export interface AcceptOfferContext {
 /**
  * React Query hook to fetch offers with caching and stale time configuration
  */
-export const useOffersQuery = (
-  params?: GetOffersParams,
-  options?: { enabled?: boolean }
-) => {
+export const useOffersQuery = (params?: GetOffersParams, options?: { enabled?: boolean }) => {
   return useQuery<GetOffersResponse>({
     queryKey: OFFERS_QUERY_KEYS.list(params),
     queryFn: () => getOffersApi(params),
@@ -73,15 +70,11 @@ export const useCreateOfferMutation = () => {
       queryClient.invalidateQueries({ queryKey: OFFERS_QUERY_KEYS.all });
     },
     onError: (err) => {
-      const errMsg =
-        (err as any)?.response?.data?.message ||
-        err.message ||
-        "Failed to send offer";
+      const errMsg = (err as any)?.response?.data?.message || err.message || "Failed to send offer";
       toast.error(errMsg);
     },
   });
 };
-
 
 /**
  * React Query hook to accept an offer with instant optimistic UI update
@@ -122,17 +115,14 @@ export const useAcceptOfferMutation = () => {
       );
 
       // Optimistically update detail query
-      queryClient.setQueryData<OfferDetailItem>(
-        OFFERS_QUERY_KEYS.detail(offerId),
-        (oldDetail) => {
-          if (!oldDetail) return oldDetail;
-          return {
-            ...oldDetail,
-            status: "ACCEPTED",
-            updatedAt: new Date().toISOString(),
-          };
-        }
-      );
+      queryClient.setQueryData<OfferDetailItem>(OFFERS_QUERY_KEYS.detail(offerId), (oldDetail) => {
+        if (!oldDetail) return oldDetail;
+        return {
+          ...oldDetail,
+          status: "ACCEPTED",
+          updatedAt: new Date().toISOString(),
+        };
+      });
 
       return { previousQueries };
     },
@@ -144,15 +134,11 @@ export const useAcceptOfferMutation = () => {
         });
       }
       const errMsg =
-        (err as any)?.response?.data?.message ||
-        err.message ||
-        "Failed to accept offer";
+        (err as any)?.response?.data?.message || err.message || "Failed to accept offer";
       toast.error(errMsg);
     },
     onSuccess: (data) => {
-      toast.success(
-        data.message || "Offer accepted! Deal initiated successfully."
-      );
+      toast.success(data.message || "Offer accepted! Deal initiated successfully.");
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: OFFERS_QUERY_KEYS.all });
@@ -174,9 +160,7 @@ export const useWithdrawOfferMutation = () => {
     },
     onError: (err) => {
       const errMsg =
-        (err as any)?.response?.data?.message ||
-        err.message ||
-        "Failed to withdraw offer";
+        (err as any)?.response?.data?.message || err.message || "Failed to withdraw offer";
       toast.error(errMsg);
     },
   });
@@ -194,17 +178,14 @@ export const useCounterOfferMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation<OfferDetailItem, Error, CounterOfferParams>({
-    mutationFn: ({ offerId, payload }: CounterOfferParams) =>
-      counterOfferApi(offerId, payload),
+    mutationFn: ({ offerId, payload }: CounterOfferParams) => counterOfferApi(offerId, payload),
     onSuccess: () => {
       toast.success("Counter offer sent successfully!");
       queryClient.invalidateQueries({ queryKey: OFFERS_QUERY_KEYS.all });
     },
     onError: (err) => {
       const errMsg =
-        (err as any)?.response?.data?.message ||
-        err.message ||
-        "Failed to send counter offer";
+        (err as any)?.response?.data?.message || err.message || "Failed to send counter offer";
       toast.error(errMsg);
     },
   });
@@ -224,11 +205,8 @@ export const useRejectOfferMutation = () => {
     },
     onError: (err) => {
       const errMsg =
-        (err as any)?.response?.data?.message ||
-        err.message ||
-        "Failed to reject offer";
+        (err as any)?.response?.data?.message || err.message || "Failed to reject offer";
       toast.error(errMsg);
     },
   });
 };
-

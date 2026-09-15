@@ -28,10 +28,7 @@ import {
   Edit3,
 } from "lucide-react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
-import {
-  useListingByIdQuery,
-  useUpdateAdminListingStatusMutation,
-} from "@/hooks/useListings";
+import { useListingByIdQuery, useUpdateAdminListingStatusMutation } from "@/hooks/useListings";
 import RejectListingModal from "@/app/admin/listings/RejectListingModal";
 import UpdateListingModal from "@/app/admin/listings/UpdateListingModal";
 import { toast } from "sonner";
@@ -84,13 +81,8 @@ const formatTimeAgo = (dateString?: string) => {
 
 const getSpecIcon = (label: string) => {
   const lower = label.toLowerCase();
-  if (lower.includes("mileage") || lower.includes("km") || lower.includes("odometer"))
-    return Gauge;
-  if (
-    lower.includes("0-100") ||
-    lower.includes("speed") ||
-    lower.includes("acceleration")
-  )
+  if (lower.includes("mileage") || lower.includes("km") || lower.includes("odometer")) return Gauge;
+  if (lower.includes("0-100") || lower.includes("speed") || lower.includes("acceleration"))
     return TrendingUp;
   if (
     lower.includes("power") ||
@@ -99,15 +91,9 @@ const getSpecIcon = (label: string) => {
     lower.includes("kw")
   )
     return Zap;
-  if (
-    lower.includes("engine") ||
-    lower.includes("fuel") ||
-    lower.includes("motor")
-  )
-    return Fuel;
+  if (lower.includes("engine") || lower.includes("fuel") || lower.includes("motor")) return Fuel;
   if (lower.includes("year") || lower.includes("build")) return Calendar;
-  if (lower.includes("brand") || lower.includes("make") || lower.includes("model"))
-    return Tag;
+  if (lower.includes("brand") || lower.includes("make") || lower.includes("model")) return Tag;
   if (lower.includes("category") || lower.includes("type")) return Layers;
   return ShieldCheck;
 };
@@ -217,12 +203,7 @@ export default function AdminListingDetails() {
   const router = useRouter();
   const slug = (params?.slug as string) || "";
 
-  const {
-    data: listing,
-    isLoading,
-    isError,
-    refetch,
-  } = useListingByIdQuery(slug);
+  const { data: listing, isLoading, isError, refetch } = useListingByIdQuery(slug);
 
   const updateStatusMutation = useUpdateAdminListingStatusMutation();
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
@@ -239,9 +220,7 @@ export default function AdminListingDetails() {
         <div className="w-16 h-16 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center justify-center text-red-500 mb-4">
           <AlertTriangle className="w-8 h-8" />
         </div>
-        <h2 className="text-xl font-semibold text-white mb-2">
-          Failed to load listing details
-        </h2>
+        <h2 className="text-xl font-semibold text-white mb-2">Failed to load listing details</h2>
         <p className="text-sm text-gray-400 max-w-md mb-6">
           The requested listing could not be retrieved or does not exist.
         </p>
@@ -289,8 +268,7 @@ export default function AdminListingDetails() {
     "https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=100";
 
   const locationStr =
-    [listing.locationCity, listing.locationCountry].filter(Boolean).join(", ") ||
-    "Location N/A";
+    [listing.locationCity, listing.locationCountry].filter(Boolean).join(", ") || "Location N/A";
 
   const formattedPrice = formatPrice(listing.askingPrice, listing.currency);
   const statusBadge = getStatusBadge(listing.status);
@@ -335,9 +313,11 @@ export default function AdminListingDetails() {
   if (listing.specifications && typeof listing.specifications === "object") {
     Object.entries(listing.specifications).forEach(([k, v]) => {
       if (v !== null && v !== undefined && v !== "") {
-        const labelStr = k.replace(/([A-Z])/g, " $1").replace(/_/g, " ").trim();
-        const formattedLabel =
-          labelStr.charAt(0).toUpperCase() + labelStr.slice(1);
+        const labelStr = k
+          .replace(/([A-Z])/g, " $1")
+          .replace(/_/g, " ")
+          .trim();
+        const formattedLabel = labelStr.charAt(0).toUpperCase() + labelStr.slice(1);
         specsList.push({
           label: formattedLabel,
           value: String(v),
@@ -379,8 +359,7 @@ export default function AdminListingDetails() {
       });
       toast.success("Listing approved successfully");
     } catch (err: any) {
-      const errMsg =
-        err?.response?.data?.message || "Failed to approve listing";
+      const errMsg = err?.response?.data?.message || "Failed to approve listing";
       toast.error(errMsg);
     }
   };
@@ -395,8 +374,7 @@ export default function AdminListingDetails() {
       setIsRejectModalOpen(false);
       toast.success("Listing rejected");
     } catch (err: any) {
-      const errMsg =
-        err?.response?.data?.message || "Failed to reject listing";
+      const errMsg = err?.response?.data?.message || "Failed to reject listing";
       toast.error(errMsg);
     }
   };
@@ -435,9 +413,7 @@ export default function AdminListingDetails() {
             <div className="space-y-4">
               <h2 className="text-2xl font-medium">{listing.title}</h2>
               <div className="flex flex-wrap items-center gap-4">
-                <span className="text-primary text-2xl font-semibold">
-                  {formattedPrice}
-                </span>
+                <span className="text-primary text-2xl font-semibold">{formattedPrice}</span>
                 <div className="flex items-center gap-2 bg-[#1A1A1A] px-3 py-1.5 rounded-full border border-primary">
                   <img
                     src={sellerAvatar}
@@ -527,11 +503,7 @@ export default function AdminListingDetails() {
                 {specsList.map((spec, i) => {
                   const SpecIcon = spec.icon;
                   return (
-                    <AnimationWrapper
-                      key={i}
-                      type="fade-up"
-                      delay={0.2 + i * 0.05}
-                    >
+                    <AnimationWrapper key={i} type="fade-up" delay={0.2 + i * 0.05}>
                       <div className="bg-[#141414] border border-[#262626] p-4 rounded-xl space-y-2">
                         <div className="flex items-center gap-1.5">
                           <SpecIcon className="w-3.5 h-3.5 text-primary" />
@@ -539,9 +511,7 @@ export default function AdminListingDetails() {
                             {spec.label}
                           </p>
                         </div>
-                        <p className="text-xl font-medium truncate">
-                          {spec.value}
-                        </p>
+                        <p className="text-xl font-medium truncate">{spec.value}</p>
                       </div>
                     </AnimationWrapper>
                   );
@@ -553,9 +523,7 @@ export default function AdminListingDetails() {
                   <p className="text-primary text-[10px] uppercase font-bold tracking-widest mb-3">
                     Condition / Type
                   </p>
-                  <p className="text-2xl font-semibold text-white capitalize">
-                    {conditionText}
-                  </p>
+                  <p className="text-2xl font-semibold text-white capitalize">{conditionText}</p>
                 </div>
               </AnimationWrapper>
             </div>
@@ -580,9 +548,7 @@ export default function AdminListingDetails() {
             {/* Dealer Information */}
             <AnimationWrapper type="fade-left" delay={0.2}>
               <div className="bg-[#141414] border border-[#262626] rounded-2xl p-6 space-y-8">
-                <h2 className="text-2xl font-semibold text-center mt-2">
-                  Dealer Information
-                </h2>
+                <h2 className="text-2xl font-semibold text-center mt-2">Dealer Information</h2>
 
                 <div className="space-y-6">
                   {/* Dealer Meta */}
@@ -596,9 +562,7 @@ export default function AdminListingDetails() {
                           Dealer Info
                         </p>
                         <div className="flex items-center gap-2">
-                          <p className="text-sm font-medium truncate">
-                            {sellerName}
-                          </p>
+                          <p className="text-sm font-medium truncate">{sellerName}</p>
                           {listing.owner?.isVerified && (
                             <BadgeCheck className="w-4 h-4 text-blue-500 shrink-0" />
                           )}
@@ -652,9 +616,7 @@ export default function AdminListingDetails() {
                     <button
                       onClick={handleApprove}
                       disabled={
-                        isUpdating ||
-                        listing.status === "LIVE" ||
-                        listing.status === "APPROVED"
+                        isUpdating || listing.status === "LIVE" || listing.status === "APPROVED"
                       }
                       className="w-full bg-primary hover:bg-primary/90 text-black font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-60 cursor-pointer"
                     >
@@ -676,9 +638,7 @@ export default function AdminListingDetails() {
                     >
                       <XCircle className="w-5 h-5 text-red-500" />
                       <span>
-                        {listing.status === "REJECTED"
-                          ? "Listing Rejected"
-                          : "Reject listing"}
+                        {listing.status === "REJECTED" ? "Listing Rejected" : "Reject listing"}
                       </span>
                     </button>
                   </div>
@@ -689,9 +649,7 @@ export default function AdminListingDetails() {
             {/* Meta Information */}
             <AnimationWrapper type="fade-left" delay={0.3}>
               <div className="bg-[#141414] border border-[#262626] rounded-2xl p-6 space-y-6">
-                <p className="text-xs text-gray-500 font-medium">
-                  Meta Information
-                </p>
+                <p className="text-xs text-gray-500 font-medium">Meta Information</p>
 
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 text-gray-400">

@@ -30,8 +30,7 @@ import { OfferItem } from "@/lib/api/offers";
 
 /* ─── Helper Functions ─── */
 const formatPrice = (priceStr?: string | number | null, currency = "USD") => {
-  if (priceStr === undefined || priceStr === null || priceStr === "")
-    return "$0";
+  if (priceStr === undefined || priceStr === null || priceStr === "") return "$0";
   const num = typeof priceStr === "number" ? priceStr : parseFloat(priceStr);
   if (isNaN(num)) return `${priceStr}`;
   const symbol = currency === "EUR" ? "€" : currency === "GBP" ? "£" : "$";
@@ -60,11 +59,7 @@ interface CounterOfferModalProps {
   offer: OfferItem | null;
 }
 
-const CounterOfferModal = ({
-  isOpen,
-  onClose,
-  offer,
-}: CounterOfferModalProps) => {
+const CounterOfferModal = ({ isOpen, onClose, offer }: CounterOfferModalProps) => {
   const [counterAmount, setCounterAmount] = useState("");
   const [note, setNote] = useState("");
   const [isClosing, setIsClosing] = useState(false);
@@ -129,9 +124,7 @@ const CounterOfferModal = ({
   return (
     <div
       className={`fixed inset-0 z-100 flex items-center justify-center p-4 ${
-        isClosing
-          ? "counter-modal-backdrop-exit"
-          : "counter-modal-backdrop-enter"
+        isClosing ? "counter-modal-backdrop-exit" : "counter-modal-backdrop-enter"
       }`}
       style={{
         backgroundColor: "rgba(0,0,0,0.75)",
@@ -149,9 +142,7 @@ const CounterOfferModal = ({
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-6 pb-4">
-          <h2 className="text-[15px] font-bold text-white tracking-tight">
-            Send Counter Offer
-          </h2>
+          <h2 className="text-[15px] font-bold text-white tracking-tight">Send Counter Offer</h2>
           <button
             onClick={handleClose}
             className="w-7 h-7 rounded-full flex items-center justify-center text-gray-500 hover:text-white hover:bg-white/10 transition-all"
@@ -186,10 +177,7 @@ const CounterOfferModal = ({
                 Your last offer
               </div>
               <div className="text-lg font-black text-white leading-none tracking-tight">
-                {formatPrice(
-                  offer.currentAmount || offer.initialAmount,
-                  offer.listing?.currency,
-                )}
+                {formatPrice(offer.currentAmount || offer.initialAmount, offer.listing?.currency)}
               </div>
             </div>
             {offer.listing?.askingPrice && (
@@ -198,10 +186,7 @@ const CounterOfferModal = ({
                   Asking price
                 </div>
                 <div className="text-lg font-black text-[#D4AF37] leading-none tracking-tight">
-                  {formatPrice(
-                    offer.listing.askingPrice,
-                    offer.listing.currency,
-                  )}
+                  {formatPrice(offer.listing.askingPrice, offer.listing.currency)}
                 </div>
               </div>
             )}
@@ -271,9 +256,7 @@ const CounterOfferModal = ({
               size={14}
               className={counterOfferMutation.isPending ? "animate-spin" : ""}
             />
-            {counterOfferMutation.isPending
-              ? "Sending..."
-              : "Send Counter Offer"}
+            {counterOfferMutation.isPending ? "Sending..." : "Send Counter Offer"}
           </button>
         </div>
       </div>
@@ -466,9 +449,7 @@ function BuyerOffer() {
             {isError && (
               <div className="py-16 text-center space-y-4">
                 <AlertCircle className="w-12 h-12 text-red-500 mx-auto" />
-                <h3 className="text-xl font-bold text-white">
-                  Failed to load offers
-                </h3>
+                <h3 className="text-xl font-bold text-white">Failed to load offers</h3>
                 <p className="text-sm text-gray-400 max-w-md mx-auto">
                   {(error as any)?.message ||
                     "An unexpected error occurred while fetching your offers."}
@@ -486,12 +467,10 @@ function BuyerOffer() {
             {!isLoading && !isError && offers.length === 0 && (
               <div className="py-16 text-center space-y-4">
                 <Inbox className="w-12 h-12 text-gray-500 mx-auto opacity-60" />
-                <h3 className="text-xl font-bold text-white">
-                  No offers found
-                </h3>
+                <h3 className="text-xl font-bold text-white">No offers found</h3>
                 <p className="text-sm text-gray-400 max-w-md mx-auto">
-                  You haven't submitted any offers yet. Explore active listings
-                  to place your first offer.
+                  You haven't submitted any offers yet. Explore active listings to place your first
+                  offer.
                 </p>
                 <Link
                   href="/inventory"
@@ -509,8 +488,7 @@ function BuyerOffer() {
                 const listing = offer.listing;
                 const saleType = (listing?.saleType || "").toUpperCase();
                 const allowCounterOffers = listing?.allowCounterOffers ?? false;
-                const isFixedWithCounter =
-                  saleType === "FIXED_PRICE" && allowCounterOffers;
+                const isFixedWithCounter = saleType === "FIXED_PRICE" && allowCounterOffers;
                 const statusUpper = (offer.status || "").toUpperCase();
                 const isTerminalStatus =
                   statusUpper === "ACCEPTED" ||
@@ -521,8 +499,7 @@ function BuyerOffer() {
                   statusUpper === "EXPIRED";
 
                 const showCounterButton =
-                  (statusUpper === "COUNTERED" || isFixedWithCounter) &&
-                  !isTerminalStatus;
+                  (statusUpper === "COUNTERED" || isFixedWithCounter) && !isTerminalStatus;
 
                 const imageUrl =
                   listing?.media?.[0]?.url ||
@@ -541,9 +518,7 @@ function BuyerOffer() {
                     {/* Offer Card */}
                     <div
                       className={`relative bg-white/5 rounded-2xl border ${
-                        showCounterButton
-                          ? "border-[#D4AF37]/20 bg-[#D4AF37]/2"
-                          : "border-white/5"
+                        showCounterButton ? "border-[#D4AF37]/20 bg-[#D4AF37]/2" : "border-white/5"
                       } p-5 md:p-6 hover:bg-white/8 transition-all duration-300`}
                     >
                       <div className="flex flex-col md:flex-row md:items-center gap-6">
@@ -570,19 +545,13 @@ function BuyerOffer() {
                                   {offer.roundsCount > 1 ? "s" : ""}
                                 </span>
                               ) : null}
-                              {offer.createdAt && (
-                                <span>Date: {formatDate(offer.createdAt)}</span>
-                              )}
+                              {offer.createdAt && <span>Date: {formatDate(offer.createdAt)}</span>}
                             </div>
 
                             {offer.histories && offer.histories.length > 0 && (
                               <button
                                 onClick={() =>
-                                  setExpandedOfferId(
-                                    expandedOfferId === offer.id
-                                      ? null
-                                      : offer.id,
-                                  )
+                                  setExpandedOfferId(expandedOfferId === offer.id ? null : offer.id)
                                 }
                                 className="flex items-center gap-1.5 text-[10px] font-bold text-gray-500 uppercase tracking-widest hover:text-[#D4AF37] transition-colors mt-2"
                               >
@@ -591,8 +560,7 @@ function BuyerOffer() {
                                 ) : (
                                   <ChevronDown size={14} />
                                 )}
-                                {expandedOfferId === offer.id ? "Hide" : "Show"}{" "}
-                                negotiation history
+                                {expandedOfferId === offer.id ? "Hide" : "Show"} negotiation history
                               </button>
                             )}
                           </div>
@@ -607,7 +575,7 @@ function BuyerOffer() {
                                 <div className="text-2xl font-black text-white leading-none tracking-tight">
                                   {formatPrice(
                                     offer.currentAmount || offer.initialAmount,
-                                    listing?.currency,
+                                    listing?.currency
                                   )}
                                 </div>
                               </div>
@@ -617,10 +585,7 @@ function BuyerOffer() {
                                     Asking Price
                                   </div>
                                   <div className="text-2xl font-black text-gray-300 leading-none tracking-tight">
-                                    {formatPrice(
-                                      listing.askingPrice,
-                                      listing.currency,
-                                    )}
+                                    {formatPrice(listing.askingPrice, listing.currency)}
                                   </div>
                                 </div>
                               )}
@@ -641,8 +606,7 @@ function BuyerOffer() {
                                 </button>
                               )}
 
-                              {(statusUpper === "PENDING" ||
-                                statusUpper === "COUNTERED") && (
+                              {(statusUpper === "PENDING" || statusUpper === "COUNTERED") && (
                                 <button
                                   onClick={() => handleWithdraw(offer.id)}
                                   disabled={withdrawOfferMutation.isPending}
@@ -651,9 +615,7 @@ function BuyerOffer() {
                                   <X
                                     size={14}
                                     className={
-                                      withdrawOfferMutation.isPending
-                                        ? "animate-spin"
-                                        : ""
+                                      withdrawOfferMutation.isPending ? "animate-spin" : ""
                                     }
                                   />{" "}
                                   Withdraw
@@ -716,10 +678,7 @@ function BuyerOffer() {
                                           }`}
                                     </span>
                                     <span className="text-white ml-2">
-                                      {formatPrice(
-                                        item.amount,
-                                        listing?.currency,
-                                      )}
+                                      {formatPrice(item.amount, listing?.currency)}
                                     </span>
                                     {item.note && (
                                       <span className="text-gray-400 text-xs italic ml-2">
@@ -744,16 +703,9 @@ function BuyerOffer() {
             {meta && meta.totalPages > 1 && (
               <div className="flex items-center justify-between pt-6 border-t border-white/5">
                 <div className="text-xs text-gray-400">
-                  Showing{" "}
-                  <span className="font-bold text-white">
-                    {(page - 1) * limit + 1}
-                  </span>{" "}
-                  to{" "}
-                  <span className="font-bold text-white">
-                    {Math.min(page * limit, meta.total)}
-                  </span>{" "}
-                  of <span className="font-bold text-white">{meta.total}</span>{" "}
-                  offers
+                  Showing <span className="font-bold text-white">{(page - 1) * limit + 1}</span> to{" "}
+                  <span className="font-bold text-white">{Math.min(page * limit, meta.total)}</span>{" "}
+                  of <span className="font-bold text-white">{meta.total}</span> offers
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -767,9 +719,7 @@ function BuyerOffer() {
                     Page {page} of {meta.totalPages}
                   </div>
                   <button
-                    onClick={() =>
-                      setPage((p) => Math.min(meta.totalPages, p + 1))
-                    }
+                    onClick={() => setPage((p) => Math.min(meta.totalPages, p + 1))}
                     disabled={page >= meta.totalPages}
                     className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-medium text-white/80 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                   >

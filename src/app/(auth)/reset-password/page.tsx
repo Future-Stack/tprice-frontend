@@ -118,11 +118,10 @@ function ResetPasswordContent() {
           </div>
         </div>
 
-        <h2 className="text-3xl font-serif text-white mb-4">
-          Invalid Reset Link
-        </h2>
+        <h2 className="text-3xl font-serif text-white mb-4">Invalid Reset Link</h2>
         <p className="text-white/60 text-sm mb-8 leading-relaxed">
-          The password reset token is missing from the URL. Please make sure you clicked the full link from the email or try requesting a new password reset.
+          The password reset token is missing from the URL. Please make sure you clicked the full
+          link from the email or try requesting a new password reset.
         </p>
 
         <div className="space-y-4">
@@ -155,12 +154,8 @@ function ResetPasswordContent() {
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
               Back to login
             </Link>
-            <h4 className="text-[#D4AF37] text-[14px] font-bold mb-4">
-              Reset Password
-            </h4>
-            <h2 className="text-4xl font-cormorant text-white mb-2">
-              Create New Password
-            </h2>
+            <h4 className="text-[#D4AF37] text-[14px] font-bold mb-4">Reset Password</h4>
+            <h2 className="text-4xl font-cormorant text-white mb-2">Create New Password</h2>
             <p className="text-white/40 text-sm">
               Please enter and confirm your new password below.
             </p>
@@ -191,11 +186,7 @@ function ResetPasswordContent() {
                   onClick={() => setShowNewPassword(!showNewPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
                 >
-                  {showNewPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
+                  {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
               {errors.newPassword && (
@@ -275,9 +266,7 @@ function ResetPasswordContent() {
             </div>
           </div>
 
-          <h2 className="text-3xl font-serif text-white mb-4">
-            Password Updated
-          </h2>
+          <h2 className="text-3xl font-serif text-white mb-4">Password Updated</h2>
           <p className="text-white/60 text-sm mb-8 leading-relaxed">
             Your password has been successfully reset. You can now use your new password to sign in.
           </p>
@@ -332,12 +321,14 @@ export default function ResetPasswordPage() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="w-full max-w-md bg-[#111111] border border-[#D4AF37]/20 p-10 md:p-12 rounded-2xl shadow-2xl"
         >
-          <Suspense fallback={
-            <div className="flex flex-col items-center justify-center py-10 gap-3 text-white/50 text-sm">
-              <Loader2 className="w-8 h-8 animate-spin text-[#D4AF37]" />
-              <span>Loading page content...</span>
-            </div>
-          }>
+          <Suspense
+            fallback={
+              <div className="flex flex-col items-center justify-center py-10 gap-3 text-white/50 text-sm">
+                <Loader2 className="w-8 h-8 animate-spin text-[#D4AF37]" />
+                <span>Loading page content...</span>
+              </div>
+            }
+          >
             <ResetPasswordContent />
           </Suspense>
         </motion.div>

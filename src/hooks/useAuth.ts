@@ -109,11 +109,7 @@ export const useGetMeQuery = (enabled: boolean = true) => {
   const hasToken =
     !!storeToken ||
     (typeof window !== "undefined" &&
-      !!(
-        Cookies.get("accessToken") ||
-        Cookies.get("token") ||
-        Cookies.get("access_token")
-      ));
+      !!(Cookies.get("accessToken") || Cookies.get("token") || Cookies.get("access_token")));
 
   return useQuery<User>({
     queryKey: AUTH_QUERY_KEYS.user,
@@ -210,4 +206,3 @@ export const useResetPasswordMutation = () => {
     mutationFn: (payload: ResetPasswordPayload) => resetPasswordApi(payload),
   });
 };
-

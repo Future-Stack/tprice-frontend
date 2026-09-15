@@ -214,11 +214,7 @@ export default function AdminTrimsPage() {
                   All Models
                 </option>
                 {models.map((model) => (
-                  <option
-                    key={model.id}
-                    value={model.id}
-                    className="bg-[#141416] text-white"
-                  >
+                  <option key={model.id} value={model.id} className="bg-[#141416] text-white">
                     {model.name} {model.brand ? `(${model.brand.name})` : ""}
                   </option>
                 ))}
@@ -259,9 +255,7 @@ export default function AdminTrimsPage() {
             className="p-2.5 bg-[#141416] border border-[#262626] rounded-xl text-gray-400 hover:text-white hover:border-primary/40 transition-colors cursor-pointer"
             title="Refresh trims list"
           >
-            <RefreshCw
-              className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`}
-            />
+            <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`} />
           </button>
         </div>
       </div>
@@ -301,15 +295,13 @@ export default function AdminTrimsPage() {
                     <td colSpan={6} className="px-6 py-16 text-center">
                       <div className="max-w-md mx-auto space-y-3">
                         <Layers className="w-10 h-10 text-gray-600 mx-auto" />
-                        <p className="text-base font-semibold text-gray-300">
-                          No trims found
-                        </p>
+                        <p className="text-base font-semibold text-gray-300">No trims found</p>
                         <p className="text-xs text-gray-500">
                           {searchQuery
                             ? `No trims matching "${searchQuery}"`
                             : modelIdFilter !== "ALL"
-                            ? "No trims found for the selected model."
-                            : "Click 'Create Trim' to add your first trim variant."}
+                              ? "No trims found for the selected model."
+                              : "Click 'Create Trim' to add your first trim variant."}
                         </p>
                       </div>
                     </td>
@@ -354,9 +346,7 @@ export default function AdminTrimsPage() {
                             </div>
                           </div>
                         ) : (
-                          <span className="text-xs text-gray-500 italic">
-                            No Model
-                          </span>
+                          <span className="text-xs text-gray-500 italic">No Model</span>
                         )}
                       </td>
 
@@ -396,9 +386,7 @@ export default function AdminTrimsPage() {
                             </div>
                           </div>
                         ) : (
-                          <span className="text-xs text-gray-500 italic">
-                            No Brand
-                          </span>
+                          <span className="text-xs text-gray-500 italic">No Brand</span>
                         )}
                       </td>
 
@@ -410,9 +398,7 @@ export default function AdminTrimsPage() {
                             {trim.yearStart || "—"} - {trim.yearEnd || "Present"}
                           </span>
                         ) : (
-                          <span className="text-xs text-gray-500 italic">
-                            All Years
-                          </span>
+                          <span className="text-xs text-gray-500 italic">All Years</span>
                         )}
                       </td>
 
@@ -462,16 +448,12 @@ export default function AdminTrimsPage() {
             <div className="px-6 py-4 bg-[#141416] border-t border-[#262626] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
               <div>
                 Showing{" "}
-                <span className="font-semibold text-white">
-                  {(meta.page - 1) * meta.limit + 1}
-                </span>{" "}
+                <span className="font-semibold text-white">{(meta.page - 1) * meta.limit + 1}</span>{" "}
                 to{" "}
                 <span className="font-semibold text-white">
                   {Math.min(meta.page * meta.limit, meta.total)}
                 </span>{" "}
-                of{" "}
-                <span className="font-semibold text-white">{meta.total}</span>{" "}
-                trims
+                of <span className="font-semibold text-white">{meta.total}</span> trims
               </div>
 
               {/* Page Buttons */}
@@ -485,21 +467,19 @@ export default function AdminTrimsPage() {
                   <span className="hidden sm:inline">Previous</span>
                 </button>
 
-                {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map(
-                  (pageNum) => (
-                    <button
-                      key={pageNum}
-                      onClick={() => handlePageChange(pageNum)}
-                      className={`w-8 h-8 rounded-lg border font-semibold text-xs transition-all cursor-pointer ${
-                        pageNum === meta.page
-                          ? "bg-primary text-black border-primary font-bold shadow-[0_2px_10px_rgba(231,143,35,0.3)]"
-                          : "bg-[#1A1A1C] border-[#262626] text-gray-300 hover:text-white hover:border-primary/40"
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  ),
-                )}
+                {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    onClick={() => handlePageChange(pageNum)}
+                    className={`w-8 h-8 rounded-lg border font-semibold text-xs transition-all cursor-pointer ${
+                      pageNum === meta.page
+                        ? "bg-primary text-black border-primary font-bold shadow-[0_2px_10px_rgba(231,143,35,0.3)]"
+                        : "bg-[#1A1A1C] border-[#262626] text-gray-300 hover:text-white hover:border-primary/40"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
 
                 <button
                   onClick={() => handlePageChange(meta.page + 1)}

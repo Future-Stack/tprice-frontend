@@ -14,9 +14,7 @@ export interface AdminSettingsData {
   updatedAt: string;
 }
 
-export type UpdateAdminSettingsInput = Partial<
-  Omit<AdminSettingsData, "id" | "updatedAt">
->;
+export type UpdateAdminSettingsInput = Partial<Omit<AdminSettingsData, "id" | "updatedAt">>;
 
 export interface UpdateGeneralSettingsPayload {
   notifyNewListings?: boolean;
@@ -50,10 +48,7 @@ export const getAdminSettingsApi = async (): Promise<AdminSettingsData> => {
 export const updateGeneralSettingsApi = async (
   payload: UpdateGeneralSettingsPayload
 ): Promise<AdminSettingsData> => {
-  const response = await apiClient.patch<AdminSettingsData>(
-    "/admin/settings/general",
-    payload
-  );
+  const response = await apiClient.patch<AdminSettingsData>("/admin/settings/general", payload);
   return response.data;
 };
 
@@ -63,10 +58,7 @@ export const updateGeneralSettingsApi = async (
 export const updateModerationSettingsApi = async (
   payload: UpdateModerationSettingsPayload
 ): Promise<AdminSettingsData> => {
-  const response = await apiClient.patch<AdminSettingsData>(
-    "/admin/settings/moderation",
-    payload
-  );
+  const response = await apiClient.patch<AdminSettingsData>("/admin/settings/moderation", payload);
   return response.data;
 };
 
@@ -76,10 +68,7 @@ export const updateModerationSettingsApi = async (
 export const updateLogsSettingsApi = async (
   payload: UpdateLogsSettingsPayload
 ): Promise<AdminSettingsData> => {
-  const response = await apiClient.patch<AdminSettingsData>(
-    "/admin/settings/logs",
-    payload
-  );
+  const response = await apiClient.patch<AdminSettingsData>("/admin/settings/logs", payload);
   return response.data;
 };
 
@@ -90,17 +79,11 @@ export const updateAdminSettingsApi = async (
   payload: UpdateAdminSettingsInput
 ): Promise<AdminSettingsData> => {
   try {
-    const response = await apiClient.patch<AdminSettingsData>(
-      "/admin/settings",
-      payload
-    );
+    const response = await apiClient.patch<AdminSettingsData>("/admin/settings", payload);
     return response.data;
   } catch (error: any) {
     if (error.response?.status === 405 || error.response?.status === 404) {
-      const fallbackResponse = await apiClient.put<AdminSettingsData>(
-        "/admin/settings",
-        payload
-      );
+      const fallbackResponse = await apiClient.put<AdminSettingsData>("/admin/settings", payload);
       return fallbackResponse.data;
     }
     throw error;

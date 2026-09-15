@@ -84,4 +84,3 @@ export interface ResetPasswordResponse {
   message?: string;
   [key: string]: unknown;
 }
-

@@ -37,12 +37,10 @@ export const useUpdateGeneralSettingsMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: UpdateGeneralSettingsPayload) =>
-      updateGeneralSettingsApi(payload),
+    mutationFn: (payload: UpdateGeneralSettingsPayload) => updateGeneralSettingsApi(payload),
     onSuccess: (updatedSettings) => {
-      queryClient.setQueryData<AdminSettingsData>(
-        ADMIN_SETTINGS_QUERY_KEYS.settings,
-        (oldData) => (oldData ? { ...oldData, ...updatedSettings } : updatedSettings)
+      queryClient.setQueryData<AdminSettingsData>(ADMIN_SETTINGS_QUERY_KEYS.settings, (oldData) =>
+        oldData ? { ...oldData, ...updatedSettings } : updatedSettings
       );
       queryClient.invalidateQueries({
         queryKey: ADMIN_SETTINGS_QUERY_KEYS.settings,
@@ -50,8 +48,7 @@ export const useUpdateGeneralSettingsMutation = () => {
       toast.success("General notification settings updated successfully");
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message || "Failed to update general settings";
+      const message = error.response?.data?.message || "Failed to update general settings";
       toast.error(message);
     },
   });
@@ -64,12 +61,10 @@ export const useUpdateModerationSettingsMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: UpdateModerationSettingsPayload) =>
-      updateModerationSettingsApi(payload),
+    mutationFn: (payload: UpdateModerationSettingsPayload) => updateModerationSettingsApi(payload),
     onSuccess: (updatedSettings) => {
-      queryClient.setQueryData<AdminSettingsData>(
-        ADMIN_SETTINGS_QUERY_KEYS.settings,
-        (oldData) => (oldData ? { ...oldData, ...updatedSettings } : updatedSettings)
+      queryClient.setQueryData<AdminSettingsData>(ADMIN_SETTINGS_QUERY_KEYS.settings, (oldData) =>
+        oldData ? { ...oldData, ...updatedSettings } : updatedSettings
       );
       queryClient.invalidateQueries({
         queryKey: ADMIN_SETTINGS_QUERY_KEYS.settings,
@@ -77,8 +72,7 @@ export const useUpdateModerationSettingsMutation = () => {
       toast.success("Moderation settings updated successfully");
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message || "Failed to update moderation settings";
+      const message = error.response?.data?.message || "Failed to update moderation settings";
       toast.error(message);
     },
   });
@@ -91,12 +85,10 @@ export const useUpdateLogsSettingsMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: UpdateLogsSettingsPayload) =>
-      updateLogsSettingsApi(payload),
+    mutationFn: (payload: UpdateLogsSettingsPayload) => updateLogsSettingsApi(payload),
     onSuccess: (updatedSettings) => {
-      queryClient.setQueryData<AdminSettingsData>(
-        ADMIN_SETTINGS_QUERY_KEYS.settings,
-        (oldData) => (oldData ? { ...oldData, ...updatedSettings } : updatedSettings)
+      queryClient.setQueryData<AdminSettingsData>(ADMIN_SETTINGS_QUERY_KEYS.settings, (oldData) =>
+        oldData ? { ...oldData, ...updatedSettings } : updatedSettings
       );
       queryClient.invalidateQueries({
         queryKey: ADMIN_SETTINGS_QUERY_KEYS.settings,
@@ -104,8 +96,7 @@ export const useUpdateLogsSettingsMutation = () => {
       toast.success("Audit and log settings updated successfully");
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message || "Failed to update audit and log settings";
+      const message = error.response?.data?.message || "Failed to update audit and log settings";
       toast.error(message);
     },
   });
@@ -118,8 +109,7 @@ export const useUpdateAdminSettingsMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: UpdateAdminSettingsInput) =>
-      updateAdminSettingsApi(payload),
+    mutationFn: (payload: UpdateAdminSettingsInput) => updateAdminSettingsApi(payload),
     onSuccess: (updatedSettings) => {
       queryClient.setQueryData<AdminSettingsData>(
         ADMIN_SETTINGS_QUERY_KEYS.settings,
@@ -131,8 +121,7 @@ export const useUpdateAdminSettingsMutation = () => {
       toast.success("Settings updated successfully");
     },
     onError: (error: any) => {
-      const message =
-        error.response?.data?.message || "Failed to update settings";
+      const message = error.response?.data?.message || "Failed to update settings";
       toast.error(message);
     },
   });

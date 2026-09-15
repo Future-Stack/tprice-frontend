@@ -63,11 +63,7 @@ const formatTimeAgo = (dateString?: string) => {
 
 const getStatusStyles = (action: string) => {
   const norm = (action || "").toUpperCase();
-  if (
-    norm.includes("DELETE") ||
-    norm.includes("REJECT") ||
-    norm.includes("SUSPEND")
-  ) {
+  if (norm.includes("DELETE") || norm.includes("REJECT") || norm.includes("SUSPEND")) {
     return {
       icon: <X className="text-red-500" size={20} />,
       bg: "bg-red-500/10",
@@ -76,11 +72,7 @@ const getStatusStyles = (action: string) => {
       glow: "shadow-[0_0_15px_rgba(239,68,68,0.6)]",
     };
   }
-  if (
-    norm.includes("APPROV") ||
-    norm.includes("GRANT") ||
-    norm.includes("SUCCESS")
-  ) {
+  if (norm.includes("APPROV") || norm.includes("GRANT") || norm.includes("SUCCESS")) {
     return {
       icon: <Check className="text-green-500" size={20} />,
       bg: "bg-green-500/10",
@@ -98,11 +90,7 @@ const getStatusStyles = (action: string) => {
       glow: "shadow-[0_0_15px_rgba(96,165,250,0.6)]",
     };
   }
-  if (
-    norm.includes("UPDATE") ||
-    norm.includes("EDIT") ||
-    norm.includes("FLAG")
-  ) {
+  if (norm.includes("UPDATE") || norm.includes("EDIT") || norm.includes("FLAG")) {
     return {
       icon: <AlertTriangle className="text-yellow-500" size={20} />,
       bg: "bg-yellow-500/10",
@@ -175,7 +163,7 @@ const formatActionDescription = (activity: AuditLogItem) => {
         details = keys
           .map(
             (k) =>
-              `${k}: ${typeof changes[k] === "object" ? JSON.stringify(changes[k]) : changes[k]}`,
+              `${k}: ${typeof changes[k] === "object" ? JSON.stringify(changes[k]) : changes[k]}`
           )
           .join(", ");
       }
@@ -321,8 +309,8 @@ function AdminActivity() {
                   Failed to load activity logs
                 </p>
                 <p className="text-xs text-gray-500 max-w-sm">
-                  There was an error communicating with the server. Please check
-                  your connection and try again.
+                  There was an error communicating with the server. Please check your connection and
+                  try again.
                 </p>
                 <button
                   onClick={() => refetch()}
@@ -336,9 +324,7 @@ function AdminActivity() {
             <div className="py-16 text-center">
               <div className="flex flex-col items-center justify-center space-y-3">
                 <ActivityIcon className="w-12 h-12 text-gray-600" />
-                <p className="text-base font-semibold text-gray-300">
-                  No activity logs found
-                </p>
+                <p className="text-base font-semibold text-gray-300">No activity logs found</p>
                 <p className="text-xs text-gray-500">
                   {searchQuery
                     ? `No activity matching "${searchQuery}"`
@@ -409,16 +395,12 @@ function AdminActivity() {
             <div className="mt-10 pt-6 border-t border-[#232323] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
               <div>
                 Showing{" "}
-                <span className="font-semibold text-white">
-                  {(meta.page - 1) * meta.limit + 1}
-                </span>{" "}
+                <span className="font-semibold text-white">{(meta.page - 1) * meta.limit + 1}</span>{" "}
                 to{" "}
                 <span className="font-semibold text-white">
                   {Math.min(meta.page * meta.limit, meta.total)}
                 </span>{" "}
-                of{" "}
-                <span className="font-semibold text-white">{meta.total}</span>{" "}
-                logs
+                of <span className="font-semibold text-white">{meta.total}</span> logs
               </div>
 
               {/* Page Buttons */}
@@ -432,35 +414,32 @@ function AdminActivity() {
                   <span className="hidden sm:inline">Previous</span>
                 </button>
 
-                {Array.from(
-                  { length: Math.min(5, meta.totalPages) },
-                  (_, i) => {
-                    let pageNum = meta.page;
-                    if (meta.totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (meta.page <= 3) {
-                      pageNum = i + 1;
-                    } else if (meta.page >= meta.totalPages - 2) {
-                      pageNum = meta.totalPages - 4 + i;
-                    } else {
-                      pageNum = meta.page - 2 + i;
-                    }
+                {Array.from({ length: Math.min(5, meta.totalPages) }, (_, i) => {
+                  let pageNum = meta.page;
+                  if (meta.totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (meta.page <= 3) {
+                    pageNum = i + 1;
+                  } else if (meta.page >= meta.totalPages - 2) {
+                    pageNum = meta.totalPages - 4 + i;
+                  } else {
+                    pageNum = meta.page - 2 + i;
+                  }
 
-                    return (
-                      <button
-                        key={pageNum}
-                        onClick={() => handlePageChange(pageNum)}
-                        className={`w-8 h-8 rounded-lg border font-semibold text-xs transition-all cursor-pointer ${
-                          pageNum === meta.page
-                            ? "bg-primary text-black border-primary font-bold shadow-[0_2px_10px_rgba(234,179,8,0.3)]"
-                            : "bg-[#1A1A1C] border-[#262626] text-gray-300 hover:text-white hover:border-primary/40"
-                        }`}
-                      >
-                        {pageNum}
-                      </button>
-                    );
-                  },
-                )}
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => handlePageChange(pageNum)}
+                      className={`w-8 h-8 rounded-lg border font-semibold text-xs transition-all cursor-pointer ${
+                        pageNum === meta.page
+                          ? "bg-primary text-black border-primary font-bold shadow-[0_2px_10px_rgba(234,179,8,0.3)]"
+                          : "bg-[#1A1A1C] border-[#262626] text-gray-300 hover:text-white hover:border-primary/40"
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
 
                 <button
                   onClick={() => handlePageChange(meta.page + 1)}

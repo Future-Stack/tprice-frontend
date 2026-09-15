@@ -80,9 +80,7 @@ export interface UpdateModelInput {
 /**
  * Fetch paginated models from GET /models
  */
-export const getModelsApi = async (
-  params?: GetModelsParams,
-): Promise<ModelsResponse> => {
+export const getModelsApi = async (params?: GetModelsParams): Promise<ModelsResponse> => {
   const queryParams: Record<string, any> = {};
 
   if (params) {
@@ -113,9 +111,7 @@ export const getModelByIdApi = async (id: string): Promise<ModelItem> => {
 /**
  * Create a new model via POST /models
  */
-export const createModelApi = async (
-  data: CreateModelInput,
-): Promise<ModelItem> => {
+export const createModelApi = async (data: CreateModelInput): Promise<ModelItem> => {
   const response = await apiClient.post<ModelItem>("/models", data);
   return response.data;
 };
@@ -123,10 +119,7 @@ export const createModelApi = async (
 /**
  * Update a model via PATCH /models/:id
  */
-export const updateModelApi = async (
-  id: string,
-  data: UpdateModelInput,
-): Promise<ModelItem> => {
+export const updateModelApi = async (id: string, data: UpdateModelInput): Promise<ModelItem> => {
   const response = await apiClient.patch<ModelItem>(`/models/${id}`, data);
   return response.data;
 };

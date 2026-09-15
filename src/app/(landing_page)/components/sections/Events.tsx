@@ -3,14 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Calendar,
-  MapPin,
-  AlertCircle,
-  RefreshCw,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, Calendar, MapPin, AlertCircle, RefreshCw } from "lucide-react";
 import { useGetEventsQuery } from "@/hooks/useEvents";
 import { EventItem } from "@/lib/api/events";
 
@@ -53,8 +46,7 @@ export default function Events() {
   const events: EventItem[] = data?.data || [];
 
   // Safeguard index in case events length changes
-  const safeIndex =
-    events.length > 0 ? Math.min(currentIndex, events.length - 1) : 0;
+  const safeIndex = events.length > 0 ? Math.min(currentIndex, events.length - 1) : 0;
   const currentEvent = events[safeIndex];
 
   const nextSlide = () => {
@@ -105,9 +97,7 @@ export default function Events() {
         ) : isError ? (
           <div className="py-16 text-center bg-[#0A0A0A] rounded-2xl border border-red-500/20 max-w-xl mx-auto space-y-4">
             <AlertCircle className="w-12 h-12 text-red-400 mx-auto" />
-            <h3 className="text-xl text-white font-medium">
-              Failed to load events
-            </h3>
+            <h3 className="text-xl text-white font-medium">Failed to load events</h3>
             <p className="text-white/60 text-sm">
               {(error as any)?.response?.data?.message ||
                 (error as Error)?.message ||
@@ -142,14 +132,11 @@ export default function Events() {
               >
                 {/* Background Image */}
                 <img
-                  src={
-                    currentEvent.coverImageUrl || "/images/landing/hero-car.png"
-                  }
+                  src={currentEvent.coverImageUrl || "/images/landing/hero-car.png"}
                   alt={currentEvent.title}
                   className="absolute inset-0 w-full h-full object-cover"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src =
-                      "/images/landing/hero-car.png";
+                    (e.target as HTMLImageElement).src = "/images/landing/hero-car.png";
                   }}
                 />
 

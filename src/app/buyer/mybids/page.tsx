@@ -22,8 +22,7 @@ import { toast } from "sonner";
 
 /* ─── Helper Functions ─── */
 const formatPrice = (priceStr?: string | number | null, currency = "USD") => {
-  if (priceStr === undefined || priceStr === null || priceStr === "")
-    return "$0";
+  if (priceStr === undefined || priceStr === null || priceStr === "") return "$0";
   const num = typeof priceStr === "number" ? priceStr : parseFloat(priceStr);
   if (isNaN(num)) return `${priceStr}`;
 
@@ -164,9 +163,7 @@ export default function MyBidsPage() {
       {isError && (
         <div className="bg-[#2A1616] border border-red-500/30 rounded-2xl p-8 text-center my-8">
           <AlertTriangle className="w-10 h-10 text-red-400 mx-auto mb-3" />
-          <h3 className="text-lg font-semibold text-white mb-1">
-            Failed to load bids
-          </h3>
+          <h3 className="text-lg font-semibold text-white mb-1">Failed to load bids</h3>
           <p className="text-sm text-gray-400 mb-4 max-w-md mx-auto">
             {(error as any)?.response?.data?.message ||
               error?.message ||
@@ -191,18 +188,14 @@ export default function MyBidsPage() {
           <div className="flex-1 min-w-0">
             {/* Table header */}
             <div className="hidden sm:grid grid-cols-[1fr_repeat(3,100px)_150px] gap-4 mb-6 px-4">
-              <span className="text-xs font-bold text-white uppercase tracking-wider">
-                Item
-              </span>
+              <span className="text-xs font-bold text-white uppercase tracking-wider">Item</span>
               <span className="text-xs font-bold text-white uppercase tracking-wider">
                 Your Bid
               </span>
               <span className="text-xs font-bold text-white uppercase tracking-wider">
                 Highest Bid
               </span>
-              <span className="text-xs font-bold text-white uppercase tracking-wider">
-                Status
-              </span>
+              <span className="text-xs font-bold text-white uppercase tracking-wider">Status</span>
               <span></span>
             </div>
 
@@ -254,10 +247,7 @@ export default function MyBidsPage() {
 
                         {/* Your Bid */}
                         <span className="text-sm font-medium text-gray-400">
-                          {formatPrice(
-                            bid.initialAmount || bid.currentAmount,
-                            bidCurrency,
-                          )}
+                          {formatPrice(bid.initialAmount || bid.currentAmount, bidCurrency)}
                         </span>
 
                         {/* Highest Bid */}
@@ -276,17 +266,13 @@ export default function MyBidsPage() {
 
                         {/* Actions */}
                         <div className="flex items-center justify-end gap-1 sm:gap-2 pr-2">
-                          {(bid.listing?.saleType || "").toUpperCase() ===
-                            "AUCTION" &&
+                          {(bid.listing?.saleType || "").toUpperCase() === "AUCTION" &&
                             (bid.status || "").toUpperCase() !== "ACCEPTED" &&
                             (bid.status || "").toUpperCase() !== "WON" &&
                             ((bid.status || "").toUpperCase() === "OUTBID" ||
-                              (bid.status || "").toUpperCase() ===
-                                "COUNTERED") && (
+                              (bid.status || "").toUpperCase() === "COUNTERED") && (
                               <Link
-                                href={`/buyer/marketplace/${
-                                  bid.listing?.slug || bid.listingId
-                                }`}
+                                href={`/buyer/marketplace/${bid.listing?.slug || bid.listingId}`}
                                 onClick={(e) => e.stopPropagation()}
                                 className="p-2 sm:p-2.5 bg-[#E78F23]/10 hover:bg-[#E78F23]/20 text-[#E78F23] rounded-lg transition-colors border border-[#E78F23]/20 group/btn"
                                 title="Increase Bid"
@@ -301,8 +287,7 @@ export default function MyBidsPage() {
                             }}
                             className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-white/5 hover:bg-white/10 text-white text-[10px] sm:text-[11px] font-bold rounded-lg border border-white/5 transition-all whitespace-nowrap"
                           >
-                            View Details{" "}
-                            <Eye className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-400" />
+                            View Details <Eye className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-400" />
                           </button>
                         </div>
                       </div>
@@ -317,15 +302,12 @@ export default function MyBidsPage() {
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-[#2C2C2E]">
                 <p className="text-xs text-gray-400">
                   Showing{" "}
-                  <span className="font-bold text-white">
-                    {(meta.page - 1) * meta.limit + 1}
-                  </span>{" "}
+                  <span className="font-bold text-white">{(meta.page - 1) * meta.limit + 1}</span>{" "}
                   to{" "}
                   <span className="font-bold text-white">
                     {Math.min(meta.page * meta.limit, meta.total)}
                   </span>{" "}
-                  of <span className="font-bold text-white">{meta.total}</span>{" "}
-                  bids
+                  of <span className="font-bold text-white">{meta.total}</span> bids
                 </p>
 
                 <div className="flex items-center gap-2">
@@ -342,9 +324,7 @@ export default function MyBidsPage() {
                   </span>
 
                   <button
-                    onClick={() =>
-                      setPage((prev) => Math.min(prev + 1, meta.totalPages))
-                    }
+                    onClick={() => setPage((prev) => Math.min(prev + 1, meta.totalPages))}
                     disabled={page >= meta.totalPages}
                     className="p-2 bg-[#161618] border border-[#2C2C2E] rounded-lg text-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white/5 transition-colors"
                   >
@@ -362,8 +342,7 @@ export default function MyBidsPage() {
                 {/* Product Info */}
                 <div>
                   <span className="inline-block bg-[#E78F23]/20 text-[#E78F23] text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-wider mb-3">
-                    {selectedBid.listing?.saleType?.replace("_", " ") ||
-                      "Auction"}
+                    {selectedBid.listing?.saleType?.replace("_", " ") || "Auction"}
                   </span>
                   <h2 className="text-2xl sm:text-3xl font-clash font-semibold text-white">
                     {selectedBid.listing?.title || "Listing Details"}
@@ -392,9 +371,7 @@ export default function MyBidsPage() {
                       >
                         <div
                           className={`absolute top-0.5 sm:top-1 w-4 h-4 sm:w-3.5 sm:h-3.5 rounded-full transition-all duration-300 ${
-                            inclFees
-                              ? "left-5 sm:left-5.5 bg-black"
-                              : "left-0.5 sm:left-1 bg-white"
+                            inclFees ? "left-5 sm:left-5.5 bg-black" : "left-0.5 sm:left-1 bg-white"
                           }`}
                         />
                       </button>
@@ -421,19 +398,13 @@ export default function MyBidsPage() {
 
                   <div className="pt-5 sm:pt-6 border-t border-white/5">
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
-                      <span className="text-sm font-medium text-gray-400">
-                        Total Payable
-                      </span>
+                      <span className="text-sm font-medium text-gray-400">Total Payable</span>
                       <div className="text-left sm:text-right">
                         <p className="text-2xl sm:text-3xl lg:text-[32px] font-clash font-medium text-[#E78F23] leading-none mb-1 tracking-tight">
                           {formatPrice(totalPayableVal, currency)}
                         </p>
                         <p className="text-[11px] text-gray-500">
-                          Asking:{" "}
-                          {formatPrice(
-                            selectedBid.listing?.askingPrice,
-                            currency,
-                          )}
+                          Asking: {formatPrice(selectedBid.listing?.askingPrice, currency)}
                         </p>
                       </div>
                     </div>
@@ -486,16 +457,11 @@ export default function MyBidsPage() {
                 {/* Seller Info */}
                 <div className="bg-[#161618] rounded-xl p-4 flex items-center gap-3.5 border border-white/5">
                   <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 font-medium text-sm border border-white/5 shrink-0 uppercase">
-                    {selectedBid.seller?.firstName?.[0] ||
-                      selectedBid.seller?.lastName?.[0] ||
-                      "S"}
+                    {selectedBid.seller?.firstName?.[0] || selectedBid.seller?.lastName?.[0] || "S"}
                   </div>
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-white leading-none mb-1 truncate">
-                      {[
-                        selectedBid.seller?.firstName,
-                        selectedBid.seller?.lastName,
-                      ]
+                      {[selectedBid.seller?.firstName, selectedBid.seller?.lastName]
                         .filter(Boolean)
                         .join(" ") || "Verified Seller"}
                     </p>
@@ -508,8 +474,7 @@ export default function MyBidsPage() {
 
                 {/* Actions */}
                 <div className="space-y-3 pt-2">
-                  {(selectedBid.listing?.saleType || "").toUpperCase() ===
-                    "AUCTION" &&
+                  {(selectedBid.listing?.saleType || "").toUpperCase() === "AUCTION" &&
                     (selectedBid.status || "").toUpperCase() !== "ACCEPTED" &&
                     (selectedBid.status || "").toUpperCase() !== "WON" && (
                       <Link
@@ -540,12 +505,10 @@ export default function MyBidsPage() {
             <div className="w-16 h-16 bg-[#2C2C2E]/50 rounded-full flex items-center justify-center mx-auto mb-4 text-[#E78F23]">
               <Gavel className="w-8 h-8" />
             </div>
-            <h3 className="text-xl font-clash font-medium text-white mb-2">
-              No Bids Placed Yet
-            </h3>
+            <h3 className="text-xl font-clash font-medium text-white mb-2">No Bids Placed Yet</h3>
             <p className="text-sm text-gray-400 mb-6 max-w-md mx-auto">
-              You haven't submitted any offers or bids on listings yet. Explore
-              the marketplace to place your first bid.
+              You haven't submitted any offers or bids on listings yet. Explore the marketplace to
+              place your first bid.
             </p>
             <Link
               href="/buyer/marketplace"

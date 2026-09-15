@@ -29,15 +29,11 @@ export const uploadMultipleMediaApi = async ({
   });
   formData.append("folder", folder);
 
-  const response = await apiClient.post<MediaUploadResponse[]>(
-    "/media/upload-multiple",
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+  const response = await apiClient.post<MediaUploadResponse[]>("/media/upload-multiple", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
     },
-  );
+  });
 
   return response.data;
 };
@@ -47,13 +43,7 @@ export const uploadMediaApi = async ({
   files,
   folder = "exoticworld/listings",
 }: UploadMediaParams): Promise<MediaUploadResponse> => {
-  const fileList = files
-    ? Array.isArray(files)
-      ? files
-      : [files]
-    : file
-      ? [file]
-      : [];
+  const fileList = files ? (Array.isArray(files) ? files : [files]) : file ? [file] : [];
 
   const res = await uploadMultipleMediaApi({
     files: fileList,
@@ -99,7 +89,7 @@ export interface GetLandingMediaParams {
 }
 
 export const getLandingMediaApi = async (
-  params: GetLandingMediaParams = {},
+  params: GetLandingMediaParams = {}
 ): Promise<LandingMediaResponse> => {
   const response = await apiClient.get<LandingMediaResponse>("/landing-media", {
     params,
@@ -120,12 +110,9 @@ export interface CreateLandingMediaPayload {
 }
 
 export const createLandingMediaApi = async (
-  payload: CreateLandingMediaPayload,
+  payload: CreateLandingMediaPayload
 ): Promise<LandingMediaItem> => {
-  const response = await apiClient.post<LandingMediaItem>(
-    "/admin/landing-media",
-    payload,
-  );
+  const response = await apiClient.post<LandingMediaItem>("/admin/landing-media", payload);
   return response.data;
 };
 

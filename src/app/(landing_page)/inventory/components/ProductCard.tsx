@@ -1,25 +1,13 @@
 "use client";
 
 import React, { useMemo } from "react";
-import {
-  Heart,
-  MapPin,
-  CheckCircle2,
-  MoveRight,
-  Gauge,
-  Calendar,
-  Zap,
-  Cog,
-} from "lucide-react";
+import { Heart, MapPin, CheckCircle2, MoveRight, Gauge, Calendar, Zap, Cog } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
 import { ListingItem } from "@/lib/api/listings";
-import {
-  useSaveListingMutation,
-  useSavedListingsQuery,
-} from "@/hooks/useListings";
+import { useSaveListingMutation, useSavedListingsQuery } from "@/hooks/useListings";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 
 interface ProductCardProps {
@@ -29,14 +17,12 @@ interface ProductCardProps {
 export default function ProductCard({ item }: ProductCardProps) {
   const saveMutation = useSaveListingMutation();
   const token =
-    Cookies.get("accessToken") ||
-    Cookies.get("token") ||
-    useAuthStore((state) => state.token);
+    Cookies.get("accessToken") || Cookies.get("token") || useAuthStore((state) => state.token);
 
   // Fetch saved listings if authenticated to cross-reference saved status
   const { data: savedResponse } = useSavedListingsQuery(
     { page: 1, limit: 100 },
-    { enabled: Boolean(token) },
+    { enabled: Boolean(token) }
   );
 
   const isSavedInListings = useMemo(() => {
@@ -83,8 +69,7 @@ export default function ProductCard({ item }: ProductCardProps) {
     "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
 
   const locationStr =
-    [item.locationCity, item.locationCountry].filter(Boolean).join(", ") ||
-    "Worldwide";
+    [item.locationCity, item.locationCountry].filter(Boolean).join(", ") || "Worldwide";
 
   const formattedPrice = item.askingPrice
     ? `$${Number(item.askingPrice).toLocaleString()}`
@@ -167,7 +152,7 @@ export default function ProductCard({ item }: ProductCardProps) {
           {item.category && (
             <span
               className={`px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider rounded-full backdrop-blur-md ${getCategoryBadgeStyle(
-                item.category,
+                item.category
               )}`}
             >
               {item.category}
@@ -184,14 +169,10 @@ export default function ProductCard({ item }: ProductCardProps) {
       {/* Content */}
       <div className="p-6 flex flex-col flex-1 bg-[#181818]">
         <div className="flex justify-between items-start mb-1 gap-2">
-          <h3 className="text-lg font-serif text-white truncate flex-1">
-            {item.title}
-          </h3>
+          <h3 className="text-lg font-serif text-white truncate flex-1">{item.title}</h3>
         </div>
 
-        <div className="text-primary text-xl font-bold mb-3 font-serif">
-          {formattedPrice}
-        </div>
+        <div className="text-primary text-xl font-bold mb-3 font-serif">{formattedPrice}</div>
 
         <div className="flex items-center gap-2 text-white/40 text-[12px] mb-5 font-light">
           <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
@@ -206,9 +187,7 @@ export default function ProductCard({ item }: ProductCardProps) {
                 <div className="text-primary/70">
                   <spec.icon size={15} strokeWidth={1.5} />
                 </div>
-                <p className="text-[12px] font-light font-montserrat truncate">
-                  {spec.value}
-                </p>
+                <p className="text-[12px] font-light font-montserrat truncate">{spec.value}</p>
               </div>
             ))}
           </div>
@@ -220,9 +199,7 @@ export default function ProductCard({ item }: ProductCardProps) {
         <div className="flex items-center justify-between pt-5 border-t border-white/5 mt-auto">
           <div className="flex items-center gap-1.5 text-white/70 truncate mr-2">
             <CheckCircle2 className="w-4 h-4 text-[#00D1FF] shrink-0" />
-            <span className="text-[11px] font-medium truncate">
-              {ownerName}
-            </span>
+            <span className="text-[11px] font-medium truncate">{ownerName}</span>
           </div>
 
           <Link

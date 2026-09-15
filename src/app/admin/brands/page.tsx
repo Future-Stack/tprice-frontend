@@ -197,11 +197,7 @@ export default function AdminBrandsPage() {
                   All Categories
                 </option>
                 {categories.map((cat) => (
-                  <option
-                    key={cat.id}
-                    value={cat.id}
-                    className="bg-[#141416] text-white"
-                  >
+                  <option key={cat.id} value={cat.id} className="bg-[#141416] text-white">
                     {cat.name}
                   </option>
                 ))}
@@ -242,9 +238,7 @@ export default function AdminBrandsPage() {
             className="p-2.5 bg-[#141416] border border-[#262626] rounded-xl text-gray-400 hover:text-white hover:border-primary/40 transition-colors cursor-pointer"
             title="Refresh brands list"
           >
-            <RefreshCw
-              className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`}
-            />
+            <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`} />
           </button>
         </div>
       </div>
@@ -287,9 +281,7 @@ export default function AdminBrandsPage() {
                     <td colSpan={7} className="px-6 py-16 text-center">
                       <div className="max-w-md mx-auto space-y-3">
                         <Award className="w-10 h-10 text-gray-600 mx-auto" />
-                        <p className="text-base font-semibold text-gray-300">
-                          No brands found
-                        </p>
+                        <p className="text-base font-semibold text-gray-300">No brands found</p>
                         <p className="text-xs text-gray-500">
                           {searchQuery
                             ? `No brands matching "${searchQuery}"`
@@ -345,9 +337,7 @@ export default function AdminBrandsPage() {
                             {brand.category.name}
                           </span>
                         ) : (
-                          <span className="text-xs text-gray-500 italic">
-                            Uncategorized
-                          </span>
+                          <span className="text-xs text-gray-500 italic">Uncategorized</span>
                         )}
                       </td>
 
@@ -355,9 +345,7 @@ export default function AdminBrandsPage() {
                       <td className="px-6 py-5 text-xs text-gray-400 max-w-xs">
                         <p className="line-clamp-2">
                           {brand.description || (
-                            <span className="text-gray-600 italic">
-                              No description
-                            </span>
+                            <span className="text-gray-600 italic">No description</span>
                           )}
                         </p>
                       </td>
@@ -429,16 +417,12 @@ export default function AdminBrandsPage() {
             <div className="px-6 py-4 bg-[#141416] border-t border-[#262626] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
               <div>
                 Showing{" "}
-                <span className="font-semibold text-white">
-                  {(meta.page - 1) * meta.limit + 1}
-                </span>{" "}
+                <span className="font-semibold text-white">{(meta.page - 1) * meta.limit + 1}</span>{" "}
                 to{" "}
                 <span className="font-semibold text-white">
                   {Math.min(meta.page * meta.limit, meta.total)}
                 </span>{" "}
-                of{" "}
-                <span className="font-semibold text-white">{meta.total}</span>{" "}
-                brands
+                of <span className="font-semibold text-white">{meta.total}</span> brands
               </div>
 
               {/* Page Buttons */}
@@ -452,21 +436,19 @@ export default function AdminBrandsPage() {
                   <span className="hidden sm:inline">Previous</span>
                 </button>
 
-                {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map(
-                  (pageNum) => (
-                    <button
-                      key={pageNum}
-                      onClick={() => handlePageChange(pageNum)}
-                      className={`w-8 h-8 rounded-lg border font-semibold text-xs transition-all cursor-pointer ${
-                        pageNum === meta.page
-                          ? "bg-primary text-black border-primary font-bold shadow-[0_2px_10px_rgba(231,143,35,0.3)]"
-                          : "bg-[#1A1A1C] border-[#262626] text-gray-300 hover:text-white hover:border-primary/40"
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  ),
-                )}
+                {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    onClick={() => handlePageChange(pageNum)}
+                    className={`w-8 h-8 rounded-lg border font-semibold text-xs transition-all cursor-pointer ${
+                      pageNum === meta.page
+                        ? "bg-primary text-black border-primary font-bold shadow-[0_2px_10px_rgba(231,143,35,0.3)]"
+                        : "bg-[#1A1A1C] border-[#262626] text-gray-300 hover:text-white hover:border-primary/40"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
 
                 <button
                   onClick={() => handlePageChange(meta.page + 1)}
@@ -483,10 +465,7 @@ export default function AdminBrandsPage() {
       </AnimationWrapper>
 
       {/* Create Brand Modal */}
-      <CreateBrandModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-      />
+      <CreateBrandModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
 
       {/* Edit Brand Modal */}
       <EditBrandModal

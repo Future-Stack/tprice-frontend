@@ -14,21 +14,15 @@ export default function ProfileCard({ item }: ProfileCardProps) {
       {/* Dynamic Avatar Overlap */}
       <div className="absolute -top-16 left-8 md:left-10 z-20">
         <div className="w-32 h-32 rounded-full border-8 border-[#1A1A1A] overflow-hidden bg-black shadow-xl">
-          <img
-            src={item.expertImage}
-            alt={item.name}
-            className="w-full h-full object-cover"
-          />
+          <img src={item.expertImage} alt={item.name} className="w-full h-full object-cover" />
         </div>
       </div>
 
       {/* Header Info */}
       <div className="mt-16 sm:mt-10 md:ml-[160px] md:mt-0 flex flex-col items-start gap-2">
-        <h1 className="text-3xl md:text-4xl font-serif text-white tracking-tight">
-          {item.name}
-        </h1>
+        <h1 className="text-3xl md:text-4xl font-serif text-white tracking-tight">{item.name}</h1>
         <p className="text-primary font-serif italic text-lg">{item.title}</p>
-        
+
         <div className="flex flex-wrap items-center gap-6 mt-3 text-white/50 text-sm">
           <div className="flex items-center gap-2">
             <Briefcase className="w-4 h-4 text-primary" />
@@ -38,16 +32,14 @@ export default function ProfileCard({ item }: ProfileCardProps) {
             <MapPin className="w-4 h-4 text-primary" />
             <span>sdfjlkjkl</span> {/* Placeholder from design image */}
           </div>
-          
+
           <div className="flex items-center gap-1.5 ml-auto">
-             <div className="flex items-center gap-0.5">
+            <div className="flex items-center gap-0.5">
               {[...Array(5)].map((_, i) => (
                 <Star key={i} className="w-4 h-4 fill-primary text-primary" />
               ))}
             </div>
-            <span className="text-white/40 text-xs font-medium">
-              ({item.reviews} reviews)
-            </span>
+            <span className="text-white/40 text-xs font-medium">({item.reviews} reviews)</span>
           </div>
         </div>
       </div>

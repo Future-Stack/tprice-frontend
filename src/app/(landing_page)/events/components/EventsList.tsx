@@ -71,12 +71,11 @@ export default function EventsList() {
   const [page, setPage] = useState(1);
   const limit = 10;
 
-  const { data, isLoading, isFetching, isError, error, refetch } =
-    useGetEventsQuery({
-      page,
-      limit,
-      category: activeTab,
-    });
+  const { data, isLoading, isFetching, isError, error, refetch } = useGetEventsQuery({
+    page,
+    limit,
+    category: activeTab,
+  });
 
   const events: EventItem[] = data?.data || [];
   const meta = data?.meta;
@@ -95,9 +94,7 @@ export default function EventsList() {
           /* Error State */
           <div className="py-16 text-center bg-[#0A0A0A] rounded-xl border border-red-500/20 max-w-xl mx-auto space-y-4">
             <AlertCircle className="w-12 h-12 text-red-400 mx-auto" />
-            <h3 className="text-xl text-white font-medium">
-              Failed to load events
-            </h3>
+            <h3 className="text-xl text-white font-medium">Failed to load events</h3>
             <p className="text-white/60 text-sm">
               {(error as any)?.response?.data?.message ||
                 (error as Error)?.message ||
@@ -208,16 +205,11 @@ export default function EventsList() {
                   <ChevronLeft className="w-5 h-5" />
                 </button>
                 <span className="text-white/60 text-sm tracking-widest uppercase">
-                  Page <span className="text-white font-bold">{meta.page}</span>{" "}
-                  of{" "}
-                  <span className="text-white font-bold">
-                    {meta.totalPages}
-                  </span>
+                  Page <span className="text-white font-bold">{meta.page}</span> of{" "}
+                  <span className="text-white font-bold">{meta.totalPages}</span>
                 </span>
                 <button
-                  onClick={() =>
-                    setPage((prev) => Math.min(prev + 1, meta.totalPages))
-                  }
+                  onClick={() => setPage((prev) => Math.min(prev + 1, meta.totalPages))}
                   disabled={page === meta.totalPages}
                   className="p-3 rounded-full border border-white/10 text-white hover:border-primary hover:text-primary disabled:opacity-30 disabled:hover:border-white/10 disabled:hover:text-white transition-all cursor-pointer disabled:cursor-not-allowed"
                 >

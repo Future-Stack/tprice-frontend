@@ -1,4 +1,10 @@
-import { useQuery, useMutation, useQueryClient, keepPreviousData, QueryKey } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  keepPreviousData,
+  QueryKey,
+} from "@tanstack/react-query";
 import {
   getAdminUsersApi,
   updateAdminUserStatusApi,
@@ -24,9 +30,7 @@ export const USERS_QUERY_KEYS = {
 /**
  * Custom React Query hook for fetching admin users with pagination & filter parameters
  */
-export const useAdminUsersQuery = (
-  params: GetAdminUsersParams = { page: 1, limit: 10 }
-) => {
+export const useAdminUsersQuery = (params: GetAdminUsersParams = { page: 1, limit: 10 }) => {
   return useQuery<AdminUsersResponse>({
     queryKey: USERS_QUERY_KEYS.admin(params),
     queryFn: () => getAdminUsersApi(params),
@@ -175,16 +179,13 @@ export const useVipStatusQuery = () => {
 export const useClaimVipTrialMutation = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<ClaimVipTrialResponse, Error, void>(
-    {
-      mutationFn: () => claimVipTrialApi(),
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEYS.vipStatus() });
-        queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.user });
-        queryClient.invalidateQueries({ queryKey: ["buyer", "dashboard"] });
-        queryClient.invalidateQueries({ queryKey: ["listings"] });
-      },
-    }
-  );
+  return useMutation<ClaimVipTrialResponse, Error, void>({
+    mutationFn: () => claimVipTrialApi(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEYS.vipStatus() });
+      queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.user });
+      queryClient.invalidateQueries({ queryKey: ["buyer", "dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["listings"] });
+    },
+  });
 };
-

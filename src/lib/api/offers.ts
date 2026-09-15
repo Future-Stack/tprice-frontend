@@ -101,9 +101,7 @@ export interface AcceptOfferResponse {
 /**
  * Fetch list of offers received by seller
  */
-export const getOffersApi = async (
-  params?: GetOffersParams
-): Promise<GetOffersResponse> => {
+export const getOffersApi = async (params?: GetOffersParams): Promise<GetOffersResponse> => {
   const response = await apiClient.get<GetOffersResponse>("/offers", {
     params,
   });
@@ -113,9 +111,7 @@ export const getOffersApi = async (
 /**
  * Fetch single offer detail by ID
  */
-export const getOfferDetailApi = async (
-  offerId: string
-): Promise<OfferDetailItem> => {
+export const getOfferDetailApi = async (offerId: string): Promise<OfferDetailItem> => {
   const response = await apiClient.get<OfferDetailItem>(`/offers/${offerId}`);
   return response.data;
 };
@@ -132,9 +128,7 @@ export interface CreateOfferPayload {
 /**
  * Create/Send a new offer for a listing
  */
-export const createOfferApi = async (
-  payload: CreateOfferPayload
-): Promise<OfferDetailItem> => {
+export const createOfferApi = async (payload: CreateOfferPayload): Promise<OfferDetailItem> => {
   const response = await apiClient.post<OfferDetailItem>("/offers", payload);
   return response.data;
 };
@@ -142,13 +136,8 @@ export const createOfferApi = async (
 /**
  * Accept an offer by offer ID
  */
-export const acceptOfferApi = async (
-  offerId: string
-): Promise<AcceptOfferResponse> => {
-  const response = await apiClient.post<AcceptOfferResponse>(
-    `/offers/${offerId}/accept`,
-    {}
-  );
+export const acceptOfferApi = async (offerId: string): Promise<AcceptOfferResponse> => {
+  const response = await apiClient.post<AcceptOfferResponse>(`/offers/${offerId}/accept`, {});
   return response.data;
 };
 
@@ -160,13 +149,8 @@ export interface WithdrawOfferResponse {
 /**
  * Withdraw an offer by offer ID
  */
-export const withdrawOfferApi = async (
-  offerId: string
-): Promise<WithdrawOfferResponse> => {
-  const response = await apiClient.post<WithdrawOfferResponse>(
-    `/offers/${offerId}/withdraw`,
-    {}
-  );
+export const withdrawOfferApi = async (offerId: string): Promise<WithdrawOfferResponse> => {
+  const response = await apiClient.post<WithdrawOfferResponse>(`/offers/${offerId}/withdraw`, {});
   return response.data;
 };
 
@@ -185,10 +169,7 @@ export const counterOfferApi = async (
   offerId: string,
   payload: CounterOfferPayload
 ): Promise<OfferDetailItem> => {
-  const response = await apiClient.post<OfferDetailItem>(
-    `/offers/${offerId}/counter`,
-    payload
-  );
+  const response = await apiClient.post<OfferDetailItem>(`/offers/${offerId}/counter`, payload);
   return response.data;
 };
 
@@ -200,15 +181,7 @@ export interface RejectOfferResponse {
 /**
  * Reject an offer by offer ID
  */
-export const rejectOfferApi = async (
-  offerId: string
-): Promise<RejectOfferResponse> => {
-  const response = await apiClient.post<RejectOfferResponse>(
-    `/offers/${offerId}/reject`,
-    {}
-  );
+export const rejectOfferApi = async (offerId: string): Promise<RejectOfferResponse> => {
+  const response = await apiClient.post<RejectOfferResponse>(`/offers/${offerId}/reject`, {});
   return response.data;
 };
-
-
-

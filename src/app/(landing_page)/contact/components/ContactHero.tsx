@@ -45,10 +45,9 @@ export default function ContactHero() {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-[24px] text-[#E0E0E0] font-normal font-montserrat"
           >
-            Whether You&apos;re Looking To Acquire, Sell, Or Simply Learn More —
-            Our Team Is Ready To Assist You With The Highest Level Of Discretion
-            And Care. From Personalized Guidance To Seamless Transaction
-            Support,
+            Whether You&apos;re Looking To Acquire, Sell, Or Simply Learn More — Our Team Is Ready
+            To Assist You With The Highest Level Of Discretion And Care. From Personalized Guidance
+            To Seamless Transaction Support,
           </motion.p>
         </div>
       </div>

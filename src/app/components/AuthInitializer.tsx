@@ -19,24 +19,17 @@ export default function AuthInitializer() {
       urlParams.get("token") ||
       urlParams.get("access_token") ||
       urlParams.get("jwt");
-    const refreshFromParams =
-      urlParams.get("refreshToken") ||
-      urlParams.get("refresh_token");
+    const refreshFromParams = urlParams.get("refreshToken") || urlParams.get("refresh_token");
 
     const cookieToken =
-      Cookies.get("accessToken") ||
-      Cookies.get("access_token") ||
-      Cookies.get("token");
-    const cookieRefreshToken =
-      Cookies.get("refreshToken") ||
-      Cookies.get("refresh_token");
+      Cookies.get("accessToken") || Cookies.get("access_token") || Cookies.get("token");
+    const cookieRefreshToken = Cookies.get("refreshToken") || Cookies.get("refresh_token");
 
     const storeToken = useAuthStore.getState().token;
     const storeRefreshToken = useAuthStore.getState().refreshToken;
 
     const effectiveAccessToken = tokenFromParams || cookieToken || storeToken;
-    const effectiveRefreshToken =
-      refreshFromParams || cookieRefreshToken || storeRefreshToken;
+    const effectiveRefreshToken = refreshFromParams || cookieRefreshToken || storeRefreshToken;
 
     if (tokenFromParams) {
       // 1. Clean URL search parameters without reloading page
@@ -49,9 +42,7 @@ export default function AuthInitializer() {
 
       const newSearch = urlParams.toString();
       const newUrl =
-        window.location.pathname +
-        (newSearch ? `?${newSearch}` : "") +
-        window.location.hash;
+        window.location.pathname + (newSearch ? `?${newSearch}` : "") + window.location.hash;
       window.history.replaceState({}, document.title, newUrl);
     }
 
@@ -63,19 +54,10 @@ export default function AuthInitializer() {
       if (currentUser) {
         useAuthStore
           .getState()
-          .setAuth(
-            currentUser,
-            effectiveAccessToken,
-            effectiveRefreshToken || undefined,
-          );
+          .setAuth(currentUser, effectiveAccessToken, effectiveRefreshToken || undefined);
         queryClient.setQueryData(AUTH_QUERY_KEYS.user, currentUser);
       } else {
-        useAuthStore
-          .getState()
-          .setToken(
-            effectiveAccessToken,
-            effectiveRefreshToken || undefined,
-          );
+        useAuthStore.getState().setToken(effectiveAccessToken, effectiveRefreshToken || undefined);
       }
 
       // Fetch fresh user info
@@ -84,11 +66,7 @@ export default function AuthInitializer() {
           if (user && typeof user === "object" && Object.keys(user).length > 0) {
             useAuthStore
               .getState()
-              .setAuth(
-                user,
-                effectiveAccessToken,
-                effectiveRefreshToken || undefined,
-              );
+              .setAuth(user, effectiveAccessToken, effectiveRefreshToken || undefined);
             queryClient.setQueryData(AUTH_QUERY_KEYS.user, user);
             queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.user });
           }

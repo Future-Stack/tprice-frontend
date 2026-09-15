@@ -65,13 +65,8 @@ export const useCreateEventMutation = () => {
 export const useRegisterEventMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      eventId,
-      data,
-    }: {
-      eventId: string;
-      data: RegisterEventInput;
-    }) => registerEventApi(eventId, data),
+    mutationFn: ({ eventId, data }: { eventId: string; data: RegisterEventInput }) =>
+      registerEventApi(eventId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: EVENTS_QUERY_KEYS.all });
     },
@@ -84,8 +79,7 @@ export const useRegisterEventMutation = () => {
 export const useUpdateEventMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateEventInput }) =>
-      updateEventApi(id, data),
+    mutationFn: ({ id, data }: { id: string; data: UpdateEventInput }) => updateEventApi(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: EVENTS_QUERY_KEYS.all });
     },
@@ -104,4 +98,3 @@ export const useDeleteEventMutation = () => {
     },
   });
 };
-

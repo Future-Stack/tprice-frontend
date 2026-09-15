@@ -44,9 +44,7 @@ export interface GetAuditLogsParams {
 /**
  * Fetch audit logs via GET /audit-logs
  */
-export const getAuditLogsApi = async (
-  params?: GetAuditLogsParams
-): Promise<AuditLogsResponse> => {
+export const getAuditLogsApi = async (params?: GetAuditLogsParams): Promise<AuditLogsResponse> => {
   const queryParams: Record<string, any> = {};
 
   if (params) {

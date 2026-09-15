@@ -1,15 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  X,
-  Layers,
-  Car,
-  Calendar,
-  Sparkles,
-  Loader2,
-  CheckCircle2,
-} from "lucide-react";
+import { X, Layers, Car, Calendar, Sparkles, Loader2, CheckCircle2 } from "lucide-react";
 import { useCreateTrimMutation } from "@/hooks/useTrims";
 import { useGetModelsQuery } from "@/hooks/useModels";
 import { toast } from "sonner";
@@ -58,9 +50,7 @@ export default function CreateTrimModal({
 
   if (!isOpen) return null;
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -83,9 +73,7 @@ export default function CreateTrimModal({
         ? Number(formData.yearStart)
         : null;
     const yEnd =
-      formData.yearEnd !== "" && !isNaN(Number(formData.yearEnd))
-        ? Number(formData.yearEnd)
-        : null;
+      formData.yearEnd !== "" && !isNaN(Number(formData.yearEnd)) ? Number(formData.yearEnd) : null;
 
     if (yStart && yEnd && yStart > yEnd) {
       toast.error("Start year cannot be greater than end year.");
@@ -109,8 +97,7 @@ export default function CreateTrimModal({
       });
       onClose();
     } catch (err: any) {
-      const errMsg =
-        err?.response?.data?.message || err?.message || "Failed to create trim";
+      const errMsg = err?.response?.data?.message || err?.message || "Failed to create trim";
       toast.error(errMsg);
     }
   };
@@ -135,9 +122,7 @@ export default function CreateTrimModal({
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white font-clash">
-                Create Trim
-              </h2>
+              <h2 className="text-xl font-bold text-white font-clash">Create Trim</h2>
               <p className="text-xs text-gray-400">
                 Add a new trim level or package to a vehicle model
               </p>
@@ -210,9 +195,7 @@ export default function CreateTrimModal({
                   <Car className="w-3.5 h-3.5" />
                 </div>
                 <div>
-                  <span className="font-semibold text-white">
-                    {selectedModel.name}
-                  </span>
+                  <span className="font-semibold text-white">{selectedModel.name}</span>
                   {selectedModel.brand && (
                     <span className="text-gray-400 ml-1.5 font-normal">
                       Brand: {selectedModel.brand.name}

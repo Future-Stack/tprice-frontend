@@ -19,10 +19,7 @@ import {
   useUpdateModerationSettingsMutation,
   useUpdateLogsSettingsMutation,
 } from "@/hooks/useAdminSettings";
-import {
-  useUserSessionsQuery,
-  useRevokeSessionMutation,
-} from "@/hooks/useSessions";
+import { useUserSessionsQuery, useRevokeSessionMutation } from "@/hooks/useSessions";
 import { useChangePasswordMutation } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
@@ -56,8 +53,7 @@ function parseUserAgent(uaString: string | null): {
   device: string;
   browser: string;
 } {
-  if (!uaString)
-    return { device: "Unknown Device", browser: "Unknown Browser" };
+  if (!uaString) return { device: "Unknown Device", browser: "Unknown Browser" };
 
   let device = "Desktop Device";
   if (/macintosh|mac os x/i.test(uaString)) {
@@ -115,9 +111,7 @@ export default function AdminSettings() {
     const params = new URLSearchParams(window.location.search);
     const tabParam = params.get("tab");
     if (tabParam) {
-      const matchedTab = tabs.find(
-        (t) => t.toLowerCase() === tabParam.toLowerCase()
-      );
+      const matchedTab = tabs.find((t) => t.toLowerCase() === tabParam.toLowerCase());
       if (matchedTab) {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setActiveTab(matchedTab);
@@ -133,16 +127,9 @@ export default function AdminSettings() {
     window.history.replaceState(null, "", `${window.location.pathname}?${params.toString()}`);
   };
 
-
-  const {
-    data: settings,
-    isLoading,
-    isError,
-    refetch,
-  } = useAdminSettingsQuery();
+  const { data: settings, isLoading, isError, refetch } = useAdminSettingsQuery();
   const updateGeneralSettingsMutation = useUpdateGeneralSettingsMutation();
-  const updateModerationSettingsMutation =
-    useUpdateModerationSettingsMutation();
+  const updateModerationSettingsMutation = useUpdateModerationSettingsMutation();
   const updateLogsSettingsMutation = useUpdateLogsSettingsMutation();
 
   const {
@@ -411,17 +398,11 @@ export default function AdminSettings() {
 
             {/* Notification Section */}
             <section>
-              <h2 className="text-xl md:text-2xl font-bold text-white mb-6">
-                Notification
-              </h2>
+              <h2 className="text-xl md:text-2xl font-bold text-white mb-6">Notification</h2>
               <div className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-10 shadow-2xl">
                 <div className="flex justify-between items-center mb-6 px-2">
-                  <span className="text-[13px] font-medium text-[#666]">
-                    Alert Type
-                  </span>
-                  <span className="text-[13px] font-medium text-[#666]">
-                    Email
-                  </span>
+                  <span className="text-[13px] font-medium text-[#666]">Alert Type</span>
+                  <span className="text-[13px] font-medium text-[#666]">Email</span>
                 </div>
 
                 <div className="space-y-1 mb-10">
@@ -466,9 +447,7 @@ export default function AdminSettings() {
                   <div className="w-10 h-10 rounded-xl bg-[#facc15]/10 flex items-center justify-center">
                     <CheckCircle2 className="w-6 h-6 text-[#facc15]" />
                   </div>
-                  <h2 className="text-xl md:text-2xl font-bold text-white">
-                    Approval Workflow
-                  </h2>
+                  <h2 className="text-xl md:text-2xl font-bold text-white">Approval Workflow</h2>
                 </div>
                 <div className="space-y-6">
                   <ToggleItem
@@ -519,9 +498,7 @@ export default function AdminSettings() {
                   <div className="w-10 h-10 rounded-xl bg-[#facc15]/10 flex items-center justify-center">
                     <Search className="w-6 h-6 text-[#facc15]" />
                   </div>
-                  <h2 className="text-xl md:text-2xl font-bold text-white">
-                    Auto flag rules
-                  </h2>
+                  <h2 className="text-xl md:text-2xl font-bold text-white">Auto flag rules</h2>
                 </div>
                 <div className="space-y-6">
                   <ToggleItem
@@ -573,9 +550,7 @@ export default function AdminSettings() {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-10">
                   <div className="space-y-3">
-                    <label className="text-[13px] font-medium text-[#666]">
-                      Current Password
-                    </label>
+                    <label className="text-[13px] font-medium text-[#666]">Current Password</label>
                     <input
                       type="password"
                       placeholder="********"
@@ -586,9 +561,7 @@ export default function AdminSettings() {
                     />
                   </div>
                   <div className="space-y-3">
-                    <label className="text-[13px] font-medium text-[#666]">
-                      New Password
-                    </label>
+                    <label className="text-[13px] font-medium text-[#666]">New Password</label>
                     <input
                       type="password"
                       placeholder="****************"
@@ -604,9 +577,7 @@ export default function AdminSettings() {
                   disabled={changePasswordMutation.isPending}
                   className="border border-[#facc15]/50 text-[#facc15] hover:bg-[#facc15] hover:text-black hover:border-[#facc15] px-8 py-3 rounded-xl text-sm font-bold transition-all duration-300 cursor-pointer flex items-center gap-2 disabled:opacity-50"
                 >
-                  {changePasswordMutation.isPending && (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  )}
+                  {changePasswordMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
                   Save Changes
                 </button>
               </section>
@@ -621,9 +592,7 @@ export default function AdminSettings() {
                     <h3 className="text-lg font-bold text-white mb-1">
                       Require admin approval for listings
                     </h3>
-                    <p className="text-[#666] text-sm">
-                      Automatically flag stale listings
-                    </p>
+                    <p className="text-[#666] text-sm">Automatically flag stale listings</p>
                   </div>
                 </div>
                 <button
@@ -645,9 +614,7 @@ export default function AdminSettings() {
                       <Monitor className="w-6 h-6 text-[#facc15]" />
                     </div>
                     <div>
-                      <h2 className="text-xl md:text-2xl font-bold text-white">
-                        Active Sessions
-                      </h2>
+                      <h2 className="text-xl md:text-2xl font-bold text-white">Active Sessions</h2>
                       <p className="text-[#666] text-xs md:text-sm">
                         Manage devices currently logged into your account
                       </p>
@@ -684,9 +651,7 @@ export default function AdminSettings() {
                   </div>
                 ) : isSessionsError ? (
                   <div className="text-center py-8 bg-[#1A1A1A]/30 rounded-xl border border-red-500/10">
-                    <p className="text-red-400 text-sm mb-3">
-                      Failed to load active sessions.
-                    </p>
+                    <p className="text-red-400 text-sm mb-3">Failed to load active sessions.</p>
                     <button
                       onClick={() => refetchSessions()}
                       className="inline-flex items-center gap-2 text-xs font-semibold px-4 py-2 bg-[#facc15] text-black rounded-lg hover:bg-[#eab308] transition-all cursor-pointer"
@@ -702,16 +667,12 @@ export default function AdminSettings() {
                 ) : (
                   <div className="space-y-4">
                     {sessions.map((session, index) => {
-                      const { device, browser } = parseUserAgent(
-                        session.userAgent,
-                      );
+                      const { device, browser } = parseUserAgent(session.userAgent);
                       const isRevoking = revokingId === session.id;
 
                       return (
                         <React.Fragment key={session.id}>
-                          {index > 0 && (
-                            <div className="h-[1px] bg-white/[0.03]" />
-                          )}
+                          {index > 0 && <div className="h-[1px] bg-white/[0.03]" />}
                           <div className="flex items-center justify-between group py-2">
                             <div className="space-y-1">
                               <h4 className="text-white font-medium flex items-center gap-2 text-base">
@@ -743,9 +704,7 @@ export default function AdminSettings() {
                             {!session.isCurrent && (
                               <button
                                 onClick={() => handleRevokeSession(session.id)}
-                                disabled={
-                                  isRevoking || revokeSessionMutation.isPending
-                                }
+                                disabled={isRevoking || revokeSessionMutation.isPending}
                                 title="Revoke session"
                                 className="w-10 h-10 rounded-xl bg-orange-500/5 hover:bg-orange-500/10 flex items-center justify-center transition-all group/btn border border-transparent hover:border-orange-500/20 cursor-pointer disabled:opacity-50"
                               >
@@ -773,17 +732,13 @@ export default function AdminSettings() {
                   <div className="w-10 h-10 rounded-xl bg-[#facc15]/10 flex items-center justify-center">
                     <ClipboardList className="w-6 h-6 text-primary" />
                   </div>
-                  <h2 className="text-xl md:text-2xl font-bold text-white">
-                    Log retention
-                  </h2>
+                  <h2 className="text-xl md:text-2xl font-bold text-white">Log retention</h2>
                 </div>
 
                 <div className="space-y-10">
                   {/* Retention Period Dropdown */}
                   <div className="space-y-3 max-w-sm">
-                    <label className="text-[13px] font-medium text-[#666]">
-                      Retention Period
-                    </label>
+                    <label className="text-[13px] font-medium text-[#666]">Retention Period</label>
                     <div className="relative">
                       <select
                         value={auditLogs.retentionPeriod}
@@ -816,8 +771,8 @@ export default function AdminSettings() {
                         Detailed Login
                       </h4>
                       <p className="text-[#666] text-sm max-w-md">
-                        Capture detailed activity logs for all administrative
-                        actions and system events.
+                        Capture detailed activity logs for all administrative actions and system
+                        events.
                       </p>
                     </div>
                     <button
@@ -881,9 +836,7 @@ function NotificationToggle({
       >
         <div
           className={`inline-block h-6 w-6 transform rounded-full transition-all duration-300 ease-in-out ${
-            isActive
-              ? "translate-x-6.5 bg-black shadow-lg"
-              : "translate-x-1 bg-[#444]"
+            isActive ? "translate-x-6.5 bg-black shadow-lg" : "translate-x-1 bg-[#444]"
           }`}
         />
       </button>
@@ -910,11 +863,7 @@ function ToggleItem({
         >
           {label}
         </h4>
-        {subtext && (
-          <p className="text-[#666] text-xs md:text-sm font-medium">
-            {subtext}
-          </p>
-        )}
+        {subtext && <p className="text-[#666] text-xs md:text-sm font-medium">{subtext}</p>}
       </div>
       <button
         onClick={onToggle}
@@ -932,9 +881,7 @@ function QualityItem({ text }: { text: string }) {
   return (
     <div className="flex items-center gap-4 py-1.5">
       <div className="w-2.5 h-2.5 rounded-full bg-[#facc15] shadow-[0_0_10px_rgba(250,204,21,0.4)]" />
-      <span className="text-[#888] text-[15px] md:text-[16px] font-medium">
-        {text}
-      </span>
+      <span className="text-[#888] text-[15px] md:text-[16px] font-medium">{text}</span>
     </div>
   );
 }

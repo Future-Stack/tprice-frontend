@@ -76,14 +76,8 @@ const DualRangeSlider = ({
     onChange({ ...value, max: newMax });
   };
 
-  const leftPercent = Math.max(
-    0,
-    Math.min(100, ((value.min - min) / (max - min)) * 100),
-  );
-  const rightPercent = Math.max(
-    0,
-    Math.min(100, ((value.max - min) / (max - min)) * 100),
-  );
+  const leftPercent = Math.max(0, Math.min(100, ((value.min - min) / (max - min)) * 100));
+  const rightPercent = Math.max(0, Math.min(100, ((value.max - min) / (max - min)) * 100));
 
   return (
     <div className="mb-6">
@@ -152,14 +146,7 @@ export default function FilterSidebar({
     if (items && items.length > 0) {
       return ["All", ...items.map((c) => c.name)];
     }
-    return [
-      "All",
-      "Supercars",
-      "Automotive",
-      "Real Estate",
-      "Yachts",
-      "Aviation",
-    ];
+    return ["All", "Supercars", "Automotive", "Real Estate", "Yachts", "Aviation"];
   }, [categoriesResponse]);
 
   const brandsList = useMemo(() => {
@@ -172,23 +159,18 @@ export default function FilterSidebar({
 
   const toggleBrand = (brandName: string) => {
     setBrands(
-      brands.includes(brandName)
-        ? brands.filter((b) => b !== brandName)
-        : [...brands, brandName],
+      brands.includes(brandName) ? brands.filter((b) => b !== brandName) : [...brands, brandName]
     );
   };
 
-  const currentSortLabel =
-    SORT_OPTIONS.find((opt) => opt.value === sortBy)?.label || sortBy;
+  const currentSortLabel = SORT_OPTIONS.find((opt) => opt.value === sortBy)?.label || sortBy;
 
   const content = (
     <div className="flex flex-col h-full space-y-6">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-3">
           <SlidersHorizontal className="w-5 h-5 text-primary" />
-          <h2 className="text-2xl font-serif text-white tracking-wide">
-            Filters
-          </h2>
+          <h2 className="text-2xl font-serif text-white tracking-wide">Filters</h2>
         </div>
         <button
           onClick={onClose}
@@ -232,8 +214,7 @@ export default function FilterSidebar({
         <div className="flex flex-wrap gap-2">
           {categoriesList.map((catItem) => {
             const isSelected =
-              (catItem === "All" &&
-                (!category || category === "ALL" || category === "All")) ||
+              (catItem === "All" && (!category || category === "ALL" || category === "All")) ||
               category === catItem;
             return (
               <button
@@ -261,9 +242,7 @@ export default function FilterSidebar({
         value={priceRange}
         onChange={setPriceRange}
         formatValue={(val) =>
-          val >= 1000000
-            ? `$${(val / 1000000).toFixed(1)}M`
-            : `$${(val / 1000).toFixed(0)}k`
+          val >= 1000000 ? `$${(val / 1000000).toFixed(1)}M` : `$${(val / 1000).toFixed(0)}k`
         }
       />
 
@@ -284,9 +263,7 @@ export default function FilterSidebar({
                     : "border-white/20 group-hover:border-primary/50"
                 }`}
               >
-                {brands.includes(bName) && (
-                  <div className="w-2 h-2 bg-black rounded-sm" />
-                )}
+                {brands.includes(bName) && <div className="w-2 h-2 bg-black rounded-sm" />}
               </div>
               <span className="text-white/70 text-sm font-light group-hover:text-white transition-colors">
                 {bName}
@@ -331,10 +308,7 @@ export default function FilterSidebar({
           isOpen ? "visible opacity-100" : "invisible opacity-0"
         }`}
       >
-        <div
-          className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-          onClick={onClose}
-        />
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
         <div
           className={`absolute left-0 top-0 bottom-0 w-80 bg-[#111111] p-8 overflow-y-auto transition-transform duration-500 ease-out ${
             isOpen ? "translate-x-0" : "-translate-x-full"

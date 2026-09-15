@@ -155,7 +155,9 @@ export default function LoginPage() {
             <h4 className="text-[#D4AF37] text-xs font-bold uppercase tracking-[0.2em] mb-4">
               Log In
             </h4>
-            <Link href="/"><h2 className="text-4xl font-serif text-white mb-2">Welcome back</h2></Link>
+            <Link href="/">
+              <h2 className="text-4xl font-serif text-white mb-2">Welcome back</h2>
+            </Link>
             <p className="text-white/40 text-sm">
               Don&apos;t have an account?{" "}
               <Link href="/register" className="text-[#D4AF37] hover:underline">
@@ -184,9 +186,7 @@ export default function LoginPage() {
                 }`}
               />
               {errors.email && (
-                <p className="text-red-400 text-xs mt-1 font-medium font-sans">
-                  {errors.email}
-                </p>
+                <p className="text-red-400 text-xs mt-1 font-medium font-sans">{errors.email}</p>
               )}
             </div>
 
@@ -218,9 +218,7 @@ export default function LoginPage() {
                 </button>
               </div>
               {errors.password && (
-                <p className="text-red-400 text-xs mt-1 font-medium font-sans">
-                  {errors.password}
-                </p>
+                <p className="text-red-400 text-xs mt-1 font-medium font-sans">{errors.password}</p>
               )}
             </div>
 

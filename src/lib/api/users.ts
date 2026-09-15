@@ -100,7 +100,10 @@ export const updateAdminUserStatusApi = async (
   } catch (error: any) {
     // Fallback if status endpoint is /admin/users/:id/status
     if (error.response?.status === 404) {
-      const fallbackResponse = await apiClient.patch<AdminUserItem>(`/admin/users/${id}/status`, payload);
+      const fallbackResponse = await apiClient.patch<AdminUserItem>(
+        `/admin/users/${id}/status`,
+        payload
+      );
       return fallbackResponse.data;
     }
     throw error;
@@ -173,9 +176,10 @@ export const getVipStatusApi = async (): Promise<VipStatusResponse> => {
  * Claim 3-Month Free VIP Trial via POST /users/me/claim-vip-trial
  */
 export const claimVipTrialApi = async (): Promise<ClaimVipTrialResponse> => {
-  const response = await apiClient.post<
-    ClaimVipTrialResponse | { data: ClaimVipTrialResponse }
-  >("/users/me/claim-vip-trial", {});
+  const response = await apiClient.post<ClaimVipTrialResponse | { data: ClaimVipTrialResponse }>(
+    "/users/me/claim-vip-trial",
+    {}
+  );
 
   const resData = response.data as any;
   if (resData?.data) {
@@ -183,4 +187,3 @@ export const claimVipTrialApi = async (): Promise<ClaimVipTrialResponse> => {
   }
   return resData;
 };
-

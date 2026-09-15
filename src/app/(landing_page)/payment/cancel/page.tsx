@@ -4,13 +4,7 @@ import React, { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { 
-  XCircle, 
-  RefreshCw, 
-  Home, 
-  HelpCircle,
-  AlertCircle
-} from "lucide-react";
+import { XCircle, RefreshCw, Home, HelpCircle, AlertCircle } from "lucide-react";
 
 function PaymentCancelContent() {
   const searchParams = useSearchParams();
@@ -63,7 +57,8 @@ function PaymentCancelContent() {
           transition={{ delay: 0.3 }}
           className="text-white/60 text-sm sm:text-base max-w-md mx-auto mb-8 leading-relaxed"
         >
-          You have cancelled the checkout process. Don&apos;t worry — no funds were deducted from your payment method.
+          You have cancelled the checkout process. Don&apos;t worry — no funds were deducted from
+          your payment method.
         </motion.p>
 
         {/* Info Box */}
@@ -78,7 +73,9 @@ function PaymentCancelContent() {
             <div>
               <span className="font-medium text-white block mb-0.5">Need to try again?</span>
               <p className="text-white/50 text-xs leading-relaxed">
-                {reason ? reason : "Your items or subscription request remain saved. You can restart the checkout process whenever you are ready."}
+                {reason
+                  ? reason
+                  : "Your items or subscription request remain saved. You can restart the checkout process whenever you are ready."}
               </p>
             </div>
           </div>
@@ -129,11 +126,11 @@ function PaymentCancelContent() {
 export default function PaymentCancelPage() {
   return (
     <section className="min-h-[85vh] bg-black flex items-center justify-center relative overflow-hidden py-12">
-      <Suspense fallback={
-        <div className="flex items-center justify-center text-white/50 text-sm">
-          Loading...
-        </div>
-      }>
+      <Suspense
+        fallback={
+          <div className="flex items-center justify-center text-white/50 text-sm">Loading...</div>
+        }
+      >
         <PaymentCancelContent />
       </Suspense>
     </section>

@@ -13,8 +13,7 @@ import { useAuthStore } from "@/lib/store/useAuthStore";
 
 export const NOTIFICATIONS_QUERY_KEYS = {
   all: ["notifications"] as const,
-  list: (params?: GetNotificationsParams) =>
-    ["notifications", "list", params] as const,
+  list: (params?: GetNotificationsParams) => ["notifications", "list", params] as const,
 };
 
 /**
@@ -22,17 +21,13 @@ export const NOTIFICATIONS_QUERY_KEYS = {
  */
 export const useNotificationsQuery = (
   params?: GetNotificationsParams,
-  options?: { enabled?: boolean },
+  options?: { enabled?: boolean }
 ) => {
   const storeToken = useAuthStore((state) => state.token);
   const hasToken =
     !!storeToken ||
     (typeof window !== "undefined" &&
-      !!(
-        Cookies.get("accessToken") ||
-        Cookies.get("token") ||
-        Cookies.get("access_token")
-      ));
+      !!(Cookies.get("accessToken") || Cookies.get("token") || Cookies.get("access_token")));
 
   return useQuery<GetNotificationsResponse>({
     queryKey: NOTIFICATIONS_QUERY_KEYS.list(params),

@@ -42,9 +42,9 @@ export default function ServicesSearchBar({
         </button>
 
         <div className="relative flex-1 md:w-48">
-           <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none border-r border-white/10 pr-3">
-              <ListFilter className="w-4 h-4 text-white/40" />
-           </div>
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none border-r border-white/10 pr-3">
+            <ListFilter className="w-4 h-4 text-white/40" />
+          </div>
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}

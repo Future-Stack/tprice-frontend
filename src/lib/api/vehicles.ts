@@ -26,7 +26,7 @@ export interface DecodedVehicleData {
 export const decodeVinApi = async (vin: string): Promise<DecodedVehicleData> => {
   const trimmedVin = vin.trim();
   const response = await apiClient.get<DecodedVehicleData>(
-    `/vehicles/decode-vin/${encodeURIComponent(trimmedVin)}`,
+    `/vehicles/decode-vin/${encodeURIComponent(trimmedVin)}`
   );
   return response.data;
 };

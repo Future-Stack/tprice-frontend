@@ -5,11 +5,7 @@ import Topbar from "../components/Topbar";
 import BuyerSidebar from "../components/BuyerSidebar";
 import ProtectedRoute from "../components/ProtectedRoute";
 
-export default function BuyerLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function BuyerLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const onClose = () => {
     setIsSidebarOpen((prev) => !prev);

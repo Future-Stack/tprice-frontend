@@ -40,8 +40,7 @@ export default function DealerSidebar({
   const router = useRouter();
   const { user: storeUser } = useAuthStore();
   const { data: apiUser } = useGetMeQuery();
-  const { data: featuredStatus, isLoading: isFeaturedLoading } =
-    useFeaturedStatusQuery();
+  const { data: featuredStatus, isLoading: isFeaturedLoading } = useFeaturedStatusQuery();
   const user = apiUser || storeUser;
   const isVip = Boolean(user?.isVip ?? user?.vipStatus);
   const hasActiveSubscription = Boolean(featuredStatus?.hasActiveSubscription);
@@ -96,9 +95,7 @@ export default function DealerSidebar({
         <nav className="flex-1 px-4 space-y-2 mt-4">
           {navItems.map((item) => {
             const isActive =
-              item.href === "/dealer"
-                ? pathname === "/dealer"
-                : pathname.startsWith(item.href);
+              item.href === "/dealer" ? pathname === "/dealer" : pathname.startsWith(item.href);
 
             return (
               <Link
@@ -137,9 +134,7 @@ export default function DealerSidebar({
             >
               <X className="w-3.5 h-3.5" />
             </button>
-            <h3 className="font-bold text-lg mb-1.5 font-clash">
-              Upgrade to VIP!
-            </h3>
+            <h3 className="font-bold text-lg mb-1.5 font-clash">Upgrade to VIP!</h3>
             <p className="text-[11px] text-white/90 mb-5 leading-relaxed">
               Unlock Premium Features And Offers
             </p>

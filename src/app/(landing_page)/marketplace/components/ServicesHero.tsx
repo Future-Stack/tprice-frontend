@@ -30,7 +30,7 @@ export default function ServicesHero() {
           >
             EXPLORE THE MARKETPLACE
           </motion.h4>
-          
+
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -46,7 +46,8 @@ export default function ServicesHero() {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="text-white/70 text-base md:text-lg max-w-2xl leading-relaxed"
           >
-            Discover A Curated Collection Of Ultra-Premium Assets And Connect With Verified Dealers, Private Sellers, And Elite Collectors Across The Global Luxury Ecosystem.
+            Discover A Curated Collection Of Ultra-Premium Assets And Connect With Verified Dealers,
+            Private Sellers, And Elite Collectors Across The Global Luxury Ecosystem.
           </motion.p>
         </div>
       </div>

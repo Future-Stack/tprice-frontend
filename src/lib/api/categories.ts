@@ -61,7 +61,7 @@ export interface UpdateCategoryInput {
  * Fetch categories with pagination & filtering from GET /categories
  */
 export const getCategoriesApi = async (
-  params?: GetCategoriesParams,
+  params?: GetCategoriesParams
 ): Promise<CategoriesResponse> => {
   const queryParams: Record<string, any> = {};
 
@@ -92,7 +92,7 @@ export const getCategoriesApi = async (
       items = items.filter(
         (cat) =>
           cat.name.toLowerCase().includes(q) ||
-          (cat.description && cat.description.toLowerCase().includes(q)),
+          (cat.description && cat.description.toLowerCase().includes(q))
       );
     }
 
@@ -130,9 +130,7 @@ export const getCategoriesApi = async (
 /**
  * Create a new category via POST /categories
  */
-export const createCategoryApi = async (
-  data: CreateCategoryInput,
-): Promise<Category> => {
+export const createCategoryApi = async (data: CreateCategoryInput): Promise<Category> => {
   const response = await apiClient.post<Category>("/categories", data);
   return response.data;
 };
@@ -142,7 +140,7 @@ export const createCategoryApi = async (
  */
 export const updateCategoryApi = async (
   id: string,
-  data: UpdateCategoryInput,
+  data: UpdateCategoryInput
 ): Promise<Category> => {
   const response = await apiClient.patch<Category>(`/categories/${id}`, data);
   return response.data;

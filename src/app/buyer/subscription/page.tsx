@@ -17,7 +17,7 @@ import {
   Zap,
   Star,
   Flame,
-  Calendar
+  Calendar,
 } from "lucide-react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
 import { useVipStatusQuery, useClaimVipTrialMutation } from "@/hooks/useUsers";
@@ -68,17 +68,9 @@ const FAQS = [
 ];
 
 export default function BuyerSubscriptionPage() {
-  const {
-    data: vipData,
-    isLoading,
-    isError,
-    error,
-    refetch,
-    isFetching,
-  } = useVipStatusQuery();
+  const { data: vipData, isLoading, isError, error, refetch, isFetching } = useVipStatusQuery();
 
-  const { mutate: claimTrial, isPending: isClaimingTrial } =
-    useClaimVipTrialMutation();
+  const { mutate: claimTrial, isPending: isClaimingTrial } = useClaimVipTrialMutation();
 
   const { mutate: createCheckoutSession, isPending: isCheckingOut } =
     useCreateCheckoutSessionMutation();
@@ -95,11 +87,13 @@ export default function BuyerSubscriptionPage() {
   const trialDays = pricing?.freeTrialDays ?? 90;
   const currency = pricing?.currency ?? "USD";
 
-  const isCurrentPlanTrial =
-    Boolean(isVip && (activeSub?.plan?.includes("TRIAL") || activeSub?.amount === 0));
+  const isCurrentPlanTrial = Boolean(
+    isVip && (activeSub?.plan?.includes("TRIAL") || activeSub?.amount === 0)
+  );
 
-  const isCurrentPlanPremium =
-    Boolean(isVip && activeSub && !activeSub.plan?.includes("TRIAL") && activeSub.amount > 0);
+  const isCurrentPlanPremium = Boolean(
+    isVip && activeSub && !activeSub.plan?.includes("TRIAL") && activeSub.amount > 0
+  );
 
   const handleClaimTrial = () => {
     if (!trialEligible) {
@@ -109,9 +103,7 @@ export default function BuyerSubscriptionPage() {
 
     claimTrial(undefined, {
       onSuccess: () => {
-        toast.success(
-          "🎉 Welcome to VIP! Your 3-Month Free Trial has been activated."
-        );
+        toast.success("🎉 Welcome to VIP! Your 3-Month Free Trial has been activated.");
       },
       onError: (err: any) => {
         const errorMsg =
@@ -136,17 +128,13 @@ export default function BuyerSubscriptionPage() {
       {
         onSuccess: (data) => {
           const checkoutUrl =
-            data?.checkoutUrl ||
-            (data as any)?.data?.checkoutUrl ||
-            (data as any)?.url;
+            data?.checkoutUrl || (data as any)?.data?.checkoutUrl || (data as any)?.url;
 
           if (checkoutUrl) {
             toast.success("Redirecting to secure checkout...");
             window.location.assign(checkoutUrl);
           } else {
-            toast.error(
-              "Checkout session created, but no checkout URL was returned."
-            );
+            toast.error("Checkout session created, but no checkout URL was returned.");
           }
         },
         onError: (err: any) => {
@@ -171,15 +159,14 @@ export default function BuyerSubscriptionPage() {
       <AnimationWrapper type="fade-down" duration={0.4}>
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 border-b border-white/10 pb-2">
           <div>
-           
             <h1 className="text-3xl sm:text-4xl font-clash font-medium text-white tracking-tight">
               Buyer Subscription Plans
             </h1>
             <p className="text-gray-400 text-sm sm:text-base mt-2 max-w-2xl font-inter leading-relaxed">
-              Unlock exclusive access to off-market inventory, private VIP deals, direct dealer negotiation, and dedicated luxury concierge assistance.
+              Unlock exclusive access to off-market inventory, private VIP deals, direct dealer
+              negotiation, and dedicated luxury concierge assistance.
             </p>
           </div>
- 
         </div>
       </AnimationWrapper>
 
@@ -187,8 +174,6 @@ export default function BuyerSubscriptionPage() {
       {!isLoading && isVip && (
         <AnimationWrapper type="fade-up" duration={0.4}>
           <div className="p-6 rounded-2xl bg-linear-to-r from-[#2A1D0B] via-[#18181A] to-[#1F170D] border-2 border-primary/60 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
-          
-
             <div className="flex items-start sm:items-center gap-4 relative z-10">
               <div className="w-13 h-13 rounded-2xl bg-[#E78F23]/15 border border-primary/40 text-primary flex items-center justify-center shrink-0 shadow-lg shadow-[#E78F23]/20">
                 <Crown className="w-7 h-7 text-primary" />
@@ -209,9 +194,7 @@ export default function BuyerSubscriptionPage() {
                   )}
                 </div>
                 <h3 className="text-lg sm:text-xl font-montserrat font-semibold text-white flex items-center gap-2">
-                  {activeSub?.plan
-                    ? activeSub.plan.replace(/_/g, " ")
-                    : "VIP Buyer Membership"}
+                  {activeSub?.plan ? activeSub.plan.replace(/_/g, " ") : "VIP Buyer Membership"}
                   <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
                 </h3>
                 <p className="text-xs sm:text-sm text-gray-300 flex items-center gap-1.5 flex-wrap">
@@ -219,11 +202,10 @@ export default function BuyerSubscriptionPage() {
                   <span>
                     Valid until{" "}
                     <strong className="text-white font-medium">
-                      {formatExpiryDate(
-                        vipData?.vipExpiresAt || activeSub?.expiresAt
-                      )}
+                      {formatExpiryDate(vipData?.vipExpiresAt || activeSub?.expiresAt)}
                     </strong>
-                    . You enjoy 100% unrestricted access to all VIP off-market deals and private listings.
+                    . You enjoy 100% unrestricted access to all VIP off-market deals and private
+                    listings.
                   </span>
                 </p>
               </div>
@@ -330,11 +312,10 @@ export default function BuyerSubscriptionPage() {
 
               {/* Title & Pricing */}
               <div>
-                <h3 className="text-2xl font-inter font-semibold text-white">
-                  3-Month Free Trial
-                </h3>
+                <h3 className="text-2xl font-inter font-semibold text-white">3-Month Free Trial</h3>
                 <p className="text-xs sm:text-sm text-gray-400 mt-1 font-inter">
-                  Full VIP access for {trialDays} days. Experience all premium features with zero upfront payment.
+                  Full VIP access for {trialDays} days. Experience all premium features with zero
+                  upfront payment.
                 </p>
 
                 <div className="mt-6 mb-6 pb-6 border-b border-white/10">
@@ -350,8 +331,6 @@ export default function BuyerSubscriptionPage() {
                     ${monthlyPrice}/month after {trialMonths}-month trial • No contract commitment
                   </p>
                 </div>
-
-            
               </div>
 
               {/* Action Button */}
@@ -388,9 +367,7 @@ export default function BuyerSubscriptionPage() {
                     className="w-full py-3.5 px-4 rounded-xl bg-white/5 border border-white/10 text-gray-400 font-medium text-sm flex items-center justify-center gap-2 cursor-not-allowed"
                   >
                     <Lock className="w-4 h-4 text-gray-500" />
-                    {isVip
-                      ? "Trial Claimed"
-                      : "Introductory Trial Unavailable"}
+                    {isVip ? "Trial Claimed" : "Introductory Trial Unavailable"}
                   </button>
                 )}
                 {!trialEligible && !isCurrentPlanTrial && (
@@ -440,7 +417,8 @@ export default function BuyerSubscriptionPage() {
                   <Crown className="w-5 h-5 text-primary" />
                 </h3>
                 <p className="text-xs sm:text-sm text-gray-300 mt-1 font-inter">
-                  Continuous, unrestricted VIP privileges for high-net-worth buyers and serious collectors.
+                  Continuous, unrestricted VIP privileges for high-net-worth buyers and serious
+                  collectors.
                 </p>
 
                 <div className="mt-6 mb-6 pb-6 border-b border-white/10">
@@ -448,16 +426,12 @@ export default function BuyerSubscriptionPage() {
                     <span className="text-4xl sm:text-5xl font-clash font-semibold text-white tracking-tight">
                       {formatCurrency(monthlyPrice, currency)}
                     </span>
-                    <span className="text-sm font-medium text-gray-400 font-inter">
-                      / month
-                    </span>
+                    <span className="text-sm font-medium text-gray-400 font-inter">/ month</span>
                   </div>
                   <p className="text-xs text-primary/90 mt-2 font-medium">
                     Continuous billing • Instant 1-click cancellation anytime
                   </p>
                 </div>
-
-           
               </div>
 
               {/* Action Button */}
@@ -500,8 +474,6 @@ export default function BuyerSubscriptionPage() {
           </AnimationWrapper>
         </div>
       )}
-
-
     </div>
   );
 }

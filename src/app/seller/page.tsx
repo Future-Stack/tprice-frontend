@@ -27,17 +27,13 @@ function formatRelativeTime(dateString?: string | null): string {
 
   if (diffInSeconds < 60) return "just now";
   const diffInMinutes = Math.floor(diffInSeconds / 60);
-  if (diffInMinutes < 60)
-    return `${diffInMinutes} minute${diffInMinutes > 1 ? "s" : ""} ago`;
+  if (diffInMinutes < 60) return `${diffInMinutes} minute${diffInMinutes > 1 ? "s" : ""} ago`;
   const diffInHours = Math.floor(diffInMinutes / 60);
-  if (diffInHours < 24)
-    return `${diffInHours} hour${diffInHours > 1 ? "s" : ""} ago`;
+  if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? "s" : ""} ago`;
   const diffInDays = Math.floor(diffInHours / 24);
-  if (diffInDays < 30)
-    return `${diffInDays} day${diffInDays > 1 ? "s" : ""} ago`;
+  if (diffInDays < 30) return `${diffInDays} day${diffInDays > 1 ? "s" : ""} ago`;
   const diffInMonths = Math.floor(diffInDays / 30);
-  if (diffInMonths < 12)
-    return `${diffInMonths} month${diffInMonths > 1 ? "s" : ""} ago`;
+  if (diffInMonths < 12) return `${diffInMonths} month${diffInMonths > 1 ? "s" : ""} ago`;
   const diffInYears = Math.floor(diffInDays / 365);
   return `${diffInYears} year${diffInYears > 1 ? "s" : ""} ago`;
 }
@@ -181,9 +177,7 @@ export default function Home() {
             }}
           >
             <div className="flex items-center gap-3 mb-8">
-              <h3 className="text-xl font-clash font-medium">
-                Quick View Listings
-              </h3>
+              <h3 className="text-xl font-clash font-medium">Quick View Listings</h3>
               <span className="bg-[#D98728] text-white text-[11px] font-bold min-w-5.5 h-5.5 px-1.5 flex items-center justify-center rounded">
                 {quickViewListings.length}
               </span>
@@ -202,9 +196,7 @@ export default function Home() {
                   <div
                     key={item.id || index}
                     className={`pb-6 ${
-                      index < quickViewListings.length - 1
-                        ? "border-b border-[#2C2C2E]/60"
-                        : "pt-2"
+                      index < quickViewListings.length - 1 ? "border-b border-[#2C2C2E]/60" : "pt-2"
                     }`}
                   >
                     <div className="flex justify-between items-start mb-2">
@@ -246,9 +238,7 @@ export default function Home() {
                 "0 66px 19px 0 rgba(178, 114, 31, 0.00), 0 42px 17px 0 rgba(178, 114, 31, 0.01), 0 24px 14px 0 rgba(178, 114, 31, 0.05), 0 11px 11px 0 rgba(178, 114, 31, 0.09), 0 3px 6px 0 rgba(178, 114, 31, 0.10)",
             }}
           >
-            <h3 className="text-xl font-clash font-medium mb-8">
-              Recent Activity
-            </h3>
+            <h3 className="text-xl font-clash font-medium mb-8">Recent Activity</h3>
             {isLoading ? (
               <RecentActivitySkeleton />
             ) : recentActivity.length === 0 ? (
@@ -271,9 +261,7 @@ export default function Home() {
                       <h4 className="font-medium text-gray-200 m-0 text-[16px] mb-1 truncate">
                         {activity.title}
                       </h4>
-                      <p className="text-[13px] text-gray-300 line-clamp-2">
-                        {activity.message}
-                      </p>
+                      <p className="text-[13px] text-gray-300 line-clamp-2">{activity.message}</p>
                       <p className="text-[12px] text-gray-500 mt-1.5 font-medium">
                         {formatRelativeTime(activity.createdAt)}
                       </p>
@@ -304,9 +292,7 @@ export default function Home() {
       >
         <AnimationWrapper type="fade-up" duration={0.5} delay={0.05}>
           <div className="flex items-center gap-3 mb-8">
-            <h3 className="text-[32px] font-clash font-medium">
-              Active Listing
-            </h3>
+            <h3 className="text-[32px] font-clash font-medium">Active Listing</h3>
             <span className="bg-[#D98728] text-white text-[11px] font-bold min-w-5.5 h-5.5 px-1.5 flex items-center justify-center rounded">
               {activeListings.length}
             </span>
@@ -324,7 +310,9 @@ export default function Home() {
           <div className="py-12 text-center text-gray-400 flex flex-col items-center justify-center">
             <PackageOpen className="w-12 h-12 mb-3 text-primary/50" />
             <p className="text-base font-medium">No active listings available</p>
-            <p className="text-xs text-gray-500 mt-1">Your active listings will appear here once approved.</p>
+            <p className="text-xs text-gray-500 mt-1">
+              Your active listings will appear here once approved.
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -361,15 +349,7 @@ export default function Home() {
   );
 }
 
-function StatCard({
-  icon,
-  count,
-  label,
-}: {
-  icon: React.ReactNode;
-  count: string;
-  label: string;
-}) {
+function StatCard({ icon, count, label }: { icon: React.ReactNode; count: string; label: string }) {
   return (
     <div
       className="bg-foreground border border-primary/30 p-5 rounded-2xl flex items-center gap-5 transition-all cursor-default shadow-card h-50.75"
@@ -382,12 +362,8 @@ function StatCard({
         {icon}
       </div>
       <div className="min-w-0">
-        <div className="text-[40px] font-medium font-clash leading-tight truncate">
-          {count}
-        </div>
-        <div className="text-[24px] text-[#FFFDFD] font-normal mt-0.5 truncate">
-          {label}
-        </div>
+        <div className="text-[40px] font-medium font-clash leading-tight truncate">{count}</div>
+        <div className="text-[24px] text-[#FFFDFD] font-normal mt-0.5 truncate">{label}</div>
       </div>
     </div>
   );
@@ -432,12 +408,8 @@ function ListingCard({
             <span className="tracking-widest uppercase text-gray-500 shrink-0">Price</span>
           </div>
           <div className="flex justify-between items-center mb-5 gap-2">
-            <h4 className="font-semibold font-inter text-[15px] truncate text-white">
-              {title}
-            </h4>
-            <span className="font-normal font-inter text-[17px] text-white shrink-0">
-              {price}
-            </span>
+            <h4 className="font-semibold font-inter text-[15px] truncate text-white">{title}</h4>
+            <span className="font-normal font-inter text-[17px] text-white shrink-0">{price}</span>
           </div>
         </div>
 

@@ -75,11 +75,11 @@ export default function LandingFooter() {
           {/* Brand Column */}
           <div className="space-y-8">
             <Link href="/" className="flex items-center gap-2">
-               <Image src="/logo.svg" alt="logo" width={200} height={80}/>
+              <Image src="/logo.svg" alt="logo" width={200} height={80} />
             </Link>
             <p className="text-white/80 text-[14px] font-montserrat max-w-70">
-              The World&apos;s most exclusive marketplace for extraordinary
-              assests by invitation only
+              The World&apos;s most exclusive marketplace for extraordinary assests by invitation
+              only
             </p>
             <div className="flex gap-4">
               {SOCIAL_SVGS.map((svg, i) => (

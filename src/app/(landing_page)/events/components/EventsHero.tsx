@@ -44,10 +44,9 @@ export default function EventsHero() {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-white/70 text-lg md:text-[24px] max-w-5xl leading-relaxed"
           >
-            From intimate VIP gatherings to world-class automotive concours,
-            ExoticWorld curates the most exclusive events in the luxury asset
-            world. Each experience is thoughtfully designed to bring together
-            collectors,
+            From intimate VIP gatherings to world-class automotive concours, ExoticWorld curates the
+            most exclusive events in the luxury asset world. Each experience is thoughtfully
+            designed to bring together collectors,
           </motion.p>
         </div>
       </div>

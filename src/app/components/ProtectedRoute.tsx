@@ -21,20 +21,14 @@ interface ProtectedRouteProps {
   allowedRoles?: string[];
 }
 
-export default function ProtectedRoute({
-  children,
-  allowedRoles,
-}: ProtectedRouteProps) {
+export default function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [isMounted, setIsMounted] = useState(false);
 
   const { user: storeUser, token: storeToken, logout } = useAuthStore();
   const token =
-    storeToken ||
-    Cookies.get("accessToken") ||
-    Cookies.get("accessToken") ||
-    Cookies.get("token");
+    storeToken || Cookies.get("accessToken") || Cookies.get("accessToken") || Cookies.get("token");
 
   // Fetch user if token exists
   const { data: fetchedUser, isLoading, isError } = useGetMeQuery(!!token);
@@ -74,16 +68,7 @@ export default function ProtectedRoute({
         }
       }
     }
-  }, [
-    isMounted,
-    token,
-    currentUser,
-    isError,
-    allowedRoles,
-    pathname,
-    router,
-    logout,
-  ]);
+  }, [isMounted, token, currentUser, isError, allowedRoles, pathname, router, logout]);
 
   // Render loading state while hydrating or waiting for initial user query
   if (!isMounted || (token && !currentUser && isLoading)) {

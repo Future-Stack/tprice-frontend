@@ -18,10 +18,7 @@ export const BRANDS_QUERY_KEYS = {
 /**
  * Hook to fetch paginated brands with TanStack Query caching
  */
-export const useGetBrandsQuery = (
-  params?: GetBrandsParams,
-  options?: { enabled?: boolean },
-) => {
+export const useGetBrandsQuery = (params?: GetBrandsParams, options?: { enabled?: boolean }) => {
   return useQuery<BrandsResponse>({
     queryKey: BRANDS_QUERY_KEYS.list(params),
     queryFn: () => getBrandsApi(params),
@@ -50,8 +47,7 @@ export const useCreateBrandMutation = () => {
 export const useUpdateBrandMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateBrandInput }) =>
-      updateBrandApi(id, data),
+    mutationFn: ({ id, data }: { id: string; data: UpdateBrandInput }) => updateBrandApi(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: BRANDS_QUERY_KEYS.all });
     },

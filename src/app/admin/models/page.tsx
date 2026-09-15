@@ -214,11 +214,7 @@ export default function AdminModelsPage() {
                   All Brands
                 </option>
                 {brands.map((brand) => (
-                  <option
-                    key={brand.id}
-                    value={brand.id}
-                    className="bg-[#141416] text-white"
-                  >
+                  <option key={brand.id} value={brand.id} className="bg-[#141416] text-white">
                     {brand.name}
                   </option>
                 ))}
@@ -259,9 +255,7 @@ export default function AdminModelsPage() {
             className="p-2.5 bg-[#141416] border border-[#262626] rounded-xl text-gray-400 hover:text-white hover:border-primary/40 transition-colors cursor-pointer"
             title="Refresh models list"
           >
-            <RefreshCw
-              className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`}
-            />
+            <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`} />
           </button>
         </div>
       </div>
@@ -304,15 +298,13 @@ export default function AdminModelsPage() {
                     <td colSpan={7} className="px-6 py-16 text-center">
                       <div className="max-w-md mx-auto space-y-3">
                         <Car className="w-10 h-10 text-gray-600 mx-auto" />
-                        <p className="text-base font-semibold text-gray-300">
-                          No models found
-                        </p>
+                        <p className="text-base font-semibold text-gray-300">No models found</p>
                         <p className="text-xs text-gray-500">
                           {searchQuery
                             ? `No models matching "${searchQuery}"`
                             : brandIdFilter !== "ALL"
-                            ? "No models found for selected brand."
-                            : "Click 'Create Model' to add your first vehicle model."}
+                              ? "No models found for selected brand."
+                              : "Click 'Create Model' to add your first vehicle model."}
                         </p>
                       </div>
                     </td>
@@ -373,9 +365,7 @@ export default function AdminModelsPage() {
                             </div>
                           </div>
                         ) : (
-                          <span className="text-xs text-gray-500 italic">
-                            No Brand
-                          </span>
+                          <span className="text-xs text-gray-500 italic">No Brand</span>
                         )}
                       </td>
 
@@ -387,9 +377,7 @@ export default function AdminModelsPage() {
                             {model.brand.category.name}
                           </span>
                         ) : (
-                          <span className="text-xs text-gray-500 italic">
-                            Uncategorized
-                          </span>
+                          <span className="text-xs text-gray-500 italic">Uncategorized</span>
                         )}
                       </td>
 
@@ -467,16 +455,12 @@ export default function AdminModelsPage() {
             <div className="px-6 py-4 bg-[#141416] border-t border-[#262626] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
               <div>
                 Showing{" "}
-                <span className="font-semibold text-white">
-                  {(meta.page - 1) * meta.limit + 1}
-                </span>{" "}
+                <span className="font-semibold text-white">{(meta.page - 1) * meta.limit + 1}</span>{" "}
                 to{" "}
                 <span className="font-semibold text-white">
                   {Math.min(meta.page * meta.limit, meta.total)}
                 </span>{" "}
-                of{" "}
-                <span className="font-semibold text-white">{meta.total}</span>{" "}
-                models
+                of <span className="font-semibold text-white">{meta.total}</span> models
               </div>
 
               {/* Page Buttons */}
@@ -490,21 +474,19 @@ export default function AdminModelsPage() {
                   <span className="hidden sm:inline">Previous</span>
                 </button>
 
-                {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map(
-                  (pageNum) => (
-                    <button
-                      key={pageNum}
-                      onClick={() => handlePageChange(pageNum)}
-                      className={`w-8 h-8 rounded-lg border font-semibold text-xs transition-all cursor-pointer ${
-                        pageNum === meta.page
-                          ? "bg-primary text-black border-primary font-bold shadow-[0_2px_10px_rgba(231,143,35,0.3)]"
-                          : "bg-[#1A1A1C] border-[#262626] text-gray-300 hover:text-white hover:border-primary/40"
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  ),
-                )}
+                {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    onClick={() => handlePageChange(pageNum)}
+                    className={`w-8 h-8 rounded-lg border font-semibold text-xs transition-all cursor-pointer ${
+                      pageNum === meta.page
+                        ? "bg-primary text-black border-primary font-bold shadow-[0_2px_10px_rgba(231,143,35,0.3)]"
+                        : "bg-[#1A1A1C] border-[#262626] text-gray-300 hover:text-white hover:border-primary/40"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
 
                 <button
                   onClick={() => handlePageChange(meta.page + 1)}

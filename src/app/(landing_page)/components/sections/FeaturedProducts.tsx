@@ -27,10 +27,7 @@ const getFormattedPrice = (item: ListingItem) => {
 };
 
 const getLocationString = (item: ListingItem) => {
-  return (
-    [item.locationCity, item.locationCountry].filter(Boolean).join(", ") ||
-    "Worldwide"
-  );
+  return [item.locationCity, item.locationCountry].filter(Boolean).join(", ") || "Worldwide";
 };
 
 const getBadgeTag = (item: ListingItem) => {
@@ -45,81 +42,79 @@ interface ProductCardProps {
   heightClass: string;
 }
 
-const ProductCard = React.memo(
-  ({ product, variant, heightClass }: ProductCardProps) => {
-    if (variant === "large") {
-      return (
-        <Link
-          href={`/inventory/${product.slug || product.id}`}
-          className={`group relative ${heightClass} block overflow-hidden rounded-xl border border-white/5 hover:border-primary/40 transition-all shadow-2xl`}
-        >
-          <img
-            src={getProductImage(product)}
-            alt={product.title}
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src =
-                "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
-            }}
-          />
-          <div className="absolute inset-0 bg-linear-to-t from-black via-black/30 to-transparent" />
-
-          {/* Badge */}
-          <div className="absolute top-6 left-6 px-4 py-1.5 bg-primary/20 backdrop-blur-md border border-primary/30 rounded-full text-primary text-xs font-bold uppercase tracking-widest">
-            {getBadgeTag(product)}
-          </div>
-
-          {/* Content Overlay */}
-          <div className="absolute bottom-0 left-6 right-6 pb-8">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">
-              {product.category}
-            </p>
-            <h3 className="text-2xl md:text-3xl font-bold text-white mb-2 line-clamp-2">
-              {product.title}
-            </h3>
-            <p className="text-2xl font-bold text-primary mb-3 font-serif">
-              {getFormattedPrice(product)}
-            </p>
-            <div className="flex items-center gap-2 text-white/70 text-sm font-light">
-              <MapPin className="w-4 h-4 text-primary shrink-0" />
-              <span className="truncate">{getLocationString(product)}</span>
-            </div>
-          </div>
-        </Link>
-      );
-    }
-
+const ProductCard = React.memo(({ product, variant, heightClass }: ProductCardProps) => {
+  if (variant === "large") {
     return (
       <Link
         href={`/inventory/${product.slug || product.id}`}
-        className={`group relative ${heightClass} block overflow-hidden rounded-xl border border-white/5 hover:border-primary/40 transition-all shadow-xl`}
+        className={`group relative ${heightClass} block overflow-hidden rounded-xl border border-white/5 hover:border-primary/40 transition-all shadow-2xl`}
       >
         <img
           src={getProductImage(product)}
           alt={product.title}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
           onError={(e) => {
             (e.target as HTMLImageElement).src =
               "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
           }}
         />
-        <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-transparent" />
-        <div className="absolute top-4 left-4 px-3 py-1 bg-white/10 backdrop-blur-md border border-white/10 rounded-full text-white/90 text-[10px] font-bold uppercase">
+        <div className="absolute inset-0 bg-linear-to-t from-black via-black/30 to-transparent" />
+
+        {/* Badge */}
+        <div className="absolute top-6 left-6 px-4 py-1.5 bg-primary/20 backdrop-blur-md border border-primary/30 rounded-full text-primary text-xs font-bold uppercase tracking-widest">
           {getBadgeTag(product)}
         </div>
-        <div className="absolute bottom-6 left-6 right-6">
-          <p className="text-white/40 text-[10px] uppercase tracking-widest mb-1">
+
+        {/* Content Overlay */}
+        <div className="absolute bottom-0 left-6 right-6 pb-8">
+          <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">
             {product.category}
           </p>
-          <h4 className="text-lg font-semibold text-white mb-1 group-hover:text-primary transition-colors truncate">
+          <h3 className="text-2xl md:text-3xl font-bold text-white mb-2 line-clamp-2">
             {product.title}
-          </h4>
-          <p className="text-primary font-bold">{getFormattedPrice(product)}</p>
+          </h3>
+          <p className="text-2xl font-bold text-primary mb-3 font-serif">
+            {getFormattedPrice(product)}
+          </p>
+          <div className="flex items-center gap-2 text-white/70 text-sm font-light">
+            <MapPin className="w-4 h-4 text-primary shrink-0" />
+            <span className="truncate">{getLocationString(product)}</span>
+          </div>
         </div>
       </Link>
     );
-  },
-);
+  }
+
+  return (
+    <Link
+      href={`/inventory/${product.slug || product.id}`}
+      className={`group relative ${heightClass} block overflow-hidden rounded-xl border border-white/5 hover:border-primary/40 transition-all shadow-xl`}
+    >
+      <img
+        src={getProductImage(product)}
+        alt={product.title}
+        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+        onError={(e) => {
+          (e.target as HTMLImageElement).src =
+            "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
+        }}
+      />
+      <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-transparent" />
+      <div className="absolute top-4 left-4 px-3 py-1 bg-white/10 backdrop-blur-md border border-white/10 rounded-full text-white/90 text-[10px] font-bold uppercase">
+        {getBadgeTag(product)}
+      </div>
+      <div className="absolute bottom-6 left-6 right-6">
+        <p className="text-white/40 text-[10px] uppercase tracking-widest mb-1">
+          {product.category}
+        </p>
+        <h4 className="text-lg font-semibold text-white mb-1 group-hover:text-primary transition-colors truncate">
+          {product.title}
+        </h4>
+        <p className="text-primary font-bold">{getFormattedPrice(product)}</p>
+      </div>
+    </Link>
+  );
+});
 
 ProductCard.displayName = "ProductCard";
 
@@ -136,10 +131,7 @@ export default function FeaturedProducts() {
   // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
       }
     };
@@ -199,11 +191,7 @@ export default function FeaturedProducts() {
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.4, delay: i * 0.1 }}
               >
-                <ProductCard
-                  product={product}
-                  variant="large"
-                  heightClass="h-96 md:h-110"
-                />
+                <ProductCard product={product} variant="large" heightClass="h-96 md:h-110" />
               </motion.div>
             ))}
           </AnimatePresence>
@@ -224,11 +212,7 @@ export default function FeaturedProducts() {
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.4, delay: i * 0.1 }}
               >
-                <ProductCard
-                  product={product}
-                  variant="large"
-                  heightClass="h-96"
-                />
+                <ProductCard product={product} variant="large" heightClass="h-96" />
               </motion.div>
             ))}
           </AnimatePresence>
@@ -249,11 +233,7 @@ export default function FeaturedProducts() {
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.4, delay: i * 0.1 }}
               >
-                <ProductCard
-                  product={product}
-                  variant="small"
-                  heightClass="h-80"
-                />
+                <ProductCard product={product} variant="small" heightClass="h-80" />
               </motion.div>
             ))}
           </AnimatePresence>
@@ -277,11 +257,7 @@ export default function FeaturedProducts() {
             transition={{ duration: 0.5 }}
             className="lg:col-span-4"
           >
-            <ProductCard
-              product={mainProduct}
-              variant="large"
-              heightClass="h-150"
-            />
+            <ProductCard product={mainProduct} variant="large" heightClass="h-150" />
           </motion.div>
         )}
 
@@ -297,11 +273,7 @@ export default function FeaturedProducts() {
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.4, delay: i * 0.1 }}
                 >
-                  <ProductCard
-                    product={product}
-                    variant="small"
-                    heightClass="h-72.5"
-                  />
+                  <ProductCard product={product} variant="small" heightClass="h-72.5" />
                 </motion.div>
               ))}
             </AnimatePresence>
@@ -343,9 +315,7 @@ export default function FeaturedProducts() {
               className="cursor-pointer w-full bg-white/5 border border-white/10 px-6 py-4 rounded-lg flex items-center justify-between text-white hover:border-primary/50 transition-all text-sm font-medium"
             >
               <span className="truncate">
-                {selectedCategory === "ALL"
-                  ? "All Categories"
-                  : selectedCategory}
+                {selectedCategory === "ALL" ? "All Categories" : selectedCategory}
               </span>
               <ChevronDown
                 className={`w-4 h-4 text-white/60 transition-transform ${
@@ -367,9 +337,7 @@ export default function FeaturedProducts() {
                       setIsDropdownOpen(false);
                     }}
                     className={`cursor-pointer w-full text-left px-6 py-3.5 hover:bg-primary/10 transition-colors text-sm ${
-                      selectedCategory === "ALL"
-                        ? "text-primary font-bold"
-                        : "text-white/70"
+                      selectedCategory === "ALL" ? "text-primary font-bold" : "text-white/70"
                     }`}
                   >
                     All Categories
@@ -382,9 +350,7 @@ export default function FeaturedProducts() {
                         setIsDropdownOpen(false);
                       }}
                       className={`cursor-pointer w-full text-left px-6 py-3.5 hover:bg-primary/10 transition-colors text-sm truncate ${
-                        selectedCategory === cat.name
-                          ? "text-primary font-bold"
-                          : "text-white/70"
+                        selectedCategory === cat.name ? "text-primary font-bold" : "text-white/70"
                       }`}
                     >
                       {cat.name}
@@ -400,9 +366,7 @@ export default function FeaturedProducts() {
         {isError && (
           <div className="bg-[#1C1212] border border-red-500/30 rounded-xl p-8 mb-12 text-center">
             <AlertTriangle className="w-10 h-10 text-red-400 mx-auto mb-3" />
-            <h3 className="text-lg font-serif text-white mb-1">
-              Failed to load featured products
-            </h3>
+            <h3 className="text-lg font-serif text-white mb-1">Failed to load featured products</h3>
             <p className="text-sm text-white/50 mb-6 max-w-md mx-auto">
               {(error as any)?.response?.data?.message ||
                 error?.message ||
@@ -430,12 +394,10 @@ export default function FeaturedProducts() {
             <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4 border border-white/10">
               <Sparkles className="w-8 h-8 text-primary/60" />
             </div>
-            <h3 className="text-xl font-serif text-white mb-2">
-              No featured listings available
-            </h3>
+            <h3 className="text-xl font-serif text-white mb-2">No featured listings available</h3>
             <p className="text-white/40 text-sm max-w-md mx-auto mb-6 font-light">
-              There are currently no featured listings found for this selection.
-              Try selecting another category.
+              There are currently no featured listings found for this selection. Try selecting
+              another category.
             </p>
             {selectedCategory !== "ALL" && (
               <button

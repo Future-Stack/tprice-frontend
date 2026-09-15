@@ -1,15 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  X,
-  Layers,
-  Car,
-  Calendar,
-  Pencil,
-  Loader2,
-  CheckCircle2,
-} from "lucide-react";
+import { X, Layers, Car, Calendar, Pencil, Loader2, CheckCircle2 } from "lucide-react";
 import { useUpdateTrimMutation } from "@/hooks/useTrims";
 import { useGetModelsQuery } from "@/hooks/useModels";
 import { TrimItem } from "@/lib/api/trims";
@@ -21,11 +13,7 @@ interface EditTrimModalProps {
   trim: TrimItem | null;
 }
 
-export default function EditTrimModal({
-  isOpen,
-  onClose,
-  trim,
-}: EditTrimModalProps) {
+export default function EditTrimModal({ isOpen, onClose, trim }: EditTrimModalProps) {
   const updateTrimMutation = useUpdateTrimMutation();
 
   const [formData, setFormData] = useState({
@@ -63,9 +51,7 @@ export default function EditTrimModal({
 
   if (!isOpen || !trim) return null;
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -83,9 +69,7 @@ export default function EditTrimModal({
         ? Number(formData.yearStart)
         : null;
     const yEnd =
-      formData.yearEnd !== "" && !isNaN(Number(formData.yearEnd))
-        ? Number(formData.yearEnd)
-        : null;
+      formData.yearEnd !== "" && !isNaN(Number(formData.yearEnd)) ? Number(formData.yearEnd) : null;
 
     if (yStart && yEnd && yStart > yEnd) {
       toast.error("Start year cannot be greater than end year.");
@@ -106,14 +90,12 @@ export default function EditTrimModal({
       toast.success(`Trim "${formData.name.trim()}" updated successfully!`);
       onClose();
     } catch (err: any) {
-      const errMsg =
-        err?.response?.data?.message || err?.message || "Failed to update trim";
+      const errMsg = err?.response?.data?.message || err?.message || "Failed to update trim";
       toast.error(errMsg);
     }
   };
 
-  const selectedModel =
-    models.find((m) => m.id === formData.modelId) || trim.model;
+  const selectedModel = models.find((m) => m.id === formData.modelId) || trim.model;
 
   return (
     <div
@@ -133,9 +115,7 @@ export default function EditTrimModal({
               <Pencil className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white font-clash">
-                Edit Trim
-              </h2>
+              <h2 className="text-xl font-bold text-white font-clash">Edit Trim</h2>
               <p className="text-xs text-gray-400">
                 Update trim name, model association, and model years
               </p>
@@ -206,9 +186,7 @@ export default function EditTrimModal({
                   <Car className="w-3.5 h-3.5" />
                 </div>
                 <div>
-                  <span className="font-semibold text-white">
-                    {selectedModel.name}
-                  </span>
+                  <span className="font-semibold text-white">{selectedModel.name}</span>
                   {selectedModel.brand && (
                     <span className="text-gray-400 ml-1.5 font-normal">
                       Brand: {selectedModel.brand.name}

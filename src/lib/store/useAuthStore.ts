@@ -24,15 +24,10 @@ interface AuthState {
 }
 
 const getCookieToken = () =>
-  Cookies.get("accessToken") ||
-  Cookies.get("token") ||
-  Cookies.get("access_token") ||
-  null;
+  Cookies.get("accessToken") || Cookies.get("token") || Cookies.get("access_token") || null;
 
 const getCookieRefreshToken = () =>
-  Cookies.get("refreshToken") ||
-  Cookies.get("refresh_token") ||
-  null;
+  Cookies.get("refreshToken") || Cookies.get("refresh_token") || null;
 
 const setTokenCookies = (token?: string) => {
   if (token && token.trim() !== "") {
@@ -81,8 +76,7 @@ export const useAuthStore = create<AuthState>()(
         set((state) => ({
           user,
           token: token || state.token || getCookieToken(),
-          refreshToken:
-            refreshToken || state.refreshToken || getCookieRefreshToken(),
+          refreshToken: refreshToken || state.refreshToken || getCookieRefreshToken(),
           isAuthenticated: !!user,
         }));
       },
@@ -98,8 +92,7 @@ export const useAuthStore = create<AuthState>()(
         setRefreshTokenCookies(refreshToken);
         set((state) => ({
           token: token || state.token || getCookieToken(),
-          refreshToken:
-            refreshToken || state.refreshToken || getCookieRefreshToken(),
+          refreshToken: refreshToken || state.refreshToken || getCookieRefreshToken(),
           isAuthenticated: !!state.user || !!token,
         }));
       },
@@ -132,6 +125,6 @@ export const useAuthStore = create<AuthState>()(
         token: state.token,
         refreshToken: state.refreshToken,
       }),
-    },
-  ),
+    }
+  )
 );

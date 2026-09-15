@@ -22,10 +22,7 @@ export const TRIMS_QUERY_KEYS = {
 /**
  * Hook to fetch paginated trims with TanStack Query caching
  */
-export const useGetTrimsQuery = (
-  params?: GetTrimsParams,
-  options?: { enabled?: boolean },
-) => {
+export const useGetTrimsQuery = (params?: GetTrimsParams, options?: { enabled?: boolean }) => {
   return useQuery<TrimsResponse>({
     queryKey: TRIMS_QUERY_KEYS.list(params),
     queryFn: () => getTrimsApi(params),
@@ -67,8 +64,7 @@ export const useCreateTrimMutation = () => {
 export const useUpdateTrimMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateTrimInput }) =>
-      updateTrimApi(id, data),
+    mutationFn: ({ id, data }: { id: string; data: UpdateTrimInput }) => updateTrimApi(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: TRIMS_QUERY_KEYS.all });
       queryClient.invalidateQueries({ queryKey: MODELS_QUERY_KEYS.all });

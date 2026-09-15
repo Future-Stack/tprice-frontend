@@ -1,16 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  X,
-  Edit3,
-  Loader2,
-  CheckCircle2,
-  Clock,
-  AlertCircle,
-  FileText,
-  User,
-} from "lucide-react";
+import { X, Edit3, Loader2, CheckCircle2, Clock, AlertCircle, FileText, User } from "lucide-react";
 import { ContactInquiryItem, UpdateContactInquiryPayload } from "@/lib/api/contact";
 
 interface UpdateInquiryModalProps {
@@ -22,9 +13,19 @@ interface UpdateInquiryModalProps {
 }
 
 const STATUS_OPTIONS = [
-  { value: "NEW", label: "New Inquiry", icon: AlertCircle, color: "text-emerald-400 border-emerald-500/30 bg-emerald-500/10" },
+  {
+    value: "NEW",
+    label: "New Inquiry",
+    icon: AlertCircle,
+    color: "text-emerald-400 border-emerald-500/30 bg-emerald-500/10",
+  },
 
-  { value: "RESOLVED", label: "Resolved", icon: CheckCircle2, color: "text-purple-400 border-purple-500/30 bg-purple-500/10" },
+  {
+    value: "RESOLVED",
+    label: "Resolved",
+    icon: CheckCircle2,
+    color: "text-purple-400 border-purple-500/30 bg-purple-500/10",
+  },
 ];
 
 export default function UpdateInquiryModal({
@@ -74,9 +75,7 @@ export default function UpdateInquiryModal({
               <h2 className="text-lg font-bold text-white font-montserrat">
                 Update Inquiry Status
               </h2>
-              <p className="text-xs text-gray-400">
-                Inquiry from {inquiry.fullName || "User"}
-              </p>
+              <p className="text-xs text-gray-400">Inquiry from {inquiry.fullName || "User"}</p>
             </div>
           </div>
           <button
@@ -120,12 +119,15 @@ export default function UpdateInquiryModal({
                       type="button"
                       key={opt.value}
                       onClick={() => setStatus(opt.value)}
-                      className={`flex items-center gap-2.5 px-3.5 py-3 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${isSelected
-                        ? "bg-primary/15 border-primary text-primary shadow-[0_0_15px_rgba(231,143,35,0.2)]"
-                        : "bg-[#1B1B1E] border-[#262626] text-gray-400 hover:text-white hover:border-gray-700"
-                        }`}
+                      className={`flex items-center gap-2.5 px-3.5 py-3 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
+                        isSelected
+                          ? "bg-primary/15 border-primary text-primary shadow-[0_0_15px_rgba(231,143,35,0.2)]"
+                          : "bg-[#1B1B1E] border-[#262626] text-gray-400 hover:text-white hover:border-gray-700"
+                      }`}
                     >
-                      <Icon className={`w-4 h-4 ${isSelected ? "text-primary" : "text-gray-500"}`} />
+                      <Icon
+                        className={`w-4 h-4 ${isSelected ? "text-primary" : "text-gray-500"}`}
+                      />
                       <span>{opt.label}</span>
                     </button>
                   );

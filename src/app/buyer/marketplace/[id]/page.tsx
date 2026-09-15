@@ -52,11 +52,7 @@ function formatSpecValue(key: string, val: any): string {
   const lowerKey = key.toLowerCase();
   if (typeof val === "number") {
     if (lowerKey.includes("mileage")) return `${val.toLocaleString()} mi`;
-    if (
-      lowerKey.includes("horsepower") ||
-      lowerKey.includes("power") ||
-      lowerKey === "hp"
-    )
+    if (lowerKey.includes("horsepower") || lowerKey.includes("power") || lowerKey === "hp")
       return `${val.toLocaleString()} hp`;
     if (lowerKey.includes("sqft") || lowerKey.includes("squarefeet"))
       return `${val.toLocaleString()} sq ft`;
@@ -64,8 +60,7 @@ function formatSpecValue(key: string, val: any): string {
   }
 
   const strVal = String(val);
-  if (lowerKey.includes("mileage") && !strVal.toLowerCase().includes("mi"))
-    return `${strVal} mi`;
+  if (lowerKey.includes("mileage") && !strVal.toLowerCase().includes("mi")) return `${strVal} mi`;
   if (
     (lowerKey.includes("horsepower") || lowerKey.includes("power")) &&
     !strVal.toLowerCase().includes("hp")
@@ -79,13 +74,7 @@ export default function BuyerListingDetailPage() {
   const params = useParams();
   const idOrSlug = (params?.id as string) || "";
 
-  const {
-    data: product,
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useListingByIdQuery(idOrSlug);
+  const { data: product, isLoading, isError, error, refetch } = useListingByIdQuery(idOrSlug);
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [inclFees, setInclFees] = useState(true);
@@ -104,28 +93,25 @@ export default function BuyerListingDetailPage() {
   const saveMutation = useSaveListingMutation();
   const createOfferMutation = useCreateOfferMutation();
   const token =
-    Cookies.get("accessToken") ||
-    Cookies.get("token") ||
-    useAuthStore((state) => state.token);
+    Cookies.get("accessToken") || Cookies.get("token") || useAuthStore((state) => state.token);
 
   const { data: savedResponse } = useSavedListingsQuery(
     { page: 1, limit: 100 },
-    { enabled: Boolean(token) },
+    { enabled: Boolean(token) }
   );
 
-  const { data: userOffersData, isLoading: isUserOffersLoading } =
-    useOffersQuery({ limit: 100 }, { enabled: Boolean(token) });
+  const { data: userOffersData, isLoading: isUserOffersLoading } = useOffersQuery(
+    { limit: 100 },
+    { enabled: Boolean(token) }
+  );
 
   const existingOffer = userOffersData?.data?.find(
-    (offer) =>
-      offer.listingId === product?.id || offer.listing?.id === product?.id,
+    (offer) => offer.listingId === product?.id || offer.listing?.id === product?.id
   );
 
   const isSavedInListings =
-    savedResponse?.data?.some((savedItem) => savedItem.id === product?.id) ??
-    false;
-  const isSaved =
-    product?.isSaved !== undefined ? product.isSaved : isSavedInListings;
+    savedResponse?.data?.some((savedItem) => savedItem.id === product?.id) ?? false;
+  const isSaved = product?.isSaved !== undefined ? product.isSaved : isSavedInListings;
 
   const handleToggleSave = (e?: React.MouseEvent) => {
     if (e) {
@@ -147,9 +133,7 @@ export default function BuyerListingDetailPage() {
     }
     const initialPrice = product?.askingPrice ? Number(product.askingPrice) : 0;
     setOfferAmount(initialPrice > 0 ? String(initialPrice) : "");
-    setOfferNote(
-      "Flexible on delivery timeline and ready to complete escrow verification.",
-    );
+    setOfferNote("Flexible on delivery timeline and ready to complete escrow verification.");
     setIsOfferModalOpen(true);
   };
 
@@ -172,7 +156,7 @@ export default function BuyerListingDetailPage() {
         onSuccess: () => {
           setIsOfferModalOpen(false);
         },
-      },
+      }
     );
   };
 
@@ -215,7 +199,7 @@ export default function BuyerListingDetailPage() {
 
     if (existingOffer && numericAmount <= currentVal) {
       toast.error(
-        `Your new bid must be higher than your current bid of $${currentVal.toLocaleString()}`,
+        `Your new bid must be higher than your current bid of $${currentVal.toLocaleString()}`
       );
       return;
     }
@@ -229,22 +213,16 @@ export default function BuyerListingDetailPage() {
       {
         onSuccess: () => {
           setIsBidModalOpen(false);
-          toast.success(
-            existingOffer
-              ? "Bid increased successfully!"
-              : "Bid placed successfully!",
-          );
+          toast.success(existingOffer ? "Bid increased successfully!" : "Bid placed successfully!");
         },
-      },
+      }
     );
   };
 
   // Extract images or use fallback
   const productImages =
     product?.media && product.media.length > 0
-      ? product.media
-          .sort((a, b) => a.displayOrder - b.displayOrder)
-          .map((m) => m.url)
+      ? product.media.sort((a, b) => a.displayOrder - b.displayOrder).map((m) => m.url)
       : [
           "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&q=80&w=1200",
           "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?auto=format&fit=crop&q=80&w=800",
@@ -252,19 +230,14 @@ export default function BuyerListingDetailPage() {
         ];
 
   // Safely clamp selected image index
-  const safeSelectedImage =
-    selectedImage < productImages.length ? selectedImage : 0;
+  const safeSelectedImage = selectedImage < productImages.length ? selectedImage : 0;
 
   // Price formatting
   const numericPrice = product?.askingPrice ? Number(product.askingPrice) : 0;
   const currencySymbol =
-    product?.currency === "USD" || !product?.currency
-      ? "$"
-      : `${product.currency} `;
+    product?.currency === "USD" || !product?.currency ? "$" : `${product.currency} `;
   const formattedPrice =
-    numericPrice > 0
-      ? `${currencySymbol}${numericPrice.toLocaleString()}`
-      : "Price on Request";
+    numericPrice > 0 ? `${currencySymbol}${numericPrice.toLocaleString()}` : "Price on Request";
 
   // Financial & Bidding properties parsing for conditional display
   const askingPriceVal =
@@ -286,9 +259,7 @@ export default function BuyerListingDetailPage() {
   const highestBidVal = (() => {
     if (product?.highestBid === null || product?.highestBid === undefined) return null;
     if (typeof product.highestBid === "object") {
-      const num = Number(
-        (product.highestBid as any).amount ?? (product.highestBid as any).price,
-      );
+      const num = Number((product.highestBid as any).amount ?? (product.highestBid as any).price);
       return !isNaN(num) && num > 0 ? num : null;
     }
     const num = Number(product.highestBid);
@@ -310,8 +281,7 @@ export default function BuyerListingDetailPage() {
       normalizedSaleType !== "FIXED_PRICE" &&
       normalizedSaleType !== "PRIVATE_SALE" &&
       normalizedSaleType !== "PRIVATE");
-  const isPrivateSale =
-    normalizedSaleType === "PRIVATE_SALE" || normalizedSaleType === "PRIVATE";
+  const isPrivateSale = normalizedSaleType === "PRIVATE_SALE" || normalizedSaleType === "PRIVATE";
   const isFixedPrice = !isAuction && !isPrivateSale;
 
   // Calculations for bidding mode
@@ -321,9 +291,8 @@ export default function BuyerListingDetailPage() {
 
   // Location string
   const locationText =
-    [product?.locationCity, product?.locationCountry]
-      .filter(Boolean)
-      .join(", ") || "Miami, United States";
+    [product?.locationCity, product?.locationCountry].filter(Boolean).join(", ") ||
+    "Miami, United States";
 
   // Seller info
   const sellerName = product?.owner
@@ -334,11 +303,7 @@ export default function BuyerListingDetailPage() {
   // Dynamic specifications key-value extraction
   const dynamicSpecs: { label: string; value: string }[] = [];
 
-  if (
-    product?.buildYear &&
-    !product?.specifications?.year &&
-    !product?.specifications?.buildYear
-  ) {
+  if (product?.buildYear && !product?.specifications?.year && !product?.specifications?.buildYear) {
     dynamicSpecs.push({
       label: "YEAR",
       value: String(product.buildYear),
@@ -362,9 +327,7 @@ export default function BuyerListingDetailPage() {
     (product as any)?.overview ||
     (product
       ? `This immaculate ${product.buildYear || ""} ${product.title} represents the pinnacle of luxury and performance. ${
-          product.specifications?.engine
-            ? `Powered by a ${product.specifications.engine}`
-            : ""
+          product.specifications?.engine ? `Powered by a ${product.specifications.engine}` : ""
         }${product.specifications?.horsepower ? ` generating ${product.specifications.horsepower} HP` : ""}. Meticulously maintained and stored in a climate-controlled environment, it stands ready for its next owner.`
       : "");
 
@@ -374,9 +337,7 @@ export default function BuyerListingDetailPage() {
       <div className="flex items-start justify-between mb-10">
         <AnimationWrapper type="fade-down" duration={0.5}>
           <div>
-            <h2 className="text-[40px] font-clash font-semibold">
-              Exclusive Collection
-            </h2>
+            <h2 className="text-[40px] font-clash font-semibold">Exclusive Collection</h2>
             <p className="text-white text-[20px] mt-1 font-medium">
               Discover the world&apos;s finest assets available for acquisition.
             </p>
@@ -444,15 +405,10 @@ export default function BuyerListingDetailPage() {
                     onClick={handleToggleSave}
                     disabled={saveMutation.isPending}
                     className={`w-10 h-10 bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center transition-colors border border-white/10 cursor-pointer ${
-                      isSaved
-                        ? "text-red-500"
-                        : "text-white/80 hover:text-red-400"
+                      isSaved ? "text-red-500" : "text-white/80 hover:text-red-400"
                     }`}
                   >
-                    <Heart
-                      className="w-4.5 h-4.5"
-                      fill={isSaved ? "currentColor" : "none"}
-                    />
+                    <Heart className="w-4.5 h-4.5" fill={isSaved ? "currentColor" : "none"} />
                   </button>
                   <button
                     onClick={() => {
@@ -512,9 +468,7 @@ export default function BuyerListingDetailPage() {
             <AnimationWrapper type="fade-up" duration={0.5} delay={0.2}>
               <div className="mt-10">
                 <h3 className="text-xl font-clash font-bold mb-4">Overview</h3>
-                <p className="text-gray-400 text-sm leading-relaxed max-w-2xl">
-                  {overviewText}
-                </p>
+                <p className="text-gray-400 text-sm leading-relaxed max-w-2xl">{overviewText}</p>
               </div>
             </AnimationWrapper>
           </div>
@@ -567,7 +521,8 @@ export default function BuyerListingDetailPage() {
                               Asking Price
                             </p>
                             <p className="text-sm font-medium text-white">
-                              {currencySymbol}{askingPriceVal.toLocaleString()}
+                              {currencySymbol}
+                              {askingPriceVal.toLocaleString()}
                             </p>
                           </div>
                         )}
@@ -577,7 +532,8 @@ export default function BuyerListingDetailPage() {
                               Starting Bid
                             </p>
                             <p className="text-sm font-medium text-white">
-                              {currencySymbol}{startingBidVal.toLocaleString()}
+                              {currencySymbol}
+                              {startingBidVal.toLocaleString()}
                             </p>
                           </div>
                         )}
@@ -587,7 +543,8 @@ export default function BuyerListingDetailPage() {
                               Highest Bid
                             </p>
                             <p className="text-sm font-medium text-green-400">
-                              {currencySymbol}{highestBidVal.toLocaleString()}
+                              {currencySymbol}
+                              {highestBidVal.toLocaleString()}
                             </p>
                           </div>
                         )}
@@ -596,9 +553,7 @@ export default function BuyerListingDetailPage() {
                             <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mb-0.5">
                               Total Bids
                             </p>
-                            <p className="text-sm font-medium text-white">
-                              {totalBidsCountVal}
-                            </p>
+                            <p className="text-sm font-medium text-white">{totalBidsCountVal}</p>
                           </div>
                         )}
                       </div>
@@ -614,7 +569,7 @@ export default function BuyerListingDetailPage() {
                         <div className="w-full h-13 bg-[#1C1C1E] border border-[#2C2C2E] rounded-xl animate-pulse" />
                       ) : existingOffer &&
                         ["PENDING", "COUNTERED", "ACCEPTED"].includes(
-                          (existingOffer.status || "").toUpperCase(),
+                          (existingOffer.status || "").toUpperCase()
                         ) ? (
                         <button
                           onClick={() => setIsViewOfferModalOpen(true)}
@@ -623,8 +578,7 @@ export default function BuyerListingDetailPage() {
                           <Clock className="w-4.5 h-4.5 text-primary" />
                           Offer Sent ($
                           {Number(
-                            existingOffer.currentAmount ||
-                              existingOffer.initialAmount,
+                            existingOffer.currentAmount || existingOffer.initialAmount
                           ).toLocaleString()}
                           )
                         </button>
@@ -645,14 +599,8 @@ export default function BuyerListingDetailPage() {
                       {isUserOffersLoading ? (
                         <div className="w-full h-13 bg-[#1C1C1E] border border-[#2C2C2E] rounded-xl animate-pulse" />
                       ) : existingOffer &&
-                        [
-                          "PENDING",
-                          "LEADING",
-                          "OUTBID",
-                          "COUNTERED",
-                          "ACCEPTED",
-                        ].includes(
-                          (existingOffer.status || "").toUpperCase(),
+                        ["PENDING", "LEADING", "OUTBID", "COUNTERED", "ACCEPTED"].includes(
+                          (existingOffer.status || "").toUpperCase()
                         ) ? (
                         <button
                           onClick={handleOpenPlaceBidModal}
@@ -661,8 +609,7 @@ export default function BuyerListingDetailPage() {
                           <Gavel className="w-4.5 h-4.5 text-primary" />
                           Increase Bid ($
                           {Number(
-                            existingOffer.currentAmount ||
-                              existingOffer.initialAmount,
+                            existingOffer.currentAmount || existingOffer.initialAmount
                           ).toLocaleString()}
                           )
                         </button>
@@ -683,10 +630,7 @@ export default function BuyerListingDetailPage() {
                       <Lock className="w-4 h-4 text-primary shrink-0" />
                       <p className="text-sm font-medium text-gray-300">
                         This item is available for{" "}
-                        <span className="text-primary font-semibold">
-                          Private Sale
-                        </span>{" "}
-                        only.
+                        <span className="text-primary font-semibold">Private Sale</span> only.
                       </p>
                     </div>
                   )}
@@ -697,25 +641,17 @@ export default function BuyerListingDetailPage() {
                   <div className="border border-[#2C2C2E] rounded-2xl p-6 bg-white/2">
                     <div className="flex items-center gap-2.5 mb-5">
                       <Info className="w-4 h-4 text-primary" />
-                      <h4 className="text-sm font-semibold text-white">
-                        Key Specifications
-                      </h4>
+                      <h4 className="text-sm font-semibold text-white">Key Specifications</h4>
                     </div>
 
                     {dynamicSpecs.length > 0 ? (
                       <div className="grid grid-cols-2 gap-y-5 gap-x-4">
                         {dynamicSpecs.map((spec, index) => (
-                          <SpecItem
-                            key={index}
-                            label={spec.label}
-                            value={spec.value}
-                          />
+                          <SpecItem key={index} label={spec.label} value={spec.value} />
                         ))}
                       </div>
                     ) : (
-                      <p className="text-xs text-gray-500 italic">
-                        No specifications listed
-                      </p>
+                      <p className="text-xs text-gray-500 italic">No specifications listed</p>
                     )}
                   </div>
                 </AnimationWrapper>
@@ -723,9 +659,7 @@ export default function BuyerListingDetailPage() {
                 {/* Seller Information */}
                 <AnimationWrapper type="fade-left" duration={0.5} delay={0.3}>
                   <div className="bg-[#161618] border border-[#2C2C2E] rounded-2xl p-6">
-                    <h4 className="text-sm font-semibold mb-5 text-white">
-                      Seller Information
-                    </h4>
+                    <h4 className="text-sm font-semibold mb-5 text-white">Seller Information</h4>
                     <div className="flex items-center gap-4">
                       {product.owner?.avatarUrl ? (
                         <img
@@ -739,9 +673,7 @@ export default function BuyerListingDetailPage() {
                         </div>
                       )}
                       <div>
-                        <p className="font-semibold text-[15px] text-white">
-                          {sellerName}
-                        </p>
+                        <p className="font-semibold text-[15px] text-white">{sellerName}</p>
                         <p className="text-xs text-green-400/90 flex items-center gap-1.5 mt-1 font-medium">
                           <BadgeCheck className="w-3.5 h-3.5" />
                           {product.owner?.isVerified
@@ -814,18 +746,14 @@ export default function BuyerListingDetailPage() {
                     <div className="space-y-4">
                       <div className="flex justify-between items-center text-sm tracking-tight">
                         <span className="text-gray-400">Asking Price</span>
-                        <span className="text-white font-medium">
-                          {formattedPrice}
-                        </span>
+                        <span className="text-white font-medium">{formattedPrice}</span>
                       </div>
                       <div className="flex justify-between items-center text-sm tracking-tight">
                         <div className="flex items-center gap-1.5">
                           <span className="text-gray-400">VIP Fee (1.5%)</span>
                           <Info className="w-3.5 h-3.5 text-gray-600" />
                         </div>
-                        <span className="text-white font-medium">
-                          ${vipFee.toLocaleString()}
-                        </span>
+                        <span className="text-white font-medium">${vipFee.toLocaleString()}</span>
                       </div>
                     </div>
 
@@ -838,9 +766,7 @@ export default function BuyerListingDetailPage() {
                           <p className="text-[32px] font-clash font-medium text-primary leading-none mb-1 tracking-tight">
                             ${totalPayable.toLocaleString()}
                           </p>
-                          <p className="text-[11px] text-gray-500">
-                            Asking: {formattedPrice}
-                          </p>
+                          <p className="text-[11px] text-gray-500">Asking: {formattedPrice}</p>
                         </div>
                       </div>
                     </div>
@@ -902,9 +828,7 @@ export default function BuyerListingDetailPage() {
                       </p>
                       <p className="text-[11px] text-green-500/80 flex items-center gap-1.5 font-medium">
                         <BadgeCheck className="w-3 h-3" />
-                        {product.owner?.isVerified
-                          ? "Verified Dealer"
-                          : "Seller"}
+                        {product.owner?.isVerified ? "Verified Dealer" : "Seller"}
                       </p>
                     </div>
                   </div>
@@ -937,10 +861,7 @@ export default function BuyerListingDetailPage() {
                       </button>
                       <button
                         onClick={() => {
-                          if (
-                            typeof window !== "undefined" &&
-                            navigator.share
-                          ) {
+                          if (typeof window !== "undefined" && navigator.share) {
                             navigator.share({
                               title: product.title,
                               url: window.location.href,
@@ -973,12 +894,10 @@ export default function BuyerListingDetailPage() {
         /* Empty / Not Found State */
         <AnimationWrapper type="zoom" duration={0.4}>
           <div className="bg-[#1C1C1E] border border-[#2C2C2E] rounded-2xl p-12 text-center max-w-xl mx-auto my-12">
-            <h3 className="text-2xl font-clash font-semibold text-white mb-2">
-              Product Not Found
-            </h3>
+            <h3 className="text-2xl font-clash font-semibold text-white mb-2">Product Not Found</h3>
             <p className="text-gray-400 text-sm mb-6">
-              The listing you are looking for does not exist or has been removed
-              from the marketplace.
+              The listing you are looking for does not exist or has been removed from the
+              marketplace.
             </p>
             <Link
               href="/buyer/marketplace"
@@ -995,10 +914,7 @@ export default function BuyerListingDetailPage() {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
           onClick={(e) => {
-            if (
-              e.target === e.currentTarget &&
-              !createOfferMutation.isPending
-            ) {
+            if (e.target === e.currentTarget && !createOfferMutation.isPending) {
               setIsOfferModalOpen(false);
             }
           }}
@@ -1007,9 +923,7 @@ export default function BuyerListingDetailPage() {
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <div>
-                <h3 className="text-xl font-clash font-bold text-white">
-                  Make an Offer
-                </h3>
+                <h3 className="text-xl font-clash font-bold text-white">Make an Offer</h3>
                 <p className="text-xs text-gray-400 mt-0.5">
                   Submit your offer directly to the seller for review.
                 </p>
@@ -1031,14 +945,9 @@ export default function BuyerListingDetailPage() {
                 className="w-16 h-12 rounded-lg object-cover border border-white/10 shrink-0"
               />
               <div className="min-w-0 flex-1">
-                <h4 className="text-sm font-semibold text-white truncate">
-                  {product.title}
-                </h4>
+                <h4 className="text-sm font-semibold text-white truncate">{product.title}</h4>
                 <p className="text-xs text-gray-400 mt-0.5">
-                  Asking Price:{" "}
-                  <span className="text-primary font-medium">
-                    {formattedPrice}
-                  </span>
+                  Asking Price: <span className="text-primary font-medium">{formattedPrice}</span>
                 </p>
               </div>
             </div>
@@ -1048,16 +957,13 @@ export default function BuyerListingDetailPage() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="text-xs font-semibold uppercase tracking-wider text-gray-300">
-                    Your Offer Amount (USD){" "}
-                    <span className="text-red-400">*</span>
+                    Your Offer Amount (USD) <span className="text-red-400">*</span>
                   </label>
                   {/* Quick preset percentage pills */}
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
-                      onClick={() =>
-                        numericPrice > 0 && setOfferAmount(String(numericPrice))
-                      }
+                      onClick={() => numericPrice > 0 && setOfferAmount(String(numericPrice))}
                       className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-gray-300 transition-colors"
                     >
                       Asking
@@ -1065,8 +971,7 @@ export default function BuyerListingDetailPage() {
                     <button
                       type="button"
                       onClick={() =>
-                        numericPrice > 0 &&
-                        setOfferAmount(String(Math.round(numericPrice * 0.95)))
+                        numericPrice > 0 && setOfferAmount(String(Math.round(numericPrice * 0.95)))
                       }
                       className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-gray-300 transition-colors"
                     >
@@ -1075,8 +980,7 @@ export default function BuyerListingDetailPage() {
                     <button
                       type="button"
                       onClick={() =>
-                        numericPrice > 0 &&
-                        setOfferAmount(String(Math.round(numericPrice * 0.9)))
+                        numericPrice > 0 && setOfferAmount(String(Math.round(numericPrice * 0.9)))
                       }
                       className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-gray-300 transition-colors"
                     >
@@ -1105,9 +1009,7 @@ export default function BuyerListingDetailPage() {
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">
                   Note / Special Terms{" "}
-                  <span className="text-gray-500 font-normal lowercase">
-                    (optional)
-                  </span>
+                  <span className="text-gray-500 font-normal lowercase">(optional)</span>
                 </label>
                 <textarea
                   rows={3}
@@ -1119,35 +1021,28 @@ export default function BuyerListingDetailPage() {
               </div>
 
               {/* Dynamic VIP Fee estimate summary */}
-              {Boolean(parseFloat(offerAmount)) &&
-                parseFloat(offerAmount) > 0 && (
-                  <div className="bg-[#111111] border border-white/5 p-3.5 rounded-xl text-xs space-y-1.5">
-                    <div className="flex justify-between text-gray-400">
-                      <span>Offer Amount</span>
-                      <span className="text-white font-medium">
-                        ${parseFloat(offerAmount).toLocaleString()}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-gray-400">
-                      <span>Estimated VIP Fee (1.5%)</span>
-                      <span className="text-white font-medium">
-                        $
-                        {Math.round(
-                          parseFloat(offerAmount) * 0.015,
-                        ).toLocaleString()}
-                      </span>
-                    </div>
-                    <div className="pt-1.5 border-t border-white/5 flex justify-between font-semibold">
-                      <span className="text-gray-300">Total Commitment</span>
-                      <span className="text-primary">
-                        $
-                        {Math.round(
-                          parseFloat(offerAmount) * 1.015,
-                        ).toLocaleString()}
-                      </span>
-                    </div>
+              {Boolean(parseFloat(offerAmount)) && parseFloat(offerAmount) > 0 && (
+                <div className="bg-[#111111] border border-white/5 p-3.5 rounded-xl text-xs space-y-1.5">
+                  <div className="flex justify-between text-gray-400">
+                    <span>Offer Amount</span>
+                    <span className="text-white font-medium">
+                      ${parseFloat(offerAmount).toLocaleString()}
+                    </span>
                   </div>
-                )}
+                  <div className="flex justify-between text-gray-400">
+                    <span>Estimated VIP Fee (1.5%)</span>
+                    <span className="text-white font-medium">
+                      ${Math.round(parseFloat(offerAmount) * 0.015).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="pt-1.5 border-t border-white/5 flex justify-between font-semibold">
+                    <span className="text-gray-300">Total Commitment</span>
+                    <span className="text-primary">
+                      ${Math.round(parseFloat(offerAmount) * 1.015).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              )}
 
               {/* Footer Actions */}
               <div className="flex items-center justify-end gap-3 pt-2">
@@ -1196,9 +1091,7 @@ export default function BuyerListingDetailPage() {
             {/* Header */}
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <div>
-                <h3 className="text-xl font-clash font-bold text-white">
-                  Your Submitted Offer
-                </h3>
+                <h3 className="text-xl font-clash font-bold text-white">Your Submitted Offer</h3>
                 <p className="text-xs text-gray-400 mt-0.5">
                   Details of your offer for this listing
                 </p>
@@ -1226,16 +1119,14 @@ export default function BuyerListingDetailPage() {
                 <span className="text-lg font-clash font-bold text-white">
                   $
                   {Number(
-                    existingOffer.currentAmount || existingOffer.initialAmount,
+                    existingOffer.currentAmount || existingOffer.initialAmount
                   ).toLocaleString()}
                 </span>
               </div>
 
               {existingOffer.histories?.[0]?.note && (
                 <div className="pt-2 border-t border-white/5">
-                  <span className="text-xs text-gray-400 block mb-1">
-                    Buyer Note
-                  </span>
+                  <span className="text-xs text-gray-400 block mb-1">Buyer Note</span>
                   <p className="text-xs text-gray-300 bg-[#161618] p-2.5 rounded-lg border border-white/5 italic">
                     &quot;{existingOffer.histories[0].note}&quot;
                   </p>
@@ -1245,9 +1136,7 @@ export default function BuyerListingDetailPage() {
               {existingOffer.createdAt && (
                 <div className="flex items-center justify-between pt-2 border-t border-white/5 text-[11px] text-gray-500">
                   <span>Submitted On</span>
-                  <span>
-                    {new Date(existingOffer.createdAt).toLocaleDateString()}
-                  </span>
+                  <span>{new Date(existingOffer.createdAt).toLocaleDateString()}</span>
                 </div>
               )}
             </div>
@@ -1277,10 +1166,7 @@ export default function BuyerListingDetailPage() {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
           onClick={(e) => {
-            if (
-              e.target === e.currentTarget &&
-              !createOfferMutation.isPending
-            ) {
+            if (e.target === e.currentTarget && !createOfferMutation.isPending) {
               setIsBidModalOpen(false);
             }
           }}
@@ -1316,14 +1202,10 @@ export default function BuyerListingDetailPage() {
                 className="w-16 h-12 rounded-lg object-cover border border-white/10 shrink-0"
               />
               <div className="min-w-0 flex-1">
-                <h4 className="text-sm font-semibold text-white truncate">
-                  {product.title}
-                </h4>
+                <h4 className="text-sm font-semibold text-white truncate">{product.title}</h4>
                 <div className="flex items-center gap-3 mt-1 text-xs">
                   <span className="text-gray-400">
-                    {existingOffer
-                      ? "Your Current Bid:"
-                      : "Starting / Current Ask:"}
+                    {existingOffer ? "Your Current Bid:" : "Starting / Current Ask:"}
                   </span>
                   <span className="text-primary font-bold">
                     {existingOffer
@@ -1339,9 +1221,7 @@ export default function BuyerListingDetailPage() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="text-xs font-semibold uppercase tracking-wider text-gray-300">
-                    {existingOffer
-                      ? "New Higher Bid Amount (USD)"
-                      : "Your Bid Amount (USD)"}{" "}
+                    {existingOffer ? "New Higher Bid Amount (USD)" : "Your Bid Amount (USD)"}{" "}
                     <span className="text-red-400">*</span>
                   </label>
 
@@ -1352,8 +1232,7 @@ export default function BuyerListingDetailPage() {
                         type="button"
                         onClick={() => {
                           const base = Number(
-                            existingOffer.currentAmount ||
-                              existingOffer.initialAmount,
+                            existingOffer.currentAmount || existingOffer.initialAmount
                           );
                           setBidAmount(String(Math.round(base * 1.05)));
                         }}
@@ -1365,8 +1244,7 @@ export default function BuyerListingDetailPage() {
                         type="button"
                         onClick={() => {
                           const base = Number(
-                            existingOffer.currentAmount ||
-                              existingOffer.initialAmount,
+                            existingOffer.currentAmount || existingOffer.initialAmount
                           );
                           setBidAmount(String(Math.round(base * 1.1)));
                         }}
@@ -1378,8 +1256,7 @@ export default function BuyerListingDetailPage() {
                         type="button"
                         onClick={() => {
                           const base = Number(
-                            existingOffer.currentAmount ||
-                              existingOffer.initialAmount,
+                            existingOffer.currentAmount || existingOffer.initialAmount
                           );
                           setBidAmount(String(Math.round(base * 1.15)));
                         }}
@@ -1412,9 +1289,7 @@ export default function BuyerListingDetailPage() {
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">
                   Bidder Note / Terms{" "}
-                  <span className="text-gray-500 font-normal lowercase">
-                    (optional)
-                  </span>
+                  <span className="text-gray-500 font-normal lowercase">(optional)</span>
                 </label>
                 <textarea
                   rows={3}
@@ -1437,19 +1312,13 @@ export default function BuyerListingDetailPage() {
                   <div className="flex justify-between text-gray-400">
                     <span>VIP Fee (1.5%)</span>
                     <span className="text-white font-medium">
-                      $
-                      {Math.round(
-                        parseFloat(bidAmount) * 0.015,
-                      ).toLocaleString()}
+                      ${Math.round(parseFloat(bidAmount) * 0.015).toLocaleString()}
                     </span>
                   </div>
                   <div className="pt-1.5 border-t border-white/5 flex justify-between font-semibold">
                     <span className="text-gray-300">Total Payable</span>
                     <span className="text-primary font-bold">
-                      $
-                      {Math.round(
-                        parseFloat(bidAmount) * 1.015,
-                      ).toLocaleString()}
+                      ${Math.round(parseFloat(bidAmount) * 1.015).toLocaleString()}
                     </span>
                   </div>
                 </div>

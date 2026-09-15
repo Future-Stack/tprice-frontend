@@ -25,9 +25,7 @@ export default function MissionVision() {
         {/* Left Side: Mission & Vision */}
         <div className="space-y-12">
           <div className="space-y-6">
-            <h2 className="text-3xl md:text-[30px] font-cormorant text-white">
-              Our Mission
-            </h2>
+            <h2 className="text-3xl md:text-[30px] font-cormorant text-white">Our Mission</h2>
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -35,17 +33,14 @@ export default function MissionVision() {
               className="p-8 bg-[#2A2A2A] border-l-4 border-primary rounded-sm shadow-xl"
             >
               <p className="text-[#9C9C9C] text-[16px] font-montserrat ">
-                &quot;To preserve the art of the rare by providing a platform
-                where provenance, authenticity, and unparalleled service are the
-                standard for every transaction.&quot;
+                &quot;To preserve the art of the rare by providing a platform where provenance,
+                authenticity, and unparalleled service are the standard for every transaction.&quot;
               </p>
             </motion.div>
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl md:text-[30px] font-cormorant text-white">
-              Our Vision
-            </h2>
+            <h2 className="text-3xl md:text-[30px] font-cormorant text-white">Our Vision</h2>
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -54,9 +49,9 @@ export default function MissionVision() {
               className="p-8 bg-[#2A2A2A]/80 border-l-4 border-primary rounded-sm shadow-xl"
             >
               <p className="text-[#9C9C9C] text-[16px] font-montserrat ">
-                We aim to become the global digital authority for luxury assets,
-                redefining how high-value items are discovered, authenticated,
-                and exchanged across borders and cultures.
+                We aim to become the global digital authority for luxury assets, redefining how
+                high-value items are discovered, authenticated, and exchanged across borders and
+                cultures.
               </p>
             </motion.div>
           </div>
@@ -93,9 +88,7 @@ export default function MissionVision() {
                 className="w-1/2 h-full rounded-lg overflow-hidden border border-white/5 mt-12"
               >
                 <img
-                  src={
-                    SLIDE_ASSETS[(currentIndex + 1) % SLIDE_ASSETS.length].src
-                  }
+                  src={SLIDE_ASSETS[(currentIndex + 1) % SLIDE_ASSETS.length].src}
                   className="w-full h-full object-cover"
                   alt="Luxury Asset 2"
                 />

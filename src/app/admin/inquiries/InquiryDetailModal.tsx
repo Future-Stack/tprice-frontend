@@ -108,9 +108,7 @@ export default function InquiryDetailModal({
               <MessageSquare className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white font-montserrat">
-                Inquiry Details
-              </h2>
+              <h2 className="text-lg font-bold text-white font-montserrat">Inquiry Details</h2>
               <p className="text-xs text-gray-400">ID: {inquiry.id}</p>
             </div>
           </div>
@@ -151,9 +149,7 @@ export default function InquiryDetailModal({
               </div>
               <div className="text-right">
                 <p className="text-[10px] text-gray-500">Submitted</p>
-                <p className="text-xs text-gray-400 mt-0.5">
-                  {formatDate(inquiry.createdAt)}
-                </p>
+                <p className="text-xs text-gray-400 mt-0.5">{formatDate(inquiry.createdAt)}</p>
               </div>
             </div>
 
@@ -228,12 +224,8 @@ export default function InquiryDetailModal({
           {/* Admin Notes if available */}
           {inquiry.adminNotes && (
             <div className="bg-[#1B1B1E] border border-primary/20 rounded-xl p-5 space-y-2">
-              <p className="text-xs font-bold uppercase text-primary tracking-wider">
-                Admin Notes
-              </p>
-              <p className="text-xs text-gray-300 italic">
-                {inquiry.adminNotes}
-              </p>
+              <p className="text-xs font-bold uppercase text-primary tracking-wider">Admin Notes</p>
+              <p className="text-xs text-gray-300 italic">{inquiry.adminNotes}</p>
             </div>
           )}
 

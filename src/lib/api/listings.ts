@@ -175,9 +175,7 @@ export const getListingsApi = async (params?: GetListingsParams): Promise<Listin
 /**
  * Fetch VIP listings via GET /listings/vip
  */
-export const getVipListingsApi = async (
-  params?: GetListingsParams
-): Promise<ListingsResponse> => {
+export const getVipListingsApi = async (params?: GetListingsParams): Promise<ListingsResponse> => {
   const queryParams: Record<string, any> = {};
 
   if (params) {
@@ -245,9 +243,7 @@ export interface GetMyListingsParams {
   category?: string;
 }
 
-export const getMyListingsApi = async (
-  params?: GetMyListingsParams
-): Promise<ListingsResponse> => {
+export const getMyListingsApi = async (params?: GetMyListingsParams): Promise<ListingsResponse> => {
   const queryParams: Record<string, any> = {};
 
   if (params) {
@@ -340,7 +336,6 @@ export const updateListingApi = async (
   const response = await apiClient.patch<ListingItem>(`/listings/${id}`, data);
   return response.data;
 };
-
 
 export interface GetAdminListingsParams {
   page?: number;
@@ -478,9 +473,9 @@ export interface FeaturedPricingResponse {
  * Fetch featured pricing options via GET /listings/featured-pricing
  */
 export const getFeaturedPricingApi = async (): Promise<FeaturedPricingResponse> => {
-  const response = await apiClient.get<
-    FeaturedPricingResponse | { data: FeaturedPricingResponse }
-  >("/listings/featured-pricing");
+  const response = await apiClient.get<FeaturedPricingResponse | { data: FeaturedPricingResponse }>(
+    "/listings/featured-pricing"
+  );
 
   const resData = response.data as any;
   if (resData?.data && resData?.data?.singleListing) {
@@ -517,9 +512,9 @@ export interface FeaturedStatusResponse {
  * Fetch current seller's featured subscription status via GET /listings/me/featured-status
  */
 export const getFeaturedStatusApi = async (): Promise<FeaturedStatusResponse> => {
-  const response = await apiClient.get<
-    FeaturedStatusResponse | { data: FeaturedStatusResponse }
-  >("/listings/me/featured-status");
+  const response = await apiClient.get<FeaturedStatusResponse | { data: FeaturedStatusResponse }>(
+    "/listings/me/featured-status"
+  );
 
   const resData = response.data as any;
   if (resData?.data && resData?.data?.hasActiveSubscription !== undefined) {

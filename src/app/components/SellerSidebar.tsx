@@ -42,8 +42,7 @@ export default function SellerSidebar({
   const router = useRouter();
   const { user: storeUser } = useAuthStore();
   const { data: apiUser } = useGetMeQuery();
-  const { data: featuredStatus, isLoading: isFeaturedLoading } =
-    useFeaturedStatusQuery();
+  const { data: featuredStatus, isLoading: isFeaturedLoading } = useFeaturedStatusQuery();
   const user = apiUser || storeUser;
   const isVip = Boolean(user?.isVip ?? user?.vipStatus);
   const hasActiveSubscription = Boolean(featuredStatus?.hasActiveSubscription);
@@ -97,8 +96,7 @@ export default function SellerSidebar({
         {/* Navigation */}
         <nav className="flex-1 px-4 space-y-2 mt-4">
           {navItems.map((item) => {
-            const isActive =
-              item.href === "/" ? pathname === "/" : pathname === item.href;
+            const isActive = item.href === "/" ? pathname === "/" : pathname === item.href;
             return (
               <Link
                 key={item.label}

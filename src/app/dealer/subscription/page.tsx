@@ -15,10 +15,7 @@ import {
   Calendar,
 } from "lucide-react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
-import {
-  useFeaturedPricingQuery,
-  useFeaturedStatusQuery,
-} from "@/hooks/useListings";
+import { useFeaturedPricingQuery, useFeaturedStatusQuery } from "@/hooks/useListings";
 import { useCreateCheckoutSessionMutation } from "@/hooks/usePayments";
 import { getPaymentReturnUrl } from "@/lib/api/payments";
 import { toast } from "sonner";
@@ -55,8 +52,7 @@ export default function DealerSubscriptionPage() {
     refetch: refetchStatus,
   } = useFeaturedStatusQuery();
 
-  const { mutate: createCheckoutSession, isPending } =
-    useCreateCheckoutSessionMutation();
+  const { mutate: createCheckoutSession, isPending } = useCreateCheckoutSessionMutation();
 
   const isLoading = isPricingLoading || isStatusLoading;
   const isError = isPricingError || isStatusError;
@@ -80,17 +76,13 @@ export default function DealerSubscriptionPage() {
       {
         onSuccess: (data) => {
           const checkoutUrl =
-            data?.checkoutUrl ||
-            (data as any)?.data?.checkoutUrl ||
-            (data as any)?.url;
+            data?.checkoutUrl || (data as any)?.data?.checkoutUrl || (data as any)?.url;
 
           if (checkoutUrl) {
             toast.success("Redirecting to secure Stripe checkout...");
             window.location.assign(checkoutUrl);
           } else {
-            toast.error(
-              "Checkout session created, but no checkout URL was returned."
-            );
+            toast.error("Checkout session created, but no checkout URL was returned.");
           }
         },
         onError: (err: any) => {
@@ -127,8 +119,8 @@ export default function DealerSubscriptionPage() {
               Dealer Subscription Plans
             </h1>
             <p className="text-gray-400 text-sm sm:text-base mt-2 max-w-2xl font-inter leading-relaxed">
-              Maximize your inventory reach. Feature your luxury assets at the top
-              of marketplace searches, VIP deals, and buyer recommendations.
+              Maximize your inventory reach. Feature your luxury assets at the top of marketplace
+              searches, VIP deals, and buyer recommendations.
             </p>
           </div>
 
@@ -344,14 +336,21 @@ export default function DealerSubscriptionPage() {
                         <Check className="w-3.5 h-3.5" />
                       </div>
                       <span>
-                        <strong className="text-white font-medium">Lifetime featured placement</strong> for 1 selected asset listing
+                        <strong className="text-white font-medium">
+                          Lifetime featured placement
+                        </strong>{" "}
+                        for 1 selected asset listing
                       </span>
                     </li>
                     <li className="flex items-start gap-3">
                       <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
                         <Check className="w-3.5 h-3.5" />
                       </div>
-                      <span>Prominent <strong className="text-white font-medium">Gold Featured Badge</strong> displayed on listing card</span>
+                      <span>
+                        Prominent{" "}
+                        <strong className="text-white font-medium">Gold Featured Badge</strong>{" "}
+                        displayed on listing card
+                      </span>
                     </li>
                     <li className="flex items-start gap-3">
                       <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
@@ -380,7 +379,8 @@ export default function DealerSubscriptionPage() {
                 <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white/[0.03] border border-white/5 text-gray-400 text-xs leading-relaxed">
                   <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                   <span>
-                    This plan is applied directly when adding or upgrading individual listings from your <strong className="text-gray-300">Listing</strong> page.
+                    This plan is applied directly when adding or upgrading individual listings from
+                    your <strong className="text-gray-300">Listing</strong> page.
                   </span>
                 </div>
               </div>
@@ -424,9 +424,7 @@ export default function DealerSubscriptionPage() {
                     </h3>
                     <p
                       className={`text-xs font-inter mt-1 font-medium ${
-                        hasActiveSubscription
-                          ? "text-emerald-400"
-                          : "text-primary/90"
+                        hasActiveSubscription ? "text-emerald-400" : "text-primary/90"
                       }`}
                     >
                       {hasActiveSubscription
@@ -509,7 +507,8 @@ export default function DealerSubscriptionPage() {
                         <Check className="w-3.5 h-3.5" />
                       </div>
                       <span>
-                        <strong className="text-white font-medium">Full 365 Days</strong> of nonstop top-tier marketplace exposure
+                        <strong className="text-white font-medium">Full 365 Days</strong> of nonstop
+                        top-tier marketplace exposure
                       </span>
                     </li>
                     <li className="flex items-start gap-3">
@@ -537,9 +536,7 @@ export default function DealerSubscriptionPage() {
                       >
                         <Check className="w-3.5 h-3.5" />
                       </div>
-                      <span>
-                        Priority 1st page ranking across all categories & search filters
-                      </span>
+                      <span>Priority 1st page ranking across all categories & search filters</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <div
@@ -551,9 +548,7 @@ export default function DealerSubscriptionPage() {
                       >
                         <Check className="w-3.5 h-3.5" />
                       </div>
-                      <span>
-                        Instant listing moderation queue & expedited approvals
-                      </span>
+                      <span>Instant listing moderation queue & expedited approvals</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <div
@@ -565,9 +560,7 @@ export default function DealerSubscriptionPage() {
                       >
                         <Check className="w-3.5 h-3.5" />
                       </div>
-                      <span>
-                        Dedicated account manager & 24/7 priority concierge support
-                      </span>
+                      <span>Dedicated account manager & 24/7 priority concierge support</span>
                     </li>
                   </ul>
                 </div>

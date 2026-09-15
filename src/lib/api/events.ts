@@ -55,19 +55,13 @@ export interface UpdateEventInput {
   status?: string;
 }
 
-export const getEventsApi = async (
-  params?: GetEventsParams,
-): Promise<EventsResponse> => {
+export const getEventsApi = async (params?: GetEventsParams): Promise<EventsResponse> => {
   const response = await apiClient.get<EventsResponse>("/events", {
     params: {
       page: params?.page ?? 1,
       limit: params?.limit ?? 10,
-      ...(params?.category && params.category !== "ALL"
-        ? { category: params.category }
-        : {}),
-      ...(params?.status && params.status !== "ALL"
-        ? { status: params.status }
-        : {}),
+      ...(params?.category && params.category !== "ALL" ? { category: params.category } : {}),
+      ...(params?.status && params.status !== "ALL" ? { status: params.status } : {}),
       ...(params?.search ? { search: params.search } : {}),
     },
   });
@@ -79,17 +73,12 @@ export const getEventByIdApi = async (id: string): Promise<EventItem> => {
   return response.data;
 };
 
-export const createEventApi = async (
-  data: CreateEventInput,
-): Promise<EventItem> => {
+export const createEventApi = async (data: CreateEventInput): Promise<EventItem> => {
   const response = await apiClient.post<EventItem>("/events", data);
   return response.data;
 };
 
-export const updateEventApi = async (
-  id: string,
-  data: UpdateEventInput,
-): Promise<EventItem> => {
+export const updateEventApi = async (id: string, data: UpdateEventInput): Promise<EventItem> => {
   const response = await apiClient.patch<EventItem>(`/events/${id}`, data);
   return response.data;
 };
@@ -124,16 +113,12 @@ export interface RegisterEventResponse {
 
 export const registerEventApi = async (
   eventId: string,
-  data: RegisterEventInput,
+  data: RegisterEventInput
 ): Promise<RegisterEventResponse> => {
-  const response = await apiClient.post<RegisterEventResponse>(
-    `/events/${eventId}/register`,
-    data,
-  );
+  const response = await apiClient.post<RegisterEventResponse>(`/events/${eventId}/register`, data);
   return response.data;
 };
 
 export const deleteEventApi = async (id: string): Promise<void> => {
   await apiClient.delete(`/events/${id}`);
 };
-

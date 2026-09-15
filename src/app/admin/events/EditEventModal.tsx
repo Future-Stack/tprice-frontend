@@ -130,8 +130,7 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
         toast.success("Image uploaded successfully!");
       }
     } catch (err: any) {
-      const errMsg =
-        err?.response?.data?.message || err?.message || "Failed to upload image";
+      const errMsg = err?.response?.data?.message || err?.message || "Failed to upload image";
       toast.error(errMsg);
     }
   };
@@ -172,7 +171,12 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.title.trim() || !formData.description.trim() || !selectedDate || !formData.location.trim()) {
+    if (
+      !formData.title.trim() ||
+      !formData.description.trim() ||
+      !selectedDate ||
+      !formData.location.trim()
+    ) {
       toast.error("Please fill in all required fields.");
       return;
     }
@@ -201,8 +205,7 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
       toast.success("Event updated successfully!");
       onClose();
     } catch (err: any) {
-      const errMsg =
-        err?.response?.data?.message || err?.message || "Failed to update event";
+      const errMsg = err?.response?.data?.message || err?.message || "Failed to update event";
       toast.error(errMsg);
     }
   };
@@ -251,7 +254,8 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <Tag className="w-3.5 h-3.5 text-primary" /> Category <span className="text-primary">*</span>
+                <Tag className="w-3.5 h-3.5 text-primary" /> Category{" "}
+                <span className="text-primary">*</span>
               </label>
               <select
                 name="category"
@@ -269,7 +273,8 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
 
             <div>
               <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <Activity className="w-3.5 h-3.5 text-primary" /> Status <span className="text-primary">*</span>
+                <Activity className="w-3.5 h-3.5 text-primary" /> Status{" "}
+                <span className="text-primary">*</span>
               </label>
               <select
                 name="status"
@@ -290,7 +295,8 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-primary" /> Event Date & Time <span className="text-primary">*</span>
+                <Calendar className="w-3.5 h-3.5 text-primary" /> Event Date & Time{" "}
+                <span className="text-primary">*</span>
               </label>
               <DatePicker
                 selected={selectedDate}
@@ -309,7 +315,8 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
 
             <div>
               <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-primary" /> Location <span className="text-primary">*</span>
+                <MapPin className="w-3.5 h-3.5 text-primary" /> Location{" "}
+                <span className="text-primary">*</span>
               </label>
               <input
                 type="text"
@@ -346,9 +353,7 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
                   type="button"
                   onClick={() => setInputMode("url")}
                   className={`px-2.5 py-1 rounded-md transition-colors font-medium cursor-pointer ${
-                    inputMode === "url"
-                      ? "bg-primary text-black"
-                      : "text-gray-400 hover:text-white"
+                    inputMode === "url" ? "bg-primary text-black" : "text-gray-400 hover:text-white"
                   }`}
                 >
                   Image URL
@@ -413,7 +418,9 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
                     {uploadMediaMutation.isPending ? (
                       <div className="flex flex-col items-center justify-center py-3 space-y-2">
                         <Loader2 className="w-8 h-8 text-primary animate-spin" />
-                        <p className="text-xs font-medium text-primary">Uploading image to cloud...</p>
+                        <p className="text-xs font-medium text-primary">
+                          Uploading image to cloud...
+                        </p>
                         <p className="text-[10px] text-gray-500">Please wait a moment</p>
                       </div>
                     ) : (
@@ -464,7 +471,8 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
           {/* Description */}
           <div>
             <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <FileText className="w-3.5 h-3.5 text-primary" /> Description <span className="text-primary">*</span>
+              <FileText className="w-3.5 h-3.5 text-primary" /> Description{" "}
+              <span className="text-primary">*</span>
             </label>
             <textarea
               name="description"

@@ -61,9 +61,7 @@ export const getPaymentReturnUrl = (path: string): string => {
   if (typeof window !== "undefined" && window.location.origin) {
     const origin = window.location.origin;
     const isLocal =
-      origin.includes("localhost") ||
-      origin.includes("127.0.0.1") ||
-      !origin.includes(".");
+      origin.includes("localhost") || origin.includes("127.0.0.1") || !origin.includes(".");
     if (!isLocal && origin.startsWith("http")) {
       return `${origin}${path}`;
     }

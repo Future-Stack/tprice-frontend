@@ -64,12 +64,8 @@ export default function Trust() {
               <div className="w-12 h-12 border border-primary/30 rounded-md flex items-center justify-center text-primary mb-8 group-hover:bg-primary group-hover:text-black transition-all duration-500">
                 <pillar.icon className="w-6 h-6 stroke-[1.2]" />
               </div>
-              <h3 className="text-xl font-serif text-white mb-4">
-                {pillar.title}
-              </h3>
-              <p className="text-white/40 text-[13px] leading-relaxed font-light">
-                {pillar.desc}
-              </p>
+              <h3 className="text-xl font-serif text-white mb-4">{pillar.title}</h3>
+              <p className="text-white/40 text-[13px] leading-relaxed font-light">{pillar.desc}</p>
             </motion.div>
           ))}
         </div>

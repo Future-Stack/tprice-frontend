@@ -95,14 +95,8 @@ export default function VIPDeals() {
   const queryParams: GetListingsParams = {
     page: currentPage,
     limit,
-    category:
-      activeCategory !== "All" && activeCategory !== "ALL"
-        ? activeCategory
-        : undefined,
-    brand:
-      selectedBrand !== "All" && selectedBrand !== "ALL"
-        ? selectedBrand
-        : undefined,
+    category: activeCategory !== "All" && activeCategory !== "ALL" ? activeCategory : undefined,
+    brand: selectedBrand !== "All" && selectedBrand !== "ALL" ? selectedBrand : undefined,
     locationCity: debouncedCity.trim() || undefined,
     locationCountry: debouncedCountry.trim() || undefined,
     buildYear: debouncedBuildYear ? Number(debouncedBuildYear) : undefined,
@@ -218,11 +212,7 @@ export default function VIPDeals() {
                 className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-lg pl-3 pr-8 py-2 text-xs font-medium text-white appearance-none cursor-pointer focus:outline-none focus:border-primary"
               >
                 {SORT_OPTIONS.map((opt) => (
-                  <option
-                    key={opt.value}
-                    value={opt.value}
-                    className="bg-[#1C1C1E] text-white"
-                  >
+                  <option key={opt.value} value={opt.value} className="bg-[#1C1C1E] text-white">
                     {opt.label}
                   </option>
                 ))}
@@ -341,9 +331,7 @@ export default function VIPDeals() {
                 <div className="w-14 h-14 rounded-full bg-[#2C2C2E] flex items-center justify-center mb-3">
                   <Search className="w-7 h-7 text-gray-400" />
                 </div>
-                <p className="text-base sm:text-lg font-medium text-white">
-                  No VIP assets found
-                </p>
+                <p className="text-base sm:text-lg font-medium text-white">No VIP assets found</p>
                 <p className="text-xs sm:text-sm mt-1 text-gray-400 max-w-sm">
                   We couldn&apos;t find any VIP deals matching your active criteria.
                 </p>
@@ -377,43 +365,26 @@ export default function VIPDeals() {
               {meta && meta.totalPages > 1 && (
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 bg-[#1C1C1E] border border-[#2C2C2E] rounded-2xl p-4 sm:px-6">
                   <p className="text-xs sm:text-sm text-gray-400">
-                    Showing{" "}
-                    <span className="font-semibold text-white">
-                      {assets.length}
-                    </span>{" "}
-                    of{" "}
-                    <span className="font-semibold text-white">
-                      {meta.total}
-                    </span>{" "}
-                    VIP deals
+                    Showing <span className="font-semibold text-white">{assets.length}</span> of{" "}
+                    <span className="font-semibold text-white">{meta.total}</span> VIP deals
                   </p>
                   <div className="flex items-center gap-2">
                     <button
                       disabled={currentPage <= 1 || isFetching}
-                      onClick={() =>
-                        setCurrentPage((prev) => Math.max(1, prev - 1))
-                      }
+                      onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                       className="flex items-center gap-1 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium bg-[#18181A] border border-[#2C2C2E] rounded-xl text-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#2C2C2E] transition-colors cursor-pointer"
                     >
                       <ChevronLeft className="w-4 h-4" /> Previous
                     </button>
                     <div className="flex items-center gap-1">
-                      {Array.from(
-                        { length: meta.totalPages },
-                        (_, idx) => idx + 1,
-                      )
+                      {Array.from({ length: meta.totalPages }, (_, idx) => idx + 1)
                         .filter(
-                          (p) =>
-                            Math.abs(p - meta.page) <= 1 ||
-                            p === 1 ||
-                            p === meta.totalPages,
+                          (p) => Math.abs(p - meta.page) <= 1 || p === 1 || p === meta.totalPages
                         )
                         .map((p, i, arr) => (
                           <React.Fragment key={p}>
                             {i > 0 && arr[i - 1] !== p - 1 && (
-                              <span className="text-gray-500 text-xs px-1">
-                                ...
-                              </span>
+                              <span className="text-gray-500 text-xs px-1">...</span>
                             )}
                             <button
                               onClick={() => setCurrentPage(p)}
@@ -430,11 +401,7 @@ export default function VIPDeals() {
                     </div>
                     <button
                       disabled={currentPage >= meta.totalPages || isFetching}
-                      onClick={() =>
-                        setCurrentPage((prev) =>
-                          Math.min(meta.totalPages, prev + 1),
-                        )
-                      }
+                      onClick={() => setCurrentPage((prev) => Math.min(meta.totalPages, prev + 1))}
                       className="flex items-center gap-1 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium bg-primary text-black rounded-xl disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary transition-colors cursor-pointer"
                     >
                       Next <ChevronRight className="w-4 h-4" />
@@ -526,9 +493,7 @@ function FilterSidebar({
     <div className="bg-[#1C1C1E] border border-[#2C2C2E] rounded-2xl p-5 sm:p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="text-base sm:text-lg font-semibold text-white">
-          Filter Listings
-        </h3>
+        <h3 className="text-base sm:text-lg font-semibold text-white">Filter Listings</h3>
         <button
           onClick={handleReset}
           className="text-primary text-xs sm:text-sm font-medium hover:underline cursor-pointer flex items-center gap-1"
@@ -631,9 +596,7 @@ function FilterSidebar({
         {/* Numeric Min / Max Inputs */}
         <div className="grid grid-cols-2 gap-2 mb-4">
           <div>
-            <span className="text-[10px] text-gray-500 block mb-1">
-              Min Price
-            </span>
+            <span className="text-[10px] text-gray-500 block mb-1">Min Price</span>
             <input
               type="number"
               value={priceMin || ""}
@@ -643,15 +606,11 @@ function FilterSidebar({
             />
           </div>
           <div>
-            <span className="text-[10px] text-gray-500 block mb-1">
-              Max Price
-            </span>
+            <span className="text-[10px] text-gray-500 block mb-1">Max Price</span>
             <input
               type="number"
               value={priceMax >= maxLimit ? "" : priceMax}
-              onChange={(e) =>
-                setPriceMax(e.target.value ? Number(e.target.value) : maxLimit)
-              }
+              onChange={(e) => setPriceMax(e.target.value ? Number(e.target.value) : maxLimit)}
               placeholder="Max"
               className="w-full bg-[#18181A] border border-[#2C2C2E] rounded-lg px-3 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-primary"
             />
@@ -673,9 +632,7 @@ function FilterSidebar({
             max={maxLimit}
             step={10000}
             value={priceMin}
-            onChange={(e) =>
-              setPriceMin(Math.min(Number(e.target.value), priceMax - 10000))
-            }
+            onChange={(e) => setPriceMin(Math.min(Number(e.target.value), priceMax - 10000))}
             className="absolute w-full -top-1.5 h-4 appearance-none bg-transparent pointer-events-none z-10
               [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none 
               [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
@@ -692,9 +649,7 @@ function FilterSidebar({
             max={maxLimit}
             step={10000}
             value={priceMax}
-            onChange={(e) =>
-              setPriceMax(Math.max(Number(e.target.value), priceMin + 10000))
-            }
+            onChange={(e) => setPriceMax(Math.max(Number(e.target.value), priceMin + 10000))}
             className="absolute w-full -top-1.5 h-4 appearance-none bg-transparent pointer-events-none z-20
               [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none 
               [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
@@ -708,9 +663,7 @@ function FilterSidebar({
         </div>
         <div className="flex justify-between text-[11px] text-gray-400 font-medium">
           <span>${priceMin.toLocaleString()}</span>
-          <span>
-            {priceMax >= maxLimit ? "Any Max" : `$${priceMax.toLocaleString()}`}
-          </span>
+          <span>{priceMax >= maxLimit ? "Any Max" : `$${priceMax.toLocaleString()}`}</span>
         </div>
       </div>
     </div>
@@ -757,9 +710,7 @@ function MarketplaceCard({ asset }: { asset: ListingItem }) {
   const image =
     asset.media?.[0]?.url ||
     "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&q=80&w=800";
-  const location =
-    [asset.locationCity, asset.locationCountry].filter(Boolean).join(", ") ||
-    "N/A";
+  const location = [asset.locationCity, asset.locationCountry].filter(Boolean).join(", ") || "N/A";
   const formattedPrice = asset.askingPrice
     ? `${asset.currency || "$"}${Number(asset.askingPrice).toLocaleString()}`
     : "Price on Request";
@@ -783,12 +734,9 @@ function MarketplaceCard({ asset }: { asset: ListingItem }) {
         <div className="p-4 sm:p-5 relative mt-2">
           <div className="flex justify-between items-center text-[10px] sm:text-[11px] text-gray-400 mb-2 font-medium">
             <span className="flex items-center gap-1 sm:gap-1.5 truncate pr-2">
-              <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 text-primary" />{" "}
-              {location}
+              <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 text-primary" /> {location}
             </span>
-            <span className="tracking-widest uppercase text-gray-500 shrink-0">
-              Asking Price
-            </span>
+            <span className="tracking-widest uppercase text-gray-500 shrink-0">Asking Price</span>
           </div>
           <div className="flex justify-between items-center mb-4 sm:mb-5 gap-2">
             <h4

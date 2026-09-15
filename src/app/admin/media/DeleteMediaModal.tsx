@@ -69,9 +69,7 @@ export default function DeleteMediaModal({
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <h4 className="font-semibold text-sm text-white line-clamp-1">
-              {mediaItem.title}
-            </h4>
+            <h4 className="font-semibold text-sm text-white line-clamp-1">{mediaItem.title}</h4>
             <p className="text-xs text-gray-400 uppercase tracking-wider">
               {mediaItem.category || "General"} • {mediaItem.type || "IMAGE"}
             </p>
@@ -80,7 +78,9 @@ export default function DeleteMediaModal({
 
         {/* Warning Message */}
         <p className="text-xs text-gray-300 leading-relaxed">
-          Are you sure you want to permanently delete <strong className="text-white">&quot;{mediaItem.title}&quot;</strong>? This media asset will be removed from the landing page.
+          Are you sure you want to permanently delete{" "}
+          <strong className="text-white">&quot;{mediaItem.title}&quot;</strong>? This media asset
+          will be removed from the landing page.
         </p>
 
         {/* Footer Actions */}

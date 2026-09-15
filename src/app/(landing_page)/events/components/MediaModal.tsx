@@ -47,17 +47,12 @@ export default function MediaModal({ isOpen, onClose, media }: MediaModalProps) 
             </button>
 
             {/* Media Rendering */}
-            <div 
+            <div
               className="w-full h-full flex items-center justify-center"
               onClick={(e) => e.stopPropagation()}
             >
               {media.type === "video" ? (
-                <video
-                  autoPlay
-                  controls
-                  playsInline
-                  className="w-full h-full object-contain"
-                >
+                <video autoPlay controls playsInline className="w-full h-full object-contain">
                   <source src={media.src} type="video/mp4" />
                 </video>
               ) : (

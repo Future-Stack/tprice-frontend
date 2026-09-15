@@ -91,7 +91,9 @@ export default function EventsGallery() {
         {/* Empty State */}
         {!isLoading && !isError && mediaItems.length === 0 && (
           <div className="py-16 text-center border border-white/5 rounded-sm bg-white/[0.02]">
-            <p className="text-white/40 text-sm font-serif">No media items available at this time.</p>
+            <p className="text-white/40 text-sm font-serif">
+              No media items available at this time.
+            </p>
           </div>
         )}
 

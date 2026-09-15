@@ -208,9 +208,7 @@ export default function AdminListingsPage() {
       await updateStatusMutation.mutateAsync({ id, status: "LIVE" });
       toast.success(`Listing "${title}" approved successfully`);
     } catch (err: any) {
-      toast.error(
-        err?.response?.data?.message || "Failed to approve listing"
-      );
+      toast.error(err?.response?.data?.message || "Failed to approve listing");
     } finally {
       setUpdatingId(null);
     }
@@ -233,9 +231,7 @@ export default function AdminListingsPage() {
       toast.success(`Listing "${target.title}" rejected`);
       setListingToReject(null);
     } catch (err: any) {
-      toast.error(
-        err?.response?.data?.message || "Failed to reject listing"
-      );
+      toast.error(err?.response?.data?.message || "Failed to reject listing");
     } finally {
       setUpdatingId(null);
     }
@@ -250,9 +246,7 @@ export default function AdminListingsPage() {
       toast.success(res?.message || `Asset listing deleted successfully`);
       setListingToDelete(null);
     } catch (err: any) {
-      toast.error(
-        err?.response?.data?.message || "Failed to delete listing"
-      );
+      toast.error(err?.response?.data?.message || "Failed to delete listing");
     } finally {
       setDeletingId(null);
     }
@@ -269,9 +263,7 @@ export default function AdminListingsPage() {
       {/* Header Section */}
       <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <AnimationWrapper type="fade-down" duration={0.5}>
-          <h1 className="text-3xl font-bold mb-2">
-            Manage and review all listings
-          </h1>
+          <h1 className="text-3xl font-bold mb-2">Manage and review all listings</h1>
           <p className="text-gray-400 text-sm">
             Review submitted marketplace assets, approve pending listings, and manage status
           </p>
@@ -289,9 +281,7 @@ export default function AdminListingsPage() {
             className="p-2.5 bg-[#141416] border border-[#262626] rounded-xl text-gray-400 hover:text-white hover:border-primary/40 transition-colors cursor-pointer"
             title="Refresh listings"
           >
-            <RefreshCw
-              className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`}
-            />
+            <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`} />
           </button>
         </div>
       </div>
@@ -396,15 +386,13 @@ export default function AdminListingsPage() {
                     <td colSpan={7} className="px-6 py-16 text-center">
                       <div className="max-w-md mx-auto space-y-3">
                         <Building2 className="w-10 h-10 text-gray-600 mx-auto" />
-                        <p className="text-base font-semibold text-gray-300">
-                          No listings found
-                        </p>
+                        <p className="text-base font-semibold text-gray-300">No listings found</p>
                         <p className="text-xs text-gray-500">
                           {searchQuery
                             ? `No listings match "${searchQuery}"`
                             : activeTab !== "All listings"
-                            ? `No ${activeTab} listings at the moment.`
-                            : "No listings available."}
+                              ? `No ${activeTab} listings at the moment.`
+                              : "No listings available."}
                         </p>
                       </div>
                     </td>
@@ -446,9 +434,7 @@ export default function AdminListingsPage() {
                                 {listing.title}
                               </span>
                               {listing.brand && (
-                                <span className="text-xs text-gray-500">
-                                  {listing.brand}
-                                </span>
+                                <span className="text-xs text-gray-500">{listing.brand}</span>
                               )}
                             </div>
                           </div>
@@ -486,9 +472,7 @@ export default function AdminListingsPage() {
                                     listing.status === "PENDING_APPROVAL") && (
                                     <>
                                       <button
-                                        onClick={() =>
-                                          handleApprove(listing.id, listing.title)
-                                        }
+                                        onClick={() => handleApprove(listing.id, listing.title)}
                                         disabled={isRowUpdating || isRowDeleting}
                                         className="flex items-center gap-1.5 px-5 py-2 bg-primary hover:bg-yellow-400 text-black text-xs font-bold rounded-lg transition-all active:scale-95 cursor-pointer disabled:opacity-50"
                                       >
@@ -514,9 +498,7 @@ export default function AdminListingsPage() {
                                   {(badge.label.toLowerCase() === "rejected" ||
                                     listing.status === "REJECTED") && (
                                     <button
-                                      onClick={() =>
-                                        handleApprove(listing.id, listing.title)
-                                      }
+                                      onClick={() => handleApprove(listing.id, listing.title)}
                                       disabled={isRowUpdating || isRowDeleting}
                                       className="flex items-center gap-1.5 px-5 py-2 bg-primary hover:bg-yellow-400 cursor-pointer text-black text-xs font-bold rounded-lg transition-all active:scale-95 disabled:opacity-50"
                                     >
@@ -569,15 +551,12 @@ export default function AdminListingsPage() {
             <div className="px-6 py-4 bg-[#141416] border-t border-[#262626] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
               <div>
                 Showing{" "}
-                <span className="font-semibold text-white">
-                  {(meta.page - 1) * meta.limit + 1}
-                </span>{" "}
+                <span className="font-semibold text-white">{(meta.page - 1) * meta.limit + 1}</span>{" "}
                 to{" "}
                 <span className="font-semibold text-white">
                   {Math.min(meta.page * meta.limit, meta.total)}
                 </span>{" "}
-                of <span className="font-semibold text-white">{meta.total}</span>{" "}
-                listings
+                of <span className="font-semibold text-white">{meta.total}</span> listings
               </div>
 
               {/* Page Buttons */}
@@ -591,21 +570,19 @@ export default function AdminListingsPage() {
                   <span className="hidden sm:inline">Previous</span>
                 </button>
 
-                {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map(
-                  (pageNum) => (
-                    <button
-                      key={pageNum}
-                      onClick={() => handlePageChange(pageNum)}
-                      className={`w-8 h-8 rounded-lg border font-semibold text-xs transition-all cursor-pointer ${
-                        pageNum === meta.page
-                          ? "bg-primary text-black border-primary font-bold shadow-[0_2px_10px_rgba(234,179,8,0.3)]"
-                          : "bg-[#1A1A1C] border-[#262626] text-gray-300 hover:text-white hover:border-primary/40"
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  )
-                )}
+                {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    onClick={() => handlePageChange(pageNum)}
+                    className={`w-8 h-8 rounded-lg border font-semibold text-xs transition-all cursor-pointer ${
+                      pageNum === meta.page
+                        ? "bg-primary text-black border-primary font-bold shadow-[0_2px_10px_rgba(234,179,8,0.3)]"
+                        : "bg-[#1A1A1C] border-[#262626] text-gray-300 hover:text-white hover:border-primary/40"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
 
                 <button
                   onClick={() => handlePageChange(meta.page + 1)}
@@ -643,9 +620,7 @@ export default function AdminListingsPage() {
         onClose={() => setListingToReject(null)}
         onConfirm={handleConfirmReject}
         listing={listingToReject}
-        isSubmitting={
-          updateStatusMutation.isPending && updatingId === listingToReject?.id
-        }
+        isSubmitting={updateStatusMutation.isPending && updatingId === listingToReject?.id}
       />
     </div>
   );

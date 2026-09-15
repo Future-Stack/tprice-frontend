@@ -5,15 +5,11 @@ import Topbar from "../components/Topbar";
 import AdminSidebar from "../components/AdminSidebar";
 import ProtectedRoute from "../components/ProtectedRoute";
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const onClose = () => {
     setIsSidebarOpen((prev) => !prev);
-  }
+  };
 
   return (
     <ProtectedRoute allowedRoles={["ADMIN"]}>
@@ -34,4 +30,3 @@ export default function AdminLayout({
     </ProtectedRoute>
   );
 }
-

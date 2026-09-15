@@ -43,20 +43,16 @@ export default function ProductDetailsPage() {
 
   return (
     <div className="mx-auto relative z-0">
-
       {/* ── Page Header ── */}
       <div className="flex items-start justify-between mb-10">
         <AnimationWrapper type="fade-down" duration={0.5}>
           <div>
-            <h2 className="text-[40px] font-clash font-semibold">
-              Exclusive Collection
-            </h2>
+            <h2 className="text-[40px] font-clash font-semibold">Exclusive Collection</h2>
             <p className="text-white text-[20px] mt-1 font-medium">
               Discover the world&apos;s finest assets available for acquisition.
             </p>
           </div>
         </AnimationWrapper>
-
       </div>
 
       {/* ── Back link ── */}
@@ -103,9 +99,10 @@ export default function ProductDetailsPage() {
                 <button
                   onClick={() => setSelectedImage(idx)}
                   className={`relative w-[100px] h-[72px] rounded-xl overflow-hidden border-2 transition-all duration-200 shrink-0
-                    ${selectedImage === idx
-                      ? "border-[#E78F23] shadow-[0_0_12px_rgba(231,143,35,0.3)]"
-                      : "border-[#2C2C2E] hover:border-[#E78F23]/40 opacity-60 hover:opacity-100"
+                    ${
+                      selectedImage === idx
+                        ? "border-[#E78F23] shadow-[0_0_12px_rgba(231,143,35,0.3)]"
+                        : "border-[#2C2C2E] hover:border-[#E78F23]/40 opacity-60 hover:opacity-100"
                     }`}
                 >
                   <img
@@ -122,9 +119,7 @@ export default function ProductDetailsPage() {
           <AnimationWrapper type="fade-up" duration={0.5} delay={0.2}>
             <div className="mt-10">
               <h3 className="text-xl font-clash font-bold mb-4">Overview</h3>
-              <p className="text-gray-400 text-sm leading-relaxed max-w-2xl">
-                {product.overview}
-              </p>
+              <p className="text-gray-400 text-sm leading-relaxed max-w-2xl">{product.overview}</p>
             </div>
           </AnimationWrapper>
         </div>
@@ -155,14 +150,12 @@ export default function ProductDetailsPage() {
                   <p className="text-[11px] text-gray-500 uppercase tracking-[0.15em] font-semibold mb-1">
                     {product.currentBidLabel}
                   </p>
-                  <p className="text-3xl font-inter font-medium text-[#E78F23]">
-                    {product.price}
-                  </p>
+                  <p className="text-3xl font-inter font-medium text-[#E78F23]">{product.price}</p>
                 </div>
               </AnimationWrapper>
 
               {/* Action Buttons */}
-              <AnimationWrapper type="fade-left" duration={0.5} delay={0.2} >
+              <AnimationWrapper type="fade-left" duration={0.5} delay={0.2}>
                 <div className="flex flex-col md:flex-row gap-3">
                   <button
                     onClick={() => setIsBiddingMode(true)}
@@ -195,17 +188,13 @@ export default function ProductDetailsPage() {
               {/* Seller Information */}
               <AnimationWrapper type="fade-left" duration={0.5} delay={0.3}>
                 <div className="bg-[#161618] border border-[#2C2C2E] rounded-2xl p-6">
-                  <h4 className="text-sm font-semibold mb-5 text-white">
-                    Seller Information
-                  </h4>
+                  <h4 className="text-sm font-semibold mb-5 text-white">Seller Information</h4>
                   <div className="flex items-center gap-4">
                     <div className="w-11 h-11 rounded-full bg-[#2C2C2E] font-inter flex items-center justify-center text-[#E78F23] font-bold text-lg border border-[#3C3C3E]">
                       {product.seller.initial}
                     </div>
                     <div>
-                      <p className="font-semibold text-[15px] text-white">
-                        {product.seller.name}
-                      </p>
+                      <p className="font-semibold text-[15px] text-white">{product.seller.name}</p>
                       <p className="text-xs text-green-400/90 flex items-center gap-1.5 mt-1 font-medium">
                         <BadgeCheck className="w-3.5 h-3.5" />
                         {product.seller.badge}
@@ -224,9 +213,7 @@ export default function ProductDetailsPage() {
                   <span className="inline-block bg-[#E78F23]/20 text-[#E78F23] text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-wider mb-3">
                     Auction
                   </span>
-                  <h2 className="text-3xl font-clash font-semibold text-white">
-                    {product.title}
-                  </h2>
+                  <h2 className="text-3xl font-clash font-semibold text-white">{product.title}</h2>
                   <div className="flex items-center gap-2 mt-1.5 text-gray-500 text-sm">
                     <MapPin className="w-3.5 h-3.5" />
                     <span>{product.location}</span>
@@ -238,14 +225,20 @@ export default function ProductDetailsPage() {
               <AnimationWrapper type="fade-up" duration={0.5} delay={0.1}>
                 <div className="bg-[#111111] border border-[#222222] rounded-2xl p-6 space-y-6">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Price Summary</span>
+                    <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
+                      Price Summary
+                    </span>
                     <div className="flex items-center gap-3">
-                      <span className="text-[10px] text-gray-500 font-medium tracking-wide">Show total incl. fees</span>
+                      <span className="text-[10px] text-gray-500 font-medium tracking-wide">
+                        Show total incl. fees
+                      </span>
                       <button
                         onClick={() => setInclFees(!inclFees)}
-                        className={`w-10 h-5.5 rounded-full relative transition-all duration-300 ${inclFees ? 'bg-white' : 'bg-[#2C2C2E]'}`}
+                        className={`w-10 h-5.5 rounded-full relative transition-all duration-300 ${inclFees ? "bg-white" : "bg-[#2C2C2E]"}`}
                       >
-                        <div className={`absolute top-1 w-3.5 h-3.5 rounded-full transition-all duration-300 ${inclFees ? 'left-5.5 bg-black' : 'left-1 bg-white'}`} />
+                        <div
+                          className={`absolute top-1 w-3.5 h-3.5 rounded-full transition-all duration-300 ${inclFees ? "left-5.5 bg-black" : "left-1 bg-white"}`}
+                        />
                       </button>
                     </div>
                   </div>
@@ -268,7 +261,9 @@ export default function ProductDetailsPage() {
                     <div className="flex justify-between items-start">
                       <span className="text-sm font-medium text-gray-400 mt-1">Total Payable</span>
                       <div className="text-right">
-                        <p className="text-[32px] font-clash font-medium text-[#E78F23] leading-none mb-1 tracking-tight">$377,580</p>
+                        <p className="text-[32px] font-clash font-medium text-[#E78F23] leading-none mb-1 tracking-tight">
+                          $377,580
+                        </p>
                         <p className="text-[11px] text-gray-500">Asking: $389,000</p>
                       </div>
                     </div>
@@ -276,7 +271,9 @@ export default function ProductDetailsPage() {
 
                   <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#E78F23]/10 rounded-full border border-[#E78F23]/20">
                     <div className="w-1.5 h-1.5 bg-[#E78F23] rounded-full shadow-[0_0_8px_rgba(231,143,35,0.6)]" />
-                    <span className="text-[9px] text-[#E78F23] font-bold uppercase tracking-widest">VIP reduced fee applied</span>
+                    <span className="text-[9px] text-[#E78F23] font-bold uppercase tracking-widest">
+                      VIP reduced fee applied
+                    </span>
                   </div>
                 </div>
               </AnimationWrapper>
@@ -285,19 +282,27 @@ export default function ProductDetailsPage() {
               <AnimationWrapper type="fade-up" duration={0.5} delay={0.2}>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-[#161618] rounded-xl p-4 border border-white/[0.03]">
-                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Mileage</p>
+                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">
+                      Mileage
+                    </p>
                     <p className="text-[15px] font-medium text-white">1,200 mi</p>
                   </div>
                   <div className="bg-[#161618] rounded-xl p-4 border border-white/[0.03]">
-                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Engine</p>
+                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">
+                      Engine
+                    </p>
                     <p className="text-[15px] font-medium text-white">3.9L V8 Twin-Turbo</p>
                   </div>
                   <div className="bg-[#161618] rounded-xl p-4 border border-white/[0.03]">
-                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Power</p>
+                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">
+                      Power
+                    </p>
                     <p className="text-[15px] font-medium text-white">661 HP</p>
                   </div>
                   <div className="bg-[#161618] rounded-xl p-4 border border-white/[0.03]">
-                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">0-60</p>
+                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">
+                      0-60
+                    </p>
                     <p className="text-[15px] font-medium text-white">2.9s</p>
                   </div>
                 </div>
@@ -310,7 +315,9 @@ export default function ProductDetailsPage() {
                     M
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-white leading-none mb-1">Monaco Prestige Motors</p>
+                    <p className="text-sm font-semibold text-white leading-none mb-1">
+                      Monaco Prestige Motors
+                    </p>
                     <p className="text-[11px] text-green-500/80 flex items-center gap-1.5 font-medium">
                       <BadgeCheck className="w-3 h-3" />
                       Verified Dealer
@@ -349,10 +356,9 @@ export default function ProductDetailsPage() {
           )}
         </div>
       </div>
-    </div >
+    </div>
   );
 }
-
 
 /* ─── Sub-components ─── */
 function SpecItem({ label, value }: { label: string; value: string }) {

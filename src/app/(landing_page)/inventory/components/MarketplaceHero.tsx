@@ -45,10 +45,9 @@ export default function MarketplaceHero() {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="text-[#E0E0E0] text-sm md:text-[24px] max-w-330     font-normal font-montserrat"
           >
-            Browse Our Curated Collection Of Ultra-Premium Assets — From Hyper
-            Cars And Super Yachts To Private Jets And Trophy Real Estate. Each
-            Listing Is Carefully Selected To Meet The Highest Standards Of
-            Quality, Exclusivity, And Performance.
+            Browse Our Curated Collection Of Ultra-Premium Assets — From Hyper Cars And Super Yachts
+            To Private Jets And Trophy Real Estate. Each Listing Is Carefully Selected To Meet The
+            Highest Standards Of Quality, Exclusivity, And Performance.
           </motion.p>
         </div>
 

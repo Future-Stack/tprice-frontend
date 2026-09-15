@@ -63,8 +63,6 @@ export interface BuyerDashboardResponse {
  * Fetch Buyer Dashboard data (user, stats, activeBids, recentActivity, savedItems)
  */
 export const getBuyerDashboardApi = async (): Promise<BuyerDashboardResponse> => {
-  const response = await apiClient.get<BuyerDashboardResponse>(
-    "/users/me/buyer-dashboard"
-  );
+  const response = await apiClient.get<BuyerDashboardResponse>("/users/me/buyer-dashboard");
   return response.data;
 };

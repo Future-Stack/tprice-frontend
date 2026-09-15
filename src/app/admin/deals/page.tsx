@@ -139,18 +139,14 @@ export default function AdminDeals() {
     if (!deals || deals.length === 0) return [];
     switch (activeTab) {
       case "Negotiation":
-        return deals.filter(
-          (d) => (d.stage || "").toUpperCase() === "NEGOTIATION",
-        );
+        return deals.filter((d) => (d.stage || "").toUpperCase() === "NEGOTIATION");
       case "Closed":
         return deals.filter((d) => {
           const stage = (d.stage || "").toUpperCase();
           return stage === "COMPLETED" || stage === "CLOSED";
         });
       case "Flagged":
-        return deals.filter(
-          (d) => d.isFlagged || (d.stage || "").toUpperCase() === "FLAGGED",
-        );
+        return deals.filter((d) => d.isFlagged || (d.stage || "").toUpperCase() === "FLAGGED");
       case "Active Deals":
       default:
         return deals.filter((d) => {
@@ -182,9 +178,7 @@ export default function AdminDeals() {
       <div className="mb-8">
         <AnimationWrapper type="fade-down" duration={0.5}>
           <h1 className="text-3xl font-bold mb-2">Deals</h1>
-          <p className="text-gray-400 text-sm">
-            Monitor all deals from one place
-          </p>
+          <p className="text-gray-400 text-sm">Monitor all deals from one place</p>
         </AnimationWrapper>
       </div>
 
@@ -197,9 +191,7 @@ export default function AdminDeals() {
                 key={tab}
                 onClick={() => handleTabChange(tab)}
                 className={`pb-4 text-sm font-medium transition-all relative whitespace-nowrap cursor-pointer ${
-                  activeTab === tab
-                    ? "text-white"
-                    : "text-gray-500 hover:text-gray-300"
+                  activeTab === tab ? "text-white" : "text-gray-500 hover:text-gray-300"
                 }`}
               >
                 {tab}
@@ -260,19 +252,13 @@ export default function AdminDeals() {
                   <TableSkeleton />
                 ) : isError ? (
                   <tr>
-                    <td
-                      colSpan={8}
-                      className="px-6 py-12 text-center text-red-400"
-                    >
+                    <td colSpan={8} className="px-6 py-12 text-center text-red-400">
                       Failed to load deals. {(error as Error)?.message}
                     </td>
                   </tr>
                 ) : filteredDeals.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan={8}
-                      className="px-6 py-12 text-center text-gray-500 text-sm"
-                    >
+                    <td colSpan={8} className="px-6 py-12 text-center text-gray-500 text-sm">
                       No deals found for this view.
                     </td>
                   </tr>
@@ -298,12 +284,8 @@ export default function AdminDeals() {
                         <td className="px-6 py-6 font-medium text-sm text-white">
                           {deal.listing?.title || "N/A"}
                         </td>
-                        <td className="px-6 py-6 text-sm text-gray-400">
-                          {buyerName}
-                        </td>
-                        <td className="px-6 py-6 text-sm text-gray-400">
-                          {dealerName}
-                        </td>
+                        <td className="px-6 py-6 text-sm text-gray-400">{buyerName}</td>
+                        <td className="px-6 py-6 text-sm text-gray-400">{dealerName}</td>
                         <td className="px-6 py-6 text-sm font-bold text-white">
                           {formatPrice(deal.agreedPrice)}
                         </td>
@@ -318,26 +300,18 @@ export default function AdminDeals() {
                               <>
                                 <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
                                 {health.message && (
-                                  <span className="text-xs text-gray-400">
-                                    {health.message}
-                                  </span>
+                                  <span className="text-xs text-gray-400">{health.message}</span>
                                 )}
-                                <span className="text-xs font-bold text-white">
-                                  {health.time}
-                                </span>
+                                <span className="text-xs font-bold text-white">{health.time}</span>
                               </>
                             )}
                             {health.status === "warning" && (
                               <>
                                 <Clock className="w-4 h-4 text-yellow-500 shrink-0" />
                                 {health.message && (
-                                  <span className="text-xs text-gray-400">
-                                    {health.message}
-                                  </span>
+                                  <span className="text-xs text-gray-400">{health.message}</span>
                                 )}
-                                <span className="text-xs font-bold text-white">
-                                  {health.time}
-                                </span>
+                                <span className="text-xs font-bold text-white">{health.time}</span>
                               </>
                             )}
                             {health.status === "healthy" && (
@@ -374,16 +348,12 @@ export default function AdminDeals() {
             <div className="px-6 py-4 bg-[#141416] border-t border-[#262626] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
               <div>
                 Showing{" "}
-                <span className="font-semibold text-white">
-                  {(meta.page - 1) * meta.limit + 1}
-                </span>{" "}
+                <span className="font-semibold text-white">{(meta.page - 1) * meta.limit + 1}</span>{" "}
                 to{" "}
                 <span className="font-semibold text-white">
                   {Math.min(meta.page * meta.limit, meta.total)}
                 </span>{" "}
-                of{" "}
-                <span className="font-semibold text-white">{meta.total}</span>{" "}
-                deals
+                of <span className="font-semibold text-white">{meta.total}</span> deals
               </div>
 
               {/* Page Buttons */}
@@ -397,21 +367,19 @@ export default function AdminDeals() {
                   <span className="hidden sm:inline">Previous</span>
                 </button>
 
-                {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map(
-                  (pageNum) => (
-                    <button
-                      key={pageNum}
-                      onClick={() => handlePageChange(pageNum)}
-                      className={`w-8 h-8 rounded-lg border font-semibold text-xs transition-all cursor-pointer ${
-                        pageNum === meta.page
-                          ? "bg-yellow-500 text-black border-yellow-500 font-bold shadow-[0_2px_10px_rgba(234,179,8,0.3)]"
-                          : "bg-[#1A1A1C] border-[#262626] text-gray-300 hover:text-white hover:border-yellow-500/40"
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  ),
-                )}
+                {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    onClick={() => handlePageChange(pageNum)}
+                    className={`w-8 h-8 rounded-lg border font-semibold text-xs transition-all cursor-pointer ${
+                      pageNum === meta.page
+                        ? "bg-yellow-500 text-black border-yellow-500 font-bold shadow-[0_2px_10px_rgba(234,179,8,0.3)]"
+                        : "bg-[#1A1A1C] border-[#262626] text-gray-300 hover:text-white hover:border-yellow-500/40"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
 
                 <button
                   onClick={() => handlePageChange(meta.page + 1)}

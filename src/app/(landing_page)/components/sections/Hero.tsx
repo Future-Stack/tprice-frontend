@@ -118,8 +118,8 @@ export default function Hero() {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="text-gray-300 max-w-2xl mx-auto text-sm md:text-base font-light mb-10 tracking-wide font-montserrat"
         >
-          From the world&apos;s most prestigious hypercars to private jets and
-          prime estates, acquire high-value assets securely.
+          From the world&apos;s most prestigious hypercars to private jets and prime estates,
+          acquire high-value assets securely.
         </motion.p>
 
         {/* Action Buttons */}

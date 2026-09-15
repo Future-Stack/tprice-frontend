@@ -63,8 +63,6 @@ export interface SellerDashboardResponse {
  * Fetch Seller Dashboard data (stats, quickViewListings, recentActivity, activeListings)
  */
 export const getSellerDashboardApi = async (): Promise<SellerDashboardResponse> => {
-  const response = await apiClient.get<SellerDashboardResponse>(
-    "/users/me/seller-dashboard"
-  );
+  const response = await apiClient.get<SellerDashboardResponse>("/users/me/seller-dashboard");
   return response.data;
 };

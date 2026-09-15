@@ -33,7 +33,6 @@ export interface DealListing {
   media?: { id?: string; url: string; type?: string }[];
 }
 
-
 export interface DealItem {
   id: string;
   offerId?: string;
@@ -52,7 +51,6 @@ export interface DealItem {
   messages?: DealMessage[];
   offer?: any;
 }
-
 
 export interface DealsMeta {
   total: number;
@@ -77,9 +75,7 @@ export interface GetDealsParams {
 /**
  * Fetch deals list for current user (Buyer/Seller) with pagination
  */
-export const getDealsApi = async (
-  params?: GetDealsParams
-): Promise<GetDealsResponse> => {
+export const getDealsApi = async (params?: GetDealsParams): Promise<GetDealsResponse> => {
   const response = await apiClient.get<GetDealsResponse>("/deals", {
     params,
   });
@@ -89,22 +85,17 @@ export const getDealsApi = async (
 /**
  * Fetch deals list with pagination for admin
  */
-export const getAdminDealsApi = async (
-  params?: GetDealsParams
-): Promise<GetDealsResponse> => {
+export const getAdminDealsApi = async (params?: GetDealsParams): Promise<GetDealsResponse> => {
   const response = await apiClient.get<GetDealsResponse>("/deals", {
     params,
   });
   return response.data;
 };
 
-
 /**
  * Fetch single deal detail by ID (if endpoint available)
  */
-export const getDealDetailApi = async (
-  dealId: string
-): Promise<DealItem> => {
+export const getDealDetailApi = async (dealId: string): Promise<DealItem> => {
   const response = await apiClient.get<DealItem>(`/deals/${dealId}`);
   return response.data;
 };
@@ -112,9 +103,7 @@ export const getDealDetailApi = async (
 /**
  * Fetch messages for a specific deal
  */
-export const getDealMessagesApi = async (
-  dealId: string
-): Promise<DealMessage[]> => {
+export const getDealMessagesApi = async (dealId: string): Promise<DealMessage[]> => {
   const response = await apiClient.get<any>(`/deals/${dealId}/messages`);
   if (Array.isArray(response.data)) {
     return response.data;
@@ -135,10 +124,7 @@ export const sendDealMessageApi = async (
   dealId: string,
   payload: SendDealMessagePayload
 ): Promise<DealMessage> => {
-  const response = await apiClient.post<any>(
-    `/deals/${dealId}/messages`,
-    payload
-  );
+  const response = await apiClient.post<any>(`/deals/${dealId}/messages`, payload);
   return response.data?.data || response.data?.message || response.data;
 };
 
@@ -157,11 +143,6 @@ export const updateDealStageApi = async (
   dealId: string,
   payload: UpdateDealStagePayload
 ): Promise<DealItem> => {
-  const response = await apiClient.patch<DealItem>(
-    `/deals/${dealId}/stage`,
-    payload
-  );
+  const response = await apiClient.patch<DealItem>(`/deals/${dealId}/stage`, payload);
   return response.data;
 };
-
-

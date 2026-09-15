@@ -41,11 +41,7 @@ const formatDate = (dateString?: string) => {
   }
 };
 
-export default function TrimDetailModal({
-  isOpen,
-  onClose,
-  trim,
-}: TrimDetailModalProps) {
+export default function TrimDetailModal({ isOpen, onClose, trim }: TrimDetailModalProps) {
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
   useEffect(() => {
@@ -86,12 +82,8 @@ export default function TrimDetailModal({
               <Layers className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white font-clash">
-                {trim.name}
-              </h2>
-              <p className="text-xs text-gray-400">
-                Trim Variant Details & Model Bindings
-              </p>
+              <h2 className="text-xl font-bold text-white font-clash">{trim.name}</h2>
+              <p className="text-xs text-gray-400">Trim Variant Details & Model Bindings</p>
             </div>
           </div>
           <button
@@ -158,12 +150,8 @@ export default function TrimDetailModal({
                     <Car className="w-5 h-5" />
                   </div>
                   <div>
-                    <span className="font-bold text-sm text-white block">
-                      {model.name}
-                    </span>
-                    <span className="text-xs text-gray-500 font-mono">
-                      Slug: /{model.slug}
-                    </span>
+                    <span className="font-bold text-sm text-white block">{model.name}</span>
+                    <span className="text-xs text-gray-500 font-mono">Slug: /{model.slug}</span>
                   </div>
                 </div>
                 <button
@@ -176,9 +164,7 @@ export default function TrimDetailModal({
                 </button>
               </div>
             ) : (
-              <p className="text-xs text-gray-500 italic">
-                No model details associated.
-              </p>
+              <p className="text-xs text-gray-500 italic">No model details associated.</p>
             )}
           </div>
 
@@ -214,9 +200,7 @@ export default function TrimDetailModal({
 
                   <div className="flex-1 space-y-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h4 className="text-base font-bold text-white">
-                        {brand.name}
-                      </h4>
+                      <h4 className="text-base font-bold text-white">{brand.name}</h4>
                       {brand.category && (
                         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-primary/10 text-primary border border-primary/20">
                           <FolderTree className="w-3 h-3" />
@@ -224,9 +208,7 @@ export default function TrimDetailModal({
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-gray-400 font-mono">
-                      Slug: /{brand.slug}
-                    </p>
+                    <p className="text-xs text-gray-400 font-mono">Slug: /{brand.slug}</p>
                     {brand.description && (
                       <p className="text-xs text-gray-300 italic pt-1">
                         &quot;{brand.description}&quot;
@@ -253,9 +235,7 @@ export default function TrimDetailModal({
                 )}
               </div>
             ) : (
-              <p className="text-xs text-gray-500 italic">
-                No brand information attached.
-              </p>
+              <p className="text-xs text-gray-500 italic">No brand information attached.</p>
             )}
           </div>
 
@@ -264,24 +244,16 @@ export default function TrimDetailModal({
             <div className="p-3.5 bg-[#18181A] border border-[#262626] rounded-xl flex items-center gap-3">
               <Calendar className="w-4 h-4 text-gray-400 shrink-0" />
               <div>
-                <span className="text-gray-500 block text-[11px]">
-                  Created At
-                </span>
-                <span className="text-gray-300 font-medium">
-                  {formatDate(trim.createdAt)}
-                </span>
+                <span className="text-gray-500 block text-[11px]">Created At</span>
+                <span className="text-gray-300 font-medium">{formatDate(trim.createdAt)}</span>
               </div>
             </div>
 
             <div className="p-3.5 bg-[#18181A] border border-[#262626] rounded-xl flex items-center gap-3">
               <Calendar className="w-4 h-4 text-gray-400 shrink-0" />
               <div>
-                <span className="text-gray-500 block text-[11px]">
-                  Last Updated
-                </span>
-                <span className="text-gray-300 font-medium">
-                  {formatDate(trim.updatedAt)}
-                </span>
+                <span className="text-gray-500 block text-[11px]">Last Updated</span>
+                <span className="text-gray-300 font-medium">{formatDate(trim.updatedAt)}</span>
               </div>
             </div>
           </div>

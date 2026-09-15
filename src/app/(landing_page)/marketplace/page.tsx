@@ -22,16 +22,15 @@ export default function ServicesPage() {
         service.title.toLowerCase().includes(search.toLowerCase()) ||
         service.category.toLowerCase().includes(search.toLowerCase());
 
-      const matchesCategory =
-        activeCategory === "All" || service.category === activeCategory;
+      const matchesCategory = activeCategory === "All" || service.category === activeCategory;
 
       return matchesSearch && matchesCategory;
     }).sort((a, b) => {
       if (sortBy === "rating") return b.rating - a.rating;
       if (sortBy === "experience") {
-          const expA = parseInt(a.experience) || 0;
-          const expB = parseInt(b.experience) || 0;
-          return expB - expA;
+        const expA = parseInt(a.experience) || 0;
+        const expB = parseInt(b.experience) || 0;
+        return expB - expA;
       }
       return b.id - a.id; // newest based on id for demo
     });
@@ -74,16 +73,19 @@ export default function ServicesPage() {
                     className="col-span-full py-32 text-center"
                   >
                     <div className="w-20 h-20 bg-primary/5 rounded-full flex items-center justify-center mx-auto mb-6">
-                         <div className="w-10 h-10 border-2 border-primary/20 rounded-full border-t-primary animate-spin" />
+                      <div className="w-10 h-10 border-2 border-primary/20 rounded-full border-t-primary animate-spin" />
                     </div>
                     <p className="text-white/40 text-xl font-serif italic">
                       No matching experts found.
                     </p>
-                    <button 
-                        onClick={() => {setSearch(""); setActiveCategory("All");}}
-                        className="mt-6 text-primary hover:underline font-medium"
+                    <button
+                      onClick={() => {
+                        setSearch("");
+                        setActiveCategory("All");
+                      }}
+                      className="mt-6 text-primary hover:underline font-medium"
                     >
-                        Clear all filters
+                      Clear all filters
                     </button>
                   </motion.div>
                 )}

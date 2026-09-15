@@ -10,7 +10,12 @@ interface DetailsHeaderProps {
   typeBadge: string;
 }
 
-export default function DetailsHeader({ title, category, location, typeBadge }: DetailsHeaderProps) {
+export default function DetailsHeader({
+  title,
+  category,
+  location,
+  typeBadge,
+}: DetailsHeaderProps) {
   return (
     <div className="space-y-4">
       {/* Type Badge */}
@@ -21,14 +26,10 @@ export default function DetailsHeader({ title, category, location, typeBadge }: 
       </div>
 
       {/* Title */}
-      <h1 className="text-5xl md:text-6xl font-serif text-white tracking-tight">
-        {title}
-      </h1>
+      <h1 className="text-5xl md:text-6xl font-serif text-white tracking-tight">{title}</h1>
 
       {/* Category Subtitle */}
-      <div className="text-white/40 text-xs font-bold uppercase tracking-[0.2em]">
-        {category}
-      </div>
+      <div className="text-white/40 text-xs font-bold uppercase tracking-[0.2em]">{category}</div>
 
       {/* Location */}
       <div className="flex items-center gap-2 text-white/30 text-sm">

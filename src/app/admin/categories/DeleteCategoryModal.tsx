@@ -83,18 +83,19 @@ export default function DeleteCategoryModal({
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <h4 className="font-semibold text-sm text-white line-clamp-1">
-              {category.name}
-            </h4>
+            <h4 className="font-semibold text-sm text-white line-clamp-1">{category.name}</h4>
             <p className="text-xs text-gray-400 uppercase tracking-wider mt-0.5">
-              {category._count?.listings ?? 0} listings • {category.isActive ? "Active" : "Inactive"}
+              {category._count?.listings ?? 0} listings •{" "}
+              {category.isActive ? "Active" : "Inactive"}
             </p>
           </div>
         </div>
 
         {/* Warning Message */}
         <p className="text-sm text-gray-300 leading-relaxed">
-          Are you sure you want to permanently delete the category <strong className="text-white">&quot;{category.name}&quot;</strong>? This will permanently delete the category and may affect any listings associated with it.
+          Are you sure you want to permanently delete the category{" "}
+          <strong className="text-white">&quot;{category.name}&quot;</strong>? This will permanently
+          delete the category and may affect any listings associated with it.
         </p>
 
         {/* Footer Actions */}

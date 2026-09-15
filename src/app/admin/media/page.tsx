@@ -17,10 +17,7 @@ import {
 } from "lucide-react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
 import Image from "next/image";
-import {
-  useLandingMediaQuery,
-  useDeleteLandingMediaMutation,
-} from "@/hooks/useMedia";
+import { useLandingMediaQuery, useDeleteLandingMediaMutation } from "@/hooks/useMedia";
 import { LandingMediaItem } from "@/lib/api/media";
 import { useDebounce } from "@/hooks/useDebounce";
 import { toast } from "sonner";
@@ -82,13 +79,9 @@ export default function AdminMediaPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("ALL");
   const [activeType, setActiveType] = useState("ALL");
-  const [selectedMedia, setSelectedMedia] = useState<LandingMediaItem | null>(
-    null,
-  );
+  const [selectedMedia, setSelectedMedia] = useState<LandingMediaItem | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [mediaToDelete, setMediaToDelete] = useState<LandingMediaItem | null>(
-    null,
-  );
+  const [mediaToDelete, setMediaToDelete] = useState<LandingMediaItem | null>(null);
 
   const deleteMediaMutation = useDeleteLandingMediaMutation();
 
@@ -102,10 +95,7 @@ export default function AdminMediaPage() {
         setSelectedMedia(null);
       }
     } catch (err: any) {
-      const errMsg =
-        err?.response?.data?.message ||
-        err?.message ||
-        "Failed to delete media asset";
+      const errMsg = err?.response?.data?.message || err?.message || "Failed to delete media asset";
       toast.error(errMsg);
     }
   };
@@ -142,8 +132,7 @@ export default function AdminMediaPage() {
                 Media Management
               </h1>
               <p className="text-gray-400 text-sm mt-1">
-                Browse, filter, and inspect landing page media assets and
-                promotional banners.
+                Browse, filter, and inspect landing page media assets and promotional banners.
               </p>
             </div>
           </div>
@@ -163,11 +152,7 @@ export default function AdminMediaPage() {
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#262626] bg-[#18181A] text-gray-300 hover:text-white hover:border-primary/50 transition-all text-sm font-medium disabled:opacity-50 cursor-pointer"
               title="Refresh data"
             >
-              <RefreshCw
-                className={`w-4 h-4 text-primary ${
-                  isFetching ? "animate-spin" : ""
-                }`}
-              />
+              <RefreshCw className={`w-4 h-4 text-primary ${isFetching ? "animate-spin" : ""}`} />
               <span>Refresh</span>
             </button>
           </div>
@@ -181,12 +166,10 @@ export default function AdminMediaPage() {
             <div className="w-16 h-16 rounded-full bg-[#E78F23]/10 border border-[#E78F23]/20 flex items-center justify-center text-primary mb-4">
               <ImageIcon className="w-8 h-8" />
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">
-              No Media Found
-            </h3>
+            <h3 className="text-xl font-semibold text-white mb-2">No Media Found</h3>
             <p className="text-gray-400 text-sm max-w-md mb-6">
-              No media items matching your selected criteria were found. Try
-              adjusting your search query or create a new media asset.
+              No media items matching your selected criteria were found. Try adjusting your search
+              query or create a new media asset.
             </p>
             <div className="flex items-center gap-3">
               <button
@@ -195,9 +178,7 @@ export default function AdminMediaPage() {
               >
                 Create Media
               </button>
-              {(searchQuery ||
-                activeCategory !== "ALL" ||
-                activeType !== "ALL") && (
+              {(searchQuery || activeCategory !== "ALL" || activeType !== "ALL") && (
                 <button
                   onClick={() => {
                     setSearchQuery("");
@@ -367,12 +348,8 @@ export default function AdminMediaPage() {
               <strong className="text-white">
                 {totalItems === 0 ? 0 : (page - 1) * limit + 1}
               </strong>{" "}
-              to{" "}
-              <strong className="text-white">
-                {Math.min(page * limit, totalItems)}
-              </strong>{" "}
-              of <strong className="text-white">{totalItems}</strong> media
-              assets
+              to <strong className="text-white">{Math.min(page * limit, totalItems)}</strong> of{" "}
+              <strong className="text-white">{totalItems}</strong> media assets
             </span>
 
             <div className="flex items-center gap-2 border-l border-[#262626] pl-4">
@@ -429,12 +406,8 @@ export default function AdminMediaPage() {
               {/* Modal Header */}
               <div className="p-5 border-b border-[#262626] flex items-center justify-between bg-[#111111]">
                 <div>
-                  <h2 className="text-lg font-bold text-white font-clash">
-                    Media Inspection
-                  </h2>
-                  <p className="text-xs text-gray-400">
-                    ID: {selectedMedia.id}
-                  </p>
+                  <h2 className="text-lg font-bold text-white font-clash">Media Inspection</h2>
+                  <p className="text-xs text-gray-400">ID: {selectedMedia.id}</p>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -467,9 +440,7 @@ export default function AdminMediaPage() {
                     unoptimized
                   />
                 ) : (
-                  <div className="text-gray-500 text-sm">
-                    No Preview Available
-                  </div>
+                  <div className="text-gray-500 text-sm">No Preview Available</div>
                 )}
               </div>
 
@@ -508,9 +479,7 @@ export default function AdminMediaPage() {
                   <div className="p-3 bg-[#111111] rounded-xl border border-[#262626]">
                     <span className="text-gray-400 block mb-1">Status</span>
                     <span className="font-semibold text-emerald-400">
-                      {selectedMedia.isPublished !== false
-                        ? "Published"
-                        : "Draft"}
+                      {selectedMedia.isPublished !== false ? "Published" : "Draft"}
                     </span>
                   </div>
                 </div>
@@ -520,10 +489,7 @@ export default function AdminMediaPage() {
         )}
 
         {/* Create Media Modal */}
-        <CreateMediaModal
-          isOpen={isCreateModalOpen}
-          onClose={() => setIsCreateModalOpen(false)}
-        />
+        <CreateMediaModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
 
         {/* Delete Media Modal */}
         <DeleteMediaModal

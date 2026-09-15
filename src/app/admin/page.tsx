@@ -34,30 +34,22 @@ function formatRelativeTime(dateString?: string | null): string {
 
   if (diffInSeconds < 60) return "just now";
   const diffInMinutes = Math.floor(diffInSeconds / 60);
-  if (diffInMinutes < 60)
-    return `${diffInMinutes} minute${diffInMinutes > 1 ? "s" : ""} ago`;
+  if (diffInMinutes < 60) return `${diffInMinutes} minute${diffInMinutes > 1 ? "s" : ""} ago`;
   const diffInHours = Math.floor(diffInMinutes / 60);
-  if (diffInHours < 24)
-    return `${diffInHours} hour${diffInHours > 1 ? "s" : ""} ago`;
+  if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? "s" : ""} ago`;
   const diffInDays = Math.floor(diffInHours / 24);
-  if (diffInDays < 30)
-    return `${diffInDays} day${diffInDays > 1 ? "s" : ""} ago`;
+  if (diffInDays < 30) return `${diffInDays} day${diffInDays > 1 ? "s" : ""} ago`;
   const diffInMonths = Math.floor(diffInDays / 30);
-  if (diffInMonths < 12)
-    return `${diffInMonths} month${diffInMonths > 1 ? "s" : ""} ago`;
+  if (diffInMonths < 12) return `${diffInMonths} month${diffInMonths > 1 ? "s" : ""} ago`;
   const diffInYears = Math.floor(diffInDays / 365);
   return `${diffInYears} year${diffInYears > 1 ? "s" : ""} ago`;
 }
 
-function formatPrice(
-  priceStr?: string | number | null,
-  currencyStr = "USD",
-): string {
+function formatPrice(priceStr?: string | number | null, currencyStr = "USD"): string {
   if (!priceStr) return "$0";
   const num = typeof priceStr === "number" ? priceStr : parseFloat(priceStr);
   if (isNaN(num)) return `${priceStr}`;
-  const symbol =
-    currencyStr === "EUR" ? "€" : currencyStr === "GBP" ? "£" : "$";
+  const symbol = currencyStr === "EUR" ? "€" : currencyStr === "GBP" ? "£" : "$";
   return `${symbol}${num.toLocaleString()}`;
 }
 
@@ -77,9 +69,7 @@ function getActivityDescription(activity: any): string {
       : "Listing approved";
   }
   if (activity.action === "DEALER_APPROVAL") {
-    return changes.status
-      ? `Dealer profile status: ${changes.status}`
-      : "Dealer profile approved";
+    return changes.status ? `Dealer profile status: ${changes.status}` : "Dealer profile approved";
   }
   if (activity.action === "USER_ROLE_UPDATED") {
     return changes.newRole
@@ -99,7 +89,7 @@ function getActivityDescription(activity: any): string {
 
 function getActivityStatusType(
   action: string,
-  changes?: any,
+  changes?: any
 ): "new" | "approved" | "closed" | "rejected" {
   const upper = (action || "").toUpperCase();
   if (upper.includes("REJECT") || upper.includes("FLAG")) return "rejected";
@@ -110,11 +100,7 @@ function getActivityStatusType(
     changes?.status === "LIVE"
   )
     return "approved";
-  if (
-    upper.includes("CLOSE") ||
-    upper.includes("UPDATE") ||
-    upper.includes("ROLE")
-  )
+  if (upper.includes("CLOSE") || upper.includes("UPDATE") || upper.includes("ROLE"))
     return "closed";
   return "new";
 }
@@ -180,10 +166,7 @@ function DealersSkeleton() {
   return (
     <div className="space-y-8">
       {[1, 2, 3, 4].map((i) => (
-        <div
-          key={i}
-          className="flex items-center justify-between animate-pulse"
-        >
+        <div key={i} className="flex items-center justify-between animate-pulse">
           <div className="flex items-center gap-4">
             <div className="w-11 h-11 bg-white/10 rounded-full shrink-0" />
             <div className="space-y-2">
@@ -205,10 +188,7 @@ function RecentActivitySkeleton() {
   return (
     <div className="space-y-6">
       {[1, 2, 3, 4].map((i) => (
-        <div
-          key={i}
-          className="flex items-start justify-between py-4 animate-pulse"
-        >
+        <div key={i} className="flex items-start justify-between py-4 animate-pulse">
           <div className="flex items-start gap-5">
             <div className="w-3 h-3 rounded-full bg-white/10 mt-1.5 shrink-0" />
             <div className="space-y-2">
@@ -247,14 +227,11 @@ function ActiveDealsSkeleton() {
 
 export default function AdminDashboard() {
   const { user } = useAuthStore();
-  const { data, isLoading, isError, refetch } =
-    useGetAdminDashboardOverviewQuery();
+  const { data, isLoading, isError, refetch } = useGetAdminDashboardOverviewQuery();
 
   const updateStatusMutation = useUpdateAdminListingStatusMutation();
   const [processingId, setProcessingId] = useState<string | null>(null);
-  const [rejectModalListing, setRejectModalListing] = useState<any | null>(
-    null,
-  );
+  const [rejectModalListing, setRejectModalListing] = useState<any | null>(null);
 
   const handleApprove = async (id: string) => {
     setProcessingId(id);
@@ -282,9 +259,7 @@ export default function AdminDashboard() {
       });
       setRejectModalListing(null);
     } catch (error) {
-      toast.error(
-        (error as Error)?.message || "Failed to update listing status",
-      );
+      toast.error((error as Error)?.message || "Failed to update listing status");
     } finally {
       setProcessingId(null);
     }
@@ -383,9 +358,7 @@ export default function AdminDashboard() {
                 <div className="p-2.5 bg-primary text-white rounded-xl border border-[#E78F23]/10 group-hover:scale-110 transition-transform duration-500">
                   {stat.icon}
                 </div>
-                <span className="text-sm text-primary font-medium">
-                  {stat.title}
-                </span>
+                <span className="text-sm text-primary font-medium">{stat.title}</span>
               </div>
               <div className="flex flex-col gap-2">
                 <span className="text-5xl font-clash font-bold text-white tracking-tighter">
@@ -407,9 +380,7 @@ export default function AdminDashboard() {
         {/* Pending Approvals (Left 8/12) */}
         <div className="lg:col-span-8 space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-clash font-medium text-white">
-              Pending Approvals
-            </h2>
+            <h2 className="text-2xl font-clash font-medium text-white">Pending Approvals</h2>
           </div>
           {isLoading ? (
             <PendingApprovalsSkeleton />
@@ -462,8 +433,7 @@ export default function AdminDashboard() {
                             )}
                           </span>
                           <span className="flex items-center gap-1.5">
-                            <Clock className="w-3 h-3" />{" "}
-                            {formatRelativeTime(item.createdAt)}
+                            <Clock className="w-3 h-3" /> {formatRelativeTime(item.createdAt)}
                           </span>
                         </div>
                       </div>
@@ -516,9 +486,7 @@ export default function AdminDashboard() {
         {/* Top Dealers (Right 4/12) */}
         <div className="lg:col-span-4 bg-[#111113] border border-white/5 rounded-[2rem] p-8 h-fit shadow-2xl">
           <div className="flex items-center justify-between mb-10">
-            <h2 className="text-2xl font-clash font-medium text-white">
-              Dealers
-            </h2>
+            <h2 className="text-2xl font-clash font-medium text-white">Dealers</h2>
             <Link
               href="/admin/users"
               className="text-[10px] font-bold text-primary flex items-center gap-1.5 group bg-primary/10 px-4 py-2 rounded-full hover:bg-primary/20 transition-all uppercase tracking-widest"
@@ -530,17 +498,14 @@ export default function AdminDashboard() {
           {isLoading ? (
             <DealersSkeleton />
           ) : !data?.dealersSummary || data.dealersSummary.length === 0 ? (
-            <div className="text-center text-gray-400 text-sm py-4">
-              No dealers found.
-            </div>
+            <div className="text-center text-gray-400 text-sm py-4">No dealers found.</div>
           ) : (
             <div className="space-y-8">
               {data.dealersSummary.map((dealer, i) => {
                 const avatar =
                   dealer.avatarUrl ||
                   "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop";
-                const fullName =
-                  `${dealer.firstName} ${dealer.lastName}`.trim();
+                const fullName = `${dealer.firstName} ${dealer.lastName}`.trim();
 
                 return (
                   <div
@@ -590,22 +555,15 @@ export default function AdminDashboard() {
         {/* Recent Activity (Left 7/12) */}
         <div className="lg:col-span-8 bg-[#111113] border border-white/5 rounded-[2rem] p-8 shadow-2xl overflow-hidden relative">
           <div className="absolute top-0 right-0 w-64 h-64 bg-[#E78F23]/5 rounded-full blur-[80px] -mr-32 -mt-32 pointer-events-none"></div>
-          <h2 className="text-2xl font-clash font-medium text-white mb-10">
-            Recent Activity
-          </h2>
+          <h2 className="text-2xl font-clash font-medium text-white mb-10">Recent Activity</h2>
           {isLoading ? (
             <RecentActivitySkeleton />
           ) : !data?.recentActivities || data.recentActivities.length === 0 ? (
-            <div className="text-center text-gray-400 text-sm py-4">
-              No recent activity.
-            </div>
+            <div className="text-center text-gray-400 text-sm py-4">No recent activity.</div>
           ) : (
             <div className="space-y-0">
               {data.recentActivities.map((activity, i) => {
-                const statusType = getActivityStatusType(
-                  activity.action,
-                  activity.changes,
-                );
+                const statusType = getActivityStatusType(activity.action, activity.changes);
                 const userName = activity.user
                   ? `${activity.user.firstName} ${activity.user.lastName}`.trim()
                   : "";
@@ -613,22 +571,22 @@ export default function AdminDashboard() {
                 return (
                   <div
                     key={activity.id || i}
-                    className={`flex items-start justify-between py-6 ${i !== data.recentActivities.length - 1
-                      ? "border-b border-white/5"
-                      : ""
-                      } group relative z-10`}
+                    className={`flex items-start justify-between py-6 ${
+                      i !== data.recentActivities.length - 1 ? "border-b border-white/5" : ""
+                    } group relative z-10`}
                   >
                     <div className="flex items-start gap-5">
                       <div className="mt-1.5 shrink-0">
                         <div
-                          className={`w-3 h-3 rounded-full ${statusType === "new"
-                            ? "bg-primary shadow-[0_0_12px_rgba(234,179,8,0.6)]"
-                            : statusType === "approved"
-                              ? "bg-[#4ADE80] shadow-[0_0_12px_rgba(74,222,128,0.6)]"
-                              : statusType === "closed"
-                                ? "bg-[#60A5FA] shadow-[0_0_12px_rgba(96,165,250,0.6)]"
-                                : "bg-[#F87171] shadow-[0_0_12px_rgba(248,113,113,0.6)]"
-                            }`}
+                          className={`w-3 h-3 rounded-full ${
+                            statusType === "new"
+                              ? "bg-primary shadow-[0_0_12px_rgba(234,179,8,0.6)]"
+                              : statusType === "approved"
+                                ? "bg-[#4ADE80] shadow-[0_0_12px_rgba(74,222,128,0.6)]"
+                                : statusType === "closed"
+                                  ? "bg-[#60A5FA] shadow-[0_0_12px_rgba(96,165,250,0.6)]"
+                                  : "bg-[#F87171] shadow-[0_0_12px_rgba(248,113,113,0.6)]"
+                          }`}
                         />
                       </div>
                       <div>
@@ -659,9 +617,7 @@ export default function AdminDashboard() {
 
         {/* Active Deals (Right 5/12) */}
         <div className="lg:col-span-4 bg-[#111113] border border-white/5 rounded-[2rem] p-8 shadow-2xl flex flex-col">
-          <h2 className="text-2xl font-clash font-medium text-white mb-10">
-            Active Deals
-          </h2>
+          <h2 className="text-2xl font-clash font-medium text-white mb-10">Active Deals</h2>
           {isLoading ? (
             <ActiveDealsSkeleton />
           ) : !data?.activeDeals || data.activeDeals.length === 0 ? (
@@ -691,15 +647,14 @@ export default function AdminDashboard() {
                       <h4 className="text-sm font-bold text-white group-hover:text-primary transition-colors line-clamp-1">
                         {dealTitle}
                       </h4>
-                      <p className="text-[11px] text-gray-500 mt-1 font-medium">
-                        {sellerName}
-                      </p>
+                      <p className="text-[11px] text-gray-500 mt-1 font-medium">{sellerName}</p>
                     </div>
                     <div
-                      className={`shrink-0 px-4 py-1.5 rounded-lg text-[10px] font-extrabold uppercase tracking-widest border ${isNegotiation
-                        ? "text-primary border-primary/20 bg-primary/5"
-                        : "text-[#4ADE80] border-[#4ADE80]/20 bg-[#4ADE80]/5"
-                        }`}
+                      className={`shrink-0 px-4 py-1.5 rounded-lg text-[10px] font-extrabold uppercase tracking-widest border ${
+                        isNegotiation
+                          ? "text-primary border-primary/20 bg-primary/5"
+                          : "text-[#4ADE80] border-[#4ADE80]/20 bg-[#4ADE80]/5"
+                      }`}
                     >
                       {stageFormatted}
                     </div>
@@ -716,10 +671,7 @@ export default function AdminDashboard() {
         onClose={() => setRejectModalListing(null)}
         onConfirm={handleRejectConfirm}
         listing={rejectModalListing}
-        isSubmitting={
-          updateStatusMutation.isPending &&
-          processingId === rejectModalListing?.id
-        }
+        isSubmitting={updateStatusMutation.isPending && processingId === rejectModalListing?.id}
       />
     </div>
   );
