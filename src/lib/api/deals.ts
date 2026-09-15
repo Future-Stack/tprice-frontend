@@ -1,0 +1,160 @@
+import apiClient from "./axios";
+
+export interface DealUser {
+  id: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  email?: string | null;
+  avatarUrl?: string | null;
+  role?: string | null;
+}
+
+export interface DealMessage {
+  id: string;
+  dealId: string;
+  senderId: string;
+  message: string;
+  attachments?: unknown | null;
+  createdAt: string;
+  sender?: DealUser | null;
+}
+
+export interface SendDealMessagePayload {
+  message: string;
+}
+
+export interface DealListing {
+  id: string;
+  title: string;
+  slug?: string;
+  category?: string;
+  askingPrice?: string | null;
+  currency?: string;
+  media?: { id?: string; url: string; type?: string }[];
+}
+
+export interface DealItem {
+  id: string;
+  offerId?: string;
+  listingId?: string;
+  buyerId?: string;
+  sellerId?: string;
+  agreedPrice: string | number;
+  stage: string;
+  isFlagged: boolean;
+  adminNotes?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  listing?: DealListing | null;
+  buyer?: DealUser | null;
+  seller?: DealUser | null;
+  messages?: DealMessage[];
+  offer?: Record<string, unknown> | null;
+}
+
+export interface DealsMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface GetDealsResponse {
+  data: DealItem[];
+  meta: DealsMeta;
+}
+
+export interface GetDealsParams {
+  page?: number;
+  limit?: number;
+  stage?: string;
+  isFlagged?: boolean;
+  search?: string;
+}
+
+/**
+ * Fetch deals list for current user (Buyer/Seller) with pagination
+ */
+export const getDealsApi = async (params?: GetDealsParams): Promise<GetDealsResponse> => {
+  const response = await apiClient.get<GetDealsResponse>("/deals", {
+    params,
+  });
+  return response.data;
+};
+
+/**
+ * Fetch deals list with pagination for admin
+ */
+export const getAdminDealsApi = async (params?: GetDealsParams): Promise<GetDealsResponse> => {
+  const response = await apiClient.get<GetDealsResponse>("/deals", {
+    params,
+  });
+  return response.data;
+};
+
+/**
+ * Fetch single deal detail by ID (if endpoint available)
+ */
+export const getDealDetailApi = async (dealId: string): Promise<DealItem> => {
+  const response = await apiClient.get<DealItem>(`/deals/${dealId}`);
+  return response.data;
+};
+
+/**
+ * Fetch messages for a specific deal
+ */
+export const getDealMessagesApi = async (dealId: string): Promise<DealMessage[]> => {
+  const response = await apiClient.get<
+    DealMessage[] | { data?: DealMessage[]; messages?: DealMessage[] }
+  >(`/deals/${dealId}/messages`);
+  if (Array.isArray(response.data)) {
+    return response.data;
+  }
+  if (response.data && Array.isArray((response.data as { data?: DealMessage[] }).data)) {
+    return (response.data as { data: DealMessage[] }).data;
+  }
+  if (response.data && Array.isArray((response.data as { messages?: DealMessage[] }).messages)) {
+    return (response.data as { messages: DealMessage[] }).messages;
+  }
+  return [];
+};
+
+/**
+ * Send a message for a specific deal
+ */
+export const sendDealMessageApi = async (
+  dealId: string,
+  payload: SendDealMessagePayload
+): Promise<DealMessage> => {
+  const response = await apiClient.post<
+    DealMessage | { data?: DealMessage; message?: DealMessage }
+  >(`/deals/${dealId}/messages`, payload);
+  const data = response.data;
+  if (data && typeof data === "object") {
+    const extracted =
+      (data as { data?: DealMessage }).data || (data as { message?: DealMessage }).message;
+    if (extracted && typeof extracted === "object") {
+      return extracted;
+    }
+  }
+  return data as DealMessage;
+};
+
+export type DealStage = "COMPLETED" | "CANCELLED" | "FLAGGED";
+
+export interface UpdateDealStagePayload {
+  stage: DealStage | string;
+  adminNotes?: string;
+  isFlagged?: boolean;
+}
+
+/**
+ * Update stage of a deal by deal ID
+ */
+export const updateDealStageApi = async (
+  dealId: string,
+  payload: UpdateDealStagePayload
+): Promise<DealItem> => {
+  const response = await apiClient.patch<DealItem>(`/deals/${dealId}/stage`, payload);
+  return response.data;
+};

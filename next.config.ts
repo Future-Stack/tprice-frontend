@@ -24,6 +24,12 @@ const nextConfig: NextConfig = {
         protocol: "http",
         hostname: "**",
       },
+
+      {
+        protocol: "https",
+        hostname: "tprice34-storage.s3.us-east-2.amazonaws.com",
+        pathname: "/**",
+      },
     ],
   },
 };
