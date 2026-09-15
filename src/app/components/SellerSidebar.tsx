@@ -23,9 +23,9 @@ const navItems = [
   { href: "/seller/my-listing", icon: Building2, label: "MyListing" },
   { href: "/seller/add-listing", icon: Gavel, label: "Add Listing" },
   {
-    href: "/seller/offer-receieved",
+    href: "/seller/offer-received",
     icon: BadgePercent,
-    label: "Offer Receieved",
+    label: "Offer Received",
   },
   { href: "/seller/subscription", icon: CreditCard, label: "Subscription" },
   { href: "/seller/settings", icon: ListIcon, label: "Settings" },

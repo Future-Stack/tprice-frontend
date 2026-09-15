@@ -418,7 +418,7 @@ function OfferReceieved() {
                           )}
 
                           <Link
-                            href={`/seller/offer-receieved/${offer.id}`}
+                            href={`/seller/offer-received/${offer.id}`}
                             className="flex items-center gap-2 px-5 py-2 rounded-xl border border-primary/40 text-xs font-black uppercase tracking-widest text-white bg-white/3 hover:bg-primary hover:border-primary hover:text-black transition-all duration-300 active:scale-95 group/btn shadow-[0_0_20px_rgba(231,143,35,0)] hover:shadow-[0_0_20px_rgba(231,143,35,0.2)] cursor-pointer"
                           >
                             <Eye
@@ -533,7 +533,7 @@ function OfferReceieved() {
                             )}
 
                             <Link
-                              href={`/seller/offer-receieved/${offer.id}`}
+                              href={`/seller/offer-received/${offer.id}`}
                               className="flex items-center justify-center gap-3 w-full py-3.5 rounded-xl border border-[#E78F23]/40 text-xs font-black uppercase tracking-widest text-primary bg-white/3 transition-all active:scale-[0.98] cursor-pointer"
                             >
                               <Eye size={18} /> View Details

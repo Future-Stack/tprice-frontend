@@ -403,7 +403,7 @@ export default function OfferDetailsPage() {
           </p>
           <div className="flex items-center justify-center gap-4 pt-2">
             <Link
-              href="/seller/offer-receieved"
+              href="/seller/offer-received"
               className="px-6 py-2.5 rounded-xl border border-white/10 text-xs font-bold uppercase tracking-wider text-gray-300 hover:text-white hover:border-white/30 transition-all"
             >
               Back to Offers
@@ -561,7 +561,7 @@ export default function OfferDetailsPage() {
         {/* Back Link */}
         <div className="mb-6">
           <Link
-            href="/seller/offer-receieved"
+            href="/seller/offer-received"
             className="inline-flex items-center gap-2 text-sm font-semibold text-gray-400 hover:text-white transition-colors group cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
