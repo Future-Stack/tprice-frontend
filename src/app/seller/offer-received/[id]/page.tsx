@@ -379,7 +379,7 @@ export default function OfferDetailsPage() {
           <AlertCircle size={56} className="mx-auto text-rose-500 stroke-[1.5]" />
           <h2 className="text-2xl font-bold text-white">Offer Not Found</h2>
           <p className="text-gray-400 max-w-md mx-auto text-sm">
-            We couldn't load the details for this offer. It may have been deleted or the URL might
+            We couldn&apos;t load the details for this offer. It may have been deleted or the URL might
             be invalid.
           </p>
           <div className="flex items-center justify-center gap-4 pt-2">
@@ -436,9 +436,9 @@ export default function OfferDetailsPage() {
 
   // Combine & format messages for deal conversation section
   const embeddedDealMessages: DealMessage[] = [
-    ...((matchedDeal as any)?.messages || []),
-    ...((offer?.deal as any)?.messages || []),
-    ...((dealDetail as any)?.messages || []),
+    ...((matchedDeal as { messages?: DealMessage[] })?.messages || []),
+    ...((offer?.deal as { messages?: DealMessage[] })?.messages || []),
+    ...((dealDetail as { messages?: DealMessage[] })?.messages || []),
   ];
 
   const rawDealMessagesList = [...embeddedDealMessages, ...(dealMessages || [])];
@@ -764,7 +764,7 @@ export default function OfferDetailsPage() {
                           {item.note && (
                             <div className="bg-[#18181b] border border-white/5 rounded-lg p-3 text-xs text-gray-300 italic flex items-start gap-2.5">
                               <MessageSquare size={14} className="text-primary shrink-0 mt-0.5" />
-                              <span>"{item.note}"</span>
+                              <span>&quot;{item.note}&quot;</span>
                             </div>
                           )}
 

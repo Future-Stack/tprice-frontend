@@ -41,12 +41,14 @@ export default function CounterOfferModal({
   const modalRef = useRef<HTMLDivElement>(null);
   const counterMutation = useCounterOfferMutation();
 
-  useEffect(() => {
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
     if (isOpen) {
       setAmount("");
       setNote("");
     }
-  }, [isOpen]);
+  }
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

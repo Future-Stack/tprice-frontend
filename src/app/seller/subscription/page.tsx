@@ -75,8 +75,7 @@ export default function SellerSubscriptionPage() {
       },
       {
         onSuccess: (data) => {
-          const checkoutUrl =
-            data?.checkoutUrl || (data as any)?.data?.checkoutUrl || (data as any)?.url;
+          const checkoutUrl = data?.checkoutUrl;
 
           if (checkoutUrl) {
             toast.success("Redirecting to secure Stripe checkout...");
@@ -85,15 +84,16 @@ export default function SellerSubscriptionPage() {
             toast.error("Checkout session created, but no checkout URL was returned.");
           }
         },
-        onError: (err: any) => {
+        onError: (err: unknown) => {
           let errorMessage = "Failed to initiate subscription checkout.";
-          const rawMsg = err?.response?.data?.message;
+          const axiosErr = err as { response?: { data?: { message?: string | string[] } }; message?: string };
+          const rawMsg = axiosErr?.response?.data?.message;
           if (Array.isArray(rawMsg)) {
             errorMessage = rawMsg.join(", ");
           } else if (typeof rawMsg === "string" && rawMsg.trim()) {
             errorMessage = rawMsg;
-          } else if (err?.message) {
-            errorMessage = err.message;
+          } else if (axiosErr?.message) {
+            errorMessage = axiosErr.message;
           }
           toast.error(errorMessage);
         },
@@ -196,7 +196,7 @@ export default function SellerSubscriptionPage() {
             <div className="flex items-center gap-3">
               <AlertCircle className="w-5 h-5 shrink-0" />
               <p className="text-sm">
-                {(error as any)?.response?.data?.message ||
+                {(error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
                   error?.message ||
                   "Unable to load subscription pricing and status. Please try again."}
               </p>
@@ -392,8 +392,8 @@ export default function SellerSubscriptionPage() {
             <div
               className={`h-full rounded-2xl p-7 sm:p-9 flex flex-col justify-between transition-all duration-300 relative overflow-hidden ${
                 hasActiveSubscription
-                  ? "bg-gradient-to-b from-[#0e271a] via-[#14231b] to-[#18181A] border-2 border-emerald-500 shadow-[0_0_50px_rgba(16,185,129,0.25)]"
-                  : "bg-gradient-to-b from-[#1E1A14] to-[#18181A] border-2 border-primary/80 shadow-[0_0_40px_rgba(231,143,35,0.15)]"
+                  ? "bg-linear-to-b from-[#0e271a] via-[#14231b] to-[#18181A] border-2 border-emerald-500 shadow-[0_0_50px_rgba(16,185,129,0.25)]"
+                  : "bg-linear-to-b from-[#1E1A14] to-[#18181A] border-2 border-primary/80 shadow-[0_0_40px_rgba(231,143,35,0.15)]"
               }`}
             >
               {/* Decorative Ambient Glow */}

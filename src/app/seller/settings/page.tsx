@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
+import Image from "next/image";
 import { User, Shield, Camera, Mail, Phone, Loader2, Eye, EyeOff } from "lucide-react";
 import AnimationWrapper from "../../components/AnimationWrapper";
 import {
@@ -45,18 +46,18 @@ export default function SellerSettings() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Synchronize form fields when user data is loaded
-  useEffect(() => {
-    if (user) {
-      setFirstName(user.firstName || user.name?.split(" ")[0] || "");
-      setLastName(user.lastName || user.name?.split(" ").slice(1).join(" ") || "");
-      setEmail(user.email || "");
-      setPhone(user.phone || "");
-      if (user.avatarUrl || user.avatar) {
-        setAvatarPreview(user.avatarUrl || user.avatar || "");
-      }
+  // Synchronize form fields when user data is loaded without cascading renders
+  const [prevUser, setPrevUser] = useState(user);
+  if (user && user !== prevUser) {
+    setPrevUser(user);
+    setFirstName(user.firstName || user.name?.split(" ")[0] || "");
+    setLastName(user.lastName || user.name?.split(" ").slice(1).join(" ") || "");
+    setEmail(user.email || "");
+    setPhone(user.phone || "");
+    if (user.avatarUrl || user.avatar) {
+      setAvatarPreview(user.avatarUrl || user.avatar || "");
     }
-  }, [user]);
+  }
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -91,7 +92,7 @@ export default function SellerSettings() {
           folder: "exoticworld/avatars",
         });
         uploadedAvatarUrl = uploadRes.url;
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Failed to upload avatar image:", err);
         toast.error("Failed to upload avatar. Updating profile without image change.");
       } finally {
@@ -201,10 +202,13 @@ export default function SellerSettings() {
                       <div className="relative group">
                         <div className="w-24 h-24 rounded-full border-2 border-[#2C2C2E] overflow-hidden bg-[#111113] flex items-center justify-center p-0.5 transition-transform duration-500 group-hover:rotate-3">
                           {avatarPreview ? (
-                            <img
+                            <Image
                               src={avatarPreview}
                               alt="Avatar"
+                              width={96}
+                              height={96}
                               className="w-full h-full object-cover rounded-full"
+                              unoptimized
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center bg-[#2C2C2E] text-primary font-bold text-2xl">

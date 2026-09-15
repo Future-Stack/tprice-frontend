@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   Gavel,
@@ -110,7 +111,7 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <AlertCircle className="w-5 h-5 shrink-0" />
             <span>
-              {(error as any)?.response?.data?.message || "Failed to load seller dashboard data."}
+              {(error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to load seller dashboard data."}
             </span>
           </div>
           <button
@@ -387,9 +388,12 @@ function ListingCard({
   return (
     <div className="bg-foreground rounded-[8px] border border-primary/30 overflow-hidden group hover:border-[#E78F23]/20 transition-all shadow-xl hover:shadow-[#E78F23]/5 flex flex-col h-full">
       <div className="relative h-54.25 overflow-hidden bg-black shrink-0">
-        <img
+        <Image
           src={image}
           alt={title}
+          width={400}
+          height={220}
+          unoptimized
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out opacity-90 group-hover:opacity-100"
         />
 
