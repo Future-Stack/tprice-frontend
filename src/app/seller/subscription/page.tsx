@@ -86,7 +86,10 @@ export default function SellerSubscriptionPage() {
         },
         onError: (err: unknown) => {
           let errorMessage = "Failed to initiate subscription checkout.";
-          const axiosErr = err as { response?: { data?: { message?: string | string[] } }; message?: string };
+          const axiosErr = err as {
+            response?: { data?: { message?: string | string[] } };
+            message?: string;
+          };
           const rawMsg = axiosErr?.response?.data?.message;
           if (Array.isArray(rawMsg)) {
             errorMessage = rawMsg.join(", ");
@@ -196,7 +199,8 @@ export default function SellerSubscriptionPage() {
             <div className="flex items-center gap-3">
               <AlertCircle className="w-5 h-5 shrink-0" />
               <p className="text-sm">
-                {(error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+                {(error as { response?: { data?: { message?: string } } })?.response?.data
+                  ?.message ||
                   error?.message ||
                   "Unable to load subscription pricing and status. Please try again."}
               </p>

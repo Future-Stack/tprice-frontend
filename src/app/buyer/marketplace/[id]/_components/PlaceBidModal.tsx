@@ -169,9 +169,7 @@ function PlaceBidForm({
                 <button
                   type="button"
                   onClick={() => {
-                    const base = Number(
-                      existingOffer.currentAmount || existingOffer.initialAmount
-                    );
+                    const base = Number(existingOffer.currentAmount || existingOffer.initialAmount);
                     setBidAmount(String(Math.round(base * 1.05)));
                   }}
                   className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-gray-300 transition-colors"
@@ -181,9 +179,7 @@ function PlaceBidForm({
                 <button
                   type="button"
                   onClick={() => {
-                    const base = Number(
-                      existingOffer.currentAmount || existingOffer.initialAmount
-                    );
+                    const base = Number(existingOffer.currentAmount || existingOffer.initialAmount);
                     setBidAmount(String(Math.round(base * 1.1)));
                   }}
                   className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-gray-300 transition-colors"
@@ -193,9 +189,7 @@ function PlaceBidForm({
                 <button
                   type="button"
                   onClick={() => {
-                    const base = Number(
-                      existingOffer.currentAmount || existingOffer.initialAmount
-                    );
+                    const base = Number(existingOffer.currentAmount || existingOffer.initialAmount);
                     setBidAmount(String(Math.round(base * 1.15)));
                   }}
                   className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-gray-300 transition-colors"
@@ -245,9 +239,7 @@ function PlaceBidForm({
           <div className="bg-[#111111] border border-white/5 p-3.5 rounded-xl text-xs space-y-1.5">
             <div className="flex justify-between text-gray-400">
               <span>Bid Amount</span>
-              <span className="text-white font-medium">
-                ${parsedBid.toLocaleString()}
-              </span>
+              <span className="text-white font-medium">${parsedBid.toLocaleString()}</span>
             </div>
             <div className="flex justify-between text-gray-400">
               <span>VIP Fee (1.5%)</span>

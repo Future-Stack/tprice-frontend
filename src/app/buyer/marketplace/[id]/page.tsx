@@ -7,7 +7,11 @@ import Link from "next/link";
 import { ChevronLeft, AlertTriangle, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
-import { useListingByIdQuery, useSaveListingMutation, useSavedListingsQuery } from "@/hooks/useListings";
+import {
+  useListingByIdQuery,
+  useSaveListingMutation,
+  useSavedListingsQuery,
+} from "@/hooks/useListings";
 import { useOffersQuery } from "@/hooks/useOffers";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -46,8 +50,14 @@ export default function BuyerListingDetailPage() {
   const [isBiddingMode, setIsBiddingMode] = useState(false);
   const [activeModal, setActiveModal] = useState<"offer" | "view-offer" | "bid" | null>(null);
 
-  const { data: savedResponse } = useSavedListingsQuery({ page: 1, limit: 100 }, { enabled: Boolean(token) });
-  const { data: userOffersData, isLoading: isUserOffersLoading } = useOffersQuery({ limit: 100 }, { enabled: Boolean(token) });
+  const { data: savedResponse } = useSavedListingsQuery(
+    { page: 1, limit: 100 },
+    { enabled: Boolean(token) }
+  );
+  const { data: userOffersData, isLoading: isUserOffersLoading } = useOffersQuery(
+    { limit: 100 },
+    { enabled: Boolean(token) }
+  );
 
   if (isLoading) return <ProductDetailsSkeleton />;
 
@@ -57,7 +67,9 @@ export default function BuyerListingDetailPage() {
         <AnimationWrapper type="zoom" duration={0.4}>
           <div className="bg-[#2A1616] border border-red-500/30 rounded-2xl p-8 mb-8 text-center max-w-3xl mx-auto">
             <AlertTriangle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-white mb-2">Failed to load product details</h3>
+            <h3 className="text-xl font-semibold text-white mb-2">
+              Failed to load product details
+            </h3>
             <p className="text-sm text-gray-400 mb-6">{getErrorMessage(error)}</p>
             <div className="flex gap-4 justify-center">
               <button
@@ -87,24 +99,37 @@ export default function BuyerListingDetailPage() {
   const safeSelectedImage = selectedImage < productImages.length ? selectedImage : 0;
 
   const numericPrice = product.askingPrice ? Number(product.askingPrice) : 0;
-  const currencySymbol = product.currency === "USD" || !product.currency ? "$" : `${product.currency} `;
-  const formattedPrice = numericPrice > 0 ? `${currencySymbol}${numericPrice.toLocaleString()}` : "Price on Request";
+  const currencySymbol =
+    product.currency === "USD" || !product.currency ? "$" : `${product.currency} `;
+  const formattedPrice =
+    numericPrice > 0 ? `${currencySymbol}${numericPrice.toLocaleString()}` : "Price on Request";
 
-  const askingPriceVal = product.askingPrice && !isNaN(Number(product.askingPrice)) ? Number(product.askingPrice) : null;
-  const startingBidVal = product.startingBid && !isNaN(Number(product.startingBid)) ? Number(product.startingBid) : null;
+  const askingPriceVal =
+    product.askingPrice && !isNaN(Number(product.askingPrice)) ? Number(product.askingPrice) : null;
+  const startingBidVal =
+    product.startingBid && !isNaN(Number(product.startingBid)) ? Number(product.startingBid) : null;
   const highestBidVal = parseHighestBid(product.highestBid);
-  const totalBidsCountVal = typeof product.totalBidsCount === "number" ? product.totalBidsCount : null;
+  const totalBidsCountVal =
+    typeof product.totalBidsCount === "number" ? product.totalBidsCount : null;
 
   const normalizedSaleType = (product.saleType || "").toUpperCase();
-  const isAuction = normalizedSaleType === "AUCTION" || (Boolean(product.startingBid) && !["FIXED_PRICE", "PRIVATE_SALE", "PRIVATE"].includes(normalizedSaleType));
+  const isAuction =
+    normalizedSaleType === "AUCTION" ||
+    (Boolean(product.startingBid) &&
+      !["FIXED_PRICE", "PRIVATE_SALE", "PRIVATE"].includes(normalizedSaleType));
   const isPrivateSale = normalizedSaleType === "PRIVATE_SALE" || normalizedSaleType === "PRIVATE";
   const isFixedPrice = !isAuction && !isPrivateSale;
 
-  const locationText = [product.locationCity, product.locationCountry].filter(Boolean).join(", ") || "Miami, United States";
-  const sellerName = product.owner ? `${product.owner.firstName} ${product.owner.lastName}` : "Monaco Exotics";
+  const locationText =
+    [product.locationCity, product.locationCountry].filter(Boolean).join(", ") ||
+    "Miami, United States";
+  const sellerName = product.owner
+    ? `${product.owner.firstName} ${product.owner.lastName}`
+    : "Monaco Exotics";
   const sellerInitial = product.owner?.firstName?.[0] || "M";
 
-  const isSavedInListings = savedResponse?.data?.some((savedItem) => savedItem.id === product.id) ?? false;
+  const isSavedInListings =
+    savedResponse?.data?.some((savedItem) => savedItem.id === product.id) ?? false;
   const isSaved = product.isSaved !== undefined ? product.isSaved : isSavedInListings;
 
   const handleToggleSave = (e?: React.MouseEvent) => {
@@ -122,8 +147,11 @@ export default function BuyerListingDetailPage() {
   };
 
   const dynamicSpecs = getDynamicSpecs(product);
-  const prodExtra = product as (typeof product & { description?: string; overview?: string });
-  const overviewText = prodExtra.description || prodExtra.overview || `This immaculate ${product.buildYear || ""} ${product.title} represents the pinnacle of luxury and performance. Meticulously maintained and stored in a climate-controlled environment, it stands ready for its next owner.`;
+  const prodExtra = product as typeof product & { description?: string; overview?: string };
+  const overviewText =
+    prodExtra.description ||
+    prodExtra.overview ||
+    `This immaculate ${product.buildYear || ""} ${product.title} represents the pinnacle of luxury and performance. Meticulously maintained and stored in a climate-controlled environment, it stands ready for its next owner.`;
 
   return (
     <div className="mx-auto relative z-0">
@@ -131,13 +159,18 @@ export default function BuyerListingDetailPage() {
         <AnimationWrapper type="fade-down" duration={0.5}>
           <div>
             <h2 className="text-[40px] font-clash font-semibold">Exclusive Collection</h2>
-            <p className="text-white text-[20px] mt-1 font-medium">Discover the world&apos;s finest assets available for acquisition.</p>
+            <p className="text-white text-[20px] mt-1 font-medium">
+              Discover the world&apos;s finest assets available for acquisition.
+            </p>
           </div>
         </AnimationWrapper>
       </div>
 
       <AnimationWrapper type="fade-right" duration={0.4} delay={0.15}>
-        <Link href="/buyer/marketplace" className="inline-flex items-center gap-2 text-gray-400 hover:text-primary text-sm font-medium mb-6 transition-colors group">
+        <Link
+          href="/buyer/marketplace"
+          className="inline-flex items-center gap-2 text-gray-400 hover:text-primary text-sm font-medium mb-6 transition-colors group"
+        >
           <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
           Back to Marketplace
         </Link>
@@ -174,12 +207,16 @@ export default function BuyerListingDetailPage() {
               dynamicSpecs={dynamicSpecs}
               sellerName={sellerName}
               sellerInitial={sellerInitial}
-              onOpenSendOffer={() => verifyAuth(() => setActiveModal("offer"), "Please sign in to send an offer.")}
+              onOpenSendOffer={() =>
+                verifyAuth(() => setActiveModal("offer"), "Please sign in to send an offer.")
+              }
               onOpenViewOffer={() => setActiveModal("view-offer")}
-              onOpenPlaceBid={() => verifyAuth(() => {
-                if (isAuction) setActiveModal("bid");
-                else setIsBiddingMode(true);
-              }, "Please sign in to place a bid.")}
+              onOpenPlaceBid={() =>
+                verifyAuth(() => {
+                  if (isAuction) setActiveModal("bid");
+                  else setIsBiddingMode(true);
+                }, "Please sign in to place a bid.")
+              }
             />
           ) : (
             <BuyerBiddingSidebar
@@ -193,7 +230,9 @@ export default function BuyerListingDetailPage() {
               dynamicSpecs={dynamicSpecs}
               sellerName={sellerName}
               sellerInitial={sellerInitial}
-              onOpenPlaceBid={() => verifyAuth(() => setActiveModal("bid"), "Please sign in to place a bid.")}
+              onOpenPlaceBid={() =>
+                verifyAuth(() => setActiveModal("bid"), "Please sign in to place a bid.")
+              }
               onToggleSave={handleToggleSave}
               onExitBiddingMode={() => setIsBiddingMode(false)}
             />

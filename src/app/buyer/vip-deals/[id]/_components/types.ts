@@ -34,7 +34,8 @@ export function parseHighestBid(highestBid: unknown): number | null {
 }
 
 export function getErrorMessage(error: unknown): string {
-  if (!error) return "The VIP listing you are looking for is currently unavailable or does not exist.";
+  if (!error)
+    return "The VIP listing you are looking for is currently unavailable or does not exist.";
   if (typeof error === "object" && error !== null) {
     const errObj = error as {
       response?: { data?: { message?: string } };
@@ -164,9 +165,7 @@ export function getSpecItems(listing: ListingItem): SpecItemType[] {
 
 export function getProductImages(product?: ListingItem): string[] {
   if (product?.media && product.media.length > 0) {
-    return [...product.media]
-      .sort((a, b) => a.displayOrder - b.displayOrder)
-      .map((m) => m.url);
+    return [...product.media].sort((a, b) => a.displayOrder - b.displayOrder).map((m) => m.url);
   }
   return [
     "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&q=80&w=1200",

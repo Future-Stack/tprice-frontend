@@ -72,13 +72,7 @@
     );
   }
 
-  function EditForm({
-    initialData,
-    onClose,
-  }: {
-    initialData: ProfileData;
-    onClose: () => void;
-  }) {
+  function EditForm({ initialData, onClose }: { initialData: ProfileData; onClose: () => void }) {
     // Initialized directly, 0 effects needed!
     const [formData, setFormData] = useState({
       first_name: initialData.first_name || "",
@@ -94,12 +88,11 @@
   // ❌ Redundant overhead that causes React Compiler dependency mismatches:
   const fullName = useMemo(
     () => `${user.first_name} ${user.last_name}`,
-    [user.first_name, user.last_name],
+    [user.first_name, user.last_name]
   );
 
   // ✅ Compute directly during render:
-  const fullName =
-    `${user.first_name || ""} ${user.last_name || ""}`.trim() || "Member";
+  const fullName = `${user.first_name || ""} ${user.last_name || ""}`.trim() || "Member";
   ```
 - Reserve `useMemo` / `useCallback` for:
   1. Expensive calculations (filtering/sorting large lists).
@@ -159,13 +152,8 @@
   {
     Boolean(error) && (
       <div className="flex items-center justify-between p-4 bg-red-500/10 border border-red-500/20 rounded-2xl">
-        <p className="text-red-700 dark:text-red-400 text-sm">
-          Failed to sync data.
-        </p>
-        <button
-          onClick={() => refetch()}
-          className="text-xs font-bold underline"
-        >
+        <p className="text-red-700 dark:text-red-400 text-sm">Failed to sync data.</p>
+        <button onClick={() => refetch()} className="text-xs font-bold underline">
           Retry
         </button>
       </div>

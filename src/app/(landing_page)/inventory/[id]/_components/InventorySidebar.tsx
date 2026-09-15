@@ -78,8 +78,7 @@ export function InventorySidebar({
           </div>
 
           <p className="text-white/50 text-xs leading-relaxed italic pt-1">
-            Premier luxury asset offering verified provenance and immediate concierge
-            acquisition.
+            Premier luxury asset offering verified provenance and immediate concierge acquisition.
           </p>
         </div>
 

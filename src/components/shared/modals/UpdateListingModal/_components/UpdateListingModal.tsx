@@ -4,11 +4,7 @@ import React, { useEffect } from "react";
 import { UpdateListingModalProps } from "./types";
 import UpdateListingForm from "./UpdateListingForm";
 
-export default function UpdateListingModal({
-  isOpen,
-  onClose,
-  listing,
-}: UpdateListingModalProps) {
+export default function UpdateListingModal({ isOpen, onClose, listing }: UpdateListingModalProps) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -32,11 +28,7 @@ export default function UpdateListingModal({
       className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
       onClick={onClose}
     >
-      <UpdateListingForm
-        key={listing.id}
-        listing={listing}
-        onClose={onClose}
-      />
+      <UpdateListingForm key={listing.id} listing={listing} onClose={onClose} />
     </div>
   );
 }

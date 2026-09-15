@@ -2,16 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import {
-  MapPin,
-  Info,
-  BadgeCheck,
-  Heart,
-  Share2,
-  Check,
-  DollarSign,
-  Gavel,
-} from "lucide-react";
+import { MapPin, Info, BadgeCheck, Heart, Share2, Check, DollarSign, Gavel } from "lucide-react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
 import type { VIPDetailsSidebarProps } from "./types";
 
@@ -87,9 +78,7 @@ export function VIPDetailsSidebar({
             <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-1">
               Asking Price
             </p>
-            <p className="text-3xl font-clash font-semibold text-primary">
-              {formattedPrice}
-            </p>
+            <p className="text-3xl font-clash font-semibold text-primary">{formattedPrice}</p>
             <p className="text-xs text-gray-500 mt-1">
               Includes VIP Concierge Inspection & Verification
             </p>
@@ -139,9 +128,7 @@ export function VIPDetailsSidebar({
                   <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mb-0.5">
                     Total Bids
                   </p>
-                  <p className="text-sm font-medium text-white">
-                    {totalBidsCountVal}
-                  </p>
+                  <p className="text-sm font-medium text-white">{totalBidsCountVal}</p>
                 </div>
               )}
             </div>
@@ -176,10 +163,7 @@ export function VIPDetailsSidebar({
                 isSaved ? "text-primary border-primary/50" : ""
               }`}
             >
-              <Heart
-                className="w-4 h-4 text-primary"
-                fill={isSaved ? "#E78F23" : "none"}
-              />
+              <Heart className="w-4 h-4 text-primary" fill={isSaved ? "#E78F23" : "none"} />
               {isSaved ? "Saved" : "Save"}
             </button>
             <button
@@ -202,9 +186,7 @@ export function VIPDetailsSidebar({
         <div className="border border-[#2C2C2E] rounded-2xl p-6 bg-white/2">
           <div className="flex items-center gap-2.5 mb-5">
             <Info className="w-4 h-4 text-primary" />
-            <h4 className="text-sm font-semibold text-white">
-              Key Specifications
-            </h4>
+            <h4 className="text-sm font-semibold text-white">Key Specifications</h4>
           </div>
 
           <div className="grid grid-cols-2 gap-y-5 gap-x-4">
@@ -214,14 +196,8 @@ export function VIPDetailsSidebar({
               ))
             ) : (
               <>
-                <SpecItem
-                  label="YEAR"
-                  value={String(product.buildYear || 2024)}
-                />
-                <SpecItem
-                  label="CATEGORY"
-                  value={product.category || "VIP Asset"}
-                />
+                <SpecItem label="YEAR" value={String(product.buildYear || 2024)} />
+                <SpecItem label="CATEGORY" value={product.category || "VIP Asset"} />
                 <SpecItem label="CONDITION" value="Pristine" />
               </>
             )}
@@ -232,9 +208,7 @@ export function VIPDetailsSidebar({
       {/* Seller Information */}
       <AnimationWrapper type="fade-left" duration={0.5} delay={0.3}>
         <div className="bg-[#161618] border border-[#2C2C2E] rounded-2xl p-6">
-          <h4 className="text-sm font-semibold mb-5 text-white">
-            Seller Information
-          </h4>
+          <h4 className="text-sm font-semibold mb-5 text-white">Seller Information</h4>
           <div className="flex items-center gap-4">
             {product.owner?.avatarUrl ? (
               <Image
@@ -250,9 +224,7 @@ export function VIPDetailsSidebar({
               </div>
             )}
             <div>
-              <p className="font-semibold text-[15px] text-white">
-                {sellerName}
-              </p>
+              <p className="font-semibold text-[15px] text-white">{sellerName}</p>
               <p className="text-xs text-green-400/90 flex items-center gap-1.5 mt-1 font-medium">
                 <BadgeCheck className="w-3.5 h-3.5" />
                 {sellerBadge}

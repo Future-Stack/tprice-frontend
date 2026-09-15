@@ -69,12 +69,7 @@ export function BuyerListingGallery({
       {productImages.length > 1 && (
         <div className="flex flex-wrap gap-3 mt-4">
           {productImages.map((img, idx) => (
-            <AnimationWrapper
-              key={idx}
-              type="fade-up"
-              duration={0.4}
-              delay={0.15 + idx * 0.05}
-            >
+            <AnimationWrapper key={idx} type="fade-up" duration={0.4} delay={0.15 + idx * 0.05}>
               <button
                 onClick={() => onSelectImage(idx)}
                 className={`relative w-25 h-18 rounded-xl overflow-hidden border-2 transition-all duration-200 shrink-0 cursor-pointer ${

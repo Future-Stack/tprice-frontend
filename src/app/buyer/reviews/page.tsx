@@ -53,7 +53,8 @@ export default function BuyerReviewsPage() {
   }
 
   const reviewsList = reviewsResponse?.data || [];
-  const userFullName = user?.fullName || [user?.firstName, user?.lastName].filter(Boolean).join(" ") || "";
+  const userFullName =
+    user?.fullName || [user?.firstName, user?.lastName].filter(Boolean).join(" ") || "";
   const userAvatarUrl = user?.avatarUrl || "";
 
   return (
@@ -71,7 +72,8 @@ export default function BuyerReviewsPage() {
               VIP Member Reviews
             </h2>
             <p className="text-gray-400 text-xs sm:text-sm mt-1">
-              Share your prestigious experience and view verified feedback from our VIP global network
+              Share your prestigious experience and view verified feedback from our VIP global
+              network
             </p>
           </div>
         </AnimationWrapper>
@@ -126,14 +128,18 @@ export default function BuyerReviewsPage() {
           </div>
         ) : isReviewsError ? (
           <div className="p-8 text-center bg-[#1C1C1E] border border-[#2C2C2E] rounded-2xl">
-            <p className="text-red-400 text-sm font-medium">Failed to load reviews. Please refresh the page.</p>
+            <p className="text-red-400 text-sm font-medium">
+              Failed to load reviews. Please refresh the page.
+            </p>
           </div>
         ) : reviewsList.length === 0 ? (
           <AnimationWrapper type="zoom" duration={0.4}>
             <div className="p-12 text-center bg-[#1C1C1E] border border-[#2C2C2E] rounded-2xl">
               <MessageSquareQuote className="w-12 h-12 text-gray-600 mx-auto mb-3" />
               <p className="text-white font-medium text-base mb-1">No VIP reviews yet</p>
-              <p className="text-gray-400 text-xs max-w-md mx-auto mb-5">Be the first VIP member to submit a review for ExoticWorld.</p>
+              <p className="text-gray-400 text-xs max-w-md mx-auto mb-5">
+                Be the first VIP member to submit a review for ExoticWorld.
+              </p>
               <button
                 onClick={() => setIsFormOpen(true)}
                 className="px-5 py-2.5 bg-primary text-black font-semibold text-xs rounded-xl cursor-pointer"
@@ -145,7 +151,12 @@ export default function BuyerReviewsPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {reviewsList.map((review, index) => (
-              <AnimationWrapper key={review.id} type="fade-up" duration={0.4} delay={0.05 * (index % 4)}>
+              <AnimationWrapper
+                key={review.id}
+                type="fade-up"
+                duration={0.4}
+                delay={0.05 * (index % 4)}
+              >
                 <ReviewCard review={review} />
               </AnimationWrapper>
             ))}

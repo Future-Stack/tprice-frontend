@@ -134,7 +134,10 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
         toast.success("Image uploaded successfully!");
       }
     } catch (err: unknown) {
-      const errMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || (err as Error)?.message || "Failed to upload image";
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to upload image";
       toast.error(errMsg);
     }
   };
@@ -209,7 +212,10 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
       toast.success("Event updated successfully!");
       onClose();
     } catch (err: unknown) {
-      const errMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || (err as Error)?.message || "Failed to update event";
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to update event";
       toast.error(errMsg);
     }
   };

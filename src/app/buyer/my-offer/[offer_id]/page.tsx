@@ -324,7 +324,8 @@ const OfferDetails = () => {
         <AlertCircle className="w-12 h-12 text-red-500" />
         <h2 className="text-2xl font-bold font-clash">Failed to load offer details</h2>
         <p className="text-gray-400 text-sm max-w-md text-center">
-          {(error as { message?: string })?.message || "The requested offer detail could not be loaded."}
+          {(error as { message?: string })?.message ||
+            "The requested offer detail could not be loaded."}
         </p>
         <button
           onClick={() => refetch()}

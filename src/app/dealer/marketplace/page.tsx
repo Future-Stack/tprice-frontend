@@ -452,9 +452,7 @@ function FilterSidebar({
           <input
             type="text"
             value={draftFilters.yearFrom}
-            onChange={(e) =>
-              setDraftFilters((prev) => ({ ...prev, yearFrom: e.target.value }))
-            }
+            onChange={(e) => setDraftFilters((prev) => ({ ...prev, yearFrom: e.target.value }))}
             className="w-full bg-transparent border border-[#E78F23]/20 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-white focus:outline-none focus:border-[#E78F23] transition-colors"
             placeholder="2005"
           />

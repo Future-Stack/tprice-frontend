@@ -1,16 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import {
-  MapPin,
-  Clock,
-  Send,
-  Gavel,
-  Lock,
-  Info,
-  BadgeCheck,
-  Mail,
-  Phone,
-} from "lucide-react";
+import { MapPin, Clock, Send, Gavel, Lock, Info, BadgeCheck, Mail, Phone } from "lucide-react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
 import type { BuyerListingSidebarProps } from "./types";
 
@@ -64,9 +54,7 @@ export function BuyerListingSidebar({
                   ? "ESTIMATED VALUE / ASK"
                   : "CURRENT PRICE / ASK"}
             </p>
-            <p className="text-3xl font-inter font-medium text-primary">
-              {formattedPrice}
-            </p>
+            <p className="text-3xl font-inter font-medium text-primary">{formattedPrice}</p>
           </div>
 
           {/* Conditional Property Details Breakdown */}
@@ -246,9 +234,7 @@ export function BuyerListingSidebar({
               <p className="font-semibold text-[15px] text-white">{sellerName}</p>
               <p className="text-xs text-green-400/90 flex items-center gap-1.5 mt-1 font-medium">
                 <BadgeCheck className="w-3.5 h-3.5" />
-                {product.owner?.isVerified
-                  ? "Verified Premium Dealer"
-                  : "Registered Seller"}
+                {product.owner?.isVerified ? "Verified Premium Dealer" : "Registered Seller"}
               </p>
             </div>
           </div>

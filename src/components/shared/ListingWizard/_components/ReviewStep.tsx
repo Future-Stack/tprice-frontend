@@ -62,7 +62,8 @@ export function ReviewStep({
                 {title || "Untitled Listing"}
               </h4>
               <p className="text-xs text-gray-400 truncate">
-                Category: <span className="text-primary font-semibold">{category || "Unassigned"}</span>{" "}
+                Category:{" "}
+                <span className="text-primary font-semibold">{category || "Unassigned"}</span>{" "}
                 {brand && `• Brand: ${brand}`}
                 {model && ` • Model: ${model}`}
                 {trim && ` • Trim: ${trim}`}

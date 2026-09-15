@@ -2,14 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import {
-  MapPin,
-  Info,
-  BadgeCheck,
-  Heart,
-  Share2,
-  Check,
-} from "lucide-react";
+import { MapPin, Info, BadgeCheck, Heart, Share2, Check } from "lucide-react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
 import type { VIPBiddingSidebarProps } from "./types";
 
@@ -36,9 +29,7 @@ export function VIPBiddingSidebar({
 
   const vipFeeNumber = rawPrice * 0.015;
   const formattedVipFee =
-    rawPrice > 0
-      ? `$${Math.round(vipFeeNumber).toLocaleString("en-US")}`
-      : "Calculated at offer";
+    rawPrice > 0 ? `$${Math.round(vipFeeNumber).toLocaleString("en-US")}` : "Calculated at offer";
 
   const totalPayableNumber = rawPrice + vipFeeNumber;
   const formattedTotalPayable =
@@ -56,9 +47,7 @@ export function VIPBiddingSidebar({
           <span className="inline-block bg-[#E78F23]/20 text-primary text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-wider mb-3">
             {badgeLabel}
           </span>
-          <h2 className="text-3xl font-clash font-semibold text-white">
-            {product.title}
-          </h2>
+          <h2 className="text-3xl font-clash font-semibold text-white">{product.title}</h2>
           <div className="flex items-center gap-2 mt-1.5 text-gray-500 text-sm">
             <MapPin className="w-3.5 h-3.5" />
             <span>{locationText}</span>
@@ -110,9 +99,7 @@ export function VIPBiddingSidebar({
 
           <div className="pt-6 border-t border-white/5">
             <div className="flex justify-between items-start">
-              <span className="text-sm font-medium text-gray-400 mt-1">
-                Total Payable
-              </span>
+              <span className="text-sm font-medium text-gray-400 mt-1">Total Payable</span>
               <div className="text-right">
                 <p className="text-[32px] font-clash font-medium text-primary leading-none mb-1 tracking-tight">
                   {displayedTotal}
@@ -135,16 +122,11 @@ export function VIPBiddingSidebar({
       <AnimationWrapper type="fade-up" duration={0.5} delay={0.2}>
         <div className="grid grid-cols-2 gap-3">
           {specItems.slice(0, 4).map((item, idx) => (
-            <div
-              key={idx}
-              className="bg-[#161618] rounded-xl p-4 border border-white/3"
-            >
+            <div key={idx} className="bg-[#161618] rounded-xl p-4 border border-white/3">
               <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">
                 {item.label}
               </p>
-              <p className="text-[15px] font-medium text-white truncate">
-                {item.value}
-              </p>
+              <p className="text-[15px] font-medium text-white truncate">{item.value}</p>
             </div>
           ))}
           {specItems.length < 4 && (
@@ -177,9 +159,7 @@ export function VIPBiddingSidebar({
             </div>
           )}
           <div>
-            <p className="text-sm font-semibold text-white leading-none mb-1">
-              {sellerName}
-            </p>
+            <p className="text-sm font-semibold text-white leading-none mb-1">{sellerName}</p>
             <p className="text-[11px] text-green-500/80 flex items-center gap-1.5 font-medium">
               <BadgeCheck className="w-3 h-3" />
               {sellerBadge}
@@ -205,10 +185,7 @@ export function VIPBiddingSidebar({
                 isSaved ? "text-primary" : ""
               }`}
             >
-              <Heart
-                className="w-4 h-4 text-primary"
-                fill={isSaved ? "#E78F23" : "none"}
-              />
+              <Heart className="w-4 h-4 text-primary" fill={isSaved ? "#E78F23" : "none"} />
               {isSaved ? "Saved" : "Save"}
             </button>
             <button

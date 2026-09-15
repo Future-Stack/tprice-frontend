@@ -28,10 +28,7 @@ import {
   getProductImages,
 } from "./_components";
 
-const VIPOfferModal = dynamic(
-  () => import("./_components/VIPOfferModal"),
-  { ssr: false }
-);
+const VIPOfferModal = dynamic(() => import("./_components/VIPOfferModal"), { ssr: false });
 
 export default function VIPDetailsPage() {
   const params = useParams();
@@ -111,7 +108,9 @@ export default function VIPDetailsPage() {
               <AlertCircle className="w-8 h-8" />
             </div>
             <div>
-              <h3 className="text-2xl font-clash font-semibold text-white">VIP Listing Not Found</h3>
+              <h3 className="text-2xl font-clash font-semibold text-white">
+                VIP Listing Not Found
+              </h3>
               <p className="text-gray-400 text-sm mt-2">{getErrorMessage(error)}</p>
             </div>
             <div className="flex items-center justify-center gap-3 pt-2">
@@ -139,17 +138,23 @@ export default function VIPDetailsPage() {
   const safeSelectedImage = selectedImage < productImages.length ? selectedImage : 0;
   const rawPrice = product.askingPrice ? Number(product.askingPrice) : 0;
   const formattedPrice = formatPrice(product.askingPrice, product.currency);
-  const currencySymbol = product.currency === "USD" || !product.currency ? "$" : `${product.currency} `;
+  const currencySymbol =
+    product.currency === "USD" || !product.currency ? "$" : `${product.currency} `;
   const askingPriceVal = rawPrice > 0 ? rawPrice : null;
   const startingBidVal = product.startingBid ? Number(product.startingBid) : null;
   const highestBidVal = parseHighestBid(product.highestBid);
-  const totalBidsCountVal = typeof product.totalBidsCount === "number" ? product.totalBidsCount : null;
+  const totalBidsCountVal =
+    typeof product.totalBidsCount === "number" ? product.totalBidsCount : null;
   const locationParts = [product.locationCity, product.locationCountry].filter(Boolean);
   const locationText = locationParts.length > 0 ? locationParts.join(", ") : "Worldwide VIP";
   const specItems = getSpecItems(product);
-  const badgeLabel = (product as typeof product & { badgeText?: string }).badgeText || product.saleType || "VIP ASSET";
+  const badgeLabel =
+    (product as typeof product & { badgeText?: string }).badgeText ||
+    product.saleType ||
+    "VIP ASSET";
   const sellerName = product.owner
-    ? `${product.owner.firstName || ""} ${product.owner.lastName || ""}`.trim() || "TPrice Concierge"
+    ? `${product.owner.firstName || ""} ${product.owner.lastName || ""}`.trim() ||
+      "TPrice Concierge"
     : "TPrice Concierge";
 
   return (

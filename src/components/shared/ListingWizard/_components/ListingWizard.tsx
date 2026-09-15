@@ -15,13 +15,7 @@ import { useDecodeVinMutation } from "@/hooks/useVehicles";
 import { getPaymentReturnUrl } from "@/lib/api/payments";
 import { toast } from "sonner";
 import { UploadedMediaItem } from "@/components/SortableMediaGallery";
-import {
-  ListingWizardProps,
-  KeyValuePair,
-  SaleType,
-  PlanType,
-  WIZARD_STEPS,
-} from "./types";
+import { ListingWizardProps, KeyValuePair, SaleType, PlanType, WIZARD_STEPS } from "./types";
 import { StepIndicator } from "./StepIndicator";
 import { BasicInfoStep } from "./BasicInfoStep";
 import { SpecificationsStep } from "./SpecificationsStep";
@@ -48,7 +42,9 @@ export function ListingWizard({ role = "dealer", redirectPath }: ListingWizardPr
   const [isOffMarket, setIsOffMarket] = useState(false);
   const [vin, setVin] = useState("");
 
-  const { data: categoriesResponse, isLoading: isLoadingCategories } = useGetCategoriesQuery({ limit: 100 });
+  const { data: categoriesResponse, isLoading: isLoadingCategories } = useGetCategoriesQuery({
+    limit: 100,
+  });
   const categoriesList = categoriesResponse?.data || [];
   const selectedCategory = categoriesList.find((c) => c.name === category || c.id === category);
   const selectedCategoryId = selectedCategory?.id;
@@ -111,7 +107,9 @@ export function ListingWizard({ role = "dealer", redirectPath }: ListingWizardPr
   };
 
   const handleSpecChange = (id: string, field: "key" | "value", val: string) => {
-    setSpecifications((prev) => prev.map((item) => (item.id === id ? { ...item, [field]: val } : item)));
+    setSpecifications((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, [field]: val } : item))
+    );
   };
 
   const handleRemoveSpecRow = (id: string) => {
@@ -134,7 +132,12 @@ export function ListingWizard({ role = "dealer", redirectPath }: ListingWizardPr
       const addedKeys = new Set<string>();
 
       const addSpec = (key: string, value: unknown) => {
-        if (value !== null && value !== undefined && String(value).trim() !== "" && String(value).trim() !== "N/A") {
+        if (
+          value !== null &&
+          value !== undefined &&
+          String(value).trim() !== "" &&
+          String(value).trim() !== "N/A"
+        ) {
           const lowerKey = key.toLowerCase();
           if (!addedKeys.has(lowerKey)) {
             addedKeys.add(lowerKey);
@@ -162,7 +165,9 @@ export function ListingWizard({ role = "dealer", redirectPath }: ListingWizardPr
       toast.success(`VIN decoded successfully! ${newSpecs.length} specifications populated.`);
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { message?: string } }; message?: string };
-      toast.error(axiosErr?.response?.data?.message || axiosErr?.message || "Failed to decode VIN.");
+      toast.error(
+        axiosErr?.response?.data?.message || axiosErr?.message || "Failed to decode VIN."
+      );
     }
   };
 
@@ -173,7 +178,10 @@ export function ListingWizard({ role = "dealer", redirectPath }: ListingWizardPr
         const newItems: UploadedMediaItem[] = res.map((item, idx) => ({
           id: `media-${Date.now()}-${idx}-${Math.random().toString(36).slice(2, 6)}`,
           url: item.url,
-          type: "type" in item && typeof (item as { type?: string }).type === "string" ? (item as { type: string }).type : "IMAGE",
+          type:
+            "type" in item && typeof (item as { type?: string }).type === "string"
+              ? (item as { type: string }).type
+              : "IMAGE",
           displayOrder: mediaList.length + idx + 1,
           isCover: mediaList.length === 0 && idx === 0,
         }));
@@ -182,7 +190,9 @@ export function ListingWizard({ role = "dealer", redirectPath }: ListingWizardPr
       }
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { message?: string } }; message?: string };
-      toast.error(axiosErr?.response?.data?.message || axiosErr?.message || "Failed to upload image(s).");
+      toast.error(
+        axiosErr?.response?.data?.message || axiosErr?.message || "Failed to upload image(s)."
+      );
     }
   };
 
@@ -200,19 +210,33 @@ export function ListingWizard({ role = "dealer", redirectPath }: ListingWizardPr
 
   const validateCurrentStep = () => {
     if (currentStep === 0) {
-      if (!title.trim()) { toast.error("Please enter a listing title."); return false; }
-      if (!category) { toast.error("Please select a category."); return false; }
+      if (!title.trim()) {
+        toast.error("Please enter a listing title.");
+        return false;
+      }
+      if (!category) {
+        toast.error("Please select a category.");
+        return false;
+      }
     }
     if (currentStep === 2 && mediaList.length === 0) {
-      toast.error("Please upload at least one image."); return false;
+      toast.error("Please upload at least one image.");
+      return false;
     }
     if (currentStep === 3) {
       if (saleType === "FIXED_PRICE" && (!askingPrice || Number(askingPrice) <= 0)) {
-        toast.error("Please enter a valid asking price."); return false;
+        toast.error("Please enter a valid asking price.");
+        return false;
       }
       if (saleType === "AUCTION") {
-        if (!startingBid || Number(startingBid) <= 0) { toast.error("Please enter a valid starting bid."); return false; }
-        if (!auctionEndsAt) { toast.error("Please set auction end date."); return false; }
+        if (!startingBid || Number(startingBid) <= 0) {
+          toast.error("Please enter a valid starting bid.");
+          return false;
+        }
+        if (!auctionEndsAt) {
+          toast.error("Please set auction end date.");
+          return false;
+        }
       }
     }
     return true;
@@ -228,7 +252,11 @@ export function ListingWizard({ role = "dealer", redirectPath }: ListingWizardPr
       if (k) specsObject[k] = v && !isNaN(Number(v)) ? Number(v) : v;
     });
 
-    const askingPriceNum = askingPrice ? Number(askingPrice) : saleType === "AUCTION" && startingBid ? Number(startingBid) : 0;
+    const askingPriceNum = askingPrice
+      ? Number(askingPrice)
+      : saleType === "AUCTION" && startingBid
+        ? Number(startingBid)
+        : 0;
 
     const payload = {
       title: title.trim(),
@@ -257,8 +285,16 @@ export function ListingWizard({ role = "dealer", redirectPath }: ListingWizardPr
 
     try {
       const createdListing = await createListingMutation.mutateAsync(payload);
-      const resListing = createdListing as unknown as { id?: string; data?: { id?: string; data?: { id?: string } }; listing?: { id?: string } };
-      const createdListingId = resListing?.id || resListing?.data?.id || resListing?.data?.data?.id || resListing?.listing?.id;
+      const resListing = createdListing as unknown as {
+        id?: string;
+        data?: { id?: string; data?: { id?: string } };
+        listing?: { id?: string };
+      };
+      const createdListingId =
+        resListing?.id ||
+        resListing?.data?.id ||
+        resListing?.data?.data?.id ||
+        resListing?.listing?.id;
 
       if (!hasActiveSubscription && selectedPlan === "featured") {
         if (!createdListingId) {
@@ -274,8 +310,13 @@ export function ListingWizard({ role = "dealer", redirectPath }: ListingWizardPr
             successUrl: getPaymentReturnUrl("/payment/success"),
             cancelUrl: getPaymentReturnUrl("/payment/cancel"),
           });
-          const resCheckout = checkoutRes as unknown as { checkoutUrl?: string; data?: { checkoutUrl?: string }; url?: string };
-          const checkoutUrl = checkoutRes?.checkoutUrl || resCheckout?.data?.checkoutUrl || resCheckout?.url;
+          const resCheckout = checkoutRes as unknown as {
+            checkoutUrl?: string;
+            data?: { checkoutUrl?: string };
+            url?: string;
+          };
+          const checkoutUrl =
+            checkoutRes?.checkoutUrl || resCheckout?.data?.checkoutUrl || resCheckout?.url;
           if (checkoutUrl) {
             toast.success("Listing created! Redirecting to Stripe checkout for VIP promotion...");
             window.location.assign(checkoutUrl);
@@ -283,8 +324,13 @@ export function ListingWizard({ role = "dealer", redirectPath }: ListingWizardPr
           }
           toast.error("Checkout session created, but no checkout URL was returned.");
         } catch (paymentErr: unknown) {
-          const axiosErr = paymentErr as { response?: { data?: { message?: string } }; message?: string };
-          toast.error(`Listing created, but payment error: ${axiosErr?.response?.data?.message || axiosErr?.message || "Failed to initiate checkout."}`);
+          const axiosErr = paymentErr as {
+            response?: { data?: { message?: string } };
+            message?: string;
+          };
+          toast.error(
+            `Listing created, but payment error: ${axiosErr?.response?.data?.message || axiosErr?.message || "Failed to initiate checkout."}`
+          );
         }
       } else {
         toast.success("Listing created successfully!");
@@ -293,7 +339,11 @@ export function ListingWizard({ role = "dealer", redirectPath }: ListingWizardPr
       router.push(finalRedirect);
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { message?: string } }; message?: string };
-      toast.error(axiosErr?.response?.data?.message || axiosErr?.message || "Failed to create listing. Please check required fields.");
+      toast.error(
+        axiosErr?.response?.data?.message ||
+          axiosErr?.message ||
+          "Failed to create listing. Please check required fields."
+      );
     }
   };
 
@@ -303,38 +353,60 @@ export function ListingWizard({ role = "dealer", redirectPath }: ListingWizardPr
     <div className="min-h-screen text-white font-sans max-w-5xl mx-auto pb-16">
       <AnimationWrapper type="fade-down" duration={0.6}>
         <div className="mb-8">
-          <h2 className="text-[40px] font-clash font-medium tracking-tight text-white">Create New Listing</h2>
-          <p className="text-gray-400 mt-1 text-base">Add your luxury item to the marketplace catalog.</p>
+          <h2 className="text-[40px] font-clash font-medium tracking-tight text-white">
+            Create New Listing
+          </h2>
+          <p className="text-gray-400 mt-1 text-base">
+            Add your luxury item to the marketplace catalog.
+          </p>
         </div>
       </AnimationWrapper>
 
       <AnimationWrapper type="fade-up" duration={0.6} delay={0.1}>
-        <div className="bg-[#1C1C1E] p-6 md:p-10 rounded-2xl border border-[#2C2C2E] shadow-2xl overflow-hidden" style={{ boxShadow: "0 0 50px -12px rgba(178, 114, 31, 0.15)" }}>
+        <div
+          className="bg-[#1C1C1E] p-6 md:p-10 rounded-2xl border border-[#2C2C2E] shadow-2xl overflow-hidden"
+          style={{ boxShadow: "0 0 50px -12px rgba(178, 114, 31, 0.15)" }}
+        >
           <StepIndicator currentStep={currentStep} />
 
           <div className="bg-[#111113]/50 rounded-2xl p-6 md:p-8 border border-[#2C2C2E]/60 min-h-105">
             <AnimationWrapper key={currentStep} type="zoom" duration={0.4}>
               {currentStep === 0 && (
                 <BasicInfoStep
-                  title={title} setTitle={setTitle}
-                  category={category} setCategory={setCategory}
-                  brand={brand} setBrand={setBrand}
-                  model={model} setModel={setModel}
-                  trim={trim} setTrim={setTrim}
-                  buildYear={buildYear} setBuildYear={setBuildYear}
-                  locationCity={locationCity} setLocationCity={setLocationCity}
-                  locationCountry={locationCountry} setLocationCountry={setLocationCountry}
-                  isOffMarket={isOffMarket} setIsOffMarket={setIsOffMarket}
-                  categoriesList={categoriesList} isLoadingCategories={isLoadingCategories}
-                  brandsList={brandsList} isLoadingBrands={isLoadingBrands}
-                  modelsList={modelsList} isLoadingModels={isLoadingModels}
-                  trimsList={trimsList} isLoadingTrims={isLoadingTrims}
+                  title={title}
+                  setTitle={setTitle}
+                  category={category}
+                  setCategory={setCategory}
+                  brand={brand}
+                  setBrand={setBrand}
+                  model={model}
+                  setModel={setModel}
+                  trim={trim}
+                  setTrim={setTrim}
+                  buildYear={buildYear}
+                  setBuildYear={setBuildYear}
+                  locationCity={locationCity}
+                  setLocationCity={setLocationCity}
+                  locationCountry={locationCountry}
+                  setLocationCountry={setLocationCountry}
+                  isOffMarket={isOffMarket}
+                  setIsOffMarket={setIsOffMarket}
+                  categoriesList={categoriesList}
+                  isLoadingCategories={isLoadingCategories}
+                  brandsList={brandsList}
+                  isLoadingBrands={isLoadingBrands}
+                  modelsList={modelsList}
+                  isLoadingModels={isLoadingModels}
+                  trimsList={trimsList}
+                  isLoadingTrims={isLoadingTrims}
                 />
               )}
               {currentStep === 1 && (
                 <SpecificationsStep
-                  vin={vin} setVin={setVin}
-                  onDecodeVin={handleDecodeVin} isDecodingVin={decodeVinMutation.isPending}
+                  vin={vin}
+                  setVin={setVin}
+                  onDecodeVin={handleDecodeVin}
+                  isDecodingVin={decodeVinMutation.isPending}
                   specifications={specifications}
                   onAddSpecRow={handleAddSpecRow}
                   onSpecChange={handleSpecChange}
@@ -344,32 +416,56 @@ export function ListingWizard({ role = "dealer", redirectPath }: ListingWizardPr
               )}
               {currentStep === 2 && (
                 <MediaStep
-                  mediaList={mediaList} setMediaList={setMediaList}
-                  onFilesUpload={handleFilesUpload} isUploading={uploadMediaMutation.isPending}
-                  onRemoveMedia={handleRemoveMedia} onSetCover={handleSetCover}
+                  mediaList={mediaList}
+                  setMediaList={setMediaList}
+                  onFilesUpload={handleFilesUpload}
+                  isUploading={uploadMediaMutation.isPending}
+                  onRemoveMedia={handleRemoveMedia}
+                  onSetCover={handleSetCover}
                 />
               )}
               {currentStep === 3 && (
                 <PricingStep
-                  saleType={saleType} setSaleType={setSaleType}
-                  askingPrice={askingPrice} setAskingPrice={setAskingPrice}
-                  startingBid={startingBid} setStartingBid={setStartingBid}
-                  auctionEndsAt={auctionEndsAt} setAuctionEndsAt={setAuctionEndsAt}
+                  saleType={saleType}
+                  setSaleType={setSaleType}
+                  askingPrice={askingPrice}
+                  setAskingPrice={setAskingPrice}
+                  startingBid={startingBid}
+                  setStartingBid={setStartingBid}
+                  auctionEndsAt={auctionEndsAt}
+                  setAuctionEndsAt={setAuctionEndsAt}
                   currency={currency}
-                  allowCounterOffers={allowCounterOffers} setAllowCounterOffers={setAllowCounterOffers}
-                  selectedPlan={selectedPlan} setSelectedPlan={setSelectedPlan}
+                  allowCounterOffers={allowCounterOffers}
+                  setAllowCounterOffers={setAllowCounterOffers}
+                  selectedPlan={selectedPlan}
+                  setSelectedPlan={setSelectedPlan}
                   hasActiveSubscription={hasActiveSubscription}
-                  minAuctionDate={minAuctionDate} maxAuctionDate={maxAuctionDate}
+                  minAuctionDate={minAuctionDate}
+                  maxAuctionDate={maxAuctionDate}
                 />
               )}
               {currentStep === 4 && (
                 <ReviewStep
-                  title={title} category={category} brand={brand} model={model} trim={trim}
-                  buildYear={buildYear} locationCity={locationCity} locationCountry={locationCountry}
-                  isOffMarket={isOffMarket} vin={vin} specifications={specifications} mediaList={mediaList}
-                  saleType={saleType} askingPrice={askingPrice} startingBid={startingBid}
-                  auctionEndsAt={auctionEndsAt} currency={currency} allowCounterOffers={allowCounterOffers}
-                  selectedPlan={selectedPlan} setSelectedPlan={setSelectedPlan}
+                  title={title}
+                  category={category}
+                  brand={brand}
+                  model={model}
+                  trim={trim}
+                  buildYear={buildYear}
+                  locationCity={locationCity}
+                  locationCountry={locationCountry}
+                  isOffMarket={isOffMarket}
+                  vin={vin}
+                  specifications={specifications}
+                  mediaList={mediaList}
+                  saleType={saleType}
+                  askingPrice={askingPrice}
+                  startingBid={startingBid}
+                  auctionEndsAt={auctionEndsAt}
+                  currency={currency}
+                  allowCounterOffers={allowCounterOffers}
+                  selectedPlan={selectedPlan}
+                  setSelectedPlan={setSelectedPlan}
                   hasActiveSubscription={hasActiveSubscription}
                 />
               )}

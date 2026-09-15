@@ -28,13 +28,7 @@ export function UpdateReviewModal({ review, isOpen, onClose }: UpdateReviewModal
   );
 }
 
-function UpdateReviewForm({
-  review,
-  onClose,
-}: {
-  review: ReviewItem;
-  onClose: () => void;
-}) {
+function UpdateReviewForm({ review, onClose }: { review: ReviewItem; onClose: () => void }) {
   const [reviewerName, setReviewerName] = useState(review.reviewerName || "");
   const [reviewerTitle, setReviewerTitle] = useState(review.reviewerTitle || "");
   const [reviewerLocation, setReviewerLocation] = useState(review.reviewerLocation || "");

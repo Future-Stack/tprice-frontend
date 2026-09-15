@@ -15,32 +15,19 @@ interface VIPOfferFormProps {
   onSuccess?: () => void;
 }
 
-function VIPOfferForm({
-  product,
-  existingOffer,
-  rawPrice,
-  onClose,
-  onSuccess,
-}: VIPOfferFormProps) {
+function VIPOfferForm({ product, existingOffer, rawPrice, onClose, onSuccess }: VIPOfferFormProps) {
   const [offerAmount, setOfferAmount] = useState<string>(() => {
     if (existingOffer) {
-      return String(
-        existingOffer.currentAmount || existingOffer.initialAmount || ""
-      );
+      return String(existingOffer.currentAmount || existingOffer.initialAmount || "");
     }
     return rawPrice > 0 ? String(rawPrice) : "";
   });
 
-  const [offerNote, setOfferNote] = useState<string>(
-    () => existingOffer?.note || ""
-  );
+  const [offerNote, setOfferNote] = useState<string>(() => existingOffer?.note || "");
 
   const createOfferMutation = useCreateOfferMutation();
 
-  const formattedAskingPrice = formatPrice(
-    product.askingPrice,
-    product.currency || "USD"
-  );
+  const formattedAskingPrice = formatPrice(product.askingPrice, product.currency || "USD");
 
   const parsedAmount = parseFloat(offerAmount);
   const isValidAmount = !isNaN(parsedAmount) && parsedAmount > 0;
@@ -114,23 +101,17 @@ function VIPOfferForm({
             </label>
             {rawPrice > 0 && (
               <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-500">
-                  Asking: {formattedAskingPrice}
-                </span>
+                <span className="text-xs text-gray-500">Asking: {formattedAskingPrice}</span>
                 <button
                   type="button"
-                  onClick={() =>
-                    setOfferAmount(String(Math.round(rawPrice * 0.95)))
-                  }
+                  onClick={() => setOfferAmount(String(Math.round(rawPrice * 0.95)))}
                   className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-gray-300 transition-colors cursor-pointer"
                 >
                   -5%
                 </button>
                 <button
                   type="button"
-                  onClick={() =>
-                    setOfferAmount(String(Math.round(rawPrice * 0.9)))
-                  }
+                  onClick={() => setOfferAmount(String(Math.round(rawPrice * 0.9)))}
                   className="text-[10px] px-2 py-0.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-gray-300 transition-colors cursor-pointer"
                 >
                   -10%
@@ -160,9 +141,7 @@ function VIPOfferForm({
         <div>
           <label className="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">
             Note / Special Terms{" "}
-            <span className="text-gray-500 font-normal lowercase">
-              (optional)
-            </span>
+            <span className="text-gray-500 font-normal lowercase">(optional)</span>
           </label>
           <textarea
             rows={3}
@@ -179,9 +158,7 @@ function VIPOfferForm({
           <div className="bg-[#111111] border border-white/5 p-3.5 rounded-xl text-xs space-y-1.5">
             <div className="flex justify-between text-gray-400">
               <span>Offer Amount</span>
-              <span className="text-white font-medium">
-                ${parsedAmount.toLocaleString()}
-              </span>
+              <span className="text-white font-medium">${parsedAmount.toLocaleString()}</span>
             </div>
             <div className="flex justify-between text-gray-400">
               <span>Estimated VIP Fee (1.5%)</span>
@@ -213,9 +190,7 @@ function VIPOfferForm({
             disabled={createOfferMutation.isPending}
             className="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-bold text-xs rounded-xl transition-all shadow-[0_4px_16px_rgba(231,143,35,0.3)] flex items-center gap-2 cursor-pointer disabled:opacity-50"
           >
-            {createOfferMutation.isPending && (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            )}
+            {createOfferMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
             {createOfferMutation.isPending
               ? "Submitting..."
               : existingOffer

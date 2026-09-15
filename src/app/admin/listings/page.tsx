@@ -208,7 +208,10 @@ export default function AdminListingsPage() {
       await updateStatusMutation.mutateAsync({ id, status: "LIVE" });
       toast.success(`Listing "${title}" approved successfully`);
     } catch (err: unknown) {
-      toast.error((err as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to approve listing");
+      toast.error(
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+          "Failed to approve listing"
+      );
     } finally {
       setUpdatingId(null);
     }
@@ -231,7 +234,10 @@ export default function AdminListingsPage() {
       toast.success(`Listing "${target.title}" rejected`);
       setListingToReject(null);
     } catch (err: unknown) {
-      toast.error((err as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to reject listing");
+      toast.error(
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+          "Failed to reject listing"
+      );
     } finally {
       setUpdatingId(null);
     }
@@ -246,7 +252,10 @@ export default function AdminListingsPage() {
       toast.success(res?.message || `Asset listing deleted successfully`);
       setListingToDelete(null);
     } catch (err: unknown) {
-      toast.error((err as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to delete listing");
+      toast.error(
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+          "Failed to delete listing"
+      );
     } finally {
       setDeletingId(null);
     }

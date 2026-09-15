@@ -69,9 +69,7 @@ export function getErrorMessage(error: unknown): string {
 
 export function getProductImages(product?: ListingItem): string[] {
   if (product?.media && product.media.length > 0) {
-    return [...product.media]
-      .sort((a, b) => a.displayOrder - b.displayOrder)
-      .map((m) => m.url);
+    return [...product.media].sort((a, b) => a.displayOrder - b.displayOrder).map((m) => m.url);
   }
   return [
     "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&q=80&w=1200",

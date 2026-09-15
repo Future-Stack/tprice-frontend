@@ -8,7 +8,11 @@ import { AlertTriangle, ChevronLeft, RefreshCw } from "lucide-react";
 import ProductGallery from "../components/details/ProductGallery";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
 import { useAuth } from "@/hooks/useAuth";
-import { useListingByIdQuery, useSaveListingMutation, useSavedListingsQuery } from "@/hooks/useListings";
+import {
+  useListingByIdQuery,
+  useSaveListingMutation,
+  useSavedListingsQuery,
+} from "@/hooks/useListings";
 import { useOffersQuery } from "@/hooks/useOffers";
 import {
   InventorySkeleton,
@@ -85,25 +89,37 @@ export default function InventoryDetailsPage() {
   }
 
   const existingOffer = offersResponse?.data?.find(
-    (off) => String(off.listingId) === String(item.id) || String(off.listing?.id) === String(item.id)
+    (off) =>
+      String(off.listingId) === String(item.id) || String(off.listing?.id) === String(item.id)
   );
 
   const numericPrice = item.askingPrice ? Number(item.askingPrice) : 0;
   const currencySymbol = item.currency === "USD" || !item.currency ? "$" : `${item.currency} `;
-  const formattedPrice = numericPrice > 0 ? `${currencySymbol}${numericPrice.toLocaleString()}` : "Price on Request";
-  const locationText = [item.locationCity, item.locationCountry].filter(Boolean).join(", ") || "Worldwide Collection";
-  const ownerName = item.owner ? `${item.owner.firstName} ${item.owner.lastName}` : item.brand || "Elite Motors Collection";
+  const formattedPrice =
+    numericPrice > 0 ? `${currencySymbol}${numericPrice.toLocaleString()}` : "Price on Request";
+  const locationText =
+    [item.locationCity, item.locationCountry].filter(Boolean).join(", ") || "Worldwide Collection";
+  const ownerName = item.owner
+    ? `${item.owner.firstName} ${item.owner.lastName}`
+    : item.brand || "Elite Motors Collection";
 
   const normalizedSaleType = (item.saleType || "").toUpperCase();
-  const isAuction = normalizedSaleType === "AUCTION" || (Boolean(item.startingBid) && !["FIXED_PRICE", "FIXED", "PRIVATE_SALE", "PRIVATE"].includes(normalizedSaleType));
+  const isAuction =
+    normalizedSaleType === "AUCTION" ||
+    (Boolean(item.startingBid) &&
+      !["FIXED_PRICE", "FIXED", "PRIVATE_SALE", "PRIVATE"].includes(normalizedSaleType));
   const isFixedPrice = !isAuction;
   const allowCounterOffers = Boolean(item.allowCounterOffers);
 
-  const startingBidVal = item.startingBid && !isNaN(Number(item.startingBid)) ? Number(item.startingBid) : null;
+  const startingBidVal =
+    item.startingBid && !isNaN(Number(item.startingBid)) ? Number(item.startingBid) : null;
   const highestBidVal = parseHighestBid(item.highestBid);
   const totalBidsCountVal = typeof item.totalBidsCount === "number" ? item.totalBidsCount : null;
 
-  const isSaved = item.isSaved !== undefined ? item.isSaved : (savedResponse?.data?.some((s) => s.id === item.id) ?? false);
+  const isSaved =
+    item.isSaved !== undefined
+      ? item.isSaved
+      : (savedResponse?.data?.some((s) => s.id === item.id) ?? false);
   const handleToggleSave = () => {
     if (!token) return toast.error("Please sign in to save listings to your favorites.");
     saveMutation.mutate(item.id);
@@ -123,7 +139,11 @@ export default function InventoryDetailsPage() {
       <div className="container mx-auto px-6 md:px-0 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           <div className="lg:col-span-8 space-y-8">
-            <InventoryHeaderCard item={item} locationText={locationText} formattedPrice={formattedPrice} />
+            <InventoryHeaderCard
+              item={item}
+              locationText={locationText}
+              formattedPrice={formattedPrice}
+            />
             <InventoryOverviewSection item={item} />
           </div>
 
@@ -147,9 +167,18 @@ export default function InventoryDetailsPage() {
                   totalBidsCountVal={totalBidsCountVal}
                   existingOffer={existingOffer}
                   isOffersLoading={isOffersLoading}
-                  onOpenPlaceBid={() => verifyAuth(() => setActiveModal("bid"), "Please sign in to place a bid.")}
-                  onOpenSendOffer={() => verifyAuth(() => setActiveModal("offer"), "Please sign in to send an offer.")}
-                  onOpenCounterOffer={() => verifyAuth(() => setActiveModal("counter"), "Please sign in to submit a counter offer.")}
+                  onOpenPlaceBid={() =>
+                    verifyAuth(() => setActiveModal("bid"), "Please sign in to place a bid.")
+                  }
+                  onOpenSendOffer={() =>
+                    verifyAuth(() => setActiveModal("offer"), "Please sign in to send an offer.")
+                  }
+                  onOpenCounterOffer={() =>
+                    verifyAuth(
+                      () => setActiveModal("counter"),
+                      "Please sign in to submit a counter offer."
+                    )
+                  }
                 />
               }
             />

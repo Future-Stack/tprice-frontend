@@ -156,7 +156,10 @@ export function PricingStep({
             onChange={(e) => setAllowCounterOffers(e.target.checked)}
             className="w-4 h-4 rounded border-[#2C2C2E] text-primary focus:ring-primary accent-[#E78F23] cursor-pointer"
           />
-          <label htmlFor="allowCounterOffers" className="text-xs font-semibold text-gray-200 cursor-pointer">
+          <label
+            htmlFor="allowCounterOffers"
+            className="text-xs font-semibold text-gray-200 cursor-pointer"
+          >
             Allow potential buyers to submit counter-offers
           </label>
         </div>

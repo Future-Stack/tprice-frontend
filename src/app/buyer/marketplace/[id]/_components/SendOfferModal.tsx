@@ -193,9 +193,7 @@ function SendOfferForm({
           <div className="bg-[#111111] border border-white/5 p-3.5 rounded-xl text-xs space-y-1.5">
             <div className="flex justify-between text-gray-400">
               <span>Offer Amount</span>
-              <span className="text-white font-medium">
-                ${parsedAmount.toLocaleString()}
-              </span>
+              <span className="text-white font-medium">${parsedAmount.toLocaleString()}</span>
             </div>
             <div className="flex justify-between text-gray-400">
               <span>Estimated VIP Fee (1.5%)</span>

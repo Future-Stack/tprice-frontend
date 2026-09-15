@@ -2,14 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import {
-  Gavel,
-  BadgePercent,
-  List as ListIcon,
-  Heart,
-  Eye,
-  MapPin,
-} from "lucide-react";
+import { Gavel, BadgePercent, List as ListIcon, Heart, Eye, MapPin } from "lucide-react";
 
 import AnimationWrapper from "../components/AnimationWrapper";
 

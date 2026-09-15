@@ -42,7 +42,10 @@ const DealerDetailModal = ({ isOpen, onClose, dealer }: DealerDetailModalProps) 
           {/* Header */}
           <div className="p-8 pb-4 flex justify-between items-center">
             <h2 className="text-2xl font-bold text-white">Dealer Details</h2>
-            <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors cursor-pointer">
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-white transition-colors cursor-pointer"
+            >
               <X className="w-6 h-6" />
             </button>
           </div>

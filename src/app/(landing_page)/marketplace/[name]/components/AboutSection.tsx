@@ -12,9 +12,9 @@ export default function AboutSection({ item }: AboutSectionProps) {
     <div className="bg-[#1A1A1A] rounded-2xl p-8 border border-white/5 mb-8">
       <h2 className="text-xl text-primary font-medium mb-6">About</h2>
       <p className="text-white/60 text-sm leading-relaxed mb-10 font-light">
-        {item.description} With projects spanning Monaco penthouses, Cöte d&apos;Azur villas, and 60M
-        superyachts, {item.name.split(" ")[0]}&apos;s work is defined by an obsessive attention to
-        material quality and spatial harmony.
+        {item.description} With projects spanning Monaco penthouses, Cöte d&apos;Azur villas, and
+        60M superyachts, {item.name.split(" ")[0]}&apos;s work is defined by an obsessive attention
+        to material quality and spatial harmony.
       </p>
 
       <div className="border-t border-white/5 pt-6">

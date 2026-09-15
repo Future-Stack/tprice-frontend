@@ -102,7 +102,8 @@ export default function BuyerSubscriptionPage() {
         onSuccess: (data) => {
           const checkoutUrl =
             data?.checkoutUrl ||
-            (data as unknown as { data?: { checkoutUrl?: string }; url?: string })?.data?.checkoutUrl ||
+            (data as unknown as { data?: { checkoutUrl?: string }; url?: string })?.data
+              ?.checkoutUrl ||
             (data as unknown as { url?: string })?.url;
 
           if (checkoutUrl) {
@@ -209,7 +210,8 @@ export default function BuyerSubscriptionPage() {
             <div className="flex items-center gap-3">
               <AlertCircle className="w-5 h-5 shrink-0" />
               <p className="text-sm">
-                {(error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+                {(error as { response?: { data?: { message?: string } } })?.response?.data
+                  ?.message ||
                   error?.message ||
                   "Unable to load subscription details. Please check your connection."}
               </p>

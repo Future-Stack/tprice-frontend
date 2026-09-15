@@ -101,9 +101,7 @@ export default function UpdateListingForm({ listing, onClose }: UpdateListingFor
   const [specifications, setSpecifications] = useState<KeyValuePair[]>(() =>
     parseInitialSpecs(listing.specifications)
   );
-  const [mediaList, setMediaList] = useState<UploadedMediaItem[]>(() =>
-    parseInitialMedia(listing)
-  );
+  const [mediaList, setMediaList] = useState<UploadedMediaItem[]>(() => parseInitialMedia(listing));
 
   // Cascading data lookups
   const selectedCategory = categoriesList.find(
@@ -385,9 +383,7 @@ export default function UpdateListingForm({ listing, onClose }: UpdateListingFor
                 prev.map((item) => (item.id === id ? { ...item, [field]: val } : item))
               )
             }
-            onRemoveRow={(id) =>
-              setSpecifications((prev) => prev.filter((item) => item.id !== id))
-            }
+            onRemoveRow={(id) => setSpecifications((prev) => prev.filter((item) => item.id !== id))}
           />
         )}
 

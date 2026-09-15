@@ -1,14 +1,5 @@
 import React from "react";
-import {
-  Gauge,
-  TrendingUp,
-  Zap,
-  Fuel,
-  Calendar,
-  Tag,
-  Layers,
-  ShieldCheck,
-} from "lucide-react";
+import { Gauge, TrendingUp, Zap, Fuel, Calendar, Tag, Layers, ShieldCheck } from "lucide-react";
 import type { ListingItem } from "@/lib/api/listings";
 
 export type Listing = ListingItem;

@@ -44,9 +44,7 @@ export function BuyerBiddingSidebar({
           <span className="inline-block bg-[#E78F23]/20 text-primary text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-wider mb-3">
             {product.subCategory || product.category || "AUCTION"}
           </span>
-          <h2 className="text-3xl font-clash font-semibold text-white">
-            {product.title}
-          </h2>
+          <h2 className="text-3xl font-clash font-semibold text-white">{product.title}</h2>
           <div className="flex items-center gap-2 mt-1.5 text-gray-500 text-sm">
             <MapPin className="w-3.5 h-3.5" />
             <span>{locationText}</span>
@@ -92,9 +90,7 @@ export function BuyerBiddingSidebar({
 
           <div className="pt-6 border-t border-white/5">
             <div className="flex justify-between items-start">
-              <span className="text-sm font-medium text-gray-400 mt-1">
-                Total Payable
-              </span>
+              <span className="text-sm font-medium text-gray-400 mt-1">Total Payable</span>
               <div className="text-right">
                 <p className="text-[32px] font-clash font-medium text-primary leading-none mb-1 tracking-tight">
                   ${totalPayable.toLocaleString()}
@@ -118,17 +114,11 @@ export function BuyerBiddingSidebar({
         <div className="grid grid-cols-2 gap-3">
           {dynamicSpecs.length > 0 ? (
             dynamicSpecs.map((spec, index) => (
-              <div
-                key={index}
-                className="bg-[#161618] rounded-xl p-4 border border-white/3"
-              >
+              <div key={index} className="bg-[#161618] rounded-xl p-4 border border-white/3">
                 <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1 truncate">
                   {spec.label}
                 </p>
-                <p
-                  className="text-[15px] font-medium text-white truncate"
-                  title={spec.value}
-                >
+                <p className="text-[15px] font-medium text-white truncate" title={spec.value}>
                   {spec.value}
                 </p>
               </div>
@@ -159,9 +149,7 @@ export function BuyerBiddingSidebar({
             </div>
           )}
           <div>
-            <p className="text-sm font-semibold text-white leading-none mb-1">
-              {sellerName}
-            </p>
+            <p className="text-sm font-semibold text-white leading-none mb-1">{sellerName}</p>
             <p className="text-[11px] text-green-500/80 flex items-center gap-1.5 font-medium">
               <BadgeCheck className="w-3 h-3" />
               {product.owner?.isVerified ? "Verified Dealer" : "Seller"}
@@ -188,10 +176,7 @@ export function BuyerBiddingSidebar({
               disabled={isSaving}
               className="flex items-center justify-center gap-2 py-4 bg-[#161618] text-white text-[13px] font-semibold rounded-xl border border-white/5 hover:bg-white/8 transition-colors cursor-pointer disabled:opacity-50"
             >
-              <Heart
-                className="w-4 h-4 text-primary"
-                fill={isSaved ? "#E78F23" : "none"}
-              />
+              <Heart className="w-4 h-4 text-primary" fill={isSaved ? "#E78F23" : "none"} />
               {isSaved ? "Saved" : "Save"}
             </button>
             <button

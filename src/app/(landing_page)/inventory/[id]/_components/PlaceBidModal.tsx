@@ -159,8 +159,7 @@ function PlaceBidForm({
         <div>
           <div className="flex items-center justify-between mb-2">
             <label className="text-xs font-semibold uppercase tracking-wider text-white/70">
-              Your Bid Amount ({item.currency || "USD"}){" "}
-              <span className="text-red-400">*</span>
+              Your Bid Amount ({item.currency || "USD"}) <span className="text-red-400">*</span>
             </label>
             {/* Shortcut pills */}
             <div className="flex items-center gap-1.5">

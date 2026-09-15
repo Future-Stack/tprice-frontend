@@ -379,8 +379,8 @@ export default function OfferDetailsPage() {
           <AlertCircle size={56} className="mx-auto text-rose-500 stroke-[1.5]" />
           <h2 className="text-2xl font-bold text-white">Offer Not Found</h2>
           <p className="text-gray-400 max-w-md mx-auto text-sm">
-            We couldn&apos;t load the details for this offer. It may have been deleted or the URL might
-            be invalid.
+            We couldn&apos;t load the details for this offer. It may have been deleted or the URL
+            might be invalid.
           </p>
           <div className="flex items-center justify-center gap-4 pt-2">
             <Link

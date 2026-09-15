@@ -22,7 +22,8 @@ export function SpecificationsStep({
             <Sparkles className="w-5 h-5 text-primary" /> Vehicle Specifications
           </h3>
           <p className="text-xs text-gray-400 mt-1">
-            Enter VIN to auto-populate all vehicle specifications, or add custom key-value pairs manually.
+            Enter VIN to auto-populate all vehicle specifications, or add custom key-value pairs
+            manually.
           </p>
         </div>
 
@@ -123,7 +124,9 @@ export function SpecificationsStep({
             Specifications List ({specifications.length})
           </span>
           {specifications.length > 0 && (
-            <span className="text-[11px] text-gray-500">All keys and values are fully editable</span>
+            <span className="text-[11px] text-gray-500">
+              All keys and values are fully editable
+            </span>
           )}
         </div>
 

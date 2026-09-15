@@ -62,7 +62,11 @@ function formatActivityAction(action: string): string {
     .join(" ");
 }
 
-function getActivityDescription(activity: { action?: string; changes?: Record<string, unknown>; resource?: string }): string {
+function getActivityDescription(activity: {
+  action?: string;
+  changes?: Record<string, unknown>;
+  resource?: string;
+}): string {
   const changes = activity.changes || {};
   if (activity.action === "LISTING_APPROVED") {
     return changes.status

@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { XCircle, X, Loader2 } from "lucide-react";
 import Image from "next/image";
 
-
 interface RejectListingModalProps {
   isOpen: boolean;
   onClose: () => void;

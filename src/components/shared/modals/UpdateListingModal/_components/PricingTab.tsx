@@ -23,13 +23,11 @@ export default function PricingTab({
           Sale Format <span className="text-rose-500">*</span>
         </label>
         <div className="grid grid-cols-3 gap-3">
-          {(
-            [
-              { id: "FIXED_PRICE" as const, label: "Fixed Price" },
-              { id: "AUCTION" as const, label: "Auction" },
-              { id: "PRIVATE_SALE" as const, label: "Private Treaty" },
-            ]
-          ).map((st) => (
+          {[
+            { id: "FIXED_PRICE" as const, label: "Fixed Price" },
+            { id: "AUCTION" as const, label: "Auction" },
+            { id: "PRIVATE_SALE" as const, label: "Private Treaty" },
+          ].map((st) => (
             <button
               key={st.id}
               type="button"
@@ -95,9 +93,7 @@ export default function PricingTab({
               </label>
               <input
                 type="datetime-local"
-                value={
-                  auctionEndsAt ? new Date(auctionEndsAt).toISOString().slice(0, 16) : ""
-                }
+                value={auctionEndsAt ? new Date(auctionEndsAt).toISOString().slice(0, 16) : ""}
                 onChange={(e) => setAuctionEndsAt(e.target.value)}
                 className="w-full bg-[#111111] border border-[#333333] rounded-xl px-4 py-3 text-sm text-gray-100 focus:outline-none focus:border-[#EAB308] transition-colors"
               />

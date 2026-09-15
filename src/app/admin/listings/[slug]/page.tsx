@@ -16,8 +16,12 @@ import {
   AdminModerationCard,
 } from "./_components";
 
-const UpdateListingModal = dynamic(() => import("@/components/shared/modals/UpdateListingModal"), { ssr: false });
-const RejectListingModal = dynamic(() => import("@/app/admin/listings/RejectListingModal"), { ssr: false });
+const UpdateListingModal = dynamic(() => import("@/components/shared/modals/UpdateListingModal"), {
+  ssr: false,
+});
+const RejectListingModal = dynamic(() => import("@/app/admin/listings/RejectListingModal"), {
+  ssr: false,
+});
 
 export default function AdminListingDetails() {
   const params = useParams();

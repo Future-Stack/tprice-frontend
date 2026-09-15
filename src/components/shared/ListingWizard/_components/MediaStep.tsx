@@ -79,7 +79,9 @@ export function MediaStep({
         {isUploading ? (
           <div className="flex flex-col items-center justify-center space-y-2 py-4">
             <Loader2 className="w-8 h-8 text-primary animate-spin" />
-            <p className="text-sm font-medium text-primary">Uploading image to cloud media service...</p>
+            <p className="text-sm font-medium text-primary">
+              Uploading image to cloud media service...
+            </p>
             <p className="text-xs text-gray-500">Please wait</p>
           </div>
         ) : (

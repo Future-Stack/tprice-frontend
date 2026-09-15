@@ -469,8 +469,8 @@ function BuyerOffer() {
                 <Inbox className="w-12 h-12 text-gray-500 mx-auto opacity-60" />
                 <h3 className="text-xl font-bold text-white">No offers found</h3>
                 <p className="text-sm text-gray-400 max-w-md mx-auto">
-                  You haven&apos;t submitted any offers yet. Explore active listings to place your first
-                  offer.
+                  You haven&apos;t submitted any offers yet. Explore active listings to place your
+                  first offer.
                 </p>
                 <Link
                   href="/inventory"

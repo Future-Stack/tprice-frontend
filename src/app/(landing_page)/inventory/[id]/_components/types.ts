@@ -143,9 +143,7 @@ export function getErrorMessage(error: unknown): string {
   return "The requested luxury listing could not be retrieved or has been removed.";
 }
 
-export function getMediaList(
-  media?: ListingMedia[]
-): { type: "image" | "video"; url: string }[] {
+export function getMediaList(media?: ListingMedia[]): { type: "image" | "video"; url: string }[] {
   if (media && media.length > 0) {
     return [...media]
       .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))

@@ -21,9 +21,8 @@ export function NonVipRestrictedCard() {
             VIP Review Access Restricted
           </h2>
           <p className="text-gray-400 text-sm max-w-xl mx-auto mb-8 leading-relaxed">
-            The Reviews section is exclusively reserved for VIP Members of ExoticWorld. Upgrade
-            your account to leave official member reviews and gain access to luxury off-market
-            deals.
+            The Reviews section is exclusively reserved for VIP Members of ExoticWorld. Upgrade your
+            account to leave official member reviews and gain access to luxury off-market deals.
           </p>
 
           <Link href="/buyer/settings">

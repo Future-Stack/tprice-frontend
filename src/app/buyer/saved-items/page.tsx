@@ -129,8 +129,8 @@ export default function SavedItems() {
             </div>
             <h3 className="text-xl font-clash font-medium text-white mb-2">No Saved Items Yet</h3>
             <p className="text-sm text-gray-400 mb-6 max-w-md mx-auto">
-              You haven&apos;t saved any listings to your favorites yet. Explore the marketplace and save
-              items to view them here.
+              You haven&apos;t saved any listings to your favorites yet. Explore the marketplace and
+              save items to view them here.
             </p>
             <Link
               href="/buyer/marketplace"

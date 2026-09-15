@@ -69,10 +69,7 @@ export function InventoryBiddingCard({
             >
               <Gavel size={16} />
               Increase Bid ($
-              {Number(
-                existingOffer.currentAmount || existingOffer.initialAmount
-              ).toLocaleString()}
-              )
+              {Number(existingOffer.currentAmount || existingOffer.initialAmount).toLocaleString()})
             </button>
           ) : (
             <button
@@ -102,10 +99,7 @@ export function InventoryBiddingCard({
             >
               <Clock size={16} />
               Offer Sent ($
-              {Number(
-                existingOffer.currentAmount || existingOffer.initialAmount
-              ).toLocaleString()}
-              )
+              {Number(existingOffer.currentAmount || existingOffer.initialAmount).toLocaleString()})
             </button>
           ) : (
             <button

@@ -3,11 +3,7 @@ import Link from "next/link";
 import { X, Clock, ArrowUpRight } from "lucide-react";
 import type { ViewOfferModalProps } from "./types";
 
-export function ViewOfferModal({
-  isOpen,
-  onClose,
-  existingOffer,
-}: ViewOfferModalProps) {
+export function ViewOfferModal({ isOpen, onClose, existingOffer }: ViewOfferModalProps) {
   if (!isOpen) return null;
 
   return (
@@ -24,9 +20,7 @@ export function ViewOfferModal({
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
           <div>
             <h3 className="text-xl font-clash font-bold text-white">Your Submitted Offer</h3>
-            <p className="text-xs text-gray-400 mt-0.5">
-              Details of your offer for this listing
-            </p>
+            <p className="text-xs text-gray-400 mt-0.5">Details of your offer for this listing</p>
           </div>
           <button
             onClick={onClose}
@@ -49,10 +43,7 @@ export function ViewOfferModal({
           <div className="flex items-center justify-between pt-2 border-t border-white/5">
             <span className="text-xs text-gray-400">Offered Amount</span>
             <span className="text-lg font-clash font-bold text-white">
-              $
-              {Number(
-                existingOffer.currentAmount || existingOffer.initialAmount
-              ).toLocaleString()}
+              ${Number(existingOffer.currentAmount || existingOffer.initialAmount).toLocaleString()}
             </span>
           </div>
 

@@ -221,7 +221,8 @@ export default function VIPDetailsPage() {
                 VIP Listing Not Found
               </h3>
               <p className="text-gray-400 text-sm mt-2">
-                {(error as unknown as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+                {(error as unknown as { response?: { data?: { message?: string } } })?.response
+                  ?.data?.message ||
                   error?.message ||
                   "The VIP listing you are looking for is currently unavailable or does not exist."}
               </p>

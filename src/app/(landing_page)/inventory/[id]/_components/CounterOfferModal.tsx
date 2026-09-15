@@ -165,8 +165,7 @@ function CounterOfferForm({
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label className="block text-xs font-semibold uppercase tracking-wider text-white/70 mb-2">
-            Counter Offer Amount ({item.currency || "USD"}){" "}
-            <span className="text-red-400">*</span>
+            Counter Offer Amount ({item.currency || "USD"}) <span className="text-red-400">*</span>
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/40">

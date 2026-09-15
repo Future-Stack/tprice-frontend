@@ -105,7 +105,10 @@ export default function CreateMediaModal({ isOpen, onClose }: CreateMediaModalPr
         toast.success("Media file uploaded successfully!");
       }
     } catch (err: unknown) {
-      const errMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || (err as Error)?.message || "Failed to upload media file";
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to upload media file";
       toast.error(errMsg);
     }
   };
@@ -133,7 +136,10 @@ export default function CreateMediaModal({ isOpen, onClose }: CreateMediaModalPr
         toast.success("Thumbnail uploaded successfully!");
       }
     } catch (err: unknown) {
-      const errMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || (err as Error)?.message || "Failed to upload thumbnail";
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to upload thumbnail";
       toast.error(errMsg);
     } finally {
       setIsUploadingThumb(false);
@@ -225,7 +231,10 @@ export default function CreateMediaModal({ isOpen, onClose }: CreateMediaModalPr
       });
       onClose();
     } catch (err: unknown) {
-      const errMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || (err as Error)?.message || "Failed to create landing media";
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to create landing media";
       toast.error(errMsg);
     }
   };

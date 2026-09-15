@@ -120,8 +120,7 @@ function MakeOfferForm({
             {item.title}
           </h4>
           <p className="text-xs text-white/50 mt-0.5">
-            Asking Price:{" "}
-            <span className="text-[#D4AF37] font-semibold">{formattedPrice}</span>
+            Asking Price: <span className="text-[#D4AF37] font-semibold">{formattedPrice}</span>
           </p>
         </div>
       </div>
@@ -130,8 +129,7 @@ function MakeOfferForm({
         <div>
           <div className="flex items-center justify-between mb-2">
             <label className="text-xs font-semibold uppercase tracking-wider text-white/70">
-              Your Offer Amount ({item.currency || "USD"}){" "}
-              <span className="text-red-400">*</span>
+              Your Offer Amount ({item.currency || "USD"}) <span className="text-red-400">*</span>
             </label>
             {/* Quick percentage shortcuts */}
             {numericPrice > 0 && (

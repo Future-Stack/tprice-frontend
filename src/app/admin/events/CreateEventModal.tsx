@@ -106,7 +106,10 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
         toast.success("Image uploaded successfully!");
       }
     } catch (err: unknown) {
-      const errMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || (err as Error)?.message || "Failed to upload image";
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to upload image";
       toast.error(errMsg);
     }
   };
@@ -185,7 +188,10 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
       setSelectedDate(null);
       onClose();
     } catch (err: unknown) {
-      const errMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || (err as Error)?.message || "Failed to create event";
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (err as Error)?.message ||
+        "Failed to create event";
       toast.error(errMsg);
     }
   };

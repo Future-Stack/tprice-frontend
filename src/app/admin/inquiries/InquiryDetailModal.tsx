@@ -77,11 +77,7 @@ const getStatusBadge = (status: string) => {
   }
 };
 
-export default function InquiryDetailModal({
-  isOpen,
-  onClose,
-  inquiry,
-}: InquiryDetailModalProps) {
+export default function InquiryDetailModal({ isOpen, onClose, inquiry }: InquiryDetailModalProps) {
   if (!isOpen || !inquiry) return null;
 
   const copyToClipboard = (text: string, label: string) => {

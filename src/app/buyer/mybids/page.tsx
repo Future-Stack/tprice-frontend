@@ -103,7 +103,8 @@ export default function MyBidsPage() {
   const [selectedBidId, setSelectedBidId] = useState<string | null>(null);
   const [inclFees, setInclFees] = useState(true);
 
-  const selectedBid = (selectedBidId && bids.find((bid) => bid.id === selectedBidId)) || bids[0] || null;
+  const selectedBid =
+    (selectedBidId && bids.find((bid) => bid.id === selectedBidId)) || bids[0] || null;
 
   // Price calculations for selected bid
   const currentBidVal = selectedBid
@@ -500,8 +501,8 @@ export default function MyBidsPage() {
             </div>
             <h3 className="text-xl font-clash font-medium text-white mb-2">No Bids Placed Yet</h3>
             <p className="text-sm text-gray-400 mb-6 max-w-md mx-auto">
-              You haven&apos;t submitted any offers or bids on listings yet. Explore the marketplace to
-              place your first bid.
+              You haven&apos;t submitted any offers or bids on listings yet. Explore the marketplace
+              to place your first bid.
             </p>
             <Link
               href="/buyer/marketplace"

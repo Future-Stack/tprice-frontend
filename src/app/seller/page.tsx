@@ -111,7 +111,8 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <AlertCircle className="w-5 h-5 shrink-0" />
             <span>
-              {(error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to load seller dashboard data."}
+              {(error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+                "Failed to load seller dashboard data."}
             </span>
           </div>
           <button

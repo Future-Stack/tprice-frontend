@@ -204,7 +204,8 @@ export default function AdminInquiriesPage() {
           <div>
             <h1 className="text-3xl font-bold font-montserrat  ">Inquiries Management</h1>
             <p className="text-gray-400 text-sm mt-1">
-              View and manage customer contact messages and inquiries{newCount > 0 ? ` (${newCount} new)` : ""}
+              View and manage customer contact messages and inquiries
+              {newCount > 0 ? ` (${newCount} new)` : ""}
             </p>
           </div>
         </AnimationWrapper>

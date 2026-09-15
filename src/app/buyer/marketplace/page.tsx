@@ -322,7 +322,8 @@ export default function MarketplacePage() {
               <AlertTriangle className="w-10 h-10 text-red-400 mx-auto mb-3" />
               <h3 className="text-lg font-semibold text-white mb-1">Failed to load listings</h3>
               <p className="text-sm text-gray-400 mb-4">
-                {(error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+                {(error as { response?: { data?: { message?: string } } })?.response?.data
+                  ?.message ||
                   error?.message ||
                   "An unexpected error occurred while fetching listings."}
               </p>
