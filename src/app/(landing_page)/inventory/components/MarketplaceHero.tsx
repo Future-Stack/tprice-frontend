@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 
 export default function MarketplaceHero() {
@@ -9,10 +10,13 @@ export default function MarketplaceHero() {
       <div className="container mx-auto">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
-          <img
+          <Image
             src="/images/landing/hero-yacht.png"
             alt="Marketplace Hero"
-            className="w-full h-full object-cover  "
+            fill
+            priority
+            className="object-cover"
+            sizes="100vw"
           />
           {/* Cinematic Overlays */}
           <div className="absolute inset-0 bg-black/60 z-1" />

@@ -38,18 +38,13 @@ export default function MarketplacePage() {
   const debouncedMaxPrice = useDebounce(priceRange.max, 400);
   const debouncedMinYear = useDebounce(yearRange.min, 400);
 
-  // Reset page to 1 whenever filters change
-  useEffect(() => {
+  // Reset page to 1 whenever filters change without cascading renders
+  const [prevFilterKey, setPrevFilterKey] = useState("");
+  const currentFilterKey = `${category}-${brands.join(",")}-${sortBy}-${debouncedSearch}-${debouncedMinPrice}-${debouncedMaxPrice}-${debouncedMinYear}`;
+  if (currentFilterKey !== prevFilterKey) {
+    setPrevFilterKey(currentFilterKey);
     setPage(1);
-  }, [
-    category,
-    brands,
-    sortBy,
-    debouncedSearch,
-    debouncedMinPrice,
-    debouncedMaxPrice,
-    debouncedMinYear,
-  ]);
+  }
 
   // React Query hook to fetch listings from GET /api/v1/listings
   const { data, isLoading, isFetching, isError, error, refetch } = useListingsQuery({
@@ -130,8 +125,10 @@ export default function MarketplacePage() {
                   Failed to load marketplace listings
                 </h3>
                 <p className="text-sm text-white/50 mb-6">
-                  {(error as any)?.response?.data?.message ||
-                    error?.message ||
+                  {(error && typeof error === "object" && "response" in error
+                    ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
+                    : undefined) ||
+                    (error instanceof Error ? error.message : undefined) ||
                     "An unexpected error occurred while fetching listings."}
                 </p>
                 <button

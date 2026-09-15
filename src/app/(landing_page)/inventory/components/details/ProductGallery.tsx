@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight, Play, Pause } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MediaItem } from "../../data";
@@ -13,6 +14,13 @@ export default function ProductGallery({ media }: ProductGalleryProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Reset play state during render when changing media without cascading renders
+  const [prevIndex, setPrevIndex] = useState(currentIndex);
+  if (currentIndex !== prevIndex) {
+    setPrevIndex(currentIndex);
+    setIsPlaying(false);
+  }
 
   const currentMedia = media?.[currentIndex];
 
@@ -49,9 +57,8 @@ export default function ProductGallery({ media }: ProductGalleryProps) {
     }
   };
 
-  // Reset play state and handle cleanup when changing media
+  // Video element imperative reload and cleanup when changing media
   useEffect(() => {
-    setIsPlaying(false);
     const video = videoRef.current;
     if (video) {
       video.load();
@@ -99,7 +106,14 @@ export default function ProductGallery({ media }: ProductGalleryProps) {
                 Your browser does not support the video tag.
               </video>
             ) : (
-              <img src={currentMedia.url} className="w-full h-full object-cover" alt="Product" />
+              <Image
+                src={currentMedia.url}
+                fill
+                className="w-full h-full object-cover"
+                alt="Product"
+                priority
+                sizes="100vw"
+              />
             )}
           </motion.div>
         </AnimatePresence>
@@ -154,10 +168,12 @@ export default function ProductGallery({ media }: ProductGalleryProps) {
                 : "border-transparent opacity-60 hover:opacity-100"
             }`}
           >
-            <img
+            <Image
               src={item.thumbnail || item.url}
+              fill
               className="w-full h-full object-cover"
               alt={`Thumb ${idx}`}
+              sizes="160px"
             />
             {item.type === "video" && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/20">

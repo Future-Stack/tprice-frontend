@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo } from "react";
+import Image from "next/image";
 import { Heart, MapPin, CheckCircle2, MoveRight, Gauge, Calendar, Zap, Cog } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -110,14 +111,12 @@ export default function ProductCard({ item }: ProductCardProps) {
     >
       {/* Image Container */}
       <div className="relative h-56 overflow-hidden shrink-0 bg-black/40">
-        <img
+        <Image
           src={imageUrl}
           alt={item.title}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src =
-              "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
-          }}
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
 
         {/* Featured/VIP Badge */}

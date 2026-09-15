@@ -8,12 +8,9 @@ import {
   Plane,
   Users,
   Wind,
-  MapPin,
-  Package,
-  FileText,
-  History,
   Move,
   Ship,
+  type LucideIcon,
 } from "lucide-react";
 
 export interface MediaItem {
@@ -35,7 +32,7 @@ export interface MarketplaceItem {
   specs: {
     label: string;
     value: string;
-    icon: any;
+    icon: LucideIcon;
   }[];
   detailedSpecs: {
     label: string;
