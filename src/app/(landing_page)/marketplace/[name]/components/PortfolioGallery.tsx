@@ -18,7 +18,7 @@ export default function PortfolioGallery({ item }: PortfolioGalleryProps) {
       <h2 className="text-xl text-primary font-medium mb-6">Portfolio</h2>
 
       {/* Main Image */}
-      <div className="relative w-full aspect-[2/1] md:aspect-[2.5/1] rounded-lg overflow-hidden mb-4">
+      <div className="relative w-full aspect-2/1 md:aspect-2.5/1 rounded-lg overflow-hidden mb-4">
         <Image
           src={images[activeIndex]}
           alt="Portfolio Main"

@@ -505,7 +505,7 @@ export function ListingWizard({ role = "dealer", redirectPath }: ListingWizardPr
                   </>
                 ) : (
                   <>
-                    <Check className="w-4 h-4 stroke-[3]" />
+                    <Check className="w-4 h-4 stroke-3" />
                     Confirm & Publish
                   </>
                 )}

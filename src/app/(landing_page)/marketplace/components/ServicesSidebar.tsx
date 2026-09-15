@@ -56,7 +56,7 @@ export default function ServicesSidebar({
 
   if (isOpen) {
     return (
-      <div className="fixed inset-0 z-[100] bg-black bg-opacity-90 p-8 flex flex-col lg:hidden">
+      <div className="fixed inset-0 z-100 bg-black bg-opacity-90 p-8 flex flex-col lg:hidden">
         <div className="flex justify-between items-center mb-10">
           <h2 className="text-2xl font-serif text-white uppercase tracking-widest">Filters</h2>
           <button onClick={onClose} className="text-white/50 hover:text-white text-xl">

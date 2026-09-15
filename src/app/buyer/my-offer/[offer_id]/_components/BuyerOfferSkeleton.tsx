@@ -11,8 +11,8 @@ export function BuyerOfferSkeleton() {
             <div className="grid grid-cols-1 md:grid-cols-11 gap-8">
               <div className="md:col-span-5 space-y-6">
                 <div className="h-9 w-64 bg-white/10 rounded-md" />
-                <div className="bg-[#111113] rounded-2xl border border-white/5 p-4 h-20 bg-white/5" />
-                <div className="bg-[#111113] rounded-3xl border border-white/5 p-6 h-64 bg-white/5" />
+                <div className="rounded-2xl border border-white/5 p-4 h-20 bg-white/5" />
+                <div className="rounded-3xl border border-white/5 p-6 h-64 bg-white/5" />
                 <div className="bg-white/5 rounded-xl p-4 h-16" />
               </div>
 
@@ -29,7 +29,7 @@ export function BuyerOfferSkeleton() {
 
           <div className="lg:col-span-4 space-y-6">
             <div className="h-8 w-40 bg-white/10 rounded-md" />
-            <div className="bg-[#0A0A0B] rounded-[2.5rem] border border-white/5 p-6 h-120 bg-white/5" />
+            <div className="rounded-[2.5rem] border border-white/5 p-6 h-120 bg-white/5" />
           </div>
         </div>
       </div>

@@ -89,7 +89,7 @@ export function VIPDetailsSidebar({
             startingBidVal !== null ||
             highestBidVal !== null ||
             totalBidsCountVal !== null) && (
-            <div className="bg-[#111111] border border-white/5 rounded-xl p-3.5 grid grid-cols-2 gap-3 pt-3 border-t border-white/10">
+            <div className="bg-[#111111] border border-white/5 rounded-xl p-3.5 grid grid-cols-2 gap-3 pt-3 border-t">
               {askingPriceVal !== null && (
                 <div>
                   <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mb-0.5">

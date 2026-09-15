@@ -123,7 +123,7 @@ export default function RegistrationModal({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -293,7 +293,7 @@ export default function RegistrationModal({
                     Phone
                   </label>
                   <div className="flex gap-2">
-                    <div className="bg-[#1A1A1A] border border-white/10 rounded-sm px-3 py-3.5 text-white text-sm min-w-[60px] text-center flex items-center justify-center">
+                    <div className="bg-[#1A1A1A] border border-white/10 rounded-sm px-3 py-3.5 text-white text-sm min-w-15 text-center flex items-center justify-center">
                       {selectedCountry.code}
                     </div>
                     <input

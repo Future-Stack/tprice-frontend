@@ -88,7 +88,7 @@ export function MediaMetadataFields({ formData, onChange }: MediaMetadataFieldsP
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Badge Text */}
         <div>
-          <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+          <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
             <BadgeAlert className="w-3.5 h-3.5 text-primary" /> Badge Text
           </label>
           <input
@@ -103,7 +103,7 @@ export function MediaMetadataFields({ formData, onChange }: MediaMetadataFieldsP
 
         {/* Display Order */}
         <div>
-          <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+          <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
             <Hash className="w-3.5 h-3.5 text-primary" /> Display Order
           </label>
           <input

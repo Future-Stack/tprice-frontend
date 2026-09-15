@@ -161,7 +161,7 @@ export function MarketplaceFilterDrawer(props: MarketplaceFilterProps) {
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={onCloseMobileDrawer}
           />
-          <div className="absolute right-0 top-0 h-full w-full max-w-[340px] bg-[#1C1C1E] shadow-2xl overflow-y-auto">
+          <div className="absolute right-0 top-0 h-full w-full max-w-85 bg-[#1C1C1E] shadow-2xl overflow-y-auto">
             <div className="sticky top-0 bg-[#1C1C1E] p-4 border-b border-[#2C2C2E] flex items-center justify-between z-10">
               <h3 className="text-lg font-semibold text-white">Filter Listings</h3>
               <button

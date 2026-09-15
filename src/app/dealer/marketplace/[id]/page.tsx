@@ -175,7 +175,7 @@ export default function ProductDetailsPage() {
 
               {/* Key Specifications */}
               <AnimationWrapper type="fade-left" duration={0.5} delay={0.25}>
-                <div className="border border-[#2C2C2E] rounded-2xl p-6 bg-white/[0.02]">
+                <div className="border border-[#2C2C2E] rounded-2xl p-6 bg-white/2">
                   <div className="flex items-center gap-2.5 mb-5">
                     <Info className="w-4 h-4 text-[#E78F23]" />
                     bg-white/2

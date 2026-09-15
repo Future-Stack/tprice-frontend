@@ -11,7 +11,7 @@ interface ProfileCardProps {
 
 export default function ProfileCard({ item }: ProfileCardProps) {
   return (
-    <div className="bg-[#1A1A1A] rounded-2xl p-8 relative mt-[-100px] shadow-2xl border border-white/5 md:p-10 z-10 w-full mb-8">
+    <div className="bg-[#1A1A1A] rounded-2xl p-8 relative -mt-25 shadow-2xl border border-white/5 md:p-10 z-10 w-full mb-8">
       {/* Dynamic Avatar Overlap */}
       <div className="absolute -top-16 left-8 md:left-10 z-20">
         <div className="relative w-32 h-32 rounded-full border-8 border-[#1A1A1A] overflow-hidden bg-black shadow-xl">

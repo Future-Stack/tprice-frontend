@@ -49,7 +49,7 @@ export function MediaUploadSection({
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider items-center gap-1.5">
           <Globe className="w-3.5 h-3.5 text-primary" /> Media File / URL{" "}
           <span className="text-primary">*</span>
         </label>
@@ -173,7 +173,7 @@ export function MediaUploadSection({
             value={mediaUrl}
             onChange={(e) => onMediaUrlChange(e.target.value)}
             placeholder="https://res.cloudinary.com/demo/image/upload/sample.jpg"
-            className="w-full bg-[#0E0E10] border border-[#262626] rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary/60 transition-colors font-mono text-xs"
+            className="w-full bg-[#0E0E10] border border-[#262626] rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary/60 transition-colors font-mono"
           />
           {mediaUrl && (
             <div className="relative w-full h-36 rounded-xl overflow-hidden border border-[#262626] bg-[#0E0E10] flex items-center justify-center">
