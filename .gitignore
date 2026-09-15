@@ -41,3 +41,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 lint_errors.txt
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat
