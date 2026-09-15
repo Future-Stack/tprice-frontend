@@ -5,7 +5,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Car, Anchor, Plane, Home, Watch, Sparkles } from "lucide-react";
 import { useGetCategoriesQuery } from "@/hooks/useCategories";
-import { Category } from "@/lib/api/categories";
 import Image from "next/image";
 
 const DEFAULT_IMAGES = [

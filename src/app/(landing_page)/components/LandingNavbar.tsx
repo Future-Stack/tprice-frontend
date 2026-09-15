@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -22,16 +22,13 @@ interface NavLink {
 
 const NAV_LINKS: NavLink[] = [
   { name: "Home", href: "/" },
+  { name: "VIP Deals", href: "/vip-deals" },
+  { name: "Browse", href: "/browse" },
   {
-    name: "MarketPlace",
-    href: "/inventory",
-  },
-  { name: "Prefered Vendor", href: "/marketplace" },
-  { name: "Sell With Us", href: "/login" },
-  {
-    name: "Events & Media",
-    href: "/events",
+    name: "Marketplace",
+    href: "/marketplace",
     subLinks: [
+      { name: "Services", href: "/marketplace" },
       { name: "Events & Media", href: "/events" },
       { name: "Sponsors", href: "/sponsors" },
     ],
@@ -40,8 +37,10 @@ const NAV_LINKS: NavLink[] = [
   { name: "Contact", href: "/contact" },
 ];
 
+const emptySubscribe = () => () => {};
+
 export default function LandingNavbar() {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -52,10 +51,6 @@ export default function LandingNavbar() {
 
   const { user: storeUser, token: storeToken, isAuthenticated } = useAuthStore();
   const logoutMutation = useLogoutMutation();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // Fetch user profile via TanStack Query
   const { data: userProfile, isLoading: isUserLoading } = useGetMeQuery(

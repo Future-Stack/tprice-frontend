@@ -7,7 +7,6 @@ import { motion } from "framer-motion";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
-import Cookies from "js-cookie";
 
 import { loginApi, handleGoogleLogin } from "@/lib/api/auth";
 import { useAuthStore } from "@/lib/store/useAuthStore";
@@ -25,6 +24,8 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const setAuth = useAuthStore((state) => state.setAuth);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -38,50 +39,42 @@ export default function LoginPage() {
     }
   };
 
-  const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
+  const validate = () => {
+    const nextErrors: Record<string, string> = {};
 
     if (!formData.email.trim()) {
-      newErrors.email = "Email address is required";
+      nextErrors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
-      newErrors.email = "Please enter a valid email address";
+      nextErrors.email = "Please enter a valid email address";
     }
 
     if (!formData.password) {
-      newErrors.password = "Password is required";
+      nextErrors.password = "Password is required";
     } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
+      nextErrors.password = "Password must be at least 6 characters";
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      toast.error("Please fix the validation errors before submitting.");
-      return;
-    }
+    if (!validate()) return;
 
     setIsLoading(true);
-
     try {
-      const payload = {
+      const res = await loginApi({
         email: formData.email.trim(),
         password: formData.password,
-      };
+      });
 
-      const res = await loginApi(payload);
-
-      if (res?.accessToken) {
-        useAuthStore.getState().setAuth(res.user, res.accessToken, res.refreshToken);
+      if (res?.user && res?.accessToken) {
+        setAuth(res.user, res.accessToken, res.refreshToken);
       }
 
-      toast.success("Welcome back! Login successful.");
+      toast.success("Welcome back! Signed in successfully.");
 
-      // Check for redirect param or admin dashboard path
       const searchParams = new URLSearchParams(window.location.search);
       const fromPath = searchParams.get("from");
       const isValidLocalPath = fromPath && fromPath.startsWith("/") && !fromPath.startsWith("//");
@@ -93,13 +86,13 @@ export default function LoginPage() {
       } else {
         router.push("/");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Login failed:", error);
 
       let errorMessage = "Invalid email or password. Please try again.";
 
       if (axios.isAxiosError(error) && error.response?.data) {
-        const resData = error.response.data;
+        const resData = error.response.data as { message?: string | string[]; error?: string };
         if (typeof resData.message === "string") {
           errorMessage = resData.message;
         } else if (Array.isArray(resData.message)) {
@@ -107,7 +100,7 @@ export default function LoginPage() {
         } else if (resData.error) {
           errorMessage = resData.error;
         }
-      } else if (error?.message) {
+      } else if (error instanceof Error) {
         errorMessage = error.message;
       }
 

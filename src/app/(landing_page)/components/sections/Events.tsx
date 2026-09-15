@@ -99,8 +99,8 @@ export default function Events() {
             <AlertCircle className="w-12 h-12 text-red-400 mx-auto" />
             <h3 className="text-xl text-white font-medium">Failed to load events</h3>
             <p className="text-white/60 text-sm">
-              {(error as any)?.response?.data?.message ||
-                (error as Error)?.message ||
+              {(error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+                (error instanceof Error ? error.message : null) ||
                 "Something went wrong while fetching events."}
             </p>
             <button

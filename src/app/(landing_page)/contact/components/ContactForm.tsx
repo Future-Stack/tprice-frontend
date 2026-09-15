@@ -54,10 +54,11 @@ export default function ContactForm() {
         });
         setIsSuccessModalOpen(true);
       },
-      onError: (error: any) => {
+      onError: (error: unknown) => {
+        const errObj = error as { response?: { data?: { message?: string } }; message?: string };
         const errorMessage =
-          error?.response?.data?.message ||
-          error?.message ||
+          errObj?.response?.data?.message ||
+          errObj?.message ||
           "Failed to send your message. Please try again.";
         toast.error(errorMessage);
       },

@@ -85,6 +85,24 @@ export default function EventsList() {
       <div className="container mx-auto">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
           <h2 className="text-4xl font-serif text-white">Events</h2>
+          <div className="flex flex-wrap gap-2">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat.value}
+                onClick={() => {
+                  setActiveTab(cat.value);
+                  setPage(1);
+                }}
+                className={`px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
+                  activeTab === cat.value
+                    ? "bg-primary text-black"
+                    : "bg-white/5 text-white/70 hover:bg-white/10 hover:text-white"
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Loading Skeleton */}
@@ -96,8 +114,8 @@ export default function EventsList() {
             <AlertCircle className="w-12 h-12 text-red-400 mx-auto" />
             <h3 className="text-xl text-white font-medium">Failed to load events</h3>
             <p className="text-white/60 text-sm">
-              {(error as any)?.response?.data?.message ||
-                (error as Error)?.message ||
+              {(error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+                (error instanceof Error ? error.message : null) ||
                 "Something went wrong while fetching events."}
             </p>
             <button

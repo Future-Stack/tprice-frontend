@@ -106,10 +106,11 @@ export default function RegistrationModal({
       setSpecialRequest("");
       setErrors({});
       onClose();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errObj = err as { response?: { data?: { message?: string } }; message?: string };
       const errorMessage =
-        err?.response?.data?.message ||
-        err?.message ||
+        errObj?.response?.data?.message ||
+        errObj?.message ||
         "Failed to register for the event. Please try again.";
       toast.error(errorMessage);
     }

@@ -8,8 +8,6 @@ import {
   LayoutDashboard,
   Building2,
   Gavel,
-  BadgePercent,
-  Crown,
   Settings,
   X,
   Heart,

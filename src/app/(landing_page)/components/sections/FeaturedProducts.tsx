@@ -368,8 +368,8 @@ export default function FeaturedProducts() {
             <AlertTriangle className="w-10 h-10 text-red-400 mx-auto mb-3" />
             <h3 className="text-lg font-serif text-white mb-1">Failed to load featured products</h3>
             <p className="text-sm text-white/50 mb-6 max-w-md mx-auto">
-              {(error as any)?.response?.data?.message ||
-                error?.message ||
+              {(error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+                (error instanceof Error ? error.message : null) ||
                 "An error occurred while connecting to the server."}
             </p>
             <button

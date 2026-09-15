@@ -12,13 +12,11 @@ import {
   Crown,
   X,
   Heart,
-  Lock,
   CreditCard,
 } from "lucide-react";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 import { useGetMeQuery } from "@/hooks/useAuth";
 import { useFeaturedStatusQuery } from "@/hooks/useListings";
-import { toast } from "sonner";
 
 const navItems = [
   { href: "/dealer", icon: LayoutDashboard, label: "Home" },

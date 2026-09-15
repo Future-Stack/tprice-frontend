@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Search, Gavel, ShieldCheck, Crown, ArrowRight } from "lucide-react";
+import { Search, Gavel, ShieldCheck, Crown } from "lucide-react";
 
 const STEPS = [
   {

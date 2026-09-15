@@ -119,13 +119,13 @@ export default function RegisterPage() {
 
       toast.success("Registration successful! Welcome to Exoticworld.");
       router.push("/login");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Registration failed:", error);
 
       let errorMessage = "Registration failed. Please try again.";
 
       if (axios.isAxiosError(error) && error.response?.data) {
-        const resData = error.response.data;
+        const resData = error.response.data as { message?: string | string[]; error?: string };
         if (typeof resData.message === "string") {
           errorMessage = resData.message;
         } else if (Array.isArray(resData.message)) {
@@ -133,7 +133,7 @@ export default function RegisterPage() {
         } else if (resData.error) {
           errorMessage = resData.error;
         }
-      } else if (error?.message) {
+      } else if (error instanceof Error) {
         errorMessage = error.message;
       }
 
