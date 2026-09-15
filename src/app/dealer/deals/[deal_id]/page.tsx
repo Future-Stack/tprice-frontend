@@ -15,7 +15,6 @@ import {
   X,
   Check,
   ChevronDown,
-  Clock,
   Circle,
   Loader2,
   MessageSquare,
@@ -63,7 +62,7 @@ const DealDetails = () => {
     }
   }, [dealMessages, dealDetail]);
 
-  const embeddedDealMessages: DealMessage[] = (dealDetail as any)?.messages || [];
+  const embeddedDealMessages: DealMessage[] = dealDetail?.messages || [];
   const rawMessagesList = [...embeddedDealMessages, ...(dealMessages || [])];
 
   const uniqueMessagesMap = new Map<string, DealMessage>();

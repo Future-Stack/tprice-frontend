@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { MapPin, Heart } from "lucide-react";
 import AnimationWrapper from "../../components/AnimationWrapper";
 
@@ -104,9 +105,12 @@ function SavedItemCard({ item }: { item: SavedItem }) {
     <div className="bg-[#161618] rounded-xl border border-[#2C2C2E] overflow-hidden group hover:border-[#E78F23]/40 transition-all shadow-xl hover:shadow-[#E78F23]/5 flex flex-col h-full">
       {/* Target image aspect ratio */}
       <div className="relative h-48 sm:h-52 overflow-hidden bg-black">
-        <img
+        <Image
           src={item.image}
           alt={item.title}
+          width={400}
+          height={200}
+          unoptimized
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out opacity-90 group-hover:opacity-100"
         />
 

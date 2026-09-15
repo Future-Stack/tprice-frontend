@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Check, ArrowRight, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -103,10 +103,12 @@ export default function Deals() {
                   <h3 className="text-xl font-semibold tracking-wide">{deal.carName}</h3>
                   <p className="text-sm text-gray-400 mt-1">Buyer : {deal.buyer}</p>
                 </div>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={deal.image}
                   alt={deal.carName}
+                  width={128}
+                  height={80}
+                  unoptimized
                   className="w-32 h-20 object-cover rounded-lg shadow-sm"
                 />
               </div>

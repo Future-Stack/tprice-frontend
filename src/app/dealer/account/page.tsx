@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
+import Image from "next/image";
 import {
   User,
   Shield,
@@ -53,15 +54,15 @@ export default function DealerAccount() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   // Synchronize form fields when API data is received
-  useEffect(() => {
-    if (user) {
-      setFirstName(user.firstName || user.name?.split(" ")[0] || "");
-      setLastName(user.lastName || user.name?.split(" ").slice(1).join(" ") || "");
-      setEmail(user.email || "");
-      setPhone(user.phone || "");
-      setAvatarPreview(user.avatarUrl || user.avatar || "");
-    }
-  }, [user]);
+  const [prevUser, setPrevUser] = useState(user);
+  if (user && user !== prevUser) {
+    setPrevUser(user);
+    setFirstName(user.firstName || user.name?.split(" ")[0] || "");
+    setLastName(user.lastName || user.name?.split(" ").slice(1).join(" ") || "");
+    setEmail(user.email || "");
+    setPhone(user.phone || "");
+    setAvatarPreview(user.avatarUrl || user.avatar || "");
+  }
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -96,7 +97,7 @@ export default function DealerAccount() {
           folder: "exoticworld/avatars",
         });
         uploadedAvatarUrl = uploadRes.url;
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Failed to upload avatar image:", err);
         toast.error("Failed to upload avatar image. Updating profile without changing image.");
       } finally {
@@ -282,9 +283,12 @@ export default function DealerAccount() {
                         <div className="relative group">
                           <div className="w-24 h-24 rounded-full border-2 border-[#2C2C2E] overflow-hidden bg-[#111113] flex items-center justify-center p-0.5 transition-transform duration-500 group-hover:rotate-3 shadow-inner">
                             {avatarPreview ? (
-                              <img
+                              <Image
                                 src={avatarPreview}
                                 alt="Avatar"
+                                width={96}
+                                height={96}
+                                unoptimized
                                 className="w-full h-full object-cover rounded-full"
                               />
                             ) : (

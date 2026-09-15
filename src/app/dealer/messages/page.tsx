@@ -153,7 +153,13 @@ const Messages = () => {
                 </button>
                 <div className="flex items-center gap-2 cursor-pointer border border-white/10 rounded-full py-1.5 px-2 md:px-3 hover:bg-white/5 transition-colors">
                   <div className="w-6 h-6 rounded-full overflow-hidden bg-white/20 shrink-0">
-                    <img src="https://i.pravatar.cc/150?u=a042581f4e29026024d" alt="User" />
+                    <Image
+                      src="https://i.pravatar.cc/150?u=a042581f4e29026024d"
+                      alt="User"
+                      width={24}
+                      height={24}
+                      unoptimized
+                    />
                   </div>
                   <span className="text-xs font-medium hidden md:inline">Adam</span>
                   <ChevronDown size={14} className="text-gray-400 hidden md:block" />

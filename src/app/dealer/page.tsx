@@ -1,15 +1,14 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import {
   Gavel,
   BadgePercent,
   List as ListIcon,
   Heart,
-  FileText,
   Eye,
   MapPin,
-  Pencil,
 } from "lucide-react";
 
 import AnimationWrapper from "../components/AnimationWrapper";
@@ -237,8 +236,12 @@ function ListingCard({
   return (
     <div className="bg-foreground  rounded-[8px] border border-primary/30 overflow-hidden group hover:border-[#E78F23]/20 transition-all shadow-xl hover:shadow-[#E78F23]/5">
       <div className="relative h-54.25 overflow-hidden bg-black  ">
-        <img
+        <Image
           src={image}
+          alt={title}
+          width={400}
+          height={220}
+          unoptimized
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out opacity-90 group-hover:opacity-100"
         />
 
