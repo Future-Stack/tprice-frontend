@@ -70,14 +70,14 @@ export default function ProductDetailsPage() {
         <div className="flex-1 min-w-0">
           {/* Main Image aspect-16/10*/}
           <AnimationWrapper type="zoom" duration={0.6} delay={0.1}>
-            <div className="relative rounded-2xl overflow-hidden bg-black w-full max-h-[409px]  group">
+            <div className="relative rounded-2xl overflow-hidden bg-black w-full max-h-102.25  group">
               <Image
                 src={productImages[selectedImage]}
                 alt={product.title}
                 width={1200}
                 height={409}
                 unoptimized
-                className="w-full h-[409px] object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]"
+                className="w-full h-102.25 object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]"
               />
               {/* Floating actions */}
               <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -99,7 +99,7 @@ export default function ProductDetailsPage() {
               <AnimationWrapper key={idx} type="fade-up" duration={0.4} delay={0.15 + idx * 0.05}>
                 <button
                   onClick={() => setSelectedImage(idx)}
-                  className={`relative w-[100px] h-[72px] rounded-xl overflow-hidden border-2 transition-all duration-200 shrink-0
+                  className={`relative w-25 h-18 rounded-xl overflow-hidden border-2 transition-all duration-200 shrink-0
                     ${
                       selectedImage === idx
                         ? "border-[#E78F23] shadow-[0_0_12px_rgba(231,143,35,0.3)]"
@@ -129,7 +129,7 @@ export default function ProductDetailsPage() {
         </div>
 
         {/* Right — Details Sidebar */}
-        <div className="max-w-[380px] w-full shrink-0">
+        <div className="max-w-95 w-full shrink-0">
           {!isBiddingMode ? (
             <div className="space-y-5">
               {/* Auction Badge & Title */}

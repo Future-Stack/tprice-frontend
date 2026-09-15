@@ -20,7 +20,7 @@ export default function ProfileCard({ item }: ProfileCardProps) {
       </div>
 
       {/* Header Info */}
-      <div className="mt-16 sm:mt-10 md:ml-[160px] md:mt-0 flex flex-col items-start gap-2">
+      <div className="mt-16 sm:mt-10 md:ml-40 md:mt-0 flex flex-col items-start gap-2">
         <h1 className="text-3xl md:text-4xl font-serif text-white tracking-tight">{item.name}</h1>
         <p className="text-primary font-serif italic text-lg">{item.title}</p>
 

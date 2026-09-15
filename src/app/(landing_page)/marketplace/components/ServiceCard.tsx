@@ -36,7 +36,7 @@ export default function ServiceCard({ item }: ServiceCardProps) {
       className="group bg-[#0A0A0A] rounded-2xl overflow-hidden border border-white/5 hover:border-primary/20 transition-all duration-500"
     >
       {/* Top Image Section */}
-      <Link href={`/marketplace/${profileSlug}`} className="block relative aspect-[4/3] w-full">
+      <Link href={`/marketplace/${profileSlug}`} className="block relative aspect-4/3 w-full">
         <div className="absolute inset-0 overflow-hidden">
           <Image
             src={item.image}

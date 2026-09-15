@@ -7,7 +7,7 @@ export function MediaMetadataFields({ formData, onChange }: MediaMetadataFieldsP
     <>
       {/* Title */}
       <div>
-        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 items-center gap-1.5">
           <FileText className="w-3.5 h-3.5 text-primary" /> Title{" "}
           <span className="text-primary">*</span>
         </label>
@@ -26,7 +26,7 @@ export function MediaMetadataFields({ formData, onChange }: MediaMetadataFieldsP
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Category */}
         <div>
-          <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+          <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 items-center gap-1.5">
             <Tag className="w-3.5 h-3.5 text-primary" /> Category
           </label>
           <select
@@ -45,7 +45,7 @@ export function MediaMetadataFields({ formData, onChange }: MediaMetadataFieldsP
 
         {/* Type */}
         <div>
-          <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+          <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 items-center gap-1.5">
             {formData.type === "VIDEO" ? (
               <Film className="w-3.5 h-3.5 text-red-400" />
             ) : (
@@ -71,7 +71,7 @@ export function MediaMetadataFields({ formData, onChange }: MediaMetadataFieldsP
 
       {/* Caption */}
       <div>
-        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 items-center gap-1.5">
           <FileText className="w-3.5 h-3.5 text-primary" /> Caption / Subtitle
         </label>
         <textarea
