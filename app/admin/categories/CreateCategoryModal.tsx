@@ -49,14 +49,17 @@ export default function CreateCategoryModal({
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     const { name, value, type } = e.target;
     if (type === "checkbox") {
       const checked = (e.target as HTMLInputElement).checked;
       setFormData((prev) => ({ ...prev, [name]: checked }));
     } else if (name === "displayOrder") {
-      setFormData((prev) => ({ ...prev, displayOrder: parseInt(value, 10) || 1 }));
+      setFormData((prev) => ({
+        ...prev,
+        displayOrder: parseInt(value, 10) || 1,
+      }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
@@ -85,7 +88,9 @@ export default function CreateCategoryModal({
       }
     } catch (err: any) {
       const errMsg =
-        err?.response?.data?.message || err?.message || "Failed to upload image";
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to upload image";
       toast.error(errMsg);
     }
   };
@@ -157,7 +162,9 @@ export default function CreateCategoryModal({
       onClose();
     } catch (err: any) {
       const errMsg =
-        err?.response?.data?.message || err?.message || "Failed to create category";
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to create category";
       toast.error(errMsg);
     }
   };
@@ -172,8 +179,12 @@ export default function CreateCategoryModal({
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white font-clash">Create Category</h2>
-              <p className="text-xs text-gray-400">Add a new category to organize luxury items</p>
+              <h2 className="text-xl font-bold text-white font-clash">
+                Create Category
+              </h2>
+              <p className="text-xs text-gray-400">
+                Add a new category to organize luxury items
+              </p>
             </div>
           </div>
           <button
@@ -189,7 +200,8 @@ export default function CreateCategoryModal({
           {/* Category Name */}
           <div>
             <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <Tag className="w-3.5 h-3.5 text-primary" /> Name <span className="text-primary">*</span>
+              <Tag className="w-3.5 h-3.5 text-primary" /> Name{" "}
+              <span className="text-primary">*</span>
             </label>
             <input
               type="text"
@@ -223,7 +235,7 @@ export default function CreateCategoryModal({
               <Hash className="w-3.5 h-3.5 text-primary" /> Display Order
             </label>
             <input
-              type="number"
+              type="text"
               name="displayOrder"
               min={1}
               value={formData.displayOrder}
@@ -236,7 +248,8 @@ export default function CreateCategoryModal({
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
-                <ImageIcon className="w-3.5 h-3.5 text-primary" /> Category Image
+                <ImageIcon className="w-3.5 h-3.5 text-primary" /> Category
+                Image
               </label>
 
               <div className="flex items-center gap-1 bg-[#0E0E10] border border-[#262626] p-0.5 rounded-lg text-[10px]">
@@ -323,8 +336,12 @@ export default function CreateCategoryModal({
                     {uploadMediaMutation.isPending ? (
                       <div className="flex flex-col items-center justify-center py-3 space-y-2">
                         <Loader2 className="w-8 h-8 text-primary animate-spin" />
-                        <p className="text-xs font-medium text-primary">Uploading image to cloud...</p>
-                        <p className="text-[10px] text-gray-500">Please wait a moment</p>
+                        <p className="text-xs font-medium text-primary">
+                          Uploading image to cloud...
+                        </p>
+                        <p className="text-[10px] text-gray-500">
+                          Please wait a moment
+                        </p>
                       </div>
                     ) : (
                       <div className="flex flex-col items-center justify-center space-y-2">
@@ -382,8 +399,12 @@ export default function CreateCategoryModal({
               onChange={handleChange}
               className="w-4 h-4 rounded border-[#262626] text-primary focus:ring-primary accent-[#E78F23] cursor-pointer"
             />
-            <label htmlFor="isActive" className="text-xs font-semibold text-gray-200 cursor-pointer flex items-center gap-2">
-              <Activity className="w-4 h-4 text-green-400" /> Mark Category as Active
+            <label
+              htmlFor="isActive"
+              className="text-xs font-semibold text-gray-200 cursor-pointer flex items-center gap-2"
+            >
+              <Activity className="w-4 h-4 text-green-400" /> Mark Category as
+              Active
             </label>
           </div>
 
@@ -398,7 +419,10 @@ export default function CreateCategoryModal({
             </button>
             <button
               type="submit"
-              disabled={createCategoryMutation.isPending || uploadMediaMutation.isPending}
+              disabled={
+                createCategoryMutation.isPending ||
+                uploadMediaMutation.isPending
+              }
               className="px-6 py-2.5 rounded-xl bg-primary hover:bg-yellow-400 text-black text-xs font-bold transition-all shadow-[0_4px_20px_rgba(231,143,35,0.3)] active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {createCategoryMutation.isPending ? (

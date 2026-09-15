@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 export default function EventsHero() {
   return (
-    <section className="relative py-35.25 w-full overflow-hidden flex flex-col justify-center">
+    <section className="relative h-125 w-full overflow-hidden flex flex-col justify-center">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img
@@ -18,7 +18,7 @@ export default function EventsHero() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-6 md:px-12 pt-20">
+      <div className="relative z-10 container mx-auto px-6 md:px-0 pt-20">
         <div className="  space-y-6">
           <motion.h4
             initial={{ opacity: 0, y: 20 }}

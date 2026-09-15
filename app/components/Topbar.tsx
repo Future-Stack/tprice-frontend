@@ -7,13 +7,11 @@ import {
   Bell,
   ChevronDown,
   Menu,
-  Settings,
   LogOut,
   Loader2,
   DollarSign,
   FileText,
   Sparkles,
-  CheckCircle2,
   Inbox,
   Check,
 } from "lucide-react";
@@ -112,8 +110,6 @@ export default function Topbar({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const menuItems = [{ icon: Settings, label: "Settings", desc: "/settings" }];
-
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case "ADMIN_HIGH_VALUE_OFFER":
@@ -200,7 +196,9 @@ export default function Topbar({
                   ) : notifications.length === 0 ? (
                     <div className="py-10 flex flex-col items-center justify-center gap-2 text-gray-500">
                       <Inbox className="w-8 h-8 stroke-[1.5]" />
-                      <p className="text-xs font-medium">No notifications yet</p>
+                      <p className="text-xs font-medium">
+                        No notifications yet
+                      </p>
                     </div>
                   ) : (
                     notifications.map((item) => (
@@ -210,7 +208,7 @@ export default function Topbar({
                         className={`group relative p-3 rounded-xl transition-all cursor-pointer border flex items-start gap-3 ${
                           !item.isRead
                             ? "bg-[#E78F23]/10 border-[#E78F23]/30 hover:bg-[#E78F23]/15 hover:border-[#E78F23]/50"
-                            : "bg-white/[0.02] border-white/5 hover:bg-white/[0.06] hover:border-white/10"
+                            : "bg-white/2 border-white/5 hover:bg-white/6 hover:border-white/10"
                         }`}
                       >
                         {/* Icon Badge */}
@@ -272,8 +270,12 @@ export default function Topbar({
                       Page {meta.page} of {meta.totalPages}
                     </span>
                     <button
-                      disabled={page >= meta.totalPages || isNotificationsLoading}
-                      onClick={() => setPage((p) => Math.min(meta.totalPages, p + 1))}
+                      disabled={
+                        page >= meta.totalPages || isNotificationsLoading
+                      }
+                      onClick={() =>
+                        setPage((p) => Math.min(meta.totalPages, p + 1))
+                      }
                       className="px-2 py-1 rounded bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                     >
                       Next
@@ -345,7 +347,7 @@ export default function Topbar({
                   </p>
                 </div>
 
-                <div className="space-y-0.5">
+                {/* <div className="space-y-0.5">
                   {menuItems.map((item, index) => (
                     <button
                       key={index}
@@ -364,7 +366,7 @@ export default function Topbar({
                       </div>
                     </button>
                   ))}
-                </div>
+                </div> */}
 
                 <div className="mt-1 pt-1 border-t border-white/5">
                   <button
@@ -397,4 +399,3 @@ export default function Topbar({
     </header>
   );
 }
-

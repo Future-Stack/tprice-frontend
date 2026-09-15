@@ -6,6 +6,7 @@ export interface ListingMedia {
   url: string;
   type: string;
   displayOrder: number;
+  isCover?: boolean;
   createdAt: string;
 }
 
@@ -47,6 +48,10 @@ export interface ListingItem {
   slug: string;
   brand?: string | null;
   brandId?: string | null;
+  model?: string | null;
+  modelId?: string | null;
+  trim?: string | null;
+  trimId?: string | null;
   category: string;
   categoryId?: string | null;
   subCategory?: string | null;
@@ -277,11 +282,15 @@ export interface CreateListingMediaInput {
   url: string;
   type?: string;
   displayOrder?: number;
+  isCover?: boolean;
 }
 
 export interface CreateListingInput {
   title: string;
-  category: string;
+  categoryId?: string;
+  brandId?: string;
+  modelId?: string;
+  trimId?: string;
   subCategory?: string;
   saleType?: string;
   allowCounterOffers?: boolean;
@@ -293,7 +302,6 @@ export interface CreateListingInput {
   locationCity?: string;
   locationCountry?: string;
   buildYear?: number;
-  brand?: string;
   specifications?: string;
   media?: CreateListingMediaInput[];
 }
@@ -305,7 +313,10 @@ export const createListingApi = async (data: CreateListingInput): Promise<Listin
 
 export interface UpdateListingInput {
   title?: string;
-  category?: string;
+  categoryId?: string;
+  brandId?: string;
+  modelId?: string;
+  trimId?: string;
   subCategory?: string;
   saleType?: string;
   allowCounterOffers?: boolean;
@@ -317,7 +328,6 @@ export interface UpdateListingInput {
   locationCity?: string;
   locationCountry?: string;
   buildYear?: number;
-  brand?: string;
   specifications?: string;
   media?: CreateListingMediaInput[];
   status?: string;
@@ -441,7 +451,79 @@ export const getSavedListingsApi = async (
   return response.data;
 };
 
+export interface FeaturedSingleListingPlan {
+  plan: "FEATURED_SINGLE_LISTING" | string;
+  price: number;
+  currency: string;
+  billingInterval: string;
+  duration?: string;
+  description: string;
+}
 
+export interface FeaturedUnlimitedAnnualPlan {
+  plan: "FEATURED_UNLIMITED_ANNUAL" | string;
+  price: number;
+  currency: string;
+  billingInterval: string;
+  durationDays?: number;
+  description: string;
+}
 
+export interface FeaturedPricingResponse {
+  singleListing: FeaturedSingleListingPlan;
+  unlimitedAnnual: FeaturedUnlimitedAnnualPlan;
+}
 
+/**
+ * Fetch featured pricing options via GET /listings/featured-pricing
+ */
+export const getFeaturedPricingApi = async (): Promise<FeaturedPricingResponse> => {
+  const response = await apiClient.get<
+    FeaturedPricingResponse | { data: FeaturedPricingResponse }
+  >("/listings/featured-pricing");
 
+  const resData = response.data as any;
+  if (resData?.data && resData?.data?.singleListing) {
+    return resData.data;
+  }
+  return resData;
+};
+
+export interface ActiveFeaturedSubscription {
+  id: string;
+  plan: string;
+  amount: number;
+  status: string;
+  startsAt?: string;
+  expiresAt?: string;
+}
+
+export interface FeaturedStatusPricing {
+  singleListingPrice: number;
+  unlimitedAnnualPrice: number;
+  currency: string;
+}
+
+export interface FeaturedStatusResponse {
+  hasActiveSubscription: boolean;
+  expiresAt?: string | null;
+  daysRemaining?: number | null;
+  totalFeaturedListings?: number;
+  activeSubscription?: ActiveFeaturedSubscription | null;
+  pricing?: FeaturedStatusPricing;
+}
+
+/**
+ * Fetch current seller's featured subscription status via GET /listings/me/featured-status
+ */
+export const getFeaturedStatusApi = async (): Promise<FeaturedStatusResponse> => {
+  const response = await apiClient.get<
+    FeaturedStatusResponse | { data: FeaturedStatusResponse }
+  >("/listings/me/featured-status");
+
+  const resData = response.data as any;
+  if (resData?.data && resData?.data?.hasActiveSubscription !== undefined) {
+    return resData.data;
+  }
+  return resData;
+};

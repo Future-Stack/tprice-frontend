@@ -188,9 +188,8 @@ export default function RegistrationModal({
                       if (errors.firstName) setErrors((prev) => ({ ...prev, firstName: "" }));
                     }}
                     disabled={registerMutation.isPending}
-                    className={`w-full bg-[#1A1A1A] border ${
-                      errors.firstName ? "border-red-500" : "border-white/10"
-                    } rounded-sm px-4 py-3.5 text-white text-sm focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-50`}
+                    className={`w-full bg-[#1A1A1A] border ${errors.firstName ? "border-red-500" : "border-white/10"
+                      } rounded-sm px-4 py-3.5 text-white text-sm focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-50`}
                   />
                   {errors.firstName && (
                     <p className="text-red-400 text-xs mt-1">{errors.firstName}</p>
@@ -209,9 +208,8 @@ export default function RegistrationModal({
                       if (errors.lastName) setErrors((prev) => ({ ...prev, lastName: "" }));
                     }}
                     disabled={registerMutation.isPending}
-                    className={`w-full bg-[#1A1A1A] border ${
-                      errors.lastName ? "border-red-500" : "border-white/10"
-                    } rounded-sm px-4 py-3.5 text-white text-sm focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-50`}
+                    className={`w-full bg-[#1A1A1A] border ${errors.lastName ? "border-red-500" : "border-white/10"
+                      } rounded-sm px-4 py-3.5 text-white text-sm focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-50`}
                   />
                   {errors.lastName && (
                     <p className="text-red-400 text-xs mt-1">{errors.lastName}</p>
@@ -233,9 +231,8 @@ export default function RegistrationModal({
                     if (errors.email) setErrors((prev) => ({ ...prev, email: "" }));
                   }}
                   disabled={registerMutation.isPending}
-                  className={`w-full bg-[#1A1A1A] border ${
-                    errors.email ? "border-red-500" : "border-white/10"
-                  } rounded-sm px-4 py-3.5 text-white text-sm focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-50`}
+                  className={`w-full bg-[#1A1A1A] border ${errors.email ? "border-red-500" : "border-white/10"
+                    } rounded-sm px-4 py-3.5 text-white text-sm focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-50`}
                 />
                 {errors.email && (
                   <p className="text-red-400 text-xs mt-1">{errors.email}</p>
@@ -256,9 +253,8 @@ export default function RegistrationModal({
                       {selectedCountry.flag} {selectedCountry.name}
                     </span>
                     <ChevronDown
-                      className={`w-4 h-4 transition-transform ${
-                        isCountryOpen ? "rotate-180" : ""
-                      }`}
+                      className={`w-4 h-4 transition-transform ${isCountryOpen ? "rotate-180" : ""
+                        }`}
                     />
                   </div>
 
@@ -306,9 +302,8 @@ export default function RegistrationModal({
                         if (errors.phone) setErrors((prev) => ({ ...prev, phone: "" }));
                       }}
                       disabled={registerMutation.isPending}
-                      className={`flex-1 bg-[#1A1A1A] border ${
-                        errors.phone ? "border-red-500" : "border-white/10"
-                      } rounded-sm px-4 py-3.5 text-white text-sm focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-50`}
+                      className={`flex-1 bg-[#1A1A1A] border ${errors.phone ? "border-red-500" : "border-white/10"
+                        } rounded-sm px-4 py-3.5 text-white text-sm focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-50`}
                     />
                   </div>
                   {errors.phone && (
@@ -329,11 +324,10 @@ export default function RegistrationModal({
                       type="button"
                       disabled={registerMutation.isPending}
                       onClick={() => setSelectedGuests(num)}
-                      className={`w-12 h-12 rounded-sm border transition-all flex items-center justify-center text-sm font-bold ${
-                        selectedGuests === num
-                          ? "bg-primary border-primary text-black"
-                          : "bg-[#1A1A1A] border-white/10 text-white/40 hover:border-white/20"
-                      } disabled:opacity-50`}
+                      className={`w-12 h-12 rounded-sm border transition-all flex items-center justify-center text-sm font-bold ${selectedGuests === num
+                        ? "bg-primary border-primary text-black"
+                        : "bg-[#1A1A1A] border-white/10 text-white/40 hover:border-white/20"
+                        } disabled:opacity-50`}
                     >
                       {num}
                     </button>

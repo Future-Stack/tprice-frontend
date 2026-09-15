@@ -5,50 +5,85 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 
 const PARTNERS = [
-  { name: "FERRARI", logo: "/images/landing/brand/ferrari.png" },
-  { name: "LAMBORGHINI", logo: "/images/landing/brand/lamborghini.png" },
-  { name: "MCLAREN", logo: "/images/landing/brand/mclaren.jpg" },
-  { name: "MERCEDES", logo: "/images/landing/brand/mercedes.png" },
-  { name: "BENTLEY", logo: "/images/landing/brand/bentley.png" },
-  { name: "ROLLS ROYCE", logo: "/images/landing/brand/rolls-royce.webp" },
+  { name: "Ferrari", logo: "/brand/2.svg", width: 44, height: 51 },
+  { name: "lamborghini", logo: "/brand/3.svg", width: 44, height: 56 },
+  { name: "McLaren", logo: "/brand/4.svg", width: 108, height: 15 },
+  { name: "Ferrari", logo: "/brand/2.svg", width: 44, height: 51 },
+  { name: "Mercedes", logo: "/brand/1.svg", width: 40, height: 40 },
+  { name: "Mercedes", logo: "/brand/1.svg", width: 40, height: 40 },
+  { name: "Ferrari", logo: "/brand/2.svg", width: 44, height: 51 },
 ];
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+    },
+  },
+} as const;
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 15 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: "easeOut",
+    },
+  },
+} as const;
 
 export default function Partners() {
   return (
-    <section className="py-24 bg-black border-t border-white/5 px-6">
+    <section className="py-20 bg-black border-t border-white/5 px-6">
       <div className="container mx-auto">
-        <div className="flex items-center gap-6 mb-16 overflow-hidden">
-          <div className="h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent flex-1" />
+        <div className="flex items-center   gap-6 mb-20 overflow-hidden">
+          <div className="h-[0.5px] bg-[#CEA630] w-25" />
           <motion.h4
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="text-white/40 text-md font-bold tracking-[0.4em] uppercase whitespace-nowrap"
+            transition={{ duration: 0.6 }}
+            className="text-[#A0A0A0] text-xs font-normal md:text-[20px] font-inter"
           >
             Our Branding Partners
           </motion.h4>
-          <div className="h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent flex-1" />
+          <div className="h-[0.5px]  bg-[#CEA630] flex-1" />
         </div>
 
-        {/* Animated Infinite Scroll or Responsive Grid */}
-        <div className="flex flex-wrap justify-center items-center gap-12 md:gap-20 opacity-50 grayscale hover:grayscale-0 transition-all duration-700">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true }}
+          className="flex flex-wrap justify-between items-center gap-x-12 md:gap-x-16 lg:gap-x-20 gap-y-12 max-w-full px-4"
+        >
           {PARTNERS.map((partner, i) => (
             <motion.div
-              key={partner.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              whileHover={{ scale: 1.1, opacity: 1 }}
-              className="flex flex-col items-center gap-4 group cursor-default"
+              key={i}
+              variants={itemVariants}
+              whileHover={{ y: -4 }}
+              transition={{ type: "spring", stiffness: 300, damping: 18 }}
+              className="flex flex-col items-center gap-4 group cursor-pointer"
             >
-              <Image src={partner.logo} alt={partner.name} width={100} height={100} />
-              <span className="text-white text-xs font-bold tracking-[0.2em] group-hover:text-primary transition-colors">
+              <div className="h-16 flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
+                <Image
+                  src={partner.logo}
+                  alt={partner.name}
+                  width={partner.width}
+                  height={partner.height}
+                  className="object-contain w-auto h-auto"
+                />
+              </div>
+              <span className="text-white text-[20px] font-clash font-medium   group-hover:text-primary transition-colors duration-300">
                 {partner.name}
               </span>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

@@ -711,7 +711,7 @@ export default function OfferDetailsPage() {
 
         {/* Main Content Two-Column Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Left Column (Primary Details & History Timeline) */}
+          {/* Left Column (primary Details & History Timeline) */}
           <div className="lg:col-span-7 space-y-8">
             {/* Listing Overview Card */}
             <div className="bg-[#111113] rounded-2xl border border-white/5 p-6 md:p-8 shadow-2xl">

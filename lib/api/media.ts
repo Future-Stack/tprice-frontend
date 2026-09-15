@@ -9,29 +9,58 @@ export interface MediaUploadResponse {
 }
 
 export interface UploadMediaParams {
-  file: File;
+  file?: File;
+  files?: File[] | File;
   folder?: string;
 }
 
-export const uploadMediaApi = async ({
-  file,
+export interface UploadMultipleMediaParams {
+  files: File[];
+  folder?: string;
+}
+
+export const uploadMultipleMediaApi = async ({
+  files,
   folder = "exoticworld/listings",
-}: UploadMediaParams): Promise<MediaUploadResponse> => {
+}: UploadMultipleMediaParams): Promise<MediaUploadResponse[]> => {
   const formData = new FormData();
-  formData.append("file", file);
+  files.forEach((file) => {
+    formData.append("files", file);
+  });
   formData.append("folder", folder);
 
-  const response = await apiClient.post<MediaUploadResponse>(
-    "/media/upload",
+  const response = await apiClient.post<MediaUploadResponse[]>(
+    "/media/upload-multiple",
     formData,
     {
       headers: {
         "Content-Type": "multipart/form-data",
       },
-    }
+    },
   );
 
   return response.data;
+};
+
+export const uploadMediaApi = async ({
+  file,
+  files,
+  folder = "exoticworld/listings",
+}: UploadMediaParams): Promise<MediaUploadResponse> => {
+  const fileList = files
+    ? Array.isArray(files)
+      ? files
+      : [files]
+    : file
+      ? [file]
+      : [];
+
+  const res = await uploadMultipleMediaApi({
+    files: fileList,
+    folder,
+  });
+
+  return Array.isArray(res) ? res[0] : (res as unknown as MediaUploadResponse);
 };
 
 export interface LandingMediaItem {
@@ -70,7 +99,7 @@ export interface GetLandingMediaParams {
 }
 
 export const getLandingMediaApi = async (
-  params: GetLandingMediaParams = {}
+  params: GetLandingMediaParams = {},
 ): Promise<LandingMediaResponse> => {
   const response = await apiClient.get<LandingMediaResponse>("/landing-media", {
     params,
@@ -91,11 +120,11 @@ export interface CreateLandingMediaPayload {
 }
 
 export const createLandingMediaApi = async (
-  payload: CreateLandingMediaPayload
+  payload: CreateLandingMediaPayload,
 ): Promise<LandingMediaItem> => {
   const response = await apiClient.post<LandingMediaItem>(
     "/admin/landing-media",
-    payload
+    payload,
   );
   return response.data;
 };
@@ -103,6 +132,3 @@ export const createLandingMediaApi = async (
 export const deleteLandingMediaApi = async (id: string): Promise<void> => {
   await apiClient.delete(`/admin/landing-media/${id}`);
 };
-
-
-

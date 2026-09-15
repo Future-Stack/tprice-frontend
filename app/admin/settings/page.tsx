@@ -1,243 +1,362 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import AnimationWrapper from '@/app/components/AnimationWrapper';
-import { ChevronDown, CheckCircle2, ClipboardList, Search, Lock, Monitor, LogOut, Loader2, RefreshCw } from 'lucide-react';
-import { useAdminSettingsQuery, useUpdateAdminSettingsMutation, useUpdateGeneralSettingsMutation, useUpdateModerationSettingsMutation, useUpdateLogsSettingsMutation } from '@/hooks/useAdminSettings';
-import { useUserSessionsQuery, useRevokeSessionMutation } from '@/hooks/useSessions';
+import React, { useState, useEffect } from "react";
+import AnimationWrapper from "@/app/components/AnimationWrapper";
+import {
+  ChevronDown,
+  CheckCircle2,
+  ClipboardList,
+  Search,
+  Lock,
+  Monitor,
+  LogOut,
+  Loader2,
+  RefreshCw,
+} from "lucide-react";
+import {
+  useAdminSettingsQuery,
+  useUpdateGeneralSettingsMutation,
+  useUpdateModerationSettingsMutation,
+  useUpdateLogsSettingsMutation,
+} from "@/hooks/useAdminSettings";
+import {
+  useUserSessionsQuery,
+  useRevokeSessionMutation,
+} from "@/hooks/useSessions";
+import { useChangePasswordMutation } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 const logRetentionToPeriod = (days?: number): string => {
-    if (!days) return '30 days';
-    if (days <= 7) return '7 days';
-    if (days <= 30) return '30 days';
-    if (days <= 90) return '90 days';
-    if (days <= 365) return '1 year';
-    return 'Forever';
+  if (!days) return "30 days";
+  if (days <= 7) return "7 days";
+  if (days <= 30) return "30 days";
+  if (days <= 90) return "90 days";
+  if (days <= 365) return "1 year";
+  return "Forever";
 };
 
 const periodToLogRetentionDays = (period: string): number => {
-    switch (period) {
-        case '7 days':
-            return 7;
-        case '30 days':
-            return 30;
-        case '90 days':
-            return 90;
-        case '1 year':
-            return 365;
-        case 'Forever':
-            return 3650;
-        default:
-            return 30;
-    }
+  switch (period) {
+    case "7 days":
+      return 7;
+    case "30 days":
+      return 30;
+    case "90 days":
+      return 90;
+    case "1 year":
+      return 365;
+    case "Forever":
+      return 3650;
+    default:
+      return 30;
+  }
 };
 
-function parseUserAgent(uaString: string | null): { device: string; browser: string } {
-    if (!uaString) return { device: "Unknown Device", browser: "Unknown Browser" };
+function parseUserAgent(uaString: string | null): {
+  device: string;
+  browser: string;
+} {
+  if (!uaString)
+    return { device: "Unknown Device", browser: "Unknown Browser" };
 
-    let device = "Desktop Device";
-    if (/macintosh|mac os x/i.test(uaString)) {
-        device = "Macbook / Mac";
-    } else if (/iphone/i.test(uaString)) {
-        device = "iPhone";
-    } else if (/ipad/i.test(uaString)) {
-        device = "iPad";
-    } else if (/android/i.test(uaString)) {
-        device = "Android Device";
-    } else if (/windows/i.test(uaString)) {
-        device = "Windows PC";
-    } else if (/linux/i.test(uaString)) {
-        device = "Linux PC";
-    }
+  let device = "Desktop Device";
+  if (/macintosh|mac os x/i.test(uaString)) {
+    device = "Macbook / Mac";
+  } else if (/iphone/i.test(uaString)) {
+    device = "iPhone";
+  } else if (/ipad/i.test(uaString)) {
+    device = "iPad";
+  } else if (/android/i.test(uaString)) {
+    device = "Android Device";
+  } else if (/windows/i.test(uaString)) {
+    device = "Windows PC";
+  } else if (/linux/i.test(uaString)) {
+    device = "Linux PC";
+  }
 
-    let browser = "Web Browser";
-    if (/firefox/i.test(uaString)) {
-        browser = "Firefox";
-    } else if (/edg/i.test(uaString)) {
-        browser = "Edge";
-    } else if (/chrome/i.test(uaString)) {
-        browser = "Chrome";
-    } else if (/safari/i.test(uaString)) {
-        browser = "Safari";
-    } else if (/opera|opr/i.test(uaString)) {
-        browser = "Opera";
-    }
+  let browser = "Web Browser";
+  if (/firefox/i.test(uaString)) {
+    browser = "Firefox";
+  } else if (/edg/i.test(uaString)) {
+    browser = "Edge";
+  } else if (/chrome/i.test(uaString)) {
+    browser = "Chrome";
+  } else if (/safari/i.test(uaString)) {
+    browser = "Safari";
+  } else if (/opera|opr/i.test(uaString)) {
+    browser = "Opera";
+  }
 
-    return { device, browser };
+  return { device, browser };
 }
 
 const formatDate = (dateStr?: string) => {
-    if (!dateStr) return '';
-    try {
-        return new Date(dateStr).toLocaleString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-        });
-    } catch {
-        return dateStr;
-    }
+  if (!dateStr) return "";
+  try {
+    return new Date(dateStr).toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return dateStr;
+  }
 };
 
+const tabs = ["General", "Moderation", "Security", "Audit and logs"];
+
 export default function AdminSettings() {
-    const [activeTab, setActiveTab] = useState('General');
+  const [activeTab, setActiveTab] = useState("General");
+  const [mounted, setMounted] = useState(false);
 
-    const { data: settings, isLoading, isError, refetch } = useAdminSettingsQuery();
-    const updateSettingsMutation = useUpdateAdminSettingsMutation();
-    const updateGeneralSettingsMutation = useUpdateGeneralSettingsMutation();
-    const updateModerationSettingsMutation = useUpdateModerationSettingsMutation();
-    const updateLogsSettingsMutation = useUpdateLogsSettingsMutation();
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tabParam = params.get("tab");
+    if (tabParam) {
+      const matchedTab = tabs.find(
+        (t) => t.toLowerCase() === tabParam.toLowerCase()
+      );
+      if (matchedTab) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setActiveTab(matchedTab);
+      }
+    }
+    setMounted(true);
+  }, []);
 
-    const {
-        data: sessions,
-        isLoading: isSessionsLoading,
-        isError: isSessionsError,
-        refetch: refetchSessions,
-    } = useUserSessionsQuery();
-    const revokeSessionMutation = useRevokeSessionMutation();
-    const [revokingId, setRevokingId] = useState<string | null>(null);
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    const params = new URLSearchParams(window.location.search);
+    params.set("tab", tab.toLowerCase());
+    window.history.replaceState(null, "", `${window.location.pathname}?${params.toString()}`);
+  };
 
-    const handleRevokeSession = (sessionId: string) => {
-        setRevokingId(sessionId);
-        revokeSessionMutation.mutate(sessionId, {
-            onSettled: () => setRevokingId(null),
-        });
-    };
 
-    const [notifications, setNotifications] = useState({
-        newListing: true,
-        dealFlagged: true,
-        dealerActivity: false,
+  const {
+    data: settings,
+    isLoading,
+    isError,
+    refetch,
+  } = useAdminSettingsQuery();
+  const updateGeneralSettingsMutation = useUpdateGeneralSettingsMutation();
+  const updateModerationSettingsMutation =
+    useUpdateModerationSettingsMutation();
+  const updateLogsSettingsMutation = useUpdateLogsSettingsMutation();
+
+  const {
+    data: sessions,
+    isLoading: isSessionsLoading,
+    isError: isSessionsError,
+    refetch: refetchSessions,
+  } = useUserSessionsQuery();
+  const revokeSessionMutation = useRevokeSessionMutation();
+  const [revokingId, setRevokingId] = useState<string | null>(null);
+
+  const handleRevokeSession = (sessionId: string) => {
+    setRevokingId(sessionId);
+    revokeSessionMutation.mutate(sessionId, {
+      onSettled: () => setRevokingId(null),
     });
+  };
 
-    const [moderation, setModeration] = useState({
-        requireApproval: true,
-        autoApproveDealers: false,
-        flagInactiveDeals: true,
-        flagMissingData: false,
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const changePasswordMutation = useChangePasswordMutation();
+
+  const handleSavePassword = () => {
+    if (!currentPassword) {
+      toast.error("Current password is required");
+      return;
+    }
+    if (!newPassword) {
+      toast.error("New password is required");
+      return;
+    }
+    if (newPassword.length < 8) {
+      toast.error("New password must be at least 8 characters");
+      return;
+    }
+    changePasswordMutation.mutate(
+      { currentPassword, newPassword },
+      {
+        onSuccess: () => {
+          setCurrentPassword("");
+          setNewPassword("");
+        },
+      }
+    );
+  };
+
+  const [notifications, setNotifications] = useState({
+    newListing: true,
+    dealFlagged: true,
+    dealerActivity: false,
+  });
+
+  const [moderation, setModeration] = useState({
+    requireApproval: true,
+    autoApproveDealers: false,
+    flagInactiveDeals: true,
+    flagMissingData: false,
+  });
+
+  const [auditLogs, setAuditLogs] = useState({
+    retentionPeriod: "30 days",
+    detailedLogin: false,
+  });
+
+  // Populate state from API data
+  useEffect(() => {
+    if (settings) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setNotifications({
+        newListing: settings.notifyNewListings ?? true,
+        dealFlagged: settings.notifyFlaggedDeals ?? true,
+        dealerActivity: settings.notifyDealerActivity ?? false,
+      });
+
+      setModeration({
+        requireApproval: settings.requireAdminApproval ?? true,
+        autoApproveDealers: settings.autoApproveTrustedDealers ?? false,
+        flagInactiveDeals: settings.autoFlagInactiveDeals ?? true,
+        flagMissingData: settings.autoFlagMissingData ?? false,
+      });
+
+      setAuditLogs({
+        retentionPeriod: logRetentionToPeriod(settings.logRetentionDays),
+        detailedLogin: settings.detailedLogging ?? false,
+      });
+    }
+  }, [settings]);
+
+  const toggleNotification = (key: keyof typeof notifications) => {
+    setNotifications((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const handleSaveNotifications = () => {
+    updateGeneralSettingsMutation.mutate({
+      notifyNewListings: notifications.newListing,
+      notifyFlaggedDeals: notifications.dealFlagged,
+      notifyDealerActivity: notifications.dealerActivity,
     });
+  };
 
-    const [auditLogs, setAuditLogs] = useState({
-        retentionPeriod: '30 days',
-        detailedLogin: false,
+  const handleSaveModeration = () => {
+    updateModerationSettingsMutation.mutate({
+      requireAdminApproval: moderation.requireApproval,
+      autoApproveTrustedDealers: moderation.autoApproveDealers,
+      autoFlagInactiveDeals: moderation.flagInactiveDeals,
+      autoFlagMissingData: moderation.flagMissingData,
     });
+  };
 
-    // Populate state from API data
-    useEffect(() => {
-        if (settings) {
-            setNotifications({
-                newListing: settings.notifyNewListings ?? true,
-                dealFlagged: settings.notifyFlaggedDeals ?? true,
-                dealerActivity: settings.notifyDealerActivity ?? false,
-            });
+  const handleToggleRequireApprovalInSecurity = () => {
+    const nextVal = !moderation.requireApproval;
+    setModeration((prev) => ({ ...prev, requireApproval: nextVal }));
+    updateModerationSettingsMutation.mutate({
+      requireAdminApproval: nextVal,
+    });
+  };
 
-            setModeration({
-                requireApproval: settings.requireAdminApproval ?? true,
-                autoApproveDealers: settings.autoApproveTrustedDealers ?? false,
-                flagInactiveDeals: settings.autoFlagInactiveDeals ?? true,
-                flagMissingData: settings.autoFlagMissingData ?? false,
-            });
+  const handleSaveAuditLogs = () => {
+    updateLogsSettingsMutation.mutate({
+      logRetentionDays: periodToLogRetentionDays(auditLogs.retentionPeriod),
+      detailedLogging: auditLogs.detailedLogin,
+    });
+  };
 
-            setAuditLogs({
-                retentionPeriod: logRetentionToPeriod(settings.logRetentionDays),
-                detailedLogin: settings.detailedLogging ?? false,
-            });
-        }
-    }, [settings]);
-
-    const tabs = ['General', 'Moderation', 'Security', 'Audit and logs'];
-
-    const toggleNotification = (key: keyof typeof notifications) => {
-        setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
-    };
-
-    const handleSaveNotifications = () => {
-        updateGeneralSettingsMutation.mutate({
-            notifyNewListings: notifications.newListing,
-            notifyFlaggedDeals: notifications.dealFlagged,
-            notifyDealerActivity: notifications.dealerActivity,
-        });
-    };
-
-    const handleSaveModeration = () => {
-        updateModerationSettingsMutation.mutate({
-            requireAdminApproval: moderation.requireApproval,
-            autoApproveTrustedDealers: moderation.autoApproveDealers,
-            autoFlagInactiveDeals: moderation.flagInactiveDeals,
-            autoFlagMissingData: moderation.flagMissingData,
-        });
-    };
-
-    const handleToggleRequireApprovalInSecurity = () => {
-        const nextVal = !moderation.requireApproval;
-        setModeration(prev => ({ ...prev, requireApproval: nextVal }));
-        updateModerationSettingsMutation.mutate({
-            requireAdminApproval: nextVal,
-        });
-    };
-
-    const handleSaveAuditLogs = () => {
-        updateLogsSettingsMutation.mutate({
-            logRetentionDays: periodToLogRetentionDays(auditLogs.retentionPeriod),
-            detailedLogging: auditLogs.detailedLogin,
-        });
-    };
-
+  if (!mounted) {
     return (
-        <AnimationWrapper>
-            <div className="max-w-250 mb-20">
-                <header className="mb-10 flex items-start justify-between">
-                    <div>
-                        <h1 className="text-[32px] md:text-[40px] font-bold text-white mb-2 leading-tight">
-                            {activeTab === 'General' ? 'General settings' :
-                                activeTab === 'Moderation' ? 'Moderation settings' :
-                                    activeTab === 'Security' ? 'Security settings' : 'Audit and logs'}
-                        </h1>
-                        <p className="text-[#888] text-sm md:text-base">
-                            {activeTab === 'General' ? 'Define your platform identity and defaults' :
-                                activeTab === 'Moderation' ? 'Manage listings approval and automated flag rules' :
-                                    activeTab === 'Security' ? 'Configure platform security and access' : 'Control listing approval workflow and quality rules'}
-                        </p>
-                    </div>
-                    {isError && (
-                        <button
-                            onClick={() => refetch()}
-                            className="flex items-center gap-2 text-xs font-semibold px-3 py-2 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg hover:bg-red-500/20 transition-all cursor-pointer"
-                        >
-                            <RefreshCw className="w-3.5 h-3.5" />
-                            Retry
-                        </button>
-                    )}
-                </header>
+      <AnimationWrapper>
+        <div className="max-w-250 mb-20 animate-pulse">
+          {/* Header Skeleton */}
+          <div className="mb-10">
+            <div className="h-10 bg-[#222] rounded-lg w-72 mb-3"></div>
+            <div className="h-4 bg-[#222] rounded-md w-96"></div>
+          </div>
+          {/* Tabs Skeleton */}
+          <div className="flex flex-wrap gap-3 mb-12">
+            <div className="h-11 bg-[#1A1A1C] rounded-lg w-24"></div>
+            <div className="h-11 bg-[#1A1A1C] rounded-lg w-28"></div>
+            <div className="h-11 bg-[#1A1A1C] rounded-lg w-24"></div>
+            <div className="h-11 bg-[#1A1A1C] rounded-lg w-32"></div>
+          </div>
+          {/* Content Skeleton */}
+          <div className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-10 shadow-2xl space-y-6">
+            <div className="h-6 bg-[#222] rounded w-1/4 mb-4"></div>
+            <div className="h-12 bg-[#1A1A1A] rounded-xl w-full"></div>
+            <div className="h-12 bg-[#1A1A1A] rounded-xl w-full"></div>
+            <div className="h-12 bg-[#1A1A1A] rounded-xl w-full"></div>
+          </div>
+        </div>
+      </AnimationWrapper>
+    );
+  }
 
-                <div className="flex flex-wrap gap-3 mb-12">
-                    {tabs.map(tab => (
-                        <button
-                            key={tab}
-                            onClick={() => setActiveTab(tab)}
-                            className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer ${activeTab === tab
-                                ? 'bg-primary text-black'
-                                : 'bg-[#1A1A1C] text-[#888] hover:text-white hover:bg-[#252528]'
-                                }`}
-                        >
-                            {tab}
-                        </button>
-                    ))}
-                </div>
+  return (
+    <AnimationWrapper>
+      <div className="max-w-250 mb-20">
+        <header className="mb-10 flex items-start justify-between">
+          <div>
+            <h1 className="text-[32px] md:text-[40px] font-bold text-white mb-2 leading-tight">
+              {activeTab === "General"
+                ? "General settings"
+                : activeTab === "Moderation"
+                  ? "Moderation settings"
+                  : activeTab === "Security"
+                    ? "Security settings"
+                    : "Audit and logs"}
+            </h1>
+            <p className="text-[#888] text-sm md:text-base">
+              {activeTab === "General"
+                ? "Define your platform identity and defaults"
+                : activeTab === "Moderation"
+                  ? "Manage listings approval and automated flag rules"
+                  : activeTab === "Security"
+                    ? "Configure platform security and access"
+                    : "Control listing approval workflow and quality rules"}
+            </p>
+          </div>
+          {isError && (
+            <button
+              onClick={() => refetch()}
+              className="flex items-center gap-2 text-xs font-semibold px-3 py-2 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg hover:bg-red-500/20 transition-all cursor-pointer"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              Retry
+            </button>
+          )}
+        </header>
 
-                {isLoading ? (
-                    <div className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-10 shadow-2xl space-y-6 animate-pulse">
-                        <div className="h-6 bg-[#222] rounded w-1/4 mb-4"></div>
-                        <div className="h-12 bg-[#1A1A1A] rounded-xl w-full"></div>
-                        <div className="h-12 bg-[#1A1A1A] rounded-xl w-full"></div>
-                        <div className="h-12 bg-[#1A1A1A] rounded-xl w-full"></div>
-                    </div>
-                ) : activeTab === 'General' ? (
-                    <div className="space-y-12">
-                        {/* System profile Section */}
-                        <section>
+        <div className="flex flex-wrap gap-3 mb-12">
+          {tabs.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => handleTabChange(tab)}
+              className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer ${
+                activeTab === tab
+                  ? "bg-primary text-black"
+                  : "bg-[#1A1A1C] text-[#888] hover:text-white hover:bg-[#252528]"
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+
+        {isLoading ? (
+          <div className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-10 shadow-2xl space-y-6 animate-pulse">
+            <div className="h-6 bg-[#222] rounded w-1/4 mb-4"></div>
+            <div className="h-12 bg-[#1A1A1A] rounded-xl w-full"></div>
+            <div className="h-12 bg-[#1A1A1A] rounded-xl w-full"></div>
+            <div className="h-12 bg-[#1A1A1A] rounded-xl w-full"></div>
+          </div>
+        ) : activeTab === "General" ? (
+          <div className="space-y-12">
+            {/* System profile Section */}
+            {/* <section>
                             <h2 className="text-xl md:text-2xl font-bold text-white mb-6">System profile</h2>
                             <div className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-10 shadow-2xl">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-10">
@@ -288,426 +407,534 @@ export default function AdminSettings() {
                                     </button>
                                 </div>
                             </div>
-                        </section>
+                        </section> */}
 
-                        {/* Notification Section */}
-                        <section>
-                            <h2 className="text-xl md:text-2xl font-bold text-white mb-6">Notification</h2>
-                            <div className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-10 shadow-2xl">
-                                <div className="flex justify-between items-center mb-6 px-2">
-                                    <span className="text-[13px] font-medium text-[#666]">Alert Type</span>
-                                    <span className="text-[13px] font-medium text-[#666]">Email</span>
-                                </div>
+            {/* Notification Section */}
+            <section>
+              <h2 className="text-xl md:text-2xl font-bold text-white mb-6">
+                Notification
+              </h2>
+              <div className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-10 shadow-2xl">
+                <div className="flex justify-between items-center mb-6 px-2">
+                  <span className="text-[13px] font-medium text-[#666]">
+                    Alert Type
+                  </span>
+                  <span className="text-[13px] font-medium text-[#666]">
+                    Email
+                  </span>
+                </div>
 
-                                <div className="space-y-1 mb-10">
-                                    <NotificationToggle
-                                        label="New Listing Submissions"
-                                        isActive={notifications.newListing}
-                                        onToggle={() => toggleNotification('newListing')}
-                                    />
-                                    <NotificationToggle
-                                        label="Deal Flagged Alerts"
-                                        isActive={notifications.dealFlagged}
-                                        onToggle={() => toggleNotification('dealFlagged')}
-                                    />
-                                    <NotificationToggle
-                                        label="Dealer activity alerts"
-                                        isActive={notifications.dealerActivity}
-                                        onToggle={() => toggleNotification('dealerActivity')}
-                                    />
-                                </div>
+                <div className="space-y-1 mb-10">
+                  <NotificationToggle
+                    label="New Listing Submissions"
+                    isActive={notifications.newListing}
+                    onToggle={() => toggleNotification("newListing")}
+                  />
+                  <NotificationToggle
+                    label="Deal Flagged Alerts"
+                    isActive={notifications.dealFlagged}
+                    onToggle={() => toggleNotification("dealFlagged")}
+                  />
+                  <NotificationToggle
+                    label="Dealer activity alerts"
+                    isActive={notifications.dealerActivity}
+                    onToggle={() => toggleNotification("dealerActivity")}
+                  />
+                </div>
 
-                                <div className="flex justify-end">
-                                    <button
-                                        onClick={handleSaveNotifications}
-                                        disabled={updateGeneralSettingsMutation.isPending}
-                                        className="bg-primary cursor-pointer text-black px-8 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2 disabled:opacity-50 hover:opacity-90"
-                                    >
-                                        {updateGeneralSettingsMutation.isPending && (
-                                            <Loader2 className="w-4 h-4 animate-spin" />
-                                        )}
-                                        Save Changes
-                                    </button>
-                                </div>
-                            </div>
-                        </section>
+                <div className="flex justify-end">
+                  <button
+                    onClick={handleSaveNotifications}
+                    disabled={updateGeneralSettingsMutation.isPending}
+                    className="bg-primary cursor-pointer text-black px-8 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2 disabled:opacity-50 hover:opacity-90"
+                  >
+                    {updateGeneralSettingsMutation.isPending && (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    )}
+                    Save Changes
+                  </button>
+                </div>
+              </div>
+            </section>
+          </div>
+        ) : activeTab === "Moderation" ? (
+          <AnimationWrapper type="fade-up">
+            <div className="space-y-8">
+              {/* Approval Workflow */}
+              <section className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-8 shadow-2xl">
+                <div className="flex items-center gap-4 mb-10">
+                  <div className="w-10 h-10 rounded-xl bg-[#facc15]/10 flex items-center justify-center">
+                    <CheckCircle2 className="w-6 h-6 text-[#facc15]" />
+                  </div>
+                  <h2 className="text-xl md:text-2xl font-bold text-white">
+                    Approval Workflow
+                  </h2>
+                </div>
+                <div className="space-y-6">
+                  <ToggleItem
+                    label="Require admin approval for listings"
+                    subtext="Automatically flag stale listings"
+                    isActive={moderation.requireApproval}
+                    onToggle={() =>
+                      setModeration((prev) => ({
+                        ...prev,
+                        requireApproval: !prev.requireApproval,
+                      }))
+                    }
+                  />
+                  <ToggleItem
+                    label="Auto approve trusted dealers"
+                    subtext="All new listings must be manually approved"
+                    isActive={moderation.autoApproveDealers}
+                    onToggle={() =>
+                      setModeration((prev) => ({
+                        ...prev,
+                        autoApproveDealers: !prev.autoApproveDealers,
+                      }))
+                    }
+                  />
+                </div>
+              </section>
+
+              {/* Listing quality requirements */}
+              <section className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-8 shadow-2xl">
+                <div className="flex items-center gap-4 mb-10">
+                  <div className="w-10 h-10 rounded-xl bg-[#facc15]/10 flex items-center justify-center">
+                    <ClipboardList className="w-6 h-6 text-[#facc15]" />
+                  </div>
+                  <h2 className="text-xl md:text-2xl font-bold text-white">
+                    Listing quality requirements
+                  </h2>
+                </div>
+                <div className="space-y-5 ml-2">
+                  <QualityItem text="Minimum price must be set" />
+                  <QualityItem text="At least 1 image must be required" />
+                  <QualityItem text="Description minimum 50 characters" />
+                </div>
+              </section>
+
+              {/* Auto flag rules */}
+              <section className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-8 shadow-2xl">
+                <div className="flex items-center gap-4 mb-10">
+                  <div className="w-10 h-10 rounded-xl bg-[#facc15]/10 flex items-center justify-center">
+                    <Search className="w-6 h-6 text-[#facc15]" />
+                  </div>
+                  <h2 className="text-xl md:text-2xl font-bold text-white">
+                    Auto flag rules
+                  </h2>
+                </div>
+                <div className="space-y-6">
+                  <ToggleItem
+                    label="Flag Deals after 48 hours of inactivity"
+                    subtext="All new listings must be manually approved"
+                    isActive={moderation.flagInactiveDeals}
+                    onToggle={() =>
+                      setModeration((prev) => ({
+                        ...prev,
+                        flagInactiveDeals: !prev.flagInactiveDeals,
+                      }))
+                    }
+                  />
+                  <ToggleItem
+                    label="Flag listings with missing Data"
+                    subtext="Flag incomplete listings submissions"
+                    isActive={moderation.flagMissingData}
+                    onToggle={() =>
+                      setModeration((prev) => ({
+                        ...prev,
+                        flagMissingData: !prev.flagMissingData,
+                      }))
+                    }
+                  />
+                </div>
+              </section>
+
+              <div className="flex justify-end pt-4">
+                <button
+                  onClick={handleSaveModeration}
+                  disabled={updateModerationSettingsMutation.isPending}
+                  className="bg-[#facc15] hover:bg-[#eab308] text-black px-10 py-4 rounded-xl text-sm font-bold transition-all shadow-lg shadow-[#facc15]/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center gap-2 disabled:opacity-50"
+                >
+                  {updateModerationSettingsMutation.isPending && (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  )}
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </AnimationWrapper>
+        ) : activeTab === "Security" ? (
+          <AnimationWrapper type="fade-up">
+            <div className="space-y-8">
+              {/* Change Password */}
+              <section className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-8 shadow-2xl">
+                <h2 className="text-xl md:text-2xl font-bold text-white mb-8 font-primary">
+                  Change Password
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-10">
+                  <div className="space-y-3">
+                    <label className="text-[13px] font-medium text-[#666]">
+                      Current Password
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="********"
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      autoComplete="new-password"
+                      className="w-full bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-4 text-sm text-white focus:outline-none focus:border-[#facc15]/50 transition-all placeholder:text-[#333]"
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-[13px] font-medium text-[#666]">
+                      New Password
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="****************"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      autoComplete="new-password"
+                      className="w-full bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-4 text-sm text-white focus:outline-none focus:border-[#facc15]/50 transition-all placeholder:text-[#333]"
+                    />
+                  </div>
+                </div>
+                <button
+                  onClick={handleSavePassword}
+                  disabled={changePasswordMutation.isPending}
+                  className="border border-[#facc15]/50 text-[#facc15] hover:bg-[#facc15] hover:text-black hover:border-[#facc15] px-8 py-3 rounded-xl text-sm font-bold transition-all duration-300 cursor-pointer flex items-center gap-2 disabled:opacity-50"
+                >
+                  {changePasswordMutation.isPending && (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  )}
+                  Save Changes
+                </button>
+              </section>
+
+              {/* Require approval toggle */}
+              <section className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-8 shadow-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div className="flex items-center gap-6">
+                  <div className="w-12 h-12 rounded-xl bg-[#facc15]/5 border border-[#facc15]/10 flex items-center justify-center">
+                    <Lock className="w-6 h-6 text-[#facc15]" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white mb-1">
+                      Require admin approval for listings
+                    </h3>
+                    <p className="text-[#666] text-sm">
+                      Automatically flag stale listings
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleToggleRequireApprovalInSecurity}
+                  disabled={updateModerationSettingsMutation.isPending}
+                  className={`relative inline-flex h-[34px] w-[64px] items-center rounded-full transition-all duration-300 focus:outline-none cursor-pointer ${moderation.requireApproval ? "bg-[#facc15]" : "bg-[#2A2A2A]"}`}
+                >
+                  <div
+                    className={`inline-block h-7 w-7 transform rounded-full transition-all duration-300 ${moderation.requireApproval ? "translate-x-[32px] bg-black shadow-lg" : "translate-x-1 bg-[#444]"}`}
+                  />
+                </button>
+              </section>
+
+              {/* Active Sessions */}
+              <section className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-8 shadow-2xl">
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-[#facc15]/10 flex items-center justify-center">
+                      <Monitor className="w-6 h-6 text-[#facc15]" />
                     </div>
-                ) : activeTab === 'Moderation' ? (
-                    <AnimationWrapper type="fade-up">
-                        <div className="space-y-8">
-                            {/* Approval Workflow */}
-                            <section className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-8 shadow-2xl">
-                                <div className="flex items-center gap-4 mb-10">
-                                    <div className="w-10 h-10 rounded-xl bg-[#facc15]/10 flex items-center justify-center">
-                                        <CheckCircle2 className="w-6 h-6 text-[#facc15]" />
-                                    </div>
-                                    <h2 className="text-xl md:text-2xl font-bold text-white">Approval Workflow</h2>
-                                </div>
-                                <div className="space-y-6">
-                                    <ToggleItem
-                                        label="Require admin approval for listings"
-                                        subtext="Automatically flag stale listings"
-                                        isActive={moderation.requireApproval}
-                                        onToggle={() => setModeration(prev => ({ ...prev, requireApproval: !prev.requireApproval }))}
-                                    />
-                                    <ToggleItem
-                                        label="Auto approve trusted dealers"
-                                        subtext="All new listings must be manually approved"
-                                        isActive={moderation.autoApproveDealers}
-                                        onToggle={() => setModeration(prev => ({ ...prev, autoApproveDealers: !prev.autoApproveDealers }))}
-                                    />
-                                </div>
-                            </section>
+                    <div>
+                      <h2 className="text-xl md:text-2xl font-bold text-white">
+                        Active Sessions
+                      </h2>
+                      <p className="text-[#666] text-xs md:text-sm">
+                        Manage devices currently logged into your account
+                      </p>
+                    </div>
+                  </div>
+                  {isSessionsError && (
+                    <button
+                      onClick={() => refetchSessions()}
+                      className="flex items-center gap-2 text-xs font-semibold px-3 py-2 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg hover:bg-red-500/20 transition-all cursor-pointer"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" />
+                      Retry
+                    </button>
+                  )}
+                </div>
 
-                            {/* Listing quality requirements */}
-                            <section className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-8 shadow-2xl">
-                                <div className="flex items-center gap-4 mb-10">
-                                    <div className="w-10 h-10 rounded-xl bg-[#facc15]/10 flex items-center justify-center">
-                                        <ClipboardList className="w-6 h-6 text-[#facc15]" />
-                                    </div>
-                                    <h2 className="text-xl md:text-2xl font-bold text-white">Listing quality requirements</h2>
-                                </div>
-                                <div className="space-y-5 ml-2">
-                                    <QualityItem text="Minimum price must be set" />
-                                    <QualityItem text="At least 1 image must be required" />
-                                    <QualityItem text="Description minimum 50 characters" />
-                                </div>
-                            </section>
-
-                            {/* Auto flag rules */}
-                            <section className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-8 shadow-2xl">
-                                <div className="flex items-center gap-4 mb-10">
-                                    <div className="w-10 h-10 rounded-xl bg-[#facc15]/10 flex items-center justify-center">
-                                        <Search className="w-6 h-6 text-[#facc15]" />
-                                    </div>
-                                    <h2 className="text-xl md:text-2xl font-bold text-white">Auto flag rules</h2>
-                                </div>
-                                <div className="space-y-6">
-                                    <ToggleItem
-                                        label="Flag Deals after 48 hours of inactivity"
-                                        subtext="All new listings must be manually approved"
-                                        isActive={moderation.flagInactiveDeals}
-                                        onToggle={() => setModeration(prev => ({ ...prev, flagInactiveDeals: !prev.flagInactiveDeals }))}
-                                    />
-                                    <ToggleItem
-                                        label="Flag listings with missing Data"
-                                        subtext="Flag incomplete listings submissions"
-                                        isActive={moderation.flagMissingData}
-                                        onToggle={() => setModeration(prev => ({ ...prev, flagMissingData: !prev.flagMissingData }))}
-                                    />
-                                </div>
-                            </section>
-
-                            <div className="flex justify-end pt-4">
-                                <button
-                                    onClick={handleSaveModeration}
-                                    disabled={updateModerationSettingsMutation.isPending}
-                                    className="bg-[#facc15] hover:bg-[#eab308] text-black px-10 py-4 rounded-xl text-sm font-bold transition-all shadow-lg shadow-[#facc15]/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center gap-2 disabled:opacity-50"
-                                >
-                                    {updateModerationSettingsMutation.isPending && (
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                    )}
-                                    Save Changes
-                                </button>
-                            </div>
+                {isSessionsLoading ? (
+                  <div className="space-y-4">
+                    {[1, 2, 3].map((i) => (
+                      <div
+                        key={i}
+                        className="animate-pulse flex items-center justify-between p-4 bg-[#1A1A1A]/40 rounded-xl border border-white/5"
+                      >
+                        <div className="space-y-2 flex-1">
+                          <div className="h-4 bg-[#2A2A2A] rounded w-52" />
+                          <div className="flex items-center gap-3">
+                            <div className="h-3 bg-[#222] rounded w-28" />
+                            <div className="h-3 bg-[#222] rounded w-36" />
+                          </div>
                         </div>
-                    </AnimationWrapper>
-                ) : activeTab === 'Security' ? (
-                    <AnimationWrapper type="fade-up">
-                        <div className="space-y-8">
-                            {/* Change Password */}
-                            <section className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-8 shadow-2xl">
-                                <h2 className="text-xl md:text-2xl font-bold text-white mb-8 font-primary">Change Password</h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-10">
-                                    <div className="space-y-3">
-                                        <label className="text-[13px] font-medium text-[#666]">Current Password</label>
-                                        <input
-                                            type="password"
-                                            placeholder="********"
-                                            className="w-full bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-4 text-sm text-white focus:outline-none focus:border-[#facc15]/50 transition-all placeholder:text-[#333]"
-                                        />
-                                    </div>
-                                    <div className="space-y-3">
-                                        <label className="text-[13px] font-medium text-[#666]">Platform Name :</label>
-                                        <input
-                                            type="text"
-                                            placeholder="support@exoticworld.com"
-                                            className="w-full bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-4 text-sm text-white focus:outline-none focus:border-[#facc15]/50 transition-all placeholder:text-[#333]"
-                                        />
-                                    </div>
-                                    <div className="space-y-3">
-                                        <label className="text-[13px] font-medium text-[#666]">New Password</label>
-                                        <input
-                                            type="password"
-                                            placeholder="****************"
-                                            className="w-full bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-4 text-sm text-white focus:outline-none focus:border-[#facc15]/50 transition-all placeholder:text-[#333]"
-                                        />
-                                    </div>
-                                    <div className="space-y-3">
-                                        <label className="text-[13px] font-medium text-[#666]">Retype new password</label>
-                                        <input
-                                            type="password"
-                                            placeholder="****************"
-                                            className="w-full bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-4 text-sm text-white focus:outline-none focus:border-[#facc15]/50 transition-all placeholder:text-[#333]"
-                                        />
-                                    </div>
-                                </div>
-                                <button className="border border-[#facc15]/50 text-[#facc15] hover:bg-[#facc15] hover:text-black hover:border-[#facc15] px-8 py-3 rounded-xl text-sm font-bold transition-all duration-300 cursor-pointer">
-                                    Save Changes
-                                </button>
-                            </section>
-
-                            {/* Require approval toggle */}
-                            <section className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-8 shadow-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                                <div className="flex items-center gap-6">
-                                    <div className="w-12 h-12 rounded-xl bg-[#facc15]/5 border border-[#facc15]/10 flex items-center justify-center">
-                                        <Lock className="w-6 h-6 text-[#facc15]" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-lg font-bold text-white mb-1">Require admin approval for listings</h3>
-                                        <p className="text-[#666] text-sm">Automatically flag stale listings</p>
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={handleToggleRequireApprovalInSecurity}
-                                    disabled={updateModerationSettingsMutation.isPending}
-                                    className={`relative inline-flex h-[34px] w-[64px] items-center rounded-full transition-all duration-300 focus:outline-none cursor-pointer ${moderation.requireApproval ? 'bg-[#facc15]' : 'bg-[#2A2A2A]'}`}
-                                >
-                                    <div className={`inline-block h-7 w-7 transform rounded-full transition-all duration-300 ${moderation.requireApproval ? 'translate-x-[32px] bg-black shadow-lg' : 'translate-x-1 bg-[#444]'}`} />
-                                </button>
-                            </section>
-
-                            {/* Active Sessions */}
-                            <section className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-8 shadow-2xl">
-                                <div className="flex items-center justify-between mb-8">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 rounded-xl bg-[#facc15]/10 flex items-center justify-center">
-                                            <Monitor className="w-6 h-6 text-[#facc15]" />
-                                        </div>
-                                        <div>
-                                            <h2 className="text-xl md:text-2xl font-bold text-white">Active Sessions</h2>
-                                            <p className="text-[#666] text-xs md:text-sm">Manage devices currently logged into your account</p>
-                                        </div>
-                                    </div>
-                                    {isSessionsError && (
-                                        <button
-                                            onClick={() => refetchSessions()}
-                                            className="flex items-center gap-2 text-xs font-semibold px-3 py-2 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg hover:bg-red-500/20 transition-all cursor-pointer"
-                                        >
-                                            <RefreshCw className="w-3.5 h-3.5" />
-                                            Retry
-                                        </button>
-                                    )}
-                                </div>
-
-                                {isSessionsLoading ? (
-                                    <div className="space-y-4">
-                                        {[1, 2, 3].map((i) => (
-                                            <div key={i} className="animate-pulse flex items-center justify-between p-4 bg-[#1A1A1A]/40 rounded-xl border border-white/5">
-                                                <div className="space-y-2 flex-1">
-                                                    <div className="h-4 bg-[#2A2A2A] rounded w-52" />
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="h-3 bg-[#222] rounded w-28" />
-                                                        <div className="h-3 bg-[#222] rounded w-36" />
-                                                    </div>
-                                                </div>
-                                                <div className="w-10 h-10 rounded-xl bg-[#2A2A2A]" />
-                                            </div>
-                                        ))}
-                                    </div>
-                                ) : isSessionsError ? (
-                                    <div className="text-center py-8 bg-[#1A1A1A]/30 rounded-xl border border-red-500/10">
-                                        <p className="text-red-400 text-sm mb-3">Failed to load active sessions.</p>
-                                        <button
-                                            onClick={() => refetchSessions()}
-                                            className="inline-flex items-center gap-2 text-xs font-semibold px-4 py-2 bg-[#facc15] text-black rounded-lg hover:bg-[#eab308] transition-all cursor-pointer"
-                                        >
-                                            <RefreshCw className="w-3.5 h-3.5" />
-                                            Reload Sessions
-                                        </button>
-                                    </div>
-                                ) : !sessions || sessions.length === 0 ? (
-                                    <div className="text-center py-8 text-[#666] text-sm bg-[#1A1A1A]/20 rounded-xl border border-white/5">
-                                        No active sessions found.
-                                    </div>
-                                ) : (
-                                    <div className="space-y-4">
-                                        {sessions.map((session, index) => {
-                                            const { device, browser } = parseUserAgent(session.userAgent);
-                                            const isRevoking = revokingId === session.id;
-
-                                            return (
-                                                <React.Fragment key={session.id}>
-                                                    {index > 0 && <div className="h-[1px] bg-white/[0.03]" />}
-                                                    <div className="flex items-center justify-between group py-2">
-                                                        <div className="space-y-1">
-                                                            <h4 className="text-white font-medium flex items-center gap-2 text-base">
-                                                                <span>{device} - {browser}</span>
-                                                            </h4>
-                                                            <div className="flex flex-wrap items-center gap-3 text-xs md:text-sm">
-                                                                <span className="text-[#888]">
-                                                                    IP: {session.ipAddress || 'Unknown IP'}
-                                                                </span>
-                                                                <span className="text-[#444]">•</span>
-                                                                <span className="text-[#666]">
-                                                                    Logged in: {formatDate(session.createdAt)}
-                                                                </span>
-                                                                {session.isCurrent && (
-                                                                    <>
-                                                                        <span className="text-[#444]">•</span>
-                                                                        <div className="flex items-center gap-1.5">
-                                                                            <div className="w-1.5 h-1.5 rounded-full bg-[#facc15] animate-pulse" />
-                                                                            <span className="text-[#facc15] text-[13px] font-medium italic">Current device</span>
-                                                                        </div>
-                                                                    </>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        {!session.isCurrent && (
-                                                            <button
-                                                                onClick={() => handleRevokeSession(session.id)}
-                                                                disabled={isRevoking || revokeSessionMutation.isPending}
-                                                                title="Revoke session"
-                                                                className="w-10 h-10 rounded-xl bg-orange-500/5 hover:bg-orange-500/10 flex items-center justify-center transition-all group/btn border border-transparent hover:border-orange-500/20 cursor-pointer disabled:opacity-50"
-                                                            >
-                                                                {isRevoking ? (
-                                                                    <Loader2 className="w-4 h-4 animate-spin text-[#f97316]" />
-                                                                ) : (
-                                                                    <LogOut className="w-5 h-5 text-[#f97316] group-hover/btn:scale-110 transition-all" />
-                                                                )}
-                                                            </button>
-                                                        )}
-                                                    </div>
-                                                </React.Fragment>
-                                            );
-                                        })}
-                                    </div>
-                                )}
-                            </section>
-                        </div>
-                    </AnimationWrapper>
+                        <div className="w-10 h-10 rounded-xl bg-[#2A2A2A]" />
+                      </div>
+                    ))}
+                  </div>
+                ) : isSessionsError ? (
+                  <div className="text-center py-8 bg-[#1A1A1A]/30 rounded-xl border border-red-500/10">
+                    <p className="text-red-400 text-sm mb-3">
+                      Failed to load active sessions.
+                    </p>
+                    <button
+                      onClick={() => refetchSessions()}
+                      className="inline-flex items-center gap-2 text-xs font-semibold px-4 py-2 bg-[#facc15] text-black rounded-lg hover:bg-[#eab308] transition-all cursor-pointer"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" />
+                      Reload Sessions
+                    </button>
+                  </div>
+                ) : !sessions || sessions.length === 0 ? (
+                  <div className="text-center py-8 text-[#666] text-sm bg-[#1A1A1A]/20 rounded-xl border border-white/5">
+                    No active sessions found.
+                  </div>
                 ) : (
-                    <AnimationWrapper type="fade-up">
-                        <div className="space-y-8">
-                            <section className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-10 shadow-2xl">
-                                <div className="flex items-center gap-4 mb-10">
-                                    <div className="w-10 h-10 rounded-xl bg-[#facc15]/10 flex items-center justify-center">
-                                        <ClipboardList className="w-6 h-6 text-primary" />
-                                    </div>
-                                    <h2 className="text-xl md:text-2xl font-bold text-white">Log retention</h2>
-                                </div>
+                  <div className="space-y-4">
+                    {sessions.map((session, index) => {
+                      const { device, browser } = parseUserAgent(
+                        session.userAgent,
+                      );
+                      const isRevoking = revokingId === session.id;
 
-                                <div className="space-y-10">
-                                    {/* Retention Period Dropdown */}
-                                    <div className="space-y-3 max-w-sm">
-                                        <label className="text-[13px] font-medium text-[#666]">Retention Period</label>
-                                        <div className="relative">
-                                            <select
-                                                value={auditLogs.retentionPeriod}
-                                                onChange={(e) => setAuditLogs(prev => ({ ...prev, retentionPeriod: e.target.value }))}
-                                                className="w-full bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-4 text-sm text-white focus:outline-none focus:border-[#facc15]/50 transition-all appearance-none cursor-pointer"
-                                            >
-                                                <option value="7 days">7 days</option>
-                                                <option value="30 days">30 days</option>
-                                                <option value="90 days">90 days</option>
-                                                <option value="1 year">1 year</option>
-                                                <option value="Forever">Forever</option>
-                                            </select>
-                                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                                                <ChevronDown className="w-4 h-4 text-[#666]" />
-                                            </div>
-                                        </div>
+                      return (
+                        <React.Fragment key={session.id}>
+                          {index > 0 && (
+                            <div className="h-[1px] bg-white/[0.03]" />
+                          )}
+                          <div className="flex items-center justify-between group py-2">
+                            <div className="space-y-1">
+                              <h4 className="text-white font-medium flex items-center gap-2 text-base">
+                                <span>
+                                  {device} - {browser}
+                                </span>
+                              </h4>
+                              <div className="flex flex-wrap items-center gap-3 text-xs md:text-sm">
+                                <span className="text-[#888]">
+                                  IP: {session.ipAddress || "Unknown IP"}
+                                </span>
+                                <span className="text-[#444]">•</span>
+                                <span className="text-[#666]">
+                                  Logged in: {formatDate(session.createdAt)}
+                                </span>
+                                {session.isCurrent && (
+                                  <>
+                                    <span className="text-[#444]">•</span>
+                                    <div className="flex items-center gap-1.5">
+                                      <div className="w-1.5 h-1.5 rounded-full bg-[#facc15] animate-pulse" />
+                                      <span className="text-[#facc15] text-[13px] font-medium italic">
+                                        Current device
+                                      </span>
                                     </div>
-
-                                    {/* Detailed Login Toggle */}
-                                    <div className="flex items-center justify-between group">
-                                        <div className="space-y-1.5">
-                                            <h4 className={`text-[17px] md:text-[19px] font-medium transition-colors ${auditLogs.detailedLogin ? 'text-white' : 'text-[#aaa]'}`}>
-                                                Detailed Login
-                                            </h4>
-                                            <p className="text-[#666] text-sm max-w-md">
-                                                Capture detailed activity logs for all administrative actions and system events.
-                                            </p>
-                                        </div>
-                                        <button
-                                            onClick={() => setAuditLogs(prev => ({ ...prev, detailedLogin: !prev.detailedLogin }))}
-                                            className={`relative inline-flex h-8 w-15 shrink-0 items-center rounded-full transition-all duration-300 focus:outline-none cursor-pointer ${auditLogs.detailedLogin ? 'bg-primary' : 'bg-[#2A2A2A]'}`}
-                                        >
-                                            <div
-                                                className={`inline-block h-6 w-6 transform rounded-full transition-all duration-300 ease-in-out ${auditLogs.detailedLogin ? 'translate-x-7.5 bg-black shadow-lg' : 'translate-x-1 bg-[#444]'}`}
-                                            />
-                                        </button>
-                                    </div>
-                                </div>
-                            </section>
-
-                            <div className="flex justify-end pt-4">
-                                <button
-                                    onClick={handleSaveAuditLogs}
-                                    disabled={updateLogsSettingsMutation.isPending}
-                                    className="bg-primary hover:bg-[#eab308] text-black px-10 py-4 rounded-xl text-sm font-bold transition-all shadow-lg cursor-pointer shadow-[#facc15]/10 hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2 disabled:opacity-50"
-                                >
-                                    {updateLogsSettingsMutation.isPending && (
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                    )}
-                                    Save Changes
-                                </button>
+                                  </>
+                                )}
+                              </div>
                             </div>
-                        </div>
-                    </AnimationWrapper>
+                            {!session.isCurrent && (
+                              <button
+                                onClick={() => handleRevokeSession(session.id)}
+                                disabled={
+                                  isRevoking || revokeSessionMutation.isPending
+                                }
+                                title="Revoke session"
+                                className="w-10 h-10 rounded-xl bg-orange-500/5 hover:bg-orange-500/10 flex items-center justify-center transition-all group/btn border border-transparent hover:border-orange-500/20 cursor-pointer disabled:opacity-50"
+                              >
+                                {isRevoking ? (
+                                  <Loader2 className="w-4 h-4 animate-spin text-[#f97316]" />
+                                ) : (
+                                  <LogOut className="w-5 h-5 text-[#f97316] group-hover/btn:scale-110 transition-all" />
+                                )}
+                              </button>
+                            )}
+                          </div>
+                        </React.Fragment>
+                      );
+                    })}
+                  </div>
                 )}
-
+              </section>
             </div>
-        </AnimationWrapper>
-    );
+          </AnimationWrapper>
+        ) : (
+          <AnimationWrapper type="fade-up">
+            <div className="space-y-8">
+              <section className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-10 shadow-2xl">
+                <div className="flex items-center gap-4 mb-10">
+                  <div className="w-10 h-10 rounded-xl bg-[#facc15]/10 flex items-center justify-center">
+                    <ClipboardList className="w-6 h-6 text-primary" />
+                  </div>
+                  <h2 className="text-xl md:text-2xl font-bold text-white">
+                    Log retention
+                  </h2>
+                </div>
+
+                <div className="space-y-10">
+                  {/* Retention Period Dropdown */}
+                  <div className="space-y-3 max-w-sm">
+                    <label className="text-[13px] font-medium text-[#666]">
+                      Retention Period
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={auditLogs.retentionPeriod}
+                        onChange={(e) =>
+                          setAuditLogs((prev) => ({
+                            ...prev,
+                            retentionPeriod: e.target.value,
+                          }))
+                        }
+                        className="w-full bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-4 text-sm text-white focus:outline-none focus:border-[#facc15]/50 transition-all appearance-none cursor-pointer"
+                      >
+                        <option value="7 days">7 days</option>
+                        <option value="30 days">30 days</option>
+                        <option value="90 days">90 days</option>
+                        <option value="1 year">1 year</option>
+                        <option value="Forever">Forever</option>
+                      </select>
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                        <ChevronDown className="w-4 h-4 text-[#666]" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Detailed Login Toggle */}
+                  <div className="flex items-center justify-between group">
+                    <div className="space-y-1.5">
+                      <h4
+                        className={`text-[17px] md:text-[19px] font-medium transition-colors ${auditLogs.detailedLogin ? "text-white" : "text-[#aaa]"}`}
+                      >
+                        Detailed Login
+                      </h4>
+                      <p className="text-[#666] text-sm max-w-md">
+                        Capture detailed activity logs for all administrative
+                        actions and system events.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() =>
+                        setAuditLogs((prev) => ({
+                          ...prev,
+                          detailedLogin: !prev.detailedLogin,
+                        }))
+                      }
+                      className={`relative inline-flex h-8 w-15 shrink-0 items-center rounded-full transition-all duration-300 focus:outline-none cursor-pointer ${auditLogs.detailedLogin ? "bg-primary" : "bg-[#2A2A2A]"}`}
+                    >
+                      <div
+                        className={`inline-block h-6 w-6 transform rounded-full transition-all duration-300 ease-in-out ${auditLogs.detailedLogin ? "translate-x-7.5 bg-black shadow-lg" : "translate-x-1 bg-[#444]"}`}
+                      />
+                    </button>
+                  </div>
+                </div>
+              </section>
+
+              <div className="flex justify-end pt-4">
+                <button
+                  onClick={handleSaveAuditLogs}
+                  disabled={updateLogsSettingsMutation.isPending}
+                  className="bg-primary hover:bg-[#eab308] text-black px-10 py-4 rounded-xl text-sm font-bold transition-all shadow-lg cursor-pointer shadow-[#facc15]/10 hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2 disabled:opacity-50"
+                >
+                  {updateLogsSettingsMutation.isPending && (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  )}
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </AnimationWrapper>
+        )}
+      </div>
+    </AnimationWrapper>
+  );
 }
 
-function NotificationToggle({ label, isActive, onToggle }: { label: string, isActive: boolean, onToggle: () => void }) {
-    return (
-        <div className="flex items-center justify-between py-5 border-b border-white/3 last:border-0 group transition-all">
-            <span className={`text-[15px] md:text-[17px] font-medium transition-colors ${isActive ? 'text-white' : 'text-[#888]'}`}>
-                {label}
-            </span>
-            <button
-                onClick={onToggle}
-                className={`relative inline-flex h-7.5 w-14 items-center rounded-full transition-all duration-300 focus:outline-none cursor-pointer ${isActive ? 'bg-primary' : 'bg-[#2A2A2A]'
-                    }`}
-            >
-                <div
-                    className={`inline-block h-6 w-6 transform rounded-full transition-all duration-300 ease-in-out ${isActive ? 'translate-x-6.5 bg-black shadow-lg' : 'translate-x-1 bg-[#444]'
-                        }`}
-                />
-            </button>
-        </div>
-    );
+function NotificationToggle({
+  label,
+  isActive,
+  onToggle,
+}: {
+  label: string;
+  isActive: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <div className="flex items-center justify-between py-5 border-b border-white/3 last:border-0 group transition-all">
+      <span
+        className={`text-[15px] md:text-[17px] font-medium transition-colors ${isActive ? "text-white" : "text-[#888]"}`}
+      >
+        {label}
+      </span>
+      <button
+        onClick={onToggle}
+        className={`relative inline-flex h-7.5 w-14 items-center rounded-full transition-all duration-300 focus:outline-none cursor-pointer ${
+          isActive ? "bg-primary" : "bg-[#2A2A2A]"
+        }`}
+      >
+        <div
+          className={`inline-block h-6 w-6 transform rounded-full transition-all duration-300 ease-in-out ${
+            isActive
+              ? "translate-x-6.5 bg-black shadow-lg"
+              : "translate-x-1 bg-[#444]"
+          }`}
+        />
+      </button>
+    </div>
+  );
 }
 
-function ToggleItem({ label, subtext, isActive, onToggle }: { label: string, subtext?: string, isActive: boolean, onToggle: () => void }) {
-    return (
-        <div className="flex items-center justify-between py-2 transition-all">
-            <div className="space-y-1.5">
-                <h4 className={`text-[16px] md:text-[18px] font-medium transition-colors ${isActive ? 'text-white' : 'text-[#aaa]'}`}>
-                    {label}
-                </h4>
-                {subtext && <p className="text-[#666] text-xs md:text-sm font-medium">{subtext}</p>}
-            </div>
-            <button
-                onClick={onToggle}
-                className={`relative inline-flex h-7.5 w-14 shrink-0 items-center rounded-full transition-all duration-300 focus:outline-none cursor-pointer ${isActive ? 'bg-primary' : 'bg-[#2A2A2A]'}`}
-            >
-                <div
-                    className={`inline-block h-6 w-6 transform rounded-full transition-all duration-300 ease-in-out ${isActive ? 'translate-x-6.5 bg-black shadow-lg' : 'translate-x-1 bg-[#444]'}`}
-                />
-            </button>
-        </div>
-    );
+function ToggleItem({
+  label,
+  subtext,
+  isActive,
+  onToggle,
+}: {
+  label: string;
+  subtext?: string;
+  isActive: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <div className="flex items-center justify-between py-2 transition-all">
+      <div className="space-y-1.5">
+        <h4
+          className={`text-[16px] md:text-[18px] font-medium transition-colors ${isActive ? "text-white" : "text-[#aaa]"}`}
+        >
+          {label}
+        </h4>
+        {subtext && (
+          <p className="text-[#666] text-xs md:text-sm font-medium">
+            {subtext}
+          </p>
+        )}
+      </div>
+      <button
+        onClick={onToggle}
+        className={`relative inline-flex h-7.5 w-14 shrink-0 items-center rounded-full transition-all duration-300 focus:outline-none cursor-pointer ${isActive ? "bg-primary" : "bg-[#2A2A2A]"}`}
+      >
+        <div
+          className={`inline-block h-6 w-6 transform rounded-full transition-all duration-300 ease-in-out ${isActive ? "translate-x-6.5 bg-black shadow-lg" : "translate-x-1 bg-[#444]"}`}
+        />
+      </button>
+    </div>
+  );
 }
 
 function QualityItem({ text }: { text: string }) {
-    return (
-        <div className="flex items-center gap-4 py-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-[#facc15] shadow-[0_0_10px_rgba(250,204,21,0.4)]" />
-            <span className="text-[#888] text-[15px] md:text-[16px] font-medium">{text}</span>
-        </div>
-    );
+  return (
+    <div className="flex items-center gap-4 py-1.5">
+      <div className="w-2.5 h-2.5 rounded-full bg-[#facc15] shadow-[0_0_10px_rgba(250,204,21,0.4)]" />
+      <span className="text-[#888] text-[15px] md:text-[16px] font-medium">
+        {text}
+      </span>
+    </div>
+  );
 }

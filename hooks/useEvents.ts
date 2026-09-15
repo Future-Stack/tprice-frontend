@@ -3,12 +3,14 @@ import {
   getEventsApi,
   getEventByIdApi,
   createEventApi,
+  updateEventApi,
   deleteEventApi,
   registerEventApi,
   GetEventsParams,
   EventsResponse,
   EventItem,
   CreateEventInput,
+  UpdateEventInput,
   RegisterEventInput,
 } from "@/lib/api/events";
 
@@ -70,6 +72,20 @@ export const useRegisterEventMutation = () => {
       eventId: string;
       data: RegisterEventInput;
     }) => registerEventApi(eventId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: EVENTS_QUERY_KEYS.all });
+    },
+  });
+};
+
+/**
+ * Hook to update an existing event by ID
+ */
+export const useUpdateEventMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateEventInput }) =>
+      updateEventApi(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: EVENTS_QUERY_KEYS.all });
     },

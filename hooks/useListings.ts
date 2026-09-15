@@ -29,6 +29,10 @@ import {
   UpdateListingInput,
   DeleteListingResponse,
   SaveListingResponse,
+  getFeaturedPricingApi,
+  FeaturedPricingResponse,
+  getFeaturedStatusApi,
+  FeaturedStatusResponse,
 } from "@/lib/api/listings";
 import { ADMIN_DASHBOARD_QUERY_KEYS } from "@/hooks/useAdminDashboard";
 import { AdminDashboardOverviewResponse } from "@/lib/api/dashboard";
@@ -43,6 +47,8 @@ export const LISTINGS_QUERY_KEYS = {
   admin: (params: GetAdminListingsParams) =>
     ["listings", "admin", params] as const,
   detail: (id: string) => ["listings", "detail", id] as const,
+  featuredPricing: ["listings", "featured-pricing"] as const,
+  featuredStatus: ["listings", "me", "featured-status"] as const,
 };
 
 export interface SaveListingContext {
@@ -514,5 +520,29 @@ export const useSaveListingMutation = () => {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["listings", "saved"] });
     },
+  });
+};
+
+/**
+ * Custom React Query hook for fetching featured pricing options
+ */
+export const useFeaturedPricingQuery = () => {
+  return useQuery<FeaturedPricingResponse>({
+    queryKey: LISTINGS_QUERY_KEYS.featuredPricing,
+    queryFn: () => getFeaturedPricingApi(),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+};
+
+/**
+ * Custom React Query hook for fetching seller's featured subscription status
+ */
+export const useFeaturedStatusQuery = () => {
+  return useQuery<FeaturedStatusResponse>({
+    queryKey: LISTINGS_QUERY_KEYS.featuredStatus,
+    queryFn: () => getFeaturedStatusApi(),
+    staleTime: 2 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 };

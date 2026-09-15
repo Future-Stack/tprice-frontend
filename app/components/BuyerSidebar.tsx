@@ -15,6 +15,7 @@ import {
   Heart,
   Lock,
   Star,
+  CreditCard,
 } from "lucide-react";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 import { useGetMeQuery } from "@/hooks/useAuth";
@@ -26,6 +27,7 @@ const navItems = [
   { href: "/buyer/mybids", icon: Gavel, label: "My Bids" },
   { href: "/buyer/my-offer", icon: BadgePercent, label: "My Offer" },
   { href: "/buyer/saved-items", icon: Heart, label: "Saved Items" },
+  { href: "/buyer/subscription", icon: CreditCard, label: "Subscription" },
 ];
 
 const secondaryItems = [
@@ -53,9 +55,10 @@ export default function BuyerSidebar({
 }) {
   const pathname = usePathname();
   const { user: storeUser } = useAuthStore();
-  const { data: apiUser } = useGetMeQuery();
+  const { data: apiUser, isLoading: isUserLoading } = useGetMeQuery();
   const user = apiUser || storeUser;
   const isVip = Boolean(user?.isVip ?? user?.vipStatus);
+  const [isBannerDismissed, setIsBannerDismissed] = React.useState(false);
 
   return (
     <>
@@ -100,7 +103,10 @@ export default function BuyerSidebar({
         <nav className="flex-1 px-4 space-y-2 mt-4">
           {navItems.map((item) => {
             const isActive =
-              item.href === "/" ? pathname === "/" : pathname === item.href;
+              item.href === "/buyer"
+                ? pathname === "/buyer"
+                : pathname.startsWith(item.href);
+
             return (
               <Link
                 key={item.label}
@@ -119,29 +125,29 @@ export default function BuyerSidebar({
               </Link>
             );
           })}
-          <div className="pt-4 mt-2 mb-2 border-t border-[#2C2C2E]/50"></div>
-          {secondaryItems.map((item) => {
-            const isActive =
-              item.href === "/" ? pathname === "/" : pathname === item.href;
-            const isDisabled = item.isVipOnly && !isVip;
 
-            if (isDisabled) {
+          <div className="pt-4 pb-2">
+            <div className="h-[1px] bg-white/10 mx-2" />
+          </div>
+
+          {secondaryItems.map((item) => {
+            const isActive = pathname.startsWith(item.href);
+            const isLocked = item.isVipOnly && !isVip;
+
+            if (isLocked) {
               return (
                 <div
                   key={item.label}
-                  onClick={() =>
-                    toast.error(`${item.label} are exclusive to VIP members.`)
-                  }
-                  className="flex items-center justify-between px-4 py-3 text-gray-400 rounded-xl bg-white/2 cursor-not-allowed opacity-50 select-none transition-all group"
-                  title="VIP Membership Required"
+                  onClick={() => {
+                    toast.error("This section is restricted to VIP members only.");
+                  }}
+                  className="flex items-center justify-between px-4 py-3 rounded-xl font-medium text-gray-500 hover:text-gray-400 hover:bg-white/5 cursor-pointer transition-all group"
                 >
                   <div className="flex items-center gap-3">
-                    <item.icon className="w-4.5 h-4.5 text-gray-300" />
-                    <span className="font-medium text-gray-300">
-                      {item.label}
-                    </span>
+                    <item.icon className="w-4.5 h-4.5 text-gray-500 group-hover:text-primary transition-colors" />
+                    <span>{item.label}</span>
                   </div>
-                  <Lock className="w-3.5 h-3.5 text-gray-500" />
+                  <Lock className="w-3.5 h-3.5 text-gray-500 group-hover:text-primary transition-colors" />
                 </div>
               );
             }
@@ -166,11 +172,18 @@ export default function BuyerSidebar({
           })}
         </nav>
 
-        {/* VIP Upgrade Banner (shown when user is not VIP) */}
-        {!isVip && (
+        {/* VIP Upgrade Banner (shown when user is not VIP and data loaded) */}
+        {!isUserLoading && !isVip && !isBannerDismissed && (
           <div className="p-5 mt-auto mb-6 mx-4 rounded-2xl bg-linear-to-br from-[#EEA341] to-[#C76E12] relative shadow-[0_10px_30px_rgba(231,143,35,0.2)] text-white overflow-hidden group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full blur-3xl -mr-10 -mt-10 group-hover:opacity-20 transition-opacity"></div>
-            <button className="absolute top-3 right-3 text-white/70 hover:text-white z-10 transition-colors">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsBannerDismissed(true);
+              }}
+              className="absolute top-3 right-3 text-white/70 hover:text-white z-10 transition-colors cursor-pointer"
+              aria-label="Dismiss banner"
+            >
               <X className="w-3.5 h-3.5" />
             </button>
             <h3 className="font-bold text-lg mb-1.5 font-clash">
@@ -179,10 +192,17 @@ export default function BuyerSidebar({
             <p className="text-[11px] text-white/90 mb-5 leading-relaxed">
               Unlock Premium Features And Offers
             </p>
-            <button className="bg-[#111113] w-full py-2.5 rounded-lg text-[#E78F23] font-semibold text-xs flex items-center justify-center gap-2 hover:bg-black transition-colors shadow-lg">
-              Upgrade Now
-              <Crown className="w-3.5 h-3.5" fill="currentColor" />
-            </button>
+            <Link
+              href="/buyer/subscription"
+              onClick={() => {
+                if (window.innerWidth < 1024) onClose();
+              }}
+            >
+              <button className="bg-[#111113] w-full py-2.5 rounded-lg text-[#E78F23] font-semibold text-xs flex items-center justify-center gap-2 hover:bg-black transition-colors shadow-lg cursor-pointer">
+                Upgrade Now
+                <Crown className="w-3.5 h-3.5" fill="currentColor" />
+              </button>
+            </Link>
           </div>
         )}
       </aside>

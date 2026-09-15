@@ -23,6 +23,7 @@ import { useGetCategoriesQuery } from "@/hooks/useCategories";
 import { Brand } from "@/lib/api/brands";
 import CreateBrandModal from "./CreateBrandModal";
 import EditBrandModal from "./EditBrandModal";
+import DeleteBrandModal from "./DeleteBrandModal";
 import { useDebounce } from "@/hooks/useDebounce";
 import { toast } from "sonner";
 import Image from "next/image";
@@ -87,6 +88,7 @@ export default function AdminBrandsPage() {
   const [categoryIdFilter, setCategoryIdFilter] = useState("ALL");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
+  const [brandToDelete, setBrandToDelete] = useState<Brand | null>(null);
 
   const debouncedSearch = useDebounce(searchQuery, 400);
 
@@ -119,10 +121,12 @@ export default function AdminBrandsPage() {
     totalPages: 1,
   };
 
-  const handleDelete = async (id: string, name: string) => {
+  const handleDeleteConfirm = async () => {
+    if (!brandToDelete) return;
     try {
-      await deleteBrandMutation.mutateAsync(id);
-      toast.success(`Brand "${name}" deleted successfully`);
+      await deleteBrandMutation.mutateAsync(brandToDelete.id);
+      toast.success(`Brand "${brandToDelete.name}" deleted successfully`);
+      setBrandToDelete(null);
     } catch (err: any) {
       toast.error(err?.response?.data?.message || "Failed to delete brand");
     }
@@ -405,9 +409,8 @@ export default function AdminBrandsPage() {
                             <Pencil className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => handleDelete(brand.id, brand.name)}
-                            disabled={deleteBrandMutation.isPending}
-                            className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg border border-red-500/20 transition-all cursor-pointer active:scale-95 disabled:opacity-50"
+                            onClick={() => setBrandToDelete(brand)}
+                            className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg border border-red-500/20 transition-all cursor-pointer active:scale-95"
                             title="Delete brand"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -490,6 +493,15 @@ export default function AdminBrandsPage() {
         isOpen={!!editingBrand}
         onClose={() => setEditingBrand(null)}
         brand={editingBrand}
+      />
+
+      {/* Delete Brand Modal */}
+      <DeleteBrandModal
+        isOpen={!!brandToDelete}
+        onClose={() => setBrandToDelete(null)}
+        onConfirm={handleDeleteConfirm}
+        brand={brandToDelete}
+        isDeleting={deleteBrandMutation.isPending}
       />
     </div>
   );

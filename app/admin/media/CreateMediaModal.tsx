@@ -321,7 +321,7 @@ export default function CreateMediaModal({ isOpen, onClose }: CreateMediaModalPr
             </div>
           </div>
 
-          {/* Primary Media File / URL Section */}
+          {/* primary Media File / URL Section */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">

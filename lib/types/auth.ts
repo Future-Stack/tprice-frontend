@@ -3,6 +3,8 @@ export interface RegisterPayload {
   password: string;
   firstName: string;
   lastName: string;
+  phone?: string;
+  role?: "BUYER" | "SELLER" | "DEALER" | string;
 }
 
 export interface RegisterUser {
@@ -64,4 +66,22 @@ export interface LogoutResponse {
   [key: string]: any;
 }
 
+export interface ForgotPasswordPayload {
+  email: string;
+}
+
+export interface ForgotPasswordResponse {
+  message?: string;
+  [key: string]: unknown;
+}
+
+export interface ResetPasswordPayload {
+  token: string;
+  newPassword: string;
+}
+
+export interface ResetPasswordResponse {
+  message?: string;
+  [key: string]: unknown;
+}
 

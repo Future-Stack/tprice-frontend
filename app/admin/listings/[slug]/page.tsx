@@ -25,6 +25,7 @@ import {
   Loader2,
   ShieldCheck,
   Layers,
+  Edit3,
 } from "lucide-react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
 import {
@@ -32,6 +33,7 @@ import {
   useUpdateAdminListingStatusMutation,
 } from "@/hooks/useListings";
 import RejectListingModal from "@/app/admin/listings/RejectListingModal";
+import UpdateListingModal from "@/app/admin/listings/UpdateListingModal";
 import { toast } from "sonner";
 
 const formatPrice = (priceStr?: string | number, currency = "USD") => {
@@ -224,6 +226,7 @@ export default function AdminListingDetails() {
 
   const updateStatusMutation = useUpdateAdminListingStatusMutation();
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   if (isLoading) {
@@ -407,13 +410,22 @@ export default function AdminListingDetails() {
         <AnimationWrapper type="fade-down" duration={0.5}>
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-2xl md:text-3xl font-semibold">Listing Review</h1>
-            <button
-              onClick={() => router.back()}
-              className="flex items-center gap-2 px-3 py-1.5 bg-[#141414] border border-[#262626] hover:bg-[#1a1a1a] text-gray-400 hover:text-white rounded-lg text-xs font-medium transition-colors"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              Back
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsEditModalOpen(true)}
+                className="flex items-center gap-2 px-3.5 py-1.5 bg-primary/10 border border-primary/30 hover:bg-primary text-primary hover:text-black rounded-lg text-xs font-semibold transition-all cursor-pointer"
+              >
+                <Edit3 className="w-3.5 h-3.5" />
+                <span>Edit Listing</span>
+              </button>
+              <button
+                onClick={() => router.back()}
+                className="flex items-center gap-2 px-3 py-1.5 bg-[#141414] border border-[#262626] hover:bg-[#1a1a1a] text-gray-400 hover:text-white rounded-lg text-xs font-medium transition-colors cursor-pointer"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                Back
+              </button>
+            </div>
           </div>
         </AnimationWrapper>
 
@@ -710,6 +722,13 @@ export default function AdminListingDetails() {
           </div>
         </div>
       </div>
+
+      {/* Edit Listing Modal */}
+      <UpdateListingModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        listing={listing}
+      />
 
       {/* Reject Listing Modal */}
       <RejectListingModal

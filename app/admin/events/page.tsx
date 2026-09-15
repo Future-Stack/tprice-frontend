@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Calendar,
   Plus,
@@ -13,12 +13,13 @@ import {
   ChevronRight,
   Filter,
   Clock,
+  Pencil,
 } from "lucide-react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
-import Image from "next/image";
 import { useGetEventsQuery, useDeleteEventMutation } from "@/hooks/useEvents";
 import { EventItem } from "@/lib/api/events";
 import CreateEventModal from "./CreateEventModal";
+import EditEventModal from "./EditEventModal";
 import { toast } from "sonner";
 
 const CATEGORIES = [
@@ -33,7 +34,7 @@ const CATEGORIES = [
 const STATUS_OPTIONS = [
   { label: "All Statuses", value: "ALL" },
   { label: "Upcoming", value: "UPCOMING" },
-  { label: "Active", value: "ACTIVE" },
+  { label: "Ongoing", value: "ONGOING" },
   { label: "Completed", value: "COMPLETED" },
   { label: "Cancelled", value: "CANCELLED" },
 ];
@@ -99,18 +100,27 @@ export default function AdminEventsPage() {
   const limit = 10;
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<EventItem | null>(null);
 
   const { data, isLoading, isFetching } = useGetEventsQuery({
     page,
     limit,
     category: activeCategory !== "ALL" ? activeCategory : undefined,
     status: activeStatus !== "ALL" ? activeStatus : undefined,
-    search: searchQuery.trim() || undefined,
   });
 
   const deleteEventMutation = useDeleteEventMutation();
 
-  const events: EventItem[] = data?.data || [];
+  const events = useMemo(() => {
+    const list = data?.data || [];
+    if (!searchQuery.trim()) return list;
+    const query = searchQuery.toLowerCase();
+    return list.filter(
+      (event) =>
+        (event.title || "").toLowerCase().includes(query) ||
+        (event.location || "").toLowerCase().includes(query),
+    );
+  }, [data?.data, searchQuery]);
   const meta = data?.meta;
 
   const handleCategoryChange = (catValue: string) => {
@@ -133,6 +143,7 @@ export default function AdminEventsPage() {
       try {
         await deleteEventMutation.mutateAsync(id);
         toast.success("Event deleted successfully");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         toast.error(err?.response?.data?.message || "Failed to delete event");
       }
@@ -173,11 +184,10 @@ export default function AdminEventsPage() {
               <button
                 key={cat.value}
                 onClick={() => handleCategoryChange(cat.value)}
-                className={`pb-4 text-sm font-medium transition-all relative whitespace-nowrap cursor-pointer ${
-                  activeCategory === cat.value
-                    ? "text-white font-semibold"
-                    : "text-gray-500 hover:text-gray-300"
-                }`}
+                className={`pb-4 text-sm font-medium transition-all relative whitespace-nowrap cursor-pointer ${activeCategory === cat.value
+                  ? "text-white font-semibold"
+                  : "text-gray-500 hover:text-gray-300"
+                  }`}
               >
                 {cat.label}
                 {activeCategory === cat.value && (
@@ -342,15 +352,14 @@ export default function AdminEventsPage() {
                       {/* Status Badge */}
                       <td className="px-6 py-5">
                         <span
-                          className={`inline-flex px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${
-                            event.status === "UPCOMING"
-                              ? "bg-green-500/10 text-green-400 border border-green-500/20"
-                              : event.status === "ACTIVE"
-                                ? "bg-yellow-500/10 text-primary border border-primary/20"
-                                : event.status === "CANCELLED"
-                                  ? "bg-red-500/10 text-red-400 border border-red-500/20"
-                                  : "bg-gray-500/10 text-gray-400 border border-gray-500/20"
-                          }`}
+                          className={`inline-flex px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${event.status === "UPCOMING"
+                            ? "bg-green-500/10 text-green-400 border border-green-500/20"
+                            : event.status === "ONGOING"
+                              ? "bg-yellow-500/10 text-primary border border-primary/20"
+                              : event.status === "CANCELLED"
+                                ? "bg-red-500/10 text-red-400 border border-red-500/20"
+                                : "bg-gray-500/10 text-gray-400 border border-gray-500/20"
+                            }`}
                         >
                           {event.status}
                         </span>
@@ -367,6 +376,13 @@ export default function AdminEventsPage() {
                       {/* Actions */}
                       <td className="px-6 py-5 text-right">
                         <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => setEditingEvent(event)}
+                            className="p-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg border border-blue-500/20 transition-all cursor-pointer active:scale-95"
+                            title="Edit event"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
                           <button
                             onClick={() => handleDelete(event.id, event.title)}
                             disabled={deleteEventMutation.isPending}
@@ -411,11 +427,10 @@ export default function AdminEventsPage() {
                         )}
                         <button
                           onClick={() => setPage(p)}
-                          className={`w-7 h-7 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${
-                            page === p
-                              ? "bg-primary text-black"
-                              : "bg-[#1C1C1E] text-gray-400 hover:text-white border border-[#262626]"
-                          }`}
+                          className={`w-7 h-7 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${page === p
+                            ? "bg-primary text-black"
+                            : "bg-[#1C1C1E] text-gray-400 hover:text-white border border-[#262626]"
+                            }`}
                         >
                           {p}
                         </button>
@@ -442,6 +457,13 @@ export default function AdminEventsPage() {
       <CreateEventModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
+      />
+
+      {/* Edit Event Modal */}
+      <EditEventModal
+        isOpen={Boolean(editingEvent)}
+        onClose={() => setEditingEvent(null)}
+        event={editingEvent}
       />
     </div>
   );

@@ -14,91 +14,90 @@ export default function AuthInitializer() {
     if (typeof window === "undefined") return;
 
     const urlParams = new URLSearchParams(window.location.search);
-    const accessToken =
+    const tokenFromParams =
       urlParams.get("accessToken") ||
       urlParams.get("token") ||
       urlParams.get("access_token") ||
-      urlParams.get("jwt") ||
+      urlParams.get("jwt");
+    const refreshFromParams =
+      urlParams.get("refreshToken") ||
+      urlParams.get("refresh_token");
+
+    const cookieToken =
       Cookies.get("accessToken") ||
       Cookies.get("access_token") ||
       Cookies.get("token");
-    const refreshToken =
-      urlParams.get("refreshToken") ||
-      urlParams.get("refresh_token") ||
+    const cookieRefreshToken =
       Cookies.get("refreshToken") ||
       Cookies.get("refresh_token");
 
-    if (accessToken) {
-      // 1. Decode JWT for instant fallback user profile
-      const decodedUser = decodeJwtUser(accessToken);
+    const storeToken = useAuthStore.getState().token;
+    const storeRefreshToken = useAuthStore.getState().refreshToken;
+
+    const effectiveAccessToken = tokenFromParams || cookieToken || storeToken;
+    const effectiveRefreshToken =
+      refreshFromParams || cookieRefreshToken || storeRefreshToken;
+
+    if (tokenFromParams) {
+      // 1. Clean URL search parameters without reloading page
+      urlParams.delete("accessToken");
+      urlParams.delete("token");
+      urlParams.delete("access_token");
+      urlParams.delete("jwt");
+      urlParams.delete("refreshToken");
+      urlParams.delete("refresh_token");
+
+      const newSearch = urlParams.toString();
+      const newUrl =
+        window.location.pathname +
+        (newSearch ? `?${newSearch}` : "") +
+        window.location.hash;
+      window.history.replaceState({}, document.title, newUrl);
+    }
+
+    if (effectiveAccessToken) {
+      // Decode JWT for instant fallback user profile
+      const decodedUser = decodeJwtUser(effectiveAccessToken);
       const currentUser = useAuthStore.getState().user || decodedUser;
 
       if (currentUser) {
         useAuthStore
           .getState()
-          .setAuth(currentUser, accessToken, refreshToken || undefined);
+          .setAuth(
+            currentUser,
+            effectiveAccessToken,
+            effectiveRefreshToken || undefined,
+          );
         queryClient.setQueryData(AUTH_QUERY_KEYS.user, currentUser);
       } else {
-        useAuthStore.getState().setToken(accessToken, refreshToken || undefined);
+        useAuthStore
+          .getState()
+          .setToken(
+            effectiveAccessToken,
+            effectiveRefreshToken || undefined,
+          );
       }
 
-      // 2. Clean URL search parameters without reloading page
-      if (
-        urlParams.has("accessToken") ||
-        urlParams.has("token") ||
-        urlParams.has("access_token") ||
-        urlParams.has("jwt") ||
-        urlParams.has("refreshToken") ||
-        urlParams.has("refresh_token")
-      ) {
-        urlParams.delete("accessToken");
-        urlParams.delete("token");
-        urlParams.delete("access_token");
-        urlParams.delete("jwt");
-        urlParams.delete("refreshToken");
-        urlParams.delete("refresh_token");
-
-        const newSearch = urlParams.toString();
-        const newUrl =
-          window.location.pathname +
-          (newSearch ? `?${newSearch}` : "") +
-          window.location.hash;
-        window.history.replaceState({}, document.title, newUrl);
-      }
-
-      // 3. Fetch full user info using getMeApi and update Zustand + Query Cache
+      // Fetch fresh user info
       getMeApi()
         .then((user) => {
           if (user && typeof user === "object" && Object.keys(user).length > 0) {
             useAuthStore
               .getState()
-              .setAuth(user, accessToken, refreshToken || undefined);
+              .setAuth(
+                user,
+                effectiveAccessToken,
+                effectiveRefreshToken || undefined,
+              );
             queryClient.setQueryData(AUTH_QUERY_KEYS.user, user);
             queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.user });
           }
         })
         .catch((err) => {
-          console.error("Error fetching profile after OAuth redirect:", err);
+          if (err?.response?.status === 401) {
+            useAuthStore.getState().logout();
+          }
         });
-    } else {
-      // HttpOnly cookies cannot be read via JavaScript (Cookies.get returns undefined).
-      // If store user is missing, attempt fetching /users/me using HttpOnly cookie via withCredentials.
-      if (
-        !useAuthStore.getState().user ||
-        !useAuthStore.getState().isAuthenticated
-      ) {
-        getMeApi()
-          .then((user) => {
-            if (user && typeof user === "object" && Object.keys(user).length > 0) {
-              useAuthStore.getState().setUser(user);
-              queryClient.setQueryData(AUTH_QUERY_KEYS.user, user);
-              queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.user });
-            }
-          })
-          .catch(() => {
-            // Unauthenticated, silently ignore
-          });
-      }
     }
   }, [queryClient]);
 

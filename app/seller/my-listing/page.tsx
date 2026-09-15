@@ -288,7 +288,7 @@ const SellerListing = () => {
                     listings.map((item) => {
                       const imageUrl =
                         item.media?.[0]?.url ||
-                        "https://images.unsplash.com/photo-1592198084033-aade902d1aae?auto=format&fit=crop&q=80&w=300&h=200";
+                        "https://community.softr.io/uploads/db9110/original/2X/7/74e6e7e382d0ff5d7773ca9a87e6f6f8817a68a6.jpeg";
 
                       return (
                         <tr
@@ -307,7 +307,7 @@ const SellerListing = () => {
                                 />
                               </div>
                               <div className="min-w-0">
-                                <p className="text-base font-bold text-white group-hover:text-[#E78F23] transition-colors duration-300 truncate">
+                                <p className="text-base font-bold text-white group-hover:text-primary transition-colors duration-300 truncate">
                                   {item.title}
                                 </p>
                                 <p className="text-[12px] text-gray-500 mt-1 font-medium">
@@ -348,7 +348,7 @@ const SellerListing = () => {
                             <div className="flex items-center justify-end gap-2">
                               <button
                                 onClick={() => setEditingListing(item)}
-                                className="px-3.5 py-2 bg-[#E78F23]/10 hover:bg-[#E78F23] text-[#E78F23] hover:text-black border border-[#E78F23]/30 font-bold text-xs rounded-xl transition-all duration-300 flex items-center gap-1.5 cursor-pointer shadow-sm hover:scale-105"
+                                className="px-3.5 py-2 bg-[#E78F23]/10 hover:bg-primary text-primary hover:text-black border border-primary/30 font-bold text-xs rounded-xl transition-all duration-300 flex items-center gap-1.5 cursor-pointer shadow-sm hover:scale-105"
                                 title="Edit listing"
                               >
                                 <Edit3 className="w-3.5 h-3.5" />

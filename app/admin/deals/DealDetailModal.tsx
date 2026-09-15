@@ -37,23 +37,22 @@ const formatDate = (dateString?: string) => {
 const DealDetailModal = ({ isOpen, onClose, deal }: DealDetailModalProps) => {
   if (!isOpen || !deal) return null;
 
-  const buyerName =
-    deal.buyer
-      ? `${deal.buyer.firstName || ""} ${deal.buyer.lastName || ""}`.trim() ||
-        deal.buyer.email ||
-        "Unknown Buyer"
-      : deal.buyer || "Unknown Buyer";
+  const buyerName = deal.buyer
+    ? `${deal.buyer.firstName || ""} ${deal.buyer.lastName || ""}`.trim() ||
+      deal.buyer.email ||
+      "Unknown Buyer"
+    : deal.buyer || "Unknown Buyer";
 
-  const dealerName =
-    deal.seller
-      ? `${deal.seller.firstName || ""} ${deal.seller.lastName || ""}`.trim() ||
-        deal.seller.email ||
-        "Unknown Dealer"
-      : deal.dealer || "Unknown Dealer";
+  const dealerName = deal.seller
+    ? `${deal.seller.firstName || ""} ${deal.seller.lastName || ""}`.trim() ||
+      deal.seller.email ||
+      "Unknown Dealer"
+    : deal.dealer || "Unknown Dealer";
 
-  const offerPrice = deal.agreedPrice !== undefined
-    ? formatPrice(deal.agreedPrice)
-    : deal.offer || "$0";
+  const offerPrice =
+    deal.agreedPrice !== undefined
+      ? formatPrice(deal.agreedPrice)
+      : deal.offer || "$0";
 
   const createdTime = formatDate(deal.createdAt);
   const updatedTime = formatDate(deal.updatedAt);
@@ -168,7 +167,9 @@ const DealDetailModal = ({ isOpen, onClose, deal }: DealDetailModalProps) => {
                           </p>
                           <p className="text-[10px] text-gray-500 uppercase tracking-widest">
                             {item.date}{" "}
-                            {item.time && <span className="ml-2">{item.time}</span>}
+                            {item.time && (
+                              <span className="ml-2">{item.time}</span>
+                            )}
                           </p>
                         </div>
                       </div>
@@ -179,7 +180,7 @@ const DealDetailModal = ({ isOpen, onClose, deal }: DealDetailModalProps) => {
             </div>
 
             {/* Admin Action */}
-            <div className="mt-10 pt-6 border-t border-[#262626]">
+            {/* <div className="mt-10 pt-6 border-t border-[#262626]">
               <p className="text-sm font-medium text-gray-400 mb-6">
                 Admin Action
               </p>
@@ -193,7 +194,7 @@ const DealDetailModal = ({ isOpen, onClose, deal }: DealDetailModalProps) => {
                   Add Note
                 </button>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </AnimationWrapper>

@@ -38,7 +38,7 @@ export default function SellerSettings() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [avatarPreview, setAvatarPreview] = useState(
-    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&h=256&auto=format&fit=crop",
+    "https://community.softr.io/uploads/db9110/original/2X/7/74e6e7e382d0ff5d7773ca9a87e6f6f8817a68a6.jpeg",
   );
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
@@ -170,14 +170,14 @@ export default function SellerSettings() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`shrink-0 lg:w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group cursor-pointer ${
                   activeTab === tab.id
-                    ? "bg-[#1C1C1E] border border-[#2C2C2E] text-primary2 shadow-lg"
+                    ? "bg-[#1C1C1E] border border-[#2C2C2E] text-primary shadow-lg"
                     : "text-gray-400 hover:text-gray-200 hover:bg-[#1C1C1E]/50 border border-transparent"
                 }`}
               >
                 <tab.icon
                   className={`w-5 h-5 ${
                     activeTab === tab.id
-                      ? "text-primary2"
+                      ? "text-primary"
                       : "text-gray-500 group-hover:text-gray-400"
                   }`}
                 />
@@ -185,7 +185,7 @@ export default function SellerSettings() {
                   {tab.label}
                 </span>
                 {activeTab === tab.id && (
-                  <div className="hidden lg:block ml-auto w-1 h-4 bg-primary2 rounded-full scale-y-125" />
+                  <div className="hidden lg:block ml-auto w-1 h-4 bg-primary rounded-full scale-y-125" />
                 )}
               </button>
             ))}
@@ -201,7 +201,7 @@ export default function SellerSettings() {
         >
           <div className="bg-[#1C1C1E] rounded-3xl border border-[#2C2C2E] overflow-hidden shadow-2xl relative">
             {/* Glow Effect */}
-            <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-primary2/5 blur-[100px] pointer-events-none rounded-full" />
+            <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-primary/5 blur-[100px] pointer-events-none rounded-full" />
 
             <div className="p-6 md:p-10">
               {activeTab === "profile" && (
@@ -225,7 +225,7 @@ export default function SellerSettings() {
                               className="w-full h-full object-cover rounded-full"
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-[#2C2C2E] text-primary2 font-bold text-2xl">
+                            <div className="w-full h-full flex items-center justify-center bg-[#2C2C2E] text-primary font-bold text-2xl">
                               {(firstName.charAt(0) || "S").toUpperCase()}
                             </div>
                           )}
@@ -233,7 +233,7 @@ export default function SellerSettings() {
                         <button
                           type="button"
                           onClick={triggerFileInput}
-                          className="absolute bottom-1 right-1 p-2 bg-primary2 text-[#111113] rounded-full shadow-lg hover:scale-110 transition-transform sm:hidden cursor-pointer"
+                          className="absolute bottom-1 right-1 p-2 bg-primary text-[#111113] rounded-full shadow-lg hover:scale-110 transition-transform sm:hidden cursor-pointer"
                         >
                           <Camera className="w-4 h-4" />
                         </button>
@@ -250,7 +250,7 @@ export default function SellerSettings() {
                         <button
                           type="button"
                           onClick={triggerFileInput}
-                          className="px-5 py-2.5 border border-primary2/40 text-primary2 rounded-xl text-sm font-semibold hover:bg-primary2/10 transition-all active:scale-95 cursor-pointer"
+                          className="px-5 py-2.5 border border-primary/40 text-primary rounded-xl text-sm font-semibold hover:bg-primary/10 transition-all active:scale-95 cursor-pointer"
                         >
                           Change Avatar
                         </button>
@@ -273,7 +273,7 @@ export default function SellerSettings() {
                           value={firstName}
                           onChange={(e) => setFirstName(e.target.value)}
                           placeholder="First Name"
-                          className="w-full bg-[#111113] border border-[#2C2C2E] rounded-2xl px-5 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] focus:ring-1 focus:ring-primary2/20"
+                          className="w-full bg-[#111113] border border-[#2C2C2E] rounded-2xl px-5 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] focus:ring-1 focus:ring-primary/20"
                         />
                       </div>
 
@@ -288,7 +288,7 @@ export default function SellerSettings() {
                           value={lastName}
                           onChange={(e) => setLastName(e.target.value)}
                           placeholder="Last Name"
-                          className="w-full bg-[#111113] border border-[#2C2C2E] rounded-2xl px-5 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] focus:ring-1 focus:ring-primary2/20"
+                          className="w-full bg-[#111113] border border-[#2C2C2E] rounded-2xl px-5 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] focus:ring-1 focus:ring-primary/20"
                         />
                       </div>
 
@@ -320,9 +320,9 @@ export default function SellerSettings() {
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
                             placeholder="+1 (555) 000-1234"
-                            className="w-full bg-[#111113] border border-[#2C2C2E] rounded-2xl px-5 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] focus:ring-1 focus:ring-primary2/20 pl-14"
+                            className="w-full bg-[#111113] border border-[#2C2C2E] rounded-2xl px-5 py-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] focus:ring-1 focus:ring-primary/20 pl-14"
                           />
-                          <Phone className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-primary2 transition-colors" />
+                          <Phone className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-primary transition-colors" />
                         </div>
                       </div>
                     </div>
@@ -332,7 +332,7 @@ export default function SellerSettings() {
                       <button
                         type="submit"
                         disabled={isSavingProfile || isUserLoading}
-                        className="flex items-center gap-2 px-12 py-4 bg-primary2 text-[#111113] rounded-2xl font-bold hover:bg-[#E78F23] transition-all duration-300 shadow-xl shadow-primary2/10 hover:shadow-primary2/20 hover:scale-[1.03] active:scale-95 group relative overflow-hidden disabled:opacity-50 cursor-pointer"
+                        className="flex items-center gap-2 px-12 py-4 bg-primary text-[#111113] rounded-2xl font-bold hover:bg-[#E78F23] transition-all duration-300 shadow-xl shadow-primary/10 hover:shadow-primary/20 hover:scale-[1.03] active:scale-95 group relative overflow-hidden disabled:opacity-50 cursor-pointer"
                       >
                         {isSavingProfile && (
                           <Loader2 className="w-5 h-5 animate-spin text-[#111113]" />
@@ -370,7 +370,7 @@ export default function SellerSettings() {
                             value={currentPassword}
                             onChange={(e) => setCurrentPassword(e.target.value)}
                             placeholder="••••••••"
-                            className="w-full bg-[#111113] border border-[#2C2C2E] rounded-2xl px-5 py-4 pr-12 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] focus:ring-1 focus:ring-primary2/20"
+                            className="w-full bg-[#111113] border border-[#2C2C2E] rounded-2xl px-5 py-4 pr-12 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] focus:ring-1 focus:ring-primary/20"
                           />
                           <button
                             type="button"
@@ -398,7 +398,7 @@ export default function SellerSettings() {
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
                             placeholder="••••••••"
-                            className="w-full bg-[#111113] border border-[#2C2C2E] rounded-2xl px-5 py-4 pr-12 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] focus:ring-1 focus:ring-primary2/20"
+                            className="w-full bg-[#111113] border border-[#2C2C2E] rounded-2xl px-5 py-4 pr-12 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] focus:ring-1 focus:ring-primary/20"
                           />
                           <button
                             type="button"
@@ -426,7 +426,7 @@ export default function SellerSettings() {
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             placeholder="••••••••"
-                            className="w-full bg-[#111113] border border-[#2C2C2E] rounded-2xl px-5 py-4 pr-12 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary2/50 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] focus:ring-1 focus:ring-primary2/20"
+                            className="w-full bg-[#111113] border border-[#2C2C2E] rounded-2xl px-5 py-4 pr-12 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] focus:ring-1 focus:ring-primary/20"
                           />
                           <button
                             type="button"
@@ -447,7 +447,7 @@ export default function SellerSettings() {
                       <button
                         type="submit"
                         disabled={isSavingPassword}
-                        className="flex items-center gap-2 px-10 py-4 bg-primary2 text-[#111113] rounded-2xl font-bold hover:bg-[#E78F23] transition-all duration-300 shadow-xl shadow-primary2/10 hover:shadow-primary2/20 hover:scale-[1.03] active:scale-95 group relative overflow-hidden disabled:opacity-50 cursor-pointer"
+                        className="flex items-center gap-2 px-10 py-4 bg-primary text-[#111113] rounded-2xl font-bold hover:bg-[#E78F23] transition-all duration-300 shadow-xl shadow-primary/1  hover:scale-[1.03] active:scale-95 group relative overflow-hidden disabled:opacity-50 cursor-pointer"
                       >
                         {isSavingPassword && (
                           <Loader2 className="w-5 h-5 animate-spin text-[#111113]" />

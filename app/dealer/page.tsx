@@ -46,7 +46,7 @@ export default function Home() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Active Bids */}
         <AnimationWrapper type="fade-right" duration={0.6} delay={0.1}>
-          <div className="bg-foreground p-7 rounded-2xl border border-primary2/30 shadow-xl hover:border-[#E78F23]/20 transition-colors"
+          <div className="bg-foreground p-7 rounded-2xl border border-primary/30 shadow-xl hover:border-[#E78F23]/20 transition-colors"
             style={{
               boxShadow: "0 66px 19px 0 rgba(178, 114, 31, 0.00), 0 42px 17px 0 rgba(178, 114, 31, 0.01), 0 24px 14px 0 rgba(178, 114, 31, 0.05), 0 11px 11px 0 rgba(178, 114, 31, 0.09), 0 3px 6px 0 rgba(178, 114, 31, 0.10)"
             }}
@@ -84,7 +84,7 @@ export default function Home() {
 
         {/* Recent Activity */}
         <AnimationWrapper type="fade-left" duration={0.6} delay={0.15}>
-          <div className="bg-foreground p-7 rounded-2xl border border-primary2/30 shadow-xl hover:border-[#E78F23]/20 transition-colors"
+          <div className="bg-foreground p-7 rounded-2xl border border-primary/30 shadow-xl hover:border-[#E78F23]/20 transition-colors"
             style={{
               boxShadow: "0 66px 19px 0 rgba(178, 114, 31, 0.00), 0 42px 17px 0 rgba(178, 114, 31, 0.01), 0 24px 14px 0 rgba(178, 114, 31, 0.05), 0 11px 11px 0 rgba(178, 114, 31, 0.09), 0 3px 6px 0 rgba(178, 114, 31, 0.10)"
             }}
@@ -189,7 +189,7 @@ function StatCard({ icon, count, label }: { icon: React.ReactNode, count: string
 
 function ListingCard({ image, title, location, price, active = false }: { image: string, title: string, location: string, price: string, active?: boolean }) {
   return (
-    <div className="bg-foreground  rounded-[8px] border border-primary2/30 overflow-hidden group hover:border-[#E78F23]/20 transition-all shadow-xl hover:shadow-[#E78F23]/5"
+    <div className="bg-foreground  rounded-[8px] border border-primary/30 overflow-hidden group hover:border-[#E78F23]/20 transition-all shadow-xl hover:shadow-[#E78F23]/5"
 
     >
       <div className="relative h-54.25 overflow-hidden bg-black  ">

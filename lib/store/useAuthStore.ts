@@ -117,6 +117,11 @@ export const useAuthStore = create<AuthState>()(
           refreshToken: null,
           isAuthenticated: false,
         });
+        if (typeof window !== "undefined") {
+          try {
+            localStorage.removeItem("auth-storage");
+          } catch {}
+        }
       },
     }),
     {

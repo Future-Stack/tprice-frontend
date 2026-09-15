@@ -80,7 +80,19 @@ export default function LoginPage() {
       }
 
       toast.success("Welcome back! Login successful.");
-      router.push("/");
+
+      // Check for redirect param or admin dashboard path
+      const searchParams = new URLSearchParams(window.location.search);
+      const fromPath = searchParams.get("from");
+      const isValidLocalPath = fromPath && fromPath.startsWith("/") && !fromPath.startsWith("//");
+
+      if (isValidLocalPath) {
+        router.push(fromPath);
+      } else if (res?.user?.role?.toUpperCase() === "ADMIN") {
+        router.push("/admin");
+      } else {
+        router.push("/");
+      }
     } catch (error: any) {
       console.error("Login failed:", error);
 
@@ -143,9 +155,9 @@ export default function LoginPage() {
             <h4 className="text-[#D4AF37] text-xs font-bold uppercase tracking-[0.2em] mb-4">
               Log In
             </h4>
-            <h2 className="text-4xl font-serif text-white mb-2">Welcome back</h2>
+            <Link href="/"><h2 className="text-4xl font-serif text-white mb-2">Welcome back</h2></Link>
             <p className="text-white/40 text-sm">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link href="/register" className="text-[#D4AF37] hover:underline">
                 create one
               </Link>
@@ -227,7 +239,7 @@ export default function LoginPage() {
                 </span>
               </label>
               <Link
-                href="#"
+                href="/forgot-password"
                 className="text-xs text-white/40 hover:text-[#D4AF37] transition-colors"
               >
                 Forgot Password?

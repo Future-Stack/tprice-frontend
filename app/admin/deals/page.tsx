@@ -37,7 +37,10 @@ const formatTimeAgo = (dateString?: string) => {
     const diffDays = Math.floor(diffHours / 24);
 
     if (diffDays > 30) {
-      return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
     }
     if (diffDays > 0) {
       return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
@@ -137,7 +140,7 @@ export default function AdminDeals() {
     switch (activeTab) {
       case "Negotiation":
         return deals.filter(
-          (d) => (d.stage || "").toUpperCase() === "NEGOTIATION"
+          (d) => (d.stage || "").toUpperCase() === "NEGOTIATION",
         );
       case "Closed":
         return deals.filter((d) => {
@@ -146,7 +149,7 @@ export default function AdminDeals() {
         });
       case "Flagged":
         return deals.filter(
-          (d) => d.isFlagged || (d.stage || "").toUpperCase() === "FLAGGED"
+          (d) => d.isFlagged || (d.stage || "").toUpperCase() === "FLAGGED",
         );
       case "Active Deals":
       default:
@@ -179,7 +182,9 @@ export default function AdminDeals() {
       <div className="mb-8">
         <AnimationWrapper type="fade-down" duration={0.5}>
           <h1 className="text-3xl font-bold mb-2">Deals</h1>
-          <p className="text-gray-400 text-sm">Monitor all deals from one place</p>
+          <p className="text-gray-400 text-sm">
+            Monitor all deals from one place
+          </p>
         </AnimationWrapper>
       </div>
 
@@ -199,7 +204,7 @@ export default function AdminDeals() {
               >
                 {tab}
                 {activeTab === tab && (
-                  <div className="absolute bottom-0 left-0 w-full h-[2px] bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.5)]" />
+                  <div className="absolute bottom-0 left-0 w-full h-0.5 bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.5)]" />
                 )}
               </button>
             ))}
@@ -221,7 +226,7 @@ export default function AdminDeals() {
       <AnimationWrapper type="fade-up" duration={0.6} delay={0.3}>
         <div className="bg-[#111111] border border-[#262626] rounded-2xl overflow-hidden shadow-xl">
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse min-w-[1000px]">
+            <table className="w-full text-left border-collapse min-w-250">
               <thead>
                 <tr className="border-b border-[#1A1A1A]">
                   <th className="px-6 py-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
@@ -255,13 +260,19 @@ export default function AdminDeals() {
                   <TableSkeleton />
                 ) : isError ? (
                   <tr>
-                    <td colSpan={8} className="px-6 py-12 text-center text-red-400">
+                    <td
+                      colSpan={8}
+                      className="px-6 py-12 text-center text-red-400"
+                    >
                       Failed to load deals. {(error as Error)?.message}
                     </td>
                   </tr>
                 ) : filteredDeals.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-6 py-12 text-center text-gray-500 text-sm">
+                    <td
+                      colSpan={8}
+                      className="px-6 py-12 text-center text-gray-500 text-sm"
+                    >
                       No deals found for this view.
                     </td>
                   </tr>
@@ -347,7 +358,7 @@ export default function AdminDeals() {
                             onClick={() => handleViewDeal(deal)}
                             className="px-4 py-2 border border-yellow-500/50 rounded-lg text-xs font-medium text-white hover:bg-yellow-500 hover:text-black transition-all active:scale-95 whitespace-nowrap cursor-pointer"
                           >
-                            view Deal
+                            View Deal
                           </button>
                         </td>
                       </tr>
@@ -370,7 +381,8 @@ export default function AdminDeals() {
                 <span className="font-semibold text-white">
                   {Math.min(meta.page * meta.limit, meta.total)}
                 </span>{" "}
-                of <span className="font-semibold text-white">{meta.total}</span>{" "}
+                of{" "}
+                <span className="font-semibold text-white">{meta.total}</span>{" "}
                 deals
               </div>
 
@@ -398,7 +410,7 @@ export default function AdminDeals() {
                     >
                       {pageNum}
                     </button>
-                  )
+                  ),
                 )}
 
                 <button

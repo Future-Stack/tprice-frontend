@@ -52,3 +52,21 @@ export const createCheckoutSessionApi = async (
   }
   return resData;
 };
+
+/**
+ * Returns a valid FQDN URL for payment success/cancel callbacks to satisfy backend @IsUrl() validators.
+ * When running in local development (e.g. localhost), falls back to a valid FQDN domain.
+ */
+export const getPaymentReturnUrl = (path: string): string => {
+  if (typeof window !== "undefined" && window.location.origin) {
+    const origin = window.location.origin;
+    const isLocal =
+      origin.includes("localhost") ||
+      origin.includes("127.0.0.1") ||
+      !origin.includes(".");
+    if (!isLocal && origin.startsWith("http")) {
+      return `${origin}${path}`;
+    }
+  }
+  return `https://exoticworldinc.com${path}`;
+};
