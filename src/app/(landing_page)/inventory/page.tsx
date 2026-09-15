@@ -26,12 +26,12 @@ function MarketplaceContent() {
   const [brands, setBrands] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("NEWEST");
 
-  // Sync category state when URL search parameter changes
-  useEffect(() => {
-    if (categoryParam) {
-      setCategory(categoryParam);
-    }
-  }, [categoryParam]);
+  // Sync category state when URL search parameter changes without cascading renders
+  const [prevCategoryParam, setPrevCategoryParam] = useState(categoryParam);
+  if (categoryParam !== prevCategoryParam) {
+    setPrevCategoryParam(categoryParam);
+    setCategory(categoryParam || "ALL");
+  }
 
   // Filter sliders state
   const [priceRange, setPriceRange] = useState({ min: 0, max: 20000000 });

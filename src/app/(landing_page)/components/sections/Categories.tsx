@@ -134,6 +134,7 @@ export default function Categories() {
             : categoriesToShow.map((cat, i) => {
                 const IconComponent = getCategoryIcon(cat.iconName, cat.name);
                 const count = cat._count?.listings ?? 0;
+                const countLabel = `${count}+ Listing${count === 1 ? "" : "s"}`;
                 const imageSrc = cat.imageUrl || DEFAULT_IMAGES[i % DEFAULT_IMAGES.length];
 
                 return (
