@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import {
   MapPin,
@@ -13,8 +13,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Gavel,
-  DollarSign,
 } from "lucide-react";
+import Image from "next/image";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
 import { useOffersQuery } from "@/hooks/useOffers";
 import { OfferItem } from "@/lib/api/offers";
@@ -26,7 +26,8 @@ const formatPrice = (priceStr?: string | number | null, currency = "USD") => {
   const num = typeof priceStr === "number" ? priceStr : parseFloat(priceStr);
   if (isNaN(num)) return `${priceStr}`;
 
-  return `$${num.toLocaleString()}`;
+  const symbol = currency === "EUR" ? "€" : currency === "GBP" ? "£" : "$";
+  return `${symbol}${num.toLocaleString()}`;
 };
 
 const formatDate = (dateString?: string) => {
@@ -102,18 +103,7 @@ export default function MyBidsPage() {
   const [selectedBidId, setSelectedBidId] = useState<string | null>(null);
   const [inclFees, setInclFees] = useState(true);
 
-  // Auto-select first bid when data loads or page changes
-  useEffect(() => {
-    if (bids.length > 0) {
-      if (!selectedBidId || !bids.some((b) => b.id === selectedBidId)) {
-        setSelectedBidId(bids[0].id);
-      }
-    } else {
-      setSelectedBidId(null);
-    }
-  }, [bids, selectedBidId]);
-
-  const selectedBid = bids.find((bid) => bid.id === selectedBidId) || bids[0];
+  const selectedBid = (selectedBidId && bids.find((bid) => bid.id === selectedBidId)) || bids[0] || null;
 
   // Price calculations for selected bid
   const currentBidVal = selectedBid
@@ -165,7 +155,7 @@ export default function MyBidsPage() {
           <AlertTriangle className="w-10 h-10 text-red-400 mx-auto mb-3" />
           <h3 className="text-lg font-semibold text-white mb-1">Failed to load bids</h3>
           <p className="text-sm text-gray-400 mb-4 max-w-md mx-auto">
-            {(error as any)?.response?.data?.message ||
+            {(error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
               error?.message ||
               "An unexpected error occurred while fetching your offers."}
           </p>
@@ -230,9 +220,12 @@ export default function MyBidsPage() {
                         {/* Item */}
                         <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                           <div className="w-10 h-8 sm:w-12 sm:h-10 rounded-lg overflow-hidden bg-black shrink-0 border border-white/5">
-                            <img
+                            <Image
                               src={imageUrl}
                               alt={itemTitle}
+                              width={48}
+                              height={40}
+                              unoptimized
                               className="w-full h-full object-cover"
                               onError={(e) => {
                                 (e.target as HTMLImageElement).src =
@@ -507,7 +500,7 @@ export default function MyBidsPage() {
             </div>
             <h3 className="text-xl font-clash font-medium text-white mb-2">No Bids Placed Yet</h3>
             <p className="text-sm text-gray-400 mb-6 max-w-md mx-auto">
-              You haven't submitted any offers or bids on listings yet. Explore the marketplace to
+              You haven&apos;t submitted any offers or bids on listings yet. Explore the marketplace to
               place your first bid.
             </p>
             <Link

@@ -1,15 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
 import {
   Crown,
   User,
-  Bell,
   Shield,
-  CreditCard,
-  Check,
-  Plus,
   Loader2,
   Eye,
   EyeOff,
@@ -38,28 +34,14 @@ export default function BuyerSettings() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const [notifications, setNotifications] = useState({
-    bids: true,
-    offers: true,
-    newListings: true,
-    priceDrops: false,
-  });
-
-  useEffect(() => {
-    if (user) {
-      const fullName = user.name || [user.firstName, user.lastName].filter(Boolean).join(" ") || "";
-      setName(fullName);
-      setEmail(user.email || "");
-      setPhone(user.phone || "");
-    }
-  }, [user]);
-
-  const toggleNotification = (key: keyof typeof notifications) => {
-    setNotifications((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
-  };
+  const [prevUser, setPrevUser] = useState(user);
+  if (user && user !== prevUser) {
+    setPrevUser(user);
+    const fullName = user.name || [user.firstName, user.lastName].filter(Boolean).join(" ") || "";
+    setName(fullName);
+    setEmail(user.email || "");
+    setPhone(user.phone || "");
+  }
 
   const handleProfileSubmit = (e: React.FormEvent) => {
     e.preventDefault();

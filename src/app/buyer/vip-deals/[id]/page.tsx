@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { useParams, usePathname } from "next/navigation";
 import Link from "next/link";
-import Cookies from "js-cookie";
 import { toast } from "sonner";
 import {
   MapPin,
@@ -234,7 +233,7 @@ export default function VIPDetailsPage() {
     }
     if (existingOffer) {
       setOfferAmount(String(existingOffer.currentAmount || existingOffer.initialAmount || ""));
-      setOfferNote((existingOffer as any).note || "");
+      setOfferNote(existingOffer.note || "");
     } else {
       const numericPrice = product?.askingPrice ? Number(product.askingPrice) : 0;
       setOfferAmount(numericPrice > 0 ? String(numericPrice) : "");
@@ -270,7 +269,7 @@ export default function VIPDetailsPage() {
   };
 
   if (isLoading) {
-    return <VIPDetailsSkeleton backLink={backLink} />;
+    return <VIPDetailsSkeleton />;
   }
 
   if (isError || !product) {
@@ -286,7 +285,7 @@ export default function VIPDetailsPage() {
                 VIP Listing Not Found
               </h3>
               <p className="text-gray-400 text-sm mt-2">
-                {(error as any)?.response?.data?.message ||
+                {(error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
                   error?.message ||
                   "The VIP listing you are looking for is currently unavailable or does not exist."}
               </p>
@@ -350,7 +349,8 @@ export default function VIPDetailsPage() {
   const highestBidVal = (() => {
     if (product?.highestBid === null || product?.highestBid === undefined) return null;
     if (typeof product.highestBid === "object") {
-      const num = Number((product.highestBid as any).amount ?? (product.highestBid as any).price);
+      const hb = product.highestBid as { amount?: number | string; price?: number | string };
+      const num = Number(hb.amount ?? hb.price);
       return !isNaN(num) && num > 0 ? num : null;
     }
     const num = Number(product.highestBid);
@@ -378,7 +378,7 @@ export default function VIPDetailsPage() {
   const locationText = locationParts.length > 0 ? locationParts.join(", ") : "Worldwide VIP";
 
   const specItems = getSpecItems(product);
-  const badgeLabel = (product as any).badgeText || product.saleType || "VIP ASSET";
+  const badgeLabel = (product as typeof product & { badgeText?: string }).badgeText || product.saleType || "VIP ASSET";
 
   // Seller details
   const sellerName = product.owner
@@ -1004,7 +1004,7 @@ function SpecItem({ label, value }: { label: string; value: string }) {
   );
 }
 
-function VIPDetailsSkeleton({ backLink }: { backLink: string }) {
+function VIPDetailsSkeleton() {
   return (
     <div className="mx-auto relative z-0 animate-pulse">
       {/* Page Header Skeleton */}

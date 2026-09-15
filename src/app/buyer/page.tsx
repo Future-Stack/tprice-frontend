@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 
 import AnimationWrapper from "../components/AnimationWrapper";
+import Image from "next/image";
 import { useBuyerDashboardQuery } from "@/hooks/useBuyerDashboard";
 import { BuyerActiveBid, BuyerRecentActivity, BuyerSavedItem } from "@/lib/api/buyerDashboard";
 
@@ -98,7 +99,7 @@ export default function Home() {
             Failed to load Buyer Dashboard
           </h3>
           <p className="text-sm text-gray-400">
-            {(error as any)?.response?.data?.message ||
+            {(error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
               error?.message ||
               "An unexpected error occurred while connecting to the server."}
           </p>
@@ -433,9 +434,12 @@ function ListingCard({
     <div className="bg-foreground rounded-[8px] border border-primary/30 overflow-hidden group hover:border-[#E78F23]/40 transition-all shadow-xl hover:shadow-[#E78F23]/10 flex flex-col justify-between h-full">
       <div>
         <div className="relative h-[200px] overflow-hidden bg-black">
-          <img
+          <Image
             src={image}
             alt={title}
+            width={400}
+            height={200}
+            unoptimized
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out opacity-90 group-hover:opacity-100"
           />
           {status && (

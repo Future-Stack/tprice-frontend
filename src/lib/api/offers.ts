@@ -38,6 +38,7 @@ export interface OfferItem {
   roundsCount: number;
   createdAt: string;
   updatedAt: string;
+  note?: string | null;
   listing?: OfferListing | null;
   buyer?: OfferUser | null;
   seller?: OfferUser | null;

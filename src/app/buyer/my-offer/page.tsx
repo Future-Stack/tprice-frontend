@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import AnimationWrapper from "@/app/components/AnimationWrapper";
 import {
   Eye,
@@ -21,7 +21,6 @@ import Link from "next/link";
 import { toast } from "sonner";
 import {
   useOffersQuery,
-  useCreateOfferMutation,
   useAcceptOfferMutation,
   useWithdrawOfferMutation,
   useCounterOfferMutation,
@@ -67,13 +66,23 @@ const CounterOfferModal = ({ isOpen, onClose, offer }: CounterOfferModalProps) =
   const counterOfferMutation = useCounterOfferMutation();
 
   // Reset on open
-  useEffect(() => {
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
     if (isOpen) {
       setCounterAmount("");
       setNote("");
       setIsClosing(false);
     }
-  }, [isOpen]);
+  }
+
+  const handleClose = useCallback(() => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+      setIsClosing(false);
+    }, 250);
+  }, [onClose]);
 
   // Close on Escape key
   useEffect(() => {
@@ -82,16 +91,7 @@ const CounterOfferModal = ({ isOpen, onClose, offer }: CounterOfferModalProps) =
     };
     if (isOpen) window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
-
-  const handleClose = () => {
-    setIsClosing(true);
-    setTimeout(() => {
-      onClose();
-      setIsClosing(false);
-    }, 250);
-  };
+  }, [isOpen, handleClose]);
 
   const handleSendCounter = async () => {
     if (!offer) return;
@@ -110,7 +110,7 @@ const CounterOfferModal = ({ isOpen, onClose, offer }: CounterOfferModalProps) =
         },
       });
       handleClose();
-    } catch (err) {
+    } catch {
       // Error handled by mutation toast
     }
   };
@@ -451,7 +451,7 @@ function BuyerOffer() {
                 <AlertCircle className="w-12 h-12 text-red-500 mx-auto" />
                 <h3 className="text-xl font-bold text-white">Failed to load offers</h3>
                 <p className="text-sm text-gray-400 max-w-md mx-auto">
-                  {(error as any)?.message ||
+                  {(error as { message?: string })?.message ||
                     "An unexpected error occurred while fetching your offers."}
                 </p>
                 <button
@@ -469,7 +469,7 @@ function BuyerOffer() {
                 <Inbox className="w-12 h-12 text-gray-500 mx-auto opacity-60" />
                 <h3 className="text-xl font-bold text-white">No offers found</h3>
                 <p className="text-sm text-gray-400 max-w-md mx-auto">
-                  You haven't submitted any offers yet. Explore active listings to place your first
+                  You haven&apos;t submitted any offers yet. Explore active listings to place your first
                   offer.
                 </p>
                 <Link
@@ -682,7 +682,7 @@ function BuyerOffer() {
                                     </span>
                                     {item.note && (
                                       <span className="text-gray-400 text-xs italic ml-2">
-                                        "{item.note}"
+                                        &ldquo;{item.note}&rdquo;
                                       </span>
                                     )}
                                   </div>

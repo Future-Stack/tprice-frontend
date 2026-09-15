@@ -27,7 +27,6 @@ import AnimationWrapper from "@/app/components/AnimationWrapper";
 import {
   useOfferDetailQuery,
   useAcceptOfferMutation,
-  useCreateOfferMutation,
   useWithdrawOfferMutation,
   useCounterOfferMutation,
 } from "@/hooks/useOffers";
@@ -81,13 +80,15 @@ const CounterOfferModal = ({ isOpen, onClose, offer }: CounterOfferModalProps) =
   const modalRef = useRef<HTMLDivElement>(null);
   const counterOfferMutation = useCounterOfferMutation();
 
-  useEffect(() => {
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
     if (isOpen) {
       setCounterAmount("");
       setNote("");
       setIsClosing(false);
     }
-  }, [isOpen]);
+  }
 
   const handleClose = () => {
     setIsClosing(true);
@@ -265,9 +266,7 @@ const OfferDetails = () => {
   const { data: dealMessages = [] } = useDealMessagesQuery(targetDealId);
 
   const acceptOfferMutation = useAcceptOfferMutation();
-  const createOfferMutation = useCreateOfferMutation();
   const withdrawOfferMutation = useWithdrawOfferMutation();
-  const counterOfferMutation = useCounterOfferMutation();
   const sendDealMessageMutation = useSendDealMessageMutation();
   const updateDealStageMutation = useUpdateDealStageMutation();
 
@@ -325,7 +324,7 @@ const OfferDetails = () => {
         <AlertCircle className="w-12 h-12 text-red-500" />
         <h2 className="text-2xl font-bold font-clash">Failed to load offer details</h2>
         <p className="text-gray-400 text-sm max-w-md text-center">
-          {(error as any)?.message || "The requested offer detail could not be loaded."}
+          {(error as { message?: string })?.message || "The requested offer detail could not be loaded."}
         </p>
         <button
           onClick={() => refetch()}
@@ -385,9 +384,9 @@ const OfferDetails = () => {
   });
 
   const embeddedDealMessages: DealMessage[] = [
-    ...((matchedDeal as any)?.messages || []),
-    ...((offer?.deal as any)?.messages || []),
-    ...((dealDetail as any)?.messages || []),
+    ...(matchedDeal?.messages || []),
+    ...((offer?.deal as { messages?: DealMessage[] } | undefined)?.messages || []),
+    ...(dealDetail?.messages || []),
   ];
 
   const rawDealMessagesList = [...embeddedDealMessages, ...(dealMessages || [])];

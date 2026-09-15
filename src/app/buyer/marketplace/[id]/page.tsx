@@ -23,7 +23,7 @@ import {
   Gavel,
 } from "lucide-react";
 import Link from "next/link";
-import Cookies from "js-cookie";
+import Image from "next/image";
 import { toast } from "sonner";
 
 import AnimationWrapper from "@/app/components/AnimationWrapper";
@@ -45,7 +45,7 @@ function formatSpecKey(key: string): string {
   return formatted.charAt(0).toUpperCase() + formatted.slice(1);
 }
 
-function formatSpecValue(key: string, val: any): string {
+function formatSpecValue(key: string, val: unknown): string {
   if (val === null || val === undefined || val === "") return "N/A";
   if (typeof val === "boolean") return val ? "Yes" : "No";
 
@@ -258,7 +258,8 @@ export default function BuyerListingDetailPage() {
   const highestBidVal = (() => {
     if (product?.highestBid === null || product?.highestBid === undefined) return null;
     if (typeof product.highestBid === "object") {
-      const num = Number((product.highestBid as any).amount ?? (product.highestBid as any).price);
+      const hb = product.highestBid as { amount?: number | string; price?: number | string };
+      const num = Number(hb.amount ?? hb.price);
       return !isNaN(num) && num > 0 ? num : null;
     }
     const num = Number(product.highestBid);
@@ -321,9 +322,10 @@ export default function BuyerListingDetailPage() {
   }
 
   // Overview / Description text
+  const prodExtra = product as (typeof product & { description?: string; overview?: string }) | undefined;
   const overviewText =
-    (product as any)?.description ||
-    (product as any)?.overview ||
+    prodExtra?.description ||
+    prodExtra?.overview ||
     (product
       ? `This immaculate ${product.buildYear || ""} ${product.title} represents the pinnacle of luxury and performance. ${
           product.specifications?.engine ? `Powered by a ${product.specifications.engine}` : ""
@@ -364,7 +366,7 @@ export default function BuyerListingDetailPage() {
               Failed to load product details
             </h3>
             <p className="text-sm text-gray-400 mb-6">
-              {(error as any)?.response?.data?.message ||
+              {(error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
                 error?.message ||
                 "An unexpected error occurred while fetching product details."}
             </p>
@@ -389,9 +391,12 @@ export default function BuyerListingDetailPage() {
             {/* Main Image aspect-16/10*/}
             <AnimationWrapper type="zoom" duration={0.6} delay={0.1}>
               <div className="relative rounded-2xl overflow-hidden bg-black w-full max-h-102.25 group">
-                <img
+                <Image
                   src={productImages[safeSelectedImage]}
                   alt={product.title}
+                  width={800}
+                  height={409}
+                  unoptimized
                   className="w-full h-[409px] object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src =
@@ -448,9 +453,12 @@ export default function BuyerListingDetailPage() {
                           : "border-[#2C2C2E] hover:border-[#E78F23]/40 opacity-60 hover:opacity-100"
                       }`}
                     >
-                      <img
+                      <Image
                         src={img}
                         alt={`${product.title} ${idx + 1}`}
+                        width={100}
+                        height={72}
+                        unoptimized
                         className="w-full h-full object-cover"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src =
@@ -661,9 +669,12 @@ export default function BuyerListingDetailPage() {
                     <h4 className="text-sm font-semibold mb-5 text-white">Seller Information</h4>
                     <div className="flex items-center gap-4">
                       {product.owner?.avatarUrl ? (
-                        <img
+                        <Image
                           src={product.owner.avatarUrl}
                           alt={sellerName}
+                          width={44}
+                          height={44}
+                          unoptimized
                           className="w-11 h-11 rounded-full object-cover border border-[#3C3C3E]"
                         />
                       ) : (
@@ -811,9 +822,12 @@ export default function BuyerListingDetailPage() {
                 <AnimationWrapper type="fade-up" duration={0.5} delay={0.3}>
                   <div className="bg-[#161618] rounded-xl p-4 flex items-center gap-3.5 border border-white/3">
                     {product.owner?.avatarUrl ? (
-                      <img
+                      <Image
                         src={product.owner.avatarUrl}
                         alt={sellerName}
+                        width={40}
+                        height={40}
+                        unoptimized
                         className="w-10 h-10 rounded-full object-cover"
                       />
                     ) : (
@@ -938,9 +952,12 @@ export default function BuyerListingDetailPage() {
 
             {/* Item Summary Card */}
             <div className="flex items-center gap-4 bg-[#1C1C1E] border border-white/5 p-3.5 rounded-xl">
-              <img
+              <Image
                 src={productImages[0]}
                 alt={product.title}
+                width={64}
+                height={48}
+                unoptimized
                 className="w-16 h-12 rounded-lg object-cover border border-white/10 shrink-0"
               />
               <div className="min-w-0 flex-1">
@@ -1195,9 +1212,12 @@ export default function BuyerListingDetailPage() {
 
             {/* Item & Current Bid Summary Card */}
             <div className="flex items-center gap-4 bg-[#1C1C1E] border border-white/5 p-3.5 rounded-xl">
-              <img
+              <Image
                 src={productImages[0]}
                 alt={product.title}
+                width={64}
+                height={48}
+                unoptimized
                 className="w-16 h-12 rounded-lg object-cover border border-white/10 shrink-0"
               />
               <div className="min-w-0 flex-1">

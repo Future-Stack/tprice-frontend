@@ -1,21 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import {
   Crown,
   Sparkles,
   Check,
   CheckCircle2,
-  ShieldCheck,
   Loader2,
   AlertCircle,
-  RefreshCw,
   ArrowRight,
-  HelpCircle,
-  ChevronDown,
   Lock,
-  Zap,
-  Star,
   Flame,
   Calendar,
 } from "lucide-react";
@@ -48,34 +42,13 @@ function formatCurrency(amount: number, currency: string = "USD"): string {
   }).format(amount);
 }
 
-const FAQS = [
-  {
-    q: "How does the 3-Month Free VIP Trial work?",
-    a: "Eligible buyers receive 90 days of full, unrestricted VIP membership at zero initial charge ($0). You get instant access to private off-market listings, direct dealer bidding, and VIP deals.",
-  },
-  {
-    q: "What happens after the 90-day free trial concludes?",
-    a: "After your 3-month trial ends, your VIP membership transitions to the standard VIP Premium plan ($200/month) so you continue enjoying exclusive off-market access without interruption.",
-  },
-  {
-    q: "Can I cancel or change my subscription at any time?",
-    a: "Yes! There are no lock-in contracts. You can manage or cancel your subscription anytime with 1-click directly from your settings or via the Stripe customer portal.",
-  },
-  {
-    q: "What makes VIP Deals and Off-Market Listings special?",
-    a: "Off-market vehicles are rare, collector-grade, and limited-edition luxury assets whose owners prefer private transactions rather than public exposure. VIP members get exclusive, first-look privileges before any public announcement.",
-  },
-];
-
 export default function BuyerSubscriptionPage() {
-  const { data: vipData, isLoading, isError, error, refetch, isFetching } = useVipStatusQuery();
+  const { data: vipData, isLoading, isError, error, refetch } = useVipStatusQuery();
 
   const { mutate: claimTrial, isPending: isClaimingTrial } = useClaimVipTrialMutation();
 
   const { mutate: createCheckoutSession, isPending: isCheckingOut } =
     useCreateCheckoutSessionMutation();
-
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const isVip = Boolean(vipData?.isVip);
   const trialEligible = Boolean(vipData?.trialEligible);
@@ -105,10 +78,10 @@ export default function BuyerSubscriptionPage() {
       onSuccess: () => {
         toast.success("🎉 Welcome to VIP! Your 3-Month Free Trial has been activated.");
       },
-      onError: (err: any) => {
+      onError: (err: unknown) => {
         const errorMsg =
-          err?.response?.data?.message ||
-          err?.message ||
+          (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+          (err as Error)?.message ||
           "Failed to claim 3-month free trial. Please try again.";
         toast.error(errorMsg);
       },
@@ -128,7 +101,9 @@ export default function BuyerSubscriptionPage() {
       {
         onSuccess: (data) => {
           const checkoutUrl =
-            data?.checkoutUrl || (data as any)?.data?.checkoutUrl || (data as any)?.url;
+            data?.checkoutUrl ||
+            (data as unknown as { data?: { checkoutUrl?: string }; url?: string })?.data?.checkoutUrl ||
+            (data as unknown as { url?: string })?.url;
 
           if (checkoutUrl) {
             toast.success("Redirecting to secure checkout...");
@@ -137,15 +112,16 @@ export default function BuyerSubscriptionPage() {
             toast.error("Checkout session created, but no checkout URL was returned.");
           }
         },
-        onError: (err: any) => {
+        onError: (err: unknown) => {
           let errorMessage = "Failed to initiate VIP checkout session.";
-          const rawMsg = err?.response?.data?.message;
+          const errObj = err as { response?: { data?: { message?: unknown } }; message?: string };
+          const rawMsg = errObj?.response?.data?.message;
           if (Array.isArray(rawMsg)) {
             errorMessage = rawMsg.join(", ");
           } else if (typeof rawMsg === "string" && rawMsg.trim()) {
             errorMessage = rawMsg;
-          } else if (err?.message) {
-            errorMessage = err.message;
+          } else if (errObj?.message) {
+            errorMessage = errObj.message;
           }
           toast.error(errorMessage);
         },
@@ -233,7 +209,7 @@ export default function BuyerSubscriptionPage() {
             <div className="flex items-center gap-3">
               <AlertCircle className="w-5 h-5 shrink-0" />
               <p className="text-sm">
-                {(error as any)?.response?.data?.message ||
+                {(error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
                   error?.message ||
                   "Unable to load subscription details. Please check your connection."}
               </p>

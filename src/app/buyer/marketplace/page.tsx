@@ -16,7 +16,7 @@ import {
   Heart,
 } from "lucide-react";
 import Link from "next/link";
-import Cookies from "js-cookie";
+import Image from "next/image";
 import { toast } from "sonner";
 import AnimationWrapper from "../../components/AnimationWrapper";
 import {
@@ -322,7 +322,7 @@ export default function MarketplacePage() {
               <AlertTriangle className="w-10 h-10 text-red-400 mx-auto mb-3" />
               <h3 className="text-lg font-semibold text-white mb-1">Failed to load listings</h3>
               <p className="text-sm text-gray-400 mb-4">
-                {(error as any)?.response?.data?.message ||
+                {(error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
                   error?.message ||
                   "An unexpected error occurred while fetching listings."}
               </p>
@@ -448,7 +448,6 @@ function FilterSidebar({
   setPriceMax,
   handleResetFilters,
 }: FilterSidebarProps) {
-  const minLimit = 0;
   const maxLimit = 10000000;
 
   return (
@@ -642,9 +641,12 @@ function MarketplaceCard({ asset }: { asset: ListingItem }) {
     <div className="bg-[#1C1C1E] rounded-xl border border-[#2C2C2E] overflow-hidden group hover:border-primary/40 transition-all duration-300 shadow-xl hover:shadow-[#E78F23]/5 flex flex-col h-full">
       {/* Media Container */}
       <div className="relative h-48 sm:h-52 overflow-hidden bg-black/40">
-        <img
+        <Image
           src={imageUrl}
           alt={asset.title}
+          width={400}
+          height={200}
+          unoptimized
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out opacity-90 group-hover:opacity-100"
           onError={(e) => {
             (e.target as HTMLImageElement).src =

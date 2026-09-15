@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { MapPin, Heart, ChevronLeft, ChevronRight, AlertTriangle } from "lucide-react";
+import Image from "next/image";
 import AnimationWrapper from "../../components/AnimationWrapper";
 import { useSavedListingsQuery, useSaveListingMutation } from "@/hooks/useListings";
 import { ListingItem } from "@/lib/api/listings";
@@ -41,7 +42,7 @@ export default function SavedItems() {
           <AlertTriangle className="w-10 h-10 text-red-400 mx-auto mb-3" />
           <h3 className="text-lg font-semibold text-white mb-1">Failed to load saved items</h3>
           <p className="text-sm text-gray-400 mb-4 max-w-md mx-auto">
-            {(error as any)?.response?.data?.message ||
+            {(error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
               error?.message ||
               "An unexpected error occurred while fetching saved items."}
           </p>
@@ -128,7 +129,7 @@ export default function SavedItems() {
             </div>
             <h3 className="text-xl font-clash font-medium text-white mb-2">No Saved Items Yet</h3>
             <p className="text-sm text-gray-400 mb-6 max-w-md mx-auto">
-              You haven't saved any listings to your favorites yet. Explore the marketplace and save
+              You haven&apos;t saved any listings to your favorites yet. Explore the marketplace and save
               items to view them here.
             </p>
             <Link
@@ -208,9 +209,12 @@ function SavedItemCard({ item }: { item: ListingItem }) {
     <div className="bg-[#161618] rounded-xl border border-[#2C2C2E] overflow-hidden group hover:border-[#E78F23]/40 transition-all shadow-xl hover:shadow-[#E78F23]/5 flex flex-col h-full">
       {/* Target image aspect ratio */}
       <div className="relative h-48 sm:h-52 overflow-hidden bg-black">
-        <img
+        <Image
           src={imageUrl}
           alt={item.title}
+          width={400}
+          height={200}
+          unoptimized
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out opacity-90 group-hover:opacity-100"
           onError={(e) => {
             (e.target as HTMLImageElement).src =

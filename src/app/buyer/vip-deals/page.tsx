@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Eye,
   MapPin,
@@ -13,6 +13,7 @@ import {
   RotateCcw,
   AlertTriangle,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import AnimationWrapper from "../../components/AnimationWrapper";
 import { useVipListingsQuery } from "@/hooks/useListings";
@@ -77,19 +78,12 @@ export default function VIPDeals() {
   }, [brandsResponse]);
 
   // Reset pagination page to 1 whenever filters change
-  useEffect(() => {
+  const filterKey = `${activeCategory}|${selectedBrand}|${debouncedCity}|${debouncedCountry}|${debouncedBuildYear}|${debouncedPriceMin}|${debouncedPriceMax}|${debouncedSearch}|${sortBy}`;
+  const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
+  if (filterKey !== prevFilterKey) {
+    setPrevFilterKey(filterKey);
     setCurrentPage(1);
-  }, [
-    activeCategory,
-    selectedBrand,
-    debouncedCity,
-    debouncedCountry,
-    debouncedBuildYear,
-    debouncedPriceMin,
-    debouncedPriceMax,
-    debouncedSearch,
-    sortBy,
-  ]);
+  }
 
   // Construct query params for API request
   const queryParams: GetListingsParams = {
@@ -719,9 +713,12 @@ function MarketplaceCard({ asset }: { asset: ListingItem }) {
     <div className="bg-[#1C1C1E] rounded-[8px] border border-[#2C2C2E] overflow-hidden group hover:border-primary/40 transition-all shadow-xl hover:shadow-[#E78F23]/5 flex flex-col justify-between h-full">
       <div>
         <div className="relative h-45 sm:h-50 lg:h-54 overflow-hidden bg-black">
-          <img
+          <Image
             src={image}
             alt={asset.title}
+            width={400}
+            height={220}
+            unoptimized
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out opacity-90 group-hover:opacity-100"
           />
           {asset.isFeatured && (

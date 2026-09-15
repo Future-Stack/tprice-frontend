@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Star,
   Plus,
@@ -75,18 +75,18 @@ export default function BuyerReviewsPage() {
   } = useGetReviewsQuery({ page: 1, limit: 20 });
 
   // Auto pre-fill reviewer details when user data is available
-  useEffect(() => {
-    if (user) {
-      if (!reviewerName) {
-        const name =
-          user.fullName || [user.firstName, user.lastName].filter(Boolean).join(" ") || "";
-        if (name) setReviewerName(name);
-      }
-      if (!avatarUrl && user.avatarUrl) {
-        setAvatarUrl(user.avatarUrl);
-      }
+  const [prevUser, setPrevUser] = useState(user);
+  if (user && user !== prevUser) {
+    setPrevUser(user);
+    if (!reviewerName) {
+      const name =
+        user.fullName || [user.firstName, user.lastName].filter(Boolean).join(" ") || "";
+      if (name) setReviewerName(name);
     }
-  }, [user]);
+    if (!avatarUrl && user.avatarUrl) {
+      setAvatarUrl(user.avatarUrl);
+    }
+  }
 
   // Handle avatar upload
   const handleAvatarFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,8 +105,11 @@ export default function BuyerReviewsPage() {
       });
       setAvatarUrl(res.url);
       toast.success("Avatar image uploaded successfully!");
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to upload avatar image");
+    } catch (err: unknown) {
+      toast.error(
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+          "Failed to upload avatar image"
+      );
     }
   };
 
@@ -175,8 +178,11 @@ export default function BuyerReviewsPage() {
       setRating(5);
       setHighlightTags([]);
       setIsFormOpen(false);
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to submit review. Please try again.");
+    } catch (err: unknown) {
+      toast.error(
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+          "Failed to submit review. Please try again."
+      );
     }
   };
 
@@ -606,7 +612,7 @@ export default function BuyerReviewsPage() {
                 duration={0.4}
                 delay={0.05 * (index % 4)}
               >
-                <ReviewCard review={review} onEdit={(rev) => setEditingReview(rev)} />
+                <ReviewCard review={review} />
               </AnimationWrapper>
             ))}
           </div>
@@ -646,18 +652,18 @@ function UpdateReviewModal({
   const uploadMutation = useUploadMediaMutation();
   const updateReviewMutation = useUpdateReviewMutation();
 
-  useEffect(() => {
-    if (review) {
-      setReviewerName(review.reviewerName || "");
-      setReviewerTitle(review.reviewerTitle || "");
-      setReviewerLocation(review.reviewerLocation || "");
-      setAvatarUrl(review.avatarUrl || "");
-      setRating(review.rating || 5);
-      setContent(review.content || "");
-      setHighlightTags(review.highlightTags || []);
-      setTagInput("");
-    }
-  }, [review]);
+  const [prevReview, setPrevReview] = useState<ReviewItem | null>(null);
+  if (review && review !== prevReview) {
+    setPrevReview(review);
+    setReviewerName(review.reviewerName || "");
+    setReviewerTitle(review.reviewerTitle || "");
+    setReviewerLocation(review.reviewerLocation || "");
+    setAvatarUrl(review.avatarUrl || "");
+    setRating(review.rating || 5);
+    setContent(review.content || "");
+    setHighlightTags(review.highlightTags || []);
+    setTagInput("");
+  }
 
   if (!isOpen || !review) return null;
 
@@ -677,8 +683,11 @@ function UpdateReviewModal({
       });
       setAvatarUrl(res.url);
       toast.success("Avatar image uploaded successfully!");
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to upload avatar image");
+    } catch (err: unknown) {
+      toast.error(
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+          "Failed to upload avatar image"
+      );
     }
   };
 
@@ -742,8 +751,11 @@ function UpdateReviewModal({
 
       toast.success("VIP review updated successfully!");
       onClose();
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to update review. Please try again.");
+    } catch (err: unknown) {
+      toast.error(
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+          "Failed to update review. Please try again."
+      );
     }
   };
 
@@ -1028,10 +1040,8 @@ function UpdateReviewModal({
 /* ─── Review Card Component ─── */
 function ReviewCard({
   review,
-  onEdit,
 }: {
   review: ReviewItem;
-  onEdit?: (review: ReviewItem) => void;
 }) {
   return (
     <div className="bg-[#1C1C1E] border border-[#2C2C2E] hover:border-[#E78F23]/30 rounded-2xl p-6 transition-all duration-300 shadow-xl flex flex-col justify-between relative group">
@@ -1059,7 +1069,7 @@ function ReviewCard({
         <div className="relative mb-6">
           <Quote className="w-8 h-8 text-[#E78F23]/15 absolute -top-2 -left-2 pointer-events-none" />
           <p className="text-gray-300 text-sm leading-relaxed relative z-10 pl-2">
-            "{review.content}"
+            &ldquo;{review.content}&rdquo;
           </p>
         </div>
 
